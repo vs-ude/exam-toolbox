@@ -14,13 +14,13 @@ RUN npm install
 COPY . .
 
 # Build the Angular app
-RUN npm run build --prod
+RUN npm run build --configuration=production
 
 # Use a lightweight web server to serve the Angular app
 FROM nginx:alpine
 
 # Copy built files to Nginx
-COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+COPY --from=build /usr/src/app/dist/frontend/browser /usr/share/nginx/html
 
 # Expose the port Nginx runs on
 EXPOSE 80
