@@ -5,7 +5,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/examToolboxDB # Adjust your DB name
+      - MONGODB_URI=mongodb://mongo:27017/examToolboxDB
     depends_on:
       - mongo
 
@@ -13,7 +13,7 @@ services:
     build:
       context: ./frontend
     ports:
-      - "4200:80" # Adjust if necessary
+      - "4200:80"
 
   mongo:
     image: mongo

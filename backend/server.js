@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb://localhost:27017/your-database', {
+mongoose.connect('mongodb://mongo:27017/examToolboxDB', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
