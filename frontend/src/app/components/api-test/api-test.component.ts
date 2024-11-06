@@ -17,8 +17,7 @@ export class ApiTestComponent {
 
   ngOnInit(){
     this.apiService.getTestMessage().subscribe((msg) =>{
-      this.message = msg; 
-      
+      this.message = msg.message; 
       // test if connection from frontend to backend works
     });
   }
