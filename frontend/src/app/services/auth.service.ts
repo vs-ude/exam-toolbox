@@ -1,32 +1,29 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-  private userIsAuthenticated = new BehaviorSubject<boolean>(false)
-  userIsAuthenticated$ = this.userIsAuthenticated.asObservable();
+  private isAuthenticated = new BehaviorSubject<boolean>(false);
+  userIsAuthenticated$ = this.isAuthenticated.asObservable();
 
+  constructor(
+    private router: Router
+  ){}
 
-  constructor() { }
-
-  getAuth(){
-    return this.userIsAuthenticated
+  login() {
+    this.isAuthenticated.next(true);
+    this.router.navigate(['/dashboard']);
   }
 
-  authUser(){
-    this.userIsAuthenticated.next(true);
-    localStorage.setItem
-    console.log("User Authenticated")
+  logout() {
+    this.isAuthenticated.next(false);
+    this.router.navigate(['/login']);
   }
-
-  logout(){
-    this.userIsAuthenticated.next(false);
-    console.log("User NOT Authenticated")
-  }
-
-  createUser(){
-    // should create a new user
+  
+  getIsAuth(){
+    return this.isAuthenticated
   }
 }

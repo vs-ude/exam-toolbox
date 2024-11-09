@@ -1,0 +1,19 @@
+<div class="main">
+    <mat-drawer-container >
+        <mat-drawer mode="side" opened class="sidenav">
+            <mat-selection-list>
+                <mat-list>
+                    <div>
+                        <a mat-button class="sideButton" routerLink="/dashboard">Dashboard</a>
+                        <a mat-button class="sideButton" routerLink="/getting-started">Getting Started</a>
+                        <a mat-button class="sideButton" routerLink="/about">About</a>
+                        <button mat-button (click)="onLogout()">Logout</button>
+                    </div>
+                </mat-list>
+            </mat-selection-list>
+        </mat-drawer>
+        <mat-drawer-content>
+            <router-outlet></router-outlet>
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

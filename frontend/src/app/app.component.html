@@ -1,11 +1,4 @@
-<router-outlet></router-outlet>
-
-<!-- <div *ngIf="isLoggedIn; then appContent else loginPage"></div>
-
+<app-main-view *ngIf="isLoggedIn; else loginPage"></app-main-view>
 <ng-template #loginPage>
-    <app-login-page></app-login-page>
-</ng-template>
-
-<ng-template #appContent>
     <router-outlet></router-outlet>
-</ng-template> -->
+</ng-template>

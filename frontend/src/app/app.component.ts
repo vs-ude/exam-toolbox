@@ -1,35 +1,35 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, Router } from '@angular/router';
-import { LoginPageComponent } from './components/login-page/login-page.component';
+import { RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { CommonModule } from '@angular/common';
+import { MainViewComponent } from './components/main-view/main-view.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, LoginPageComponent, CommonModule],
+  imports: [RouterOutlet, CommonModule, MainViewComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'exascan-toolbox';
   isLoggedIn = false;
+  private authSubscription!: Subscription
 
   constructor(
-    private authService: AuthService, 
-    private router: Router
+    private authService: AuthService,
   ){}
 
   ngOnInit(): void{
     this.authService.userIsAuthenticated$.subscribe((isAuth: boolean) => {
       this.isLoggedIn = isAuth
       console.log("Authentication status: " + isAuth)
-
-      if(isAuth){
-        this.router.navigate(['/app'])
-      }else{
-        this.router.navigate(['/login'])
-      }
     })
+  }
+
+  ngOnDestroy(){
+    if(this.authSubscription){
+      this.authSubscription.unsubscribe()
+    }
   }
 }

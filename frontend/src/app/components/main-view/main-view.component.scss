@@ -1,0 +1,26 @@
+.main {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+}
+
+.mat-drawer-content {
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.sidenav{
+    background-color: #cccccc;
+    text-align: center;
+    width: 12%;
+    min-width: 200px;
+    height: 100%;
+}
+
+.sideButton{
+    width: 90%;
+}
+
+.mat-drawer-container{
+    height: 100%;
+}
