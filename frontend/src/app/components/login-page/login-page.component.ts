@@ -11,13 +11,24 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginPageComponent {
 
+  usernameValid = true;
+  passwordValid = true;
+
   constructor(
     private authService: AuthService
-  ){}
+  ) { }
 
-  login(){
+  login(userName: string, password: string) {
+
+    console.log(`username: "${userName}", password: "${password}"`)
+
+    this.usernameValid = userName !== "";
+    this.passwordValid = password !== "";
+
+    if (!this.usernameValid || !this.passwordValid) { return; }
+
     this.authService.authUser();
-    
+
   }
 
 }
