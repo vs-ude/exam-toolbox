@@ -19,7 +19,7 @@ export class LoginPageComponent {
     private authService: AuthService
   ) { }
 
-  onLogin(userName: string, password: string) {
+  login(userName: string, password: string) {
 
     console.log(`username: "${userName}", password: "${password}"`)
 
