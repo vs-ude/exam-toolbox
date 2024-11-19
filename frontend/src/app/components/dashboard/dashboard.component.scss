@@ -1,0 +1,356 @@
+.file_browser {
+    width: 100%;
+    height: 100%;
+
+    border-left: solid 1px;
+    border-color: var(--border-color);
+}
+
+.recents {
+    border-bottom-width: 100px;
+    border-bottom: solid 1px;
+    border-color: var(--border-color);
+    padding: 10px 32px 10px 32px;
+}
+
+
+
+.file_creation_thumbnails {
+    width: 100%;
+    margin: 32px 0 16px 0;
+    padding: 0 32px 0 32px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: stretch;
+    align-items: center;
+    gap: 4%;
+}
+
+
+/*------------------------------------------------------------------
+  [ Create Exam Section ]*/
+.create_exam_button {
+    padding: 24px 0 24px 0;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    flex-direction: column;
+    padding: 24px 0;
+    height: 128px;
+    width: 15vw;
+    min-width: 164px;
+    border-radius: 8px;
+    border: 0;
+    background: f5f5f5;
+    text-align: center;
+    box-sizing: border-box;
+    transition: .1s ease-in;
+}
+
+.create_exam_button:hover {
+    transition: .1s ease-in;
+
+    .create_icon_container {
+        background-color: #0768c4
+    }
+
+    ;
+
+    .create_name {
+        color: #ffff
+    }
+
+    ;
+
+    .create_description {
+        color: #ffffffcc
+    }
+
+    ;
+    background-color:#0d99ff;
+    cursor: pointer;
+}
+
+.create_exam_button:active {
+    filter: brightness(85%);
+    transition: .05 ease-in;
+}
+
+.create_icon_container {
+    width: 32px;
+    height: 32px;
+    margin: 0 0 12 0;
+    background-color: #0d99ff;
+    color: white;
+    box-sizing: border-box;
+    border-radius: 24px;
+    padding: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+    animation: create_background-fadeIn .2s ease-in-out;
+    transition: .1s ease-in;
+}
+
+
+.description_shelf {
+    display: flex;
+    flex-direction: column;
+    font-size: 11px;
+    font-style: normal;
+    gap: 4px;
+    line-height: 16px;
+    transition: .1s ease-in;
+}
+
+.create_name {
+    color: var(--color-text);
+    font-weight: 550;
+    transition: .1s ease-in;
+}
+
+.create_description {
+    color: var(--color-text-secondary);
+    font-weight: 450;
+    transition: .1s ease-in;
+}
+
+
+
+/*------------------------------------------------------------------
+  [ Exercise Pool Section ]*/
+
+.pool_exam_button {
+    padding: 24px 0 24px 0;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    flex-direction: column;
+    padding: 24px 0;
+    height: 128px;
+    width: 15vw;
+    min-width: 164px;
+    border-radius: 8px;
+    border: 0;
+    background: f5f5f5;
+    text-align: center;
+    box-sizing: border-box;
+    transition: .1s ease-in;
+}
+
+.pool_exam_button:hover {
+    transition: .1s ease-in;
+
+    .pool_icon_container {
+        background-color: #0000001a
+    }
+
+    ;
+
+    .pool_name {
+        color: #ffff
+    }
+
+    ;
+
+    .pool_description {
+        color: #ffffffcc
+    }
+
+    ;
+    background-color:#9747ff;
+    cursor: pointer;
+}
+
+.pool_exam_button:active {
+    filter: brightness(85%);
+    transition: .05 ease-in;
+}
+
+.pool_icon_container {
+    width: 32px;
+    height: 32px;
+    margin: 0 0 12 0;
+    background-color: #9747ff;
+    color: white;
+    box-sizing: border-box;
+    border-radius: 24px;
+    padding: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+    animation: create_background-fadeIn .2s ease-in-out;
+    transition: .1s ease-in;
+}
+
+.pool_name {
+    color: var(--color-text);
+    font-weight: 550;
+    transition: .1s ease-in;
+}
+
+.pool_description {
+    color: var(--color-text-secondary);
+    font-weight: 450;
+    transition: .1s ease-in;
+}
+
+
+/*------------------------------------------------------------------
+  [ Export Section ]*/
+.export_exam_button {
+    padding: 24px 0 24px 0;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    flex-direction: column;
+    padding: 24px 0;
+    height: 128px;
+    width: 15vw;
+    min-width: 164px;
+    border-radius: 8px;
+    border: 0;
+    background: f5f5f5;
+    text-align: center;
+    box-sizing: border-box;
+    transition: .1s ease-in;
+}
+
+.export_exam_button:hover {
+    transition: .1s ease-in;
+
+    .export_icon_container {
+        background-color: #0000001a
+    }
+
+    ;
+
+    .export_name {
+        color: #ffff
+    }
+
+    ;
+
+    .export_description {
+        color: #ffffffcc
+    }
+
+    ;
+    background-color:#ff5c16;
+    cursor: pointer;
+}
+
+.export_exam_button:active {
+    filter: brightness(85%);
+    transition: .05 ease-in;
+}
+
+.export_icon_container {
+    width: 32px;
+    height: 32px;
+    margin: 0 0 12 0;
+    background-color: #ff5c16;
+    color: white;
+    box-sizing: border-box;
+    border-radius: 24px;
+    padding: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+    animation: create_background-fadeIn .2s ease-in-out;
+    transition: .1s ease-in;
+}
+
+.export_name {
+    color: var(--color-text);
+    font-weight: 550;
+    transition: .1s ease-in;
+}
+
+.export_description {
+    color: var(--color-text-secondary);
+    font-weight: 450;
+    transition: .1s ease-in;
+}
+
+
+/*------------------------------------------------------------------
+  [ Export Section ]*/
+.import_exam_button {
+    padding: 24px 0 24px 0;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    flex-direction: column;
+    padding: 24px 0;
+    height: 128px;
+    width: 15vw;
+    min-width: 164px;
+    border-radius: 8px;
+    border: 0;
+    background: f5f5f5;
+    text-align: center;
+    box-sizing: border-box;
+    transition: .1s ease-in;
+}
+
+.import_exam_button:hover {
+    transition: .1s ease-in;
+
+    .import_icon_container {
+        background-color: #0000001a
+    }
+
+    ;
+
+    .import_name {
+        color: #ffff
+    }
+
+    ;
+
+    .import_description {
+        color: #ffffffcc
+    }
+
+    ;
+    background-color:#757575;
+    cursor: pointer;
+}
+
+.import_exam_button:active {
+    filter: brightness(85%);
+    transition: .05 ease-in;
+}
+
+.import_icon_container {
+    width: 32px;
+    height: 32px;
+    margin: 0 0 12 0;
+    background-color: #757575;
+    color: white;
+    box-sizing: border-box;
+    border-radius: 24px;
+    padding: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+    animation: create_background-fadeIn .2s ease-in-out;
+    transition: .1s ease-in;
+}
+
+.import_name {
+    color: var(--color-text);
+    font-weight: 550;
+    transition: .1s ease-in;
+}
+
+.import_description {
+    color: var(--color-text-secondary);
+    font-weight: 450;
+    transition: .1s ease-in;
+}

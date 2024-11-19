@@ -24,6 +24,9 @@ export class AuthService {
   }
   
   getIsAuth(){
-    return this.isAuthenticated
+    return true; // for debug purposes 
+
+
+    //return this.isAuthenticated
   }
 }
