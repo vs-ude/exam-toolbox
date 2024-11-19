@@ -5,11 +5,11 @@
 
     <div class="file_creation_thumbnails">
 
-
         <div class="create_exam thumbnail">
             <button class="create_exam_button">
                 <div class="create_icon_container">
-                    <mat-icon aria-hidden="false" fontIcon="playlist_add"></mat-icon> <!--Icons: create, add, add_box, playlist_add -->
+                    <mat-icon aria-hidden="false" fontIcon="playlist_add"></mat-icon>
+                    <!--Icons: create, add, add_box, playlist_add -->
                 </div>
                 <div class="description_shelf">
                     <span class="create_name">Add Exam</span>
@@ -56,17 +56,62 @@
                 </div>
             </button>
         </div>
+    </div>
+
+    <div class="viewBar_wrapper">
+        <div class="viewBar_left">
+            <button class="tab_button tab_select">Recently Viewed</button>
+            <button class="tab_button">My Exams</button>
+            <button class="tab_button">Relevant Exams</button>
+        </div>
 
 
+
+
+        <div class="viewBar_right">
+            <div class="sortingOptions_wrapper">
+                <span>Last viewed</span>
+                <div><mat-icon aria-hidden="false" fontIcon="arrow_drop_down"></mat-icon></div>
+
+            </div>
+            <div class="filterOptions_wrapper">
+                <span>All files</span>
+                <div><mat-icon aria-hidden="false" fontIcon="arrow_drop_down"></mat-icon></div>
+            </div>
+
+            <div class="viewOptions_wrapper">
+                <div class="icon_wrapper" id="viewOption grid">
+                    <div class="viewOptions_select">
+                        <mat-icon aria-hidden="false"
+                            fontIcon="apps"></mat-icon><!-- Icons: view_comfy, apps, view_module-->
+                    </div>
+                </div>
+                <div class="icon_wrapper">
+                    <div class="" id="viewOption row">
+                        <mat-icon aria-hidden="false" fontIcon="view_headline"></mat-icon>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+
+
+
+    <div class="fileBrowser_view">
+        <div class="fileBrowser_item">moin</div>
+        <div class="fileBrowser_item">moin</div>
+        <div class="fileBrowser_item">moin</div>
+        <div class="fileBrowser_item">moin</div>
+        
 
 
     </div>
-    <div class="file_browser_toolbar">Toolbar</div>
-    <div class="file_browser_view">View</div>
 
 </div>
 
 
 
-
-<button mat-raised-button (click)="onDBTest()">dbTestButton</button>
+<!--   <button mat-raised-button (click)="onDBTest()">dbTestButton</button>  -->

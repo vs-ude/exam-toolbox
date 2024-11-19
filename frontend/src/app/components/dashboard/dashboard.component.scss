@@ -16,11 +16,10 @@
 
 
 .file_creation_thumbnails {
-    width: 100%;
     margin: 32px 0 16px 0;
     padding: 0 32px 0 32px;
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
     justify-content: stretch;
     align-items: center;
     gap: 4%;
@@ -354,3 +353,142 @@
     font-weight: 450;
     transition: .1s ease-in;
 }
+
+
+
+
+/*------------------------------------------------------------------
+  [ View Bar ]*/
+.viewBar_wrapper{
+    display: flex;
+    justify-content: space-between;
+    padding: 0 32px 0 32px;
+    height: 64px;
+}
+
+
+.viewBar_left{
+    display: flex;
+    flex-shrink: 0;
+    gap: 4px;
+    align-items: center;
+    padding-right: 1px;
+}
+
+.tab_button{
+    padding: 0 8px 0 8px;
+    height: 24px;
+    font-size: 11px;
+    line-height: 16px;
+    border-radius: 5px;
+    border: none;
+    background: #faf9fd;
+    color: #00000080;
+    transition: .1s ease-in;
+    font-weight: normal;
+}
+
+.tab_button:hover{
+    cursor: pointer;
+    background-color: var(--border-color);
+    transition: ease-in .05s;
+}
+
+.tab_button:active{
+    filter: brightness(85%);
+}
+
+.tab_select{
+    background: #f5f5f5;
+    color: black;
+    transition: .1s ease-in;
+    font-weight: 500;
+}
+
+
+.viewBar_right{
+    display: flex;
+    flex-shrink: 0;
+    gap: 4px;
+    align-items: center;
+    padding-right: 1px;
+}
+
+
+.sortingOptions_wrapper{
+    display: flex;
+    align-items: center;
+    padding-right: 17px;
+    font-size: 11px;
+}
+
+.sortingOptions_wrapper:hover{
+    cursor: pointer;
+}
+
+.sortingOptions_wrapper:active{
+    filter: brightness(85%);
+}
+
+
+.filterOptions_wrapper{
+    display: flex;
+    align-items: center;
+    padding-right: 17px;
+    font-size: 11px;
+}
+
+.filterOptions_wrapper{
+    cursor: pointer;
+}
+
+.viewOptions_wrapper{
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    padding-right: 17px;
+    font-size: 11px;
+    box-sizing: border-box;
+}
+
+.icon_wrapper{
+
+    box-sizing: border-box;
+    padding: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon_wrapper:hover{
+    cursor: pointer;
+}
+
+.icon_wrapper:active{
+    filter: brightness(85%);
+}
+
+
+.viewOptions_select{
+    color: var(--color-text);
+    background-color: var(--border-color);
+    border-radius: 5px;
+}
+
+/*------------------------------------------------------------------
+  [ File Browser ]*/
+
+.fileBrowser_view{
+    padding: 0 32px 0 32px;
+    display: grid;
+    grid-template-columns: auto auto auto ;
+    gap: 4%;
+}
+
+.fileBrowser_item{
+    margin-bottom: 4%;
+}
+
+
+
+
