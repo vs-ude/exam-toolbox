@@ -66,7 +66,7 @@
     }
 
     ;
-    background-color:#0d99ff;
+    background-color:var(--color-primary);
     cursor: pointer;
 }
 
@@ -79,7 +79,7 @@
     width: 32px;
     height: 32px;
     margin: 0 0 12 0;
-    background-color: #0d99ff;
+    background-color: var(--color-primary);
     color: white;
     box-sizing: border-box;
     border-radius: 24px;
@@ -158,7 +158,7 @@
     }
 
     ;
-    background-color:#9747ff;
+    background-color:var(--color-secondary);
     cursor: pointer;
 }
 
@@ -171,7 +171,7 @@
     width: 32px;
     height: 32px;
     margin: 0 0 12 0;
-    background-color: #9747ff;
+    background-color: var(--color-secondary);
     color: white;
     box-sizing: border-box;
     border-radius: 24px;
@@ -237,7 +237,7 @@
     }
 
     ;
-    background-color:#ff5c16;
+    background-color:var(--color-warn);
     cursor: pointer;
 }
 
@@ -250,7 +250,7 @@
     width: 32px;
     height: 32px;
     margin: 0 0 12 0;
-    background-color: #ff5c16;
+    background-color: var(--color-warn);
     color: white;
     box-sizing: border-box;
     border-radius: 24px;
@@ -329,7 +329,7 @@
     width: 32px;
     height: 32px;
     margin: 0 0 12 0;
-    background-color: #757575;
+    background-color: var(--color-dark-gray);
     color: white;
     box-sizing: border-box;
     border-radius: 24px;
@@ -481,8 +481,9 @@
 .fileBrowser_view{
     padding: 0 32px 0 32px;
     display: grid;
-    grid-template-columns: auto auto auto ;
+    grid-template-columns: auto auto auto auto;
     gap: 4%;
+    grid-template-rows: 15vw 15vw 15vw;
 }
 
 .fileBrowser_item{
