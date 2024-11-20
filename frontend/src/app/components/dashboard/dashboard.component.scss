@@ -481,9 +481,9 @@
 .fileBrowser_view{
     padding: 0 32px 0 32px;
     display: grid;
-    grid-template-columns: auto auto auto auto;
+    grid-template-columns: 22% 22% 22% 22%;
     gap: 4%;
-    grid-template-rows: 15vw 15vw 15vw;
+    grid-auto-rows: 25vh;
 }
 
 .fileBrowser_item{
