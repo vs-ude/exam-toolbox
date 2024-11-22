@@ -28,7 +28,7 @@ export class DashboardComponent {
 
 
   onDBTest() {
-    const name = 'Sample Exam'
+    const name = 'Cloud, Web & Mobile'
     const comment = 'This is a sample exam comment'
     this.dbService.addExam(name, comment).subscribe(
       (response) => {

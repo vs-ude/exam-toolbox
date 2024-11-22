@@ -5,7 +5,7 @@
 
     <div class="file_creation_thumbnails">
 
-        <div class="create_exam thumbnail">
+        <div class="create_exam thumbnail" (click)="onDBTest()">
             <button class="create_exam_button">
                 <div class="create_icon_container">
                     <mat-icon aria-hidden="false" fontIcon="playlist_add"></mat-icon>
@@ -69,16 +69,48 @@
 
 
         <div class="viewBar_right">
+
+            <!-- Sorting Options -->
             <div class="sortingOptions_wrapper">
                 <span>Last viewed</span>
                 <div><mat-icon aria-hidden="false" fontIcon="arrow_drop_down"></mat-icon></div>
-
+                <!-- Dropdown -->
+                <div class="dropdown triangle ">
+                    <div class="dropdown_header">Sort by</div>
+                    <div class="option_container">
+                        <mat-icon class="hide_icon" aria-hidden="false" fontIcon="" style="font-size: small;">done</mat-icon>
+                        <span>Alphabetical</span>
+                    </div>
+                    <div class="option_container">
+                        <mat-icon class="hide_icon" aria-hidden="false" fontIcon="" style="font-size: small;">done</mat-icon>
+                        <span>Created</span> 
+                    </div>
+                    <div class="option_container">
+                        <mat-icon aria-hidden="false" fontIcon="" style="font-size: small;">done</mat-icon>
+                        <span>Last Viewed</span>
+                    </div>
+                    <hr class="divider">
+                    <div class="dropdown_header">Order</div>
+                    <div class="option_container">
+                        <mat-icon aria-hidden="false" fontIcon="" style="font-size: small;">done</mat-icon>
+                        <span>A-Z</span>
+                    </div>
+                    <div class="option_container">
+                        <mat-icon class="hide_icon" aria-hidden="false" fontIcon="" style="font-size: small;">done</mat-icon>
+                        <span>Z-A</span>
+                    </div>
+                </div>
             </div>
+           
+
+
+            <!-- Filter Options -->
             <div class="filterOptions_wrapper">
                 <span>All files</span>
                 <div><mat-icon aria-hidden="false" fontIcon="arrow_drop_down"></mat-icon></div>
             </div>
 
+            <!-- View Options -->
             <div class="viewOptions_wrapper">
                 <div class="icon_wrapper" id="viewOption grid">
                     <div class="viewOptions_select">
@@ -91,7 +123,6 @@
                         <mat-icon aria-hidden="false" fontIcon="view_headline"></mat-icon>
                     </div>
                 </div>
-
             </div>
 
 
@@ -105,7 +136,3 @@
     </div>
 
 </div>
-
-
-
-<!--   <button mat-raised-button (click)="onDBTest()">dbTestButton</button>  -->
