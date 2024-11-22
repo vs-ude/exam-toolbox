@@ -434,6 +434,7 @@
     align-items: center;
     padding-right: 17px;
     font-size: 11px;
+    position: relative;
 }
 
 .filterOptions_wrapper {
@@ -513,8 +514,23 @@
     display: flex;
     justify-content: left;
     flex-direction: row;
-    margin-top: 3%;
+    padding: 2%;
+    align-items:center ;
 }
+
+.option_container:hover{
+    background-color: #0768c4;
+    margin-left: -10%;
+    margin-right: -10%;
+    transition: .1s ease-in;
+}
+
+.dropdown_icon_wrapper{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
 
 .divider {
     margin-left: -10%;

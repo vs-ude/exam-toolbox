@@ -1,21 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { DbService } from '../../services/db.service';
 import { MatIconModule } from '@angular/material/icon';
 import { ExamCardComponent } from '../exam-card/exam-card.component';
-import { NgFor } from '@angular/common';
+import { NgClass, NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, ExamCardComponent, NgFor],
+  imports: [MatButtonModule, MatIconModule, ExamCardComponent, NgFor, NgClass],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
   constructor(
-    private dbService: DbService
+    private dbService: DbService,
   ) { }
+
+  @HostListener("document:click", ["$event"])
+  handleDropdownStates(event: MouseEvent) {
+    const elementId = (event.target as Element).id
+
+    if (elementId === "openSortingDropdown") {
+      this.showDropdowns.sorting = !this.showDropdowns.sorting;
+    } else { this.showDropdowns.sorting = false; }
+
+    if (elementId === "openFilterDropdown") {
+      this.showDropdowns.filter = !this.showDropdowns.filter;
+    } else { this.showDropdowns.filter = false; }
+  }
+
+  public showDropdowns = { sorting: false, filter: false, }
 
   public examNames = [
     "Cloud, Web & Mobile",
@@ -25,6 +40,7 @@ export class DashboardComponent {
     "Sicherheit in Kommunikationsnetzen",
     "Rechnerarchitektur",
   ]
+
 
 
   onDBTest() {
