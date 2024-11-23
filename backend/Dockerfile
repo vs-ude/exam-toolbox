@@ -1,20 +1,14 @@
-# Use the official Node.js image
-FROM node:22
+# Use the official Deno image
+FROM denoland/deno:alpine
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Copy the backend files into the container
+COPY . /app
 
-# Install dependencies
-RUN npm install
+# Set environment variables (if needed)
+ENV MONGODB_URI=mongodb://mongo:27017/examToolboxDB
 
-# Copy the rest of the application files
-COPY . .
-
-# Expose the port your app runs on
-EXPOSE 3000
-
-# Command to run the application
-CMD ["node", "server.js"]
+# Run the server.ts script using Deno
+CMD ["deno", "run", "--allow-net", "--allow-env", "server.ts"]
