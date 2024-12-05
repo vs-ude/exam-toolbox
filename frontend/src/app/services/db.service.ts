@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Exam } from "../exam.ts";
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,8 @@ export class DbService {
     private http: HttpClient
   ) { }
 
-  addExam(name: string, comment: string): Observable<any>{
-    const exam = { name, comment }
+  addExam(exam: Exam): Observable<any>{
+    console.log(exam.questions + " | " + exam.title)
     return this.http.post(this.apiUrl, exam)
   }
 }

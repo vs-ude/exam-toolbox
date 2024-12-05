@@ -1,6 +1,16 @@
-// Import necessary modules
 import { Application, Router } from "https://deno.land/x/oak@v10.5.0/mod.ts";
 import { MongoClient } from "https://deno.land/x/mongo/mod.ts";
+
+
+export class Exam{
+  title: string;
+  questions: {question: string; points: number}[];
+
+  constructor(title: string, questions: { question: string; points: number }[]) {
+      this.title = title;
+      this.questions = questions;
+  }
+}
 
 // MongoDB setup
 const client = new MongoClient();
@@ -36,9 +46,8 @@ router
     }
   })
   .post("/api/exams", async (ctx) => {
-    const { name, comment } = await ctx.request.body().value;
+    const exam: Exam = await ctx.request.body().value
     try {
-      const exam = { name, comment };
       await exams.insertOne(exam);
       ctx.response.status = 200;
       ctx.response.body = { message: 'Exam saved successfully!' };
@@ -47,9 +56,21 @@ router
       ctx.response.body = { message: 'Error saving exam', error: err };
     }
   })
-  .get("/api/test", (ctx) => {
-    ctx.response.body = { message: 'Hello this is the Backend calling!' };
-  });
+  .post("/api/generate-exam", async (ctx) => {
+    const exam: Exam = await ctx.request.body().value
+    try {
+      const examPDF = await generateExamLatex(exam)
+
+      // tell the frontend that this is an PDF
+      ctx.response.headers.set("Content-Type", "application/pdf")
+      ctx.response.headers.set("Content-Disposition", `attachment; filename="${exam.title}.pdf"`)
+
+      ctx.response.body = examPDF
+    } catch (error) {
+      ctx.response.status = 500;
+      ctx.response.body = { message: 'Error generating Exam PDF', error }
+    }
+  })
 
 // Use the Router
 app.use(router.routes());
@@ -57,5 +78,54 @@ app.use(router.allowedMethods());
 
 // Start the server
 const port = 3000;
-console.log(`Server is running on http://localhost:${port}`);
 await app.listen({ port });
+
+
+async function generateExamLatex(exam: Exam): Promise<Uint8Array> {
+  const latexContent = `
+    \\documentclass{article}
+    \\begin{document}
+    \\title{${exam.title}}
+    \\maketitle
+    ${exam.questions
+      .map((q) => `\\section*{Question:} ${q.question} \\hfill ${q.points} points`)
+      .join("\n")}
+    \\end{document}`;
+
+  // Write the LaTeX content to a temporary .tex file
+  const tempFilePath = "/tmp/exam.tex";
+  await Deno.writeTextFile(tempFilePath, latexContent);
+
+  // Run XeLaTeX using Deno.Command
+  const process = new Deno.Command("xelatex", {
+    args: [tempFilePath],
+    stderr: "piped", // capture error output
+    stdout: "piped" // capture standard output
+  });
+  console.log("1");
+
+  const { code, stdout, stderr } = await process.output();
+  console.log("stdout:", new TextDecoder().decode(stdout));
+  console.error("stderr:", new TextDecoder().decode(stderr));
+
+  console.log("1.5")
+
+  if (code !== 0) {
+    const errorText = new TextDecoder().decode(stderr);
+    console.error("Error generating PDF:", errorText);
+    throw new Error("LaTeX generation failed");
+  }
+  console.log("2");
+
+  // Read the generated PDF back into memory
+  const pdfPath = "/tmp/exam.pdf";
+  const pdfData = await Deno.readFile(pdfPath);
+
+  // Clean up the temporary files (optional)
+  await Deno.remove(tempFilePath);
+  await Deno.remove(pdfPath);
+
+  // Return the PDF data as a Uint8Array
+  console.log("3");
+  return pdfData;
+}

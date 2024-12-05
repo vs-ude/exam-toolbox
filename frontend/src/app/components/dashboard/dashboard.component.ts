@@ -1,9 +1,13 @@
 import { Component, HostListener } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { DbService } from '../../services/db.service';
+import { DbService } from "../../services/db.service.ts";
 import { MatIconModule } from '@angular/material/icon';
-import { ExamCardComponent } from '../exam-card/exam-card.component';
+import { ExamCardComponent } from "../exam-card/exam-card.component.ts";
 import { NgClass, NgFor } from '@angular/common';
+import { Exam } from '../../exam.ts';
+import { ApiService } from '../../services/api.service.ts';
+import { saveAs } from 'file-saver';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -13,9 +17,13 @@ import { NgClass, NgFor } from '@angular/common';
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
+
+
   constructor(
     private dbService: DbService,
+    private api: ApiService
   ) { }
+
 
   @HostListener("document:click", ["$event"])
   handleDropdownStates(event: MouseEvent) {
@@ -43,18 +51,30 @@ export class DashboardComponent {
 
 
 
-  onDBTest() {
-    const name = 'Cloud, Web & Mobile'
-    const comment = 'This is a sample exam comment'
-    this.dbService.addExam(name, comment).subscribe(
-      (response) => {
-        console.log('Exam added successfully:', response)
-      },
-      (error) => {
-        console.error('Error adding exam:', error)
-      }
-    );
+  addExam() {
+    const title = 'Cloud, Web & Mobile'
+    const questions = [
+      {question: 'What is Cloud?', points: 4},
+      {question: 'What is Web & Mobile?', points: 6}
+    ]
+    const exam: Exam = new Exam(title, questions)
 
-    this.dbService.addExam("sd", "df")
+    this.dbService.addExam(exam).subscribe({
+      next: (response) => {
+        console.log('Exam added successfully:', response);
+      },
+      error: (error) => {
+        console.error('Error adding exam:', error);
+      }
+    })
+
+    this.api.generateExamLatex(exam).subscribe({
+      next: (examPDF: Blob) => {
+        saveAs(examPDF, `${exam.title}.pdf`)
+      },
+      error: (err) => {
+        console.error('Error downloading PDF: ', err)
+      }
+    })
   }
 }

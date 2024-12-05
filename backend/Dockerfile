@@ -11,4 +11,4 @@ COPY . /app
 ENV MONGODB_URI=mongodb://mongo:27017/examToolboxDB
 
 # Run the server.ts script using Deno
-CMD ["deno", "run", "--allow-net", "--allow-env", "server.ts"]
+CMD ["deno", "run", "--allow-net", "--allow-env", "--allow-write", "--allow-read", "--allow-run", "server.ts"]
