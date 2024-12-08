@@ -23,8 +23,8 @@
       "ES2022",
       "dom"
     ], 
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
+    // "allowImportingTsExtensions": true,
+    // "noEmit": true,
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

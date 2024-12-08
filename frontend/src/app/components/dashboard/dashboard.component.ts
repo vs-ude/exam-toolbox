@@ -1,11 +1,11 @@
 import { Component, HostListener } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { DbService } from "../../services/db.service.ts";
+import { DbService } from "../../services/db.service";
 import { MatIconModule } from '@angular/material/icon';
-import { ExamCardComponent } from "../exam-card/exam-card.component.ts";
+import { ExamCardComponent } from "../exam-card/exam-card.component";
 import { NgClass, NgFor } from '@angular/common';
-import { Exam } from '../../exam.ts';
-import { ApiService } from '../../services/api.service.ts';
+import { Exam } from '../../exam';
+import { ApiService } from '../../services/api.service';
 import { saveAs } from 'file-saver';
 
 
