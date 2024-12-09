@@ -7,6 +7,7 @@ import { NgClass, NgFor } from '@angular/common';
 import { Exam } from '../../exam';
 import { ApiService } from '../../services/api.service';
 import { saveAs } from 'file-saver';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -21,7 +22,8 @@ export class DashboardComponent {
 
   constructor(
     private dbService: DbService,
-    private api: ApiService
+    private api: ApiService,
+    private router: Router,
   ) { }
 
 
@@ -50,6 +52,8 @@ export class DashboardComponent {
   ]
 
 
+  onAddExam(){
+    this.router.navigate(['/create-exam']);  }
 
   addExam() {
     const title = 'Cloud, Web & Mobile'

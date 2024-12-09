@@ -1,0 +1,29 @@
+<div class="createExam_container">
+    <div class="left_container">
+        <div class="exam_name_wrapper">
+            <span>Cloud, Web & Mobile </span>
+        </div>
+        <div class="tasks_container">
+            <app-task class="task_wrapper" [name]="'Multiple Choice'" [color]="'var(--color-primary)'"
+                [iconName]="'multipleChoice.svg'"></app-task>
+            <app-task class="task_wrapper" [name]="'Short Text'" [color]="'var(--color-secondary)'"
+                [iconName]="'shortText.svg'"></app-task>
+            <app-task class="task_wrapper" [name]="'Ranking'" [color]="'var(--color-warn)'"
+                [iconName]="'ranking.svg'"></app-task>
+        </div>
+
+    </div>
+
+    <div class="center_container">
+        <div class="viewBar_spacer"></div>
+        <div class="viewBar_wrapper">
+            <span>bar</span>
+            <div class="icon_wrapper preview">
+                <mat-icon aria-hidden="false" fontIcon="play_arrow" matTooltip="Preview"></mat-icon>
+            </div>
+        </div>
+        <div class="view_wrapper"></div>
+    </div>
+
+    <div class="right_container">pool</div>
+</div>

@@ -1,0 +1,90 @@
+.createExam_container {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    flex-wrap: nowrap;
+    color: var(--color-text);
+}
+
+.icon_wrapper {
+    box-sizing: border-box;
+    padding: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+}
+
+/*------------ [ left ] ------------*/
+.exam_name_wrapper{
+    height: 5%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left_container {
+    width: 15%;
+    padding: 10px 1% 10px 1%;
+    display: flex;
+    flex-direction: column;
+}
+
+.tasks_container {
+    background-color: #F5F5F5;
+    height: 70%;
+    border-radius: 15px;
+    padding: 10px 32px 10px 32px;
+    box-sizing: border-box;
+}
+
+.task_wrapper{
+    margin-left: 1%;
+}
+
+
+/*------------ [ center ] ------------*/
+.center_container {
+    width: 55%;
+    padding: 10px 32px 10px 32px;
+    display: flex;
+    flex-direction: column;
+}
+
+.viewBar_spacer {
+    height: 5%;
+}
+
+.viewBar_wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+    background-color: #F5F5F5;
+    box-sizing: border-box;
+    border-radius: 10px;
+    padding: 2%;
+    flex-grow: 1;
+}
+
+.preview:hover {
+    cursor: pointer;
+    background-color: #0000001a;
+}
+
+.view_wrapper {
+    border: solid 1px;
+    border-color: var(--border-color);
+    margin-top: 3%;
+    flex-grow: 99;
+
+}
+
+/*------------ [ right ] ------------*/
+.right_container {
+    width: 15%;
+    border-left: solid 1px;
+    border-color: var(--border-color);
+    padding: 10px 1% 10px 1%;
+}
