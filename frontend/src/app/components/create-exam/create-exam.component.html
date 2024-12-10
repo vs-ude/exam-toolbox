@@ -5,11 +5,15 @@
         </div>
         <div class="tasks_container">
             <app-task class="task_wrapper" [name]="'Multiple Choice'" [color]="'var(--color-primary)'"
-                [iconName]="'multipleChoice.svg'"></app-task>
+                [iconName]="'multipleChoice.svg'" id="multipleChoice" draggable="true" (dragstart)="dragStart($event)"
+                (dragend)="drop($event)">
+            </app-task>
             <app-task class="task_wrapper" [name]="'Short Text'" [color]="'var(--color-secondary)'"
-                [iconName]="'shortText.svg'"></app-task>
+                [iconName]="'shortText.svg'" id="text" draggable="true" (dragstart)="dragStart($event)"
+                (dragend)="drop($event)"></app-task>
             <app-task class="task_wrapper" [name]="'Ranking'" [color]="'var(--color-warn)'"
-                [iconName]="'ranking.svg'"></app-task>
+                [iconName]="'ranking.svg'" id="ranking" draggable="true" (dragstart)="dragStart($event)"
+                (dragend)="drop($event)"></app-task>
         </div>
 
     </div>
@@ -22,8 +26,12 @@
                 <mat-icon aria-hidden="false" fontIcon="play_arrow" matTooltip="Preview"></mat-icon>
             </div>
         </div>
-        <div class="view_wrapper"></div>
+        <div class="view_wrapper" cdkDropList id="drop-list" (dragover)="dragOverDropzone($event)">
+            <div *ngFor="let task of tasks">{{task}}</div>
+        </div>
     </div>
+
+
 
     <div class="right_container">pool</div>
 </div>

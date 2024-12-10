@@ -4,7 +4,7 @@ import { Component, Input } from '@angular/core';
 @Component({
   selector: 'app-task',
   standalone: true,
-  imports: [NgStyle],
+  imports: [NgStyle, ],
   templateUrl: './task.component.html',
   styleUrl: './task.component.scss'
 })
