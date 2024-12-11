@@ -3,27 +3,31 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TaskComponent } from './task/task.component';
 import { NgFor, NgIf, NgStyle } from '@angular/common';
-
-
+import { DbService } from '../../services/db.service';
+import { Exam } from '../../exam';
 
 
 @Component({
   selector: 'app-create-exam',
   standalone: true,
-  imports: [MatIconModule, MatTooltipModule, TaskComponent, NgFor, NgIf, ],
+  imports: [MatIconModule, MatTooltipModule, TaskComponent, NgFor, NgIf,],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
 })
 export class CreateExamComponent {
 
+  constructor(
+    private dbService: DbService,
+  ) { }
+
   public inDropzone = false;
   private bodyElement: HTMLElement = document.body;
 
   public examName = "New Exam"
-  tasks:string[] = [];
+  tasks: string[] = [];
   public isNameChange = false
 
-  @ViewChild("nameInput") nameInput?:ElementRef;
+  @ViewChild("nameInput") nameInput?: ElementRef;
 
   @HostListener("document:click", ["$event"])
   unselectInputs(event: MouseEvent) {
@@ -33,24 +37,16 @@ export class CreateExamComponent {
       return;
     }
     this.isNameChange = false;
-    if (!this.nameInput){return;}
+    if (!this.nameInput) { return; }
     const newName = this.nameInput.nativeElement.value;
-    if(newName === ""){return}
+    if (newName === "") { return }
     this.examName = newName
   }
 
-
-
-  changeName(event:Event){
-    console.log(event)
-
-   
-  }
-
-  onNameChange(event:any){
-    if (event.key !== "Enter"){return}
+  onNameChange(event: any) {
+    if (event.key !== "Enter") { return }
     const newName = event.target.value;
-    if(newName !== ""){
+    if (newName !== "") {
       this.examName = event.target.value;
     };
     this.isNameChange = false;
@@ -65,12 +61,33 @@ export class CreateExamComponent {
     this.bodyElement.classList.remove("inheritCursors");
     this.bodyElement.style.cursor = "unset"
     const element = event.target as Element;
-    this.tasks.push(element.id);
-
+    if (this.inDropzone) {
+      this.tasks.push(element.id);
+    }
+    this.inDropzone = false;
   }
 
   dragOverDropzone(event: DragEvent) {
     event.preventDefault();
+    this.inDropzone = true;
+  }
+
+  onSave() {
+    let questions = [];
+    for (let question of this.tasks) {
+      questions.push({ question: question, points: 10 })
+    }
+
+    const exam: Exam = new Exam(this.examName, questions);
+
+    this.dbService.addExam(exam).subscribe({
+      next: (response) => {
+        console.log('Exam added successfully:', response);
+      },
+      error: (error) => {
+        console.error('Error adding exam:', error);
+      }
+    })
   }
 
 }

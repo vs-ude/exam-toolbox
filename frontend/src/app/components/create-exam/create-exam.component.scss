@@ -64,6 +64,13 @@
 .task_wrapper{
     margin-left: 1%;
 }
+.task_wrapper:hover{
+    cursor: grab;
+}
+
+.task_wrapper:active{
+    cursor: grabbing;
+}
 
 
 /*------------ [ center ] ------------*/
@@ -90,7 +97,12 @@
     flex-grow: 1;
 }
 
-.preview:hover {
+.bar_icon{
+    color: var(--color-dark-gray);
+    margin-right: 1%;
+}
+
+.bar_icon:hover {
     cursor: pointer;
     background-color: #0000001a;
 }

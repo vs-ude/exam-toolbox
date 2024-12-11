@@ -24,12 +24,30 @@
     <div class="center_container">
         <div class="viewBar_spacer"></div>
         <div class="viewBar_wrapper">
-            <span>bar</span>
-            <div class="icon_wrapper preview">
-                <mat-icon aria-hidden="false" fontIcon="play_arrow" matTooltip="Preview"></mat-icon>
+            <div class="icon_wrapper bar_icon" >
+                <mat-icon aria-hidden="false" fontIcon="remove_red_eye" matTooltip="Preview"></mat-icon>
             </div>
+            <div class="icon_wrapper bar_icon">
+                <mat-icon aria-hidden="false" fontIcon="save" matTooltip="Save" (click)="onSave()"></mat-icon>
+            </div>
+            <div class="icon_wrapper bar_icon">
+                <mat-icon aria-hidden="false" fontIcon="insert_link" matTooltip="Copy Link"></mat-icon>
+            </div>
+            <div class="icon_wrapper bar_icon">
+                <mat-icon aria-hidden="false" fontIcon="undo" matTooltip="Undo"></mat-icon>
+            </div>
+            <div class="icon_wrapper bar_icon">
+                <mat-icon aria-hidden="false" fontIcon="content_copy" matTooltip="Copy Task"></mat-icon>
+            </div>
+            <div class="icon_wrapper bar_icon">
+                <mat-icon aria-hidden="false" fontIcon="date_range" matTooltip="Choose Year"></mat-icon>
+            </div>
+            <div class="icon_wrapper bar_icon">
+                <mat-icon aria-hidden="false" fontIcon="print" matTooltip="Print"></mat-icon>
+            </div>
+
         </div>
-        <div class="view_wrapper" cdkDropList id="drop-list" (dragover)="dragOverDropzone($event)">
+        <div class="view_wrapper" cdkDropList id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
             <div *ngFor="let task of tasks">{{task}}</div>
         </div>
     </div>
