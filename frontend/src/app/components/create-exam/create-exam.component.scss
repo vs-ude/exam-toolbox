@@ -24,6 +24,28 @@
     align-items: center;
 }
 
+.exam_name{
+    border-radius: 5px;
+    padding: 3%
+}
+
+.exam_name:hover{
+    background-color: var(--border-color);
+}
+
+
+.name_input{
+    border-radius: 5px;
+    padding: 3%;
+    border-color: var(--color-primary);
+}
+
+.name_input:focus{
+    border-color: #0768c4;
+    outline: none;
+}
+
+
 .left_container {
     width: 15%;
     padding: 10px 1% 10px 1%;

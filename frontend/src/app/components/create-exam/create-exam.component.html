@@ -1,7 +1,11 @@
 <div class="createExam_container">
     <div class="left_container">
-        <div class="exam_name_wrapper">
-            <span>Cloud, Web & Mobile </span>
+        <div class="exam_name_wrapper" id="examName">
+            <span class="exam_name" (click)="isNameChange = true" *ngIf="!isNameChange" id="examName">
+                {{ examName}}
+            </span>
+            <input class="name_input" *ngIf="isNameChange" [value]="examName" (keydown)="onNameChange($event)"
+                id="examName" #nameInput >
         </div>
         <div class="tasks_container">
             <app-task class="task_wrapper" [name]="'Multiple Choice'" [color]="'var(--color-primary)'"
@@ -11,9 +15,8 @@
             <app-task class="task_wrapper" [name]="'Short Text'" [color]="'var(--color-secondary)'"
                 [iconName]="'shortText.svg'" id="text" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-task>
-            <app-task class="task_wrapper" [name]="'Ranking'" [color]="'var(--color-warn)'"
-                [iconName]="'ranking.svg'" id="ranking" draggable="true" (dragstart)="dragStart($event)"
-                (dragend)="drop($event)"></app-task>
+            <app-task class="task_wrapper" [name]="'Ranking'" [color]="'var(--color-warn)'" [iconName]="'ranking.svg'"
+                id="ranking" draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)"></app-task>
         </div>
 
     </div>
