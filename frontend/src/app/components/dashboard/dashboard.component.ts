@@ -1,12 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { DbService } from "../../services/db.service";
 import { MatIconModule } from '@angular/material/icon';
 import { ExamCardComponent } from "../exam-card/exam-card.component";
 import { NgClass, NgFor } from '@angular/common';
-import { Exam } from '../../exam';
-import { ApiService } from '../../services/api.service';
-import { saveAs } from 'file-saver';
 import { Router } from '@angular/router';
 
 
@@ -21,8 +17,6 @@ export class DashboardComponent {
 
 
   constructor(
-    private dbService: DbService,
-    private api: ApiService,
     private router: Router,
   ) { }
 
@@ -53,32 +47,11 @@ export class DashboardComponent {
 
 
   onAddExam(){
-    this.router.navigate(['/create-exam']);  }
-
-  addExam() {
-    const title = 'Cloud, Web & Mobile'
-    const questions = [
-      {question: 'What is Cloud?', points: 4},
-      {question: 'What is Web & Mobile?', points: 6}
-    ]
-    const exam: Exam = new Exam(title, questions)
-
-    this.dbService.addExam(exam).subscribe({
-      next: (response) => {
-        console.log('Exam added successfully:', response);
-      },
-      error: (error) => {
-        console.error('Error adding exam:', error);
-      }
-    })
-
-    this.api.generateExamLatex(exam).subscribe({
-      next: (examPDF: Blob) => {
-        saveAs(examPDF, `${exam.title}.pdf`)
-      },
-      error: (err) => {
-        console.error('Error downloading PDF: ', err)
-      }
-    })
+    this.router.navigate(['/create-exam']);  
   }
+
+  onDebug(){
+    this.router.navigate(['/debug'])
+  }
+
 }

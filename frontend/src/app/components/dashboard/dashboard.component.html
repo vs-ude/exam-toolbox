@@ -18,7 +18,7 @@
             </button>
         </div>
 
-        <div class="exercise_pool thumbnail"  (click)="addExam()">
+        <div class="exercise_pool thumbnail">
             <button class="pool_exam_button">
                 <div class="pool_icon_container">
                     <mat-icon aria-hidden="false" fontIcon="">toc</mat-icon>
@@ -52,6 +52,18 @@
                 <div class="description_shelf">
                     <span class="import_name">Import</span>
                     <span class="import_description">Import files</span>
+                </div>
+            </button>
+        </div>
+
+        <div class="import thumbnail" (click)="onDebug()">
+            <button class="import_exam_button">
+                <div class="import_icon_container">
+                    <mat-icon aria-hidden="false" fontIcon="">setting</mat-icon>
+                </div>
+                <div class="description_shelf">
+                    <span class="import_name">Debug</span>
+                    <span class="import_description">Just for debugging</span>
                 </div>
             </button>
         </div>

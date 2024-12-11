@@ -5,6 +5,7 @@ import { AboutComponent } from './components/about/about.component';
 import { GettingStartedComponent } from './components/getting-started/getting-started.component';
 import { AuthGuard } from './auth.guard';
 import { CreateExamComponent } from './components/create-exam/create-exam.component';
+import { DebugComponent } from './components/debug/debug.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -13,4 +14,5 @@ export const routes: Routes = [
   { path: 'about', component: AboutComponent, canActivate: [AuthGuard] },
   { path: 'getting-started', component: GettingStartedComponent, canActivate: [AuthGuard] },
   { path: 'create-exam', component: CreateExamComponent, canActivate: [AuthGuard] },
+  { path: 'debug', component: DebugComponent, canActivate: [AuthGuard] },
 ];
