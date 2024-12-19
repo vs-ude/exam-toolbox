@@ -1,5 +1,6 @@
 import { Application, Router } from "https://deno.land/x/oak@v10.5.0/mod.ts";
 import { MongoClient } from "https://deno.land/x/mongo/mod.ts";
+import { latrex } from "https://deno.land/x/latrex/mod.ts";
 
 
 export class Exam{
@@ -87,45 +88,16 @@ async function generateExamLatex(exam: Exam): Promise<Uint8Array> {
     \\begin{document}
     \\title{${exam.title}}
     \\maketitle
-    ${exam.questions
-      .map((q) => `\\section*{Question:} ${q.question} \\hfill ${q.points} points`)
-      .join("\n")}
+    ${exam.questions.map((q) => `\\section*{Question:} ${q.question} \\hfill ${q.points} points`).join("\n")}
     \\end{document}`;
 
-  // Write the LaTeX content to a temporary .tex file
-  const tempFilePath = "/tmp/exam.tex";
-  await Deno.writeTextFile(tempFilePath, latexContent);
-
-  // Run XeLaTeX using Deno.Command
-  const process = new Deno.Command("xelatex", {
-    args: [tempFilePath],
-    stderr: "piped", // capture error output
-    stdout: "piped" // capture standard output
-  });
-  console.log("1");
-
-  const { code, stdout, stderr } = await process.output();
-  console.log("stdout:", new TextDecoder().decode(stdout));
-  console.error("stderr:", new TextDecoder().decode(stderr));
-
-  console.log("1.5")
-
-  if (code !== 0) {
-    const errorText = new TextDecoder().decode(stderr);
-    console.error("Error generating PDF:", errorText);
-    throw new Error("LaTeX generation failed");
+  try {
+    console.log("Generating PDF from LaTeX content: " + latexContent)
+    const pdfBuffer = await latrex(latexContent, {returnLogs: true})
+    console.log("PDF generation successful")
+    return pdfBuffer
+  } catch (error) {
+    console.error("Error during LaTeX document generation:", error);
+    throw new Error("LaTeX Document generation failed")
   }
-  console.log("2");
-
-  // Read the generated PDF back into memory
-  const pdfPath = "/tmp/exam.pdf";
-  const pdfData = await Deno.readFile(pdfPath);
-
-  // Clean up the temporary files (optional)
-  await Deno.remove(tempFilePath);
-  await Deno.remove(pdfPath);
-
-  // Return the PDF data as a Uint8Array
-  console.log("3");
-  return pdfData;
 }

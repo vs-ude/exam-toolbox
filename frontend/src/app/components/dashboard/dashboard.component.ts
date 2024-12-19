@@ -37,7 +37,7 @@ export class DashboardComponent {
   public showDropdowns = { sorting: false, filter: false, }
 
   public examNames = [
-    "Cloud, Web & Mobile",
+    "Cloud Web Mobile",
     "Rechnernetze",
     "Betriebssysteme",
     "Verteilte Systeme",

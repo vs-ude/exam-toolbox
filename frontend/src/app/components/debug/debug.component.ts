@@ -19,21 +19,21 @@ export class DebugComponent {
   ) { }
 
   onAddExam() {
-    const title = 'Cloud, Web & Mobile'
+    const title = 'Cloud Web Mobile'
     const questions = [
-      {question: 'What is Cloud?', points: 4},
-      {question: 'What is Web & Mobile?', points: 6}
+      {question: 'What is Cloud', points: 4},
+      {question: 'What is Web Mobile', points: 6}
     ]
     const exam: Exam = new Exam(title, questions)
   
-    this.dbService.addExam(exam).subscribe({
-      next: (response) => {
-        console.log('Exam added successfully:', response);
-      },
-      error: (error) => {
-        console.error('Error adding exam:', error);
-      }
-    })
+    // this.dbService.addExam(exam).subscribe({
+    //   next: (response) => {
+    //     console.log('Exam added successfully:', response);
+    //   },
+    //   error: (error) => {
+    //     console.error('Error adding exam:', error);
+    //   }
+    // })
   
     this.api.generateExamLatex(exam).subscribe({
       next: (examPDF: Blob) => {
