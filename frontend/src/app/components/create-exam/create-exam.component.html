@@ -7,16 +7,16 @@
             <input class="name_input" *ngIf="isNameChange" [value]="examName" (keydown)="onNameChange($event)"
                 id="examName" #nameInput >
         </div>
-        <div class="tasks_container">
-            <app-task class="task_wrapper" [name]="'Multiple Choice'" [color]="'var(--color-primary)'"
+        <div class="add_tasks_container">
+            <app-AddTask class="task_wrapper" [name]="'Multiple Choice'" [color]="'var(--color-primary)'"
                 [iconName]="'multipleChoice.svg'" id="multipleChoice" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)">
-            </app-task>
-            <app-task class="task_wrapper" [name]="'Short Text'" [color]="'var(--color-secondary)'"
+            </app-AddTask>
+            <app-AddTask class="task_wrapper" [name]="'Short Text'" [color]="'var(--color-secondary)'"
                 [iconName]="'shortText.svg'" id="text" draggable="true" (dragstart)="dragStart($event)"
-                (dragend)="drop($event)"></app-task>
-            <app-task class="task_wrapper" [name]="'Ranking'" [color]="'var(--color-warn)'" [iconName]="'ranking.svg'"
-                id="ranking" draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)"></app-task>
+                (dragend)="drop($event)"></app-AddTask>
+            <app-AddTask class="task_wrapper" [name]="'Ranking'" [color]="'var(--color-warn)'" [iconName]="'ranking.svg'"
+                id="ranking" draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)"></app-AddTask>
         </div>
 
     </div>
@@ -40,7 +40,7 @@
                 <mat-icon aria-hidden="false" fontIcon="content_copy" matTooltip="Copy Task"></mat-icon>
             </div>
             <div class="icon_wrapper bar_icon">
-                <mat-icon aria-hidden="false" fontIcon="date_range" matTooltip="Choose Year"></mat-icon>
+                <mat-icon aria-hidden="false" fontIcon="date_range" matTooltip="Choose Semester"></mat-icon>
             </div>
             <div class="icon_wrapper bar_icon">
                 <mat-icon aria-hidden="false" fontIcon="print" matTooltip="Print"></mat-icon>
@@ -48,7 +48,7 @@
 
         </div>
         <div class="view_wrapper" cdkDropList id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
-            <div *ngFor="let task of tasks">{{task}}</div>
+            <app-task class="task_container" *ngFor="let task of tasks" [name]="task"></app-task>
         </div>
     </div>
 

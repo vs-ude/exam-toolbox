@@ -1,7 +1,79 @@
-<div class="task_container" (mouseover)="hovered=true" (mouseleave)="hovered=false"
-    [ngStyle]="{'backgroundColor': hovered ? color : '#00000010' }">
-    <div class="task_icon" [ngStyle]="{'backgroundColor': hovered ? '#0000002a' : color }" >
-        <img src="{{ iconName }}">
+<mat-card class="form-card">
+  <!-- Frage -->
+  <div class="form-header">
+    <div
+      #questionField
+      contenteditable="true"
+      class="form-question"
+      (focus)="onFocus()"
+      (blur)="onBlur($event)"
+      (input)="updateQuestion($event)"
+      (keydown)="handleKeyDown($event)"
+      [attr.data-placeholder]="'Frage eingeben...'"
+    ></div>
+  </div>
+
+  <!-- Toolbar für Formatierung -->
+  <div *ngIf="isQuestionActive" class="form-toolbar">
+    <button
+      mat-icon-button
+      (mousedown)="setFormat('bold')"
+      [ngStyle]="{ 'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }"
+    >
+      <mat-icon>format_bold</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      (mousedown)="setFormat('italic')"
+      [ngStyle]="{ 'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }"
+    >
+      <mat-icon>format_italic</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      (mousedown)="setFormat('underline')"
+      [ngStyle]="{ 'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }"
+    >
+      <mat-icon>format_underlined</mat-icon>
+    </button>
+  </div>
+
+  <!-- Antwortoptionen -->
+  <div class="form-body">
+    <div class="form-option" *ngFor="let option of options; let i = index">
+      <input type="radio" name="multiple-choice" disabled />
+      <input
+        type="text"
+        [(ngModel)]="options[i]"
+        placeholder="Option {{ i + 1 }}"
+        class="form-option-input"
+      />
+      <button mat-icon-button class="remove-option-button" (click)="removeOption(i)">
+        <mat-icon>delete</mat-icon>
+      </button>
     </div>
-    <div class="task_name" [ngStyle]="{'color': hovered ? '#fff' : '' }" ><span> {{ name }} </span></div>
-</div>
+
+    <!-- Option hinzufügen -->
+    <div class="add-option">
+      <button mat-button color="primary" class="add-option-button" (click)="addOption()">
+        Option hinzufügen
+      </button>
+      <a href="#" class="add-other">oder "Sonstiges" hinzufügen</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="form-footer">
+    <div class="footer-actions">
+      <button mat-icon-button>
+        <mat-icon>content_copy</mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon>delete</mat-icon>
+      </button>
+      <label class="required-toggle">
+        Pflichtfrage
+      </label>
+    </div>
+  </div>
+</mat-card>

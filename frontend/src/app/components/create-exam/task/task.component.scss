@@ -1,21 +1,122 @@
-.task_container {
-    border-radius: 10px;
-    padding: 6px;
+/* Gesamte Karte */
+.form-card {
+    padding: 16px;
+    margin: 20px auto;
+    max-width: 600px;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+  }
+  
+  /* Frage */
+  .form-header {
+    margin-bottom: 16px;
+  }
+  
+  .form-question {
+    width: 100%;
+    font-size: 16px;
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 4px;
+    min-height: 40px;
+    outline: none;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+  
+  .form-question:empty:before {
+    content: attr(data-placeholder);
+    color: #aaa;
+    display: block;
+  }
+  
+  /* Toolbar */
+  .form-toolbar {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+  }
+  
+  mat-icon-button.active {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+  }
+  
+  /* Antwortoptionen */
+  .form-body {
+    margin-bottom: 16px;
+  }
+  
+  .form-option {
     display: flex;
     align-items: center;
-    background-color: #00000010;
-    user-select: none;
-    min-width: 100px;
-}
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .form-option-input {
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 4px;
+    flex: 1;
+  }
+  
+  .remove-option-button {
+    color: #d32f2f;
+    cursor: pointer;
+  }
+  
+  /* Option hinzufügen */
+  .add-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .add-other {
+    color: #4285f4;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  /* Footer */
+  .form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+  }
+  
+  .footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
+  /* Button Styling */
+.mat-icon-button {
+    border-radius: 50%;
+  }
+  
+  .mat-icon-button[ngStyle] {
+    transition: background-color 0.2s ease-in-out;
+  }
+  
 
-.task_icon {
-    background-color: var(--color-primary);
-    padding: 4px 10px 4px 10px;
-    border-radius: 10px;
-}
-
-.task_name{
-    padding: 4px 10px 4px 10px;
-    font-size: smaller;
-}
+  /* Smooth transition for toolbar visibility */
+.form-toolbar {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  .form-toolbar[ng-reflect-ng-if="false"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+  

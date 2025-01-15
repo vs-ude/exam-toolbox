@@ -1,0 +1,21 @@
+.task_container {
+    border-radius: 10px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    background-color: #00000010;
+    user-select: none;
+    min-width: 100px;
+}
+
+
+.task_icon {
+    background-color: var(--color-primary);
+    padding: 4px 10px 4px 10px;
+    border-radius: 10px;
+}
+
+.task_name{
+    padding: 4px 10px 4px 10px;
+    font-size: smaller;
+}

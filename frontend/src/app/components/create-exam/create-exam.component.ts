@@ -1,16 +1,17 @@
 import { Component, ElementRef, HostListener, viewChild, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TaskComponent } from './task/task.component';
 import { NgFor, NgIf, NgStyle } from '@angular/common';
 import { DbService } from '../../services/db.service';
 import { Exam } from '../../exam';
+import { AddTaskComponent } from './add-task/add-task.component';
+import { TaskComponent } from "./task/task.component";
 
 
 @Component({
   selector: 'app-create-exam',
   standalone: true,
-  imports: [MatIconModule, MatTooltipModule, TaskComponent, NgFor, NgIf,],
+  imports: [MatIconModule, MatTooltipModule, AddTaskComponent, TaskComponent, NgFor, NgIf, TaskComponent],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
 })
