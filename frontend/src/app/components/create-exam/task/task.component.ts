@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-task',
@@ -18,6 +19,7 @@ import { MatInputModule } from '@angular/material/input';
     MatInputModule,
     NgStyle,
     NgIf,
+    MatTooltipModule,
   ],
   templateUrl: './task.component.html',
   styleUrl: './task.component.scss'

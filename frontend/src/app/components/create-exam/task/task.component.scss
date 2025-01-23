@@ -1,122 +1,174 @@
 /* Gesamte Karte */
 .form-card {
-    padding: 16px;
-    margin: 20px auto;
-    max-width: 600px;
-    border: 1px solid #dadce0;
-    border-radius: 8px;
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    background-color: white;
-  }
-  
-  /* Frage */
-  .form-header {
-    margin-bottom: 16px;
-  }
-  
-  .form-question {
-    width: 100%;
-    font-size: 16px;
-    border: none;
-    border-bottom: 1px solid #e0e0e0;
-    padding: 4px;
-    min-height: 40px;
-    outline: none;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-  }
-  
-  .form-question:empty:before {
-    content: attr(data-placeholder);
-    color: #aaa;
-    display: block;
-  }
-  
-  /* Toolbar */
-  .form-toolbar {
-    margin-top: 12px;
-    display: flex;
-    gap: 8px;
-  }
-  
-  mat-icon-button.active {
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-  }
-  
-  /* Antwortoptionen */
-  .form-body {
-    margin-bottom: 16px;
-  }
-  
-  .form-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-  
-  .form-option-input {
-    border: none;
-    border-bottom: 1px solid #e0e0e0;
-    padding: 4px;
-    flex: 1;
-  }
-  
-  .remove-option-button {
-    color: #d32f2f;
-    cursor: pointer;
-  }
-  
-  /* Option hinzufügen */
-  .add-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .add-other {
-    color: #4285f4;
-    text-decoration: none;
-    cursor: pointer;
-  }
-  
-  /* Footer */
-  .form-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 16px;
-  }
-  
-  .footer-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  padding: 16px;
+  margin: 20px auto;
+  max-width: 600px;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+}
 
-  /* Button Styling */
-.mat-icon-button {
-    border-radius: 50%;
-  }
-  
-  .mat-icon-button[ngStyle] {
-    transition: background-color 0.2s ease-in-out;
-  }
-  
+/* Frage */
+.form-header {
+  margin-bottom: 16px;
+}
 
-  /* Smooth transition for toolbar visibility */
+.form-question {
+  width: 100%;
+  font-size: 16px;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 4px;
+  min-height: 40px;
+  outline: none;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.form-question:empty:before {
+  content: attr(data-placeholder);
+  color: #aaa;
+  display: block;
+}
+
+/* Toolbar */
 .form-toolbar {
-    margin-top: 10px;
-    display: flex;
-    gap: 8px;
-    transition: opacity 0.2s ease-in-out;
-  }
-  
-  .form-toolbar[ng-reflect-ng-if="false"] {
-    opacity: 0;
-    pointer-events: none;
-  }
-  
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+mat-icon-button.active {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+}
+
+/* Antwortoptionen */
+.form-body {
+  margin-bottom: 16px;
+}
+
+.form-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.form-option-input {
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 4px;
+  flex: 1;
+}
+
+.remove-option-button {
+  color: #d32f2f;
+  cursor: pointer;
+}
+
+/* Option hinzufügen */
+.delete_option_icon {
+  color: var(--color-dark-gray);
+  margin-right: 1%;
+}
+
+.delete_option_icon:hover {
+  cursor: pointer;
+  background-color: #0000001a;
+}
+
+.add_option_icon {
+  color: var(--color-dark-gray);
+  margin-right: 1%;
+  margin-left: 20%;
+}
+
+.add_option_icon:hover {
+  cursor: pointer;
+  background-color: #0000001a;
+}
+
+.add-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-other {
+  color: #4285f4;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Footer */
+.form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Button Styling */
+.mat-icon-button {
+  border-radius: 50%;
+}
+
+.mat-icon-button[ngStyle] {
+  transition: background-color 0.2s ease-in-out;
+}
+
+
+/* Smooth transition for toolbar visibility */
+.form-toolbar {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.form-toolbar[ng-reflect-ng-if="false"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+
+
+.icon_wrapper {
+  box-sizing: border-box;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+}
+
+.footer_icon {
+  color: var(--color-dark-gray);
+  margin-right: 1%;
+}
+
+.footer_icon:hover {
+  cursor: pointer;
+  background-color: #0000001a;
+}
+
+.footer_icon_delete {
+  color: #d32f2f;
+}
+
+
+.footer_icon_delete:hover {
+  cursor: pointer;
+  background-color: #ff00001a;
+}
