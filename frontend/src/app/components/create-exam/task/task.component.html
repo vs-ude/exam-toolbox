@@ -1,50 +1,51 @@
 <mat-card class="form-card">
-  <!-- Frage -->
+  <!-- Question -->
   <div class="form-header">
     <div
       #questionField
       contenteditable="true"
       class="form-question"
-      (focus)="onFocus()"
-      (blur)="onBlur($event)"
+      (focus)="activateFormatButtons()"
+      (blur)="deactivateFormatButtons($event)"
       (input)="updateQuestion($event)"
-      (keydown)="handleKeyDown($event)"
       [attr.data-placeholder]="'Frage eingeben...'"
     ></div>
   </div>
 
-  <!-- Toolbar für Formatierung -->
+  <!-- Buttons for formatting -->
   <div *ngIf="isQuestionActive" class="form-toolbar">
     <button
       mat-icon-button
-      (mousedown)="setFormat('bold')"
+      (mousedown)="setQuestionFormat('bold', $event)"
       [ngStyle]="{ 'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }"
     >
       <mat-icon>format_bold</mat-icon>
     </button>
     <button
       mat-icon-button
-      (mousedown)="setFormat('italic')"
+      (mousedown)="setQuestionFormat('italic', $event)"
       [ngStyle]="{ 'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }"
     >
       <mat-icon>format_italic</mat-icon>
     </button>
     <button
       mat-icon-button
-      (mousedown)="setFormat('underline')"
+      (mousedown)="setQuestionFormat('underline', $event)"
       [ngStyle]="{ 'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }"
     >
       <mat-icon>format_underlined</mat-icon>
     </button>
   </div>
 
-  <!-- Antwortoptionen -->
+  <!-- Answer Options -->
   <div class="form-body">
-    <div class="form-option" *ngFor="let option of options; let i = index">
+    <div class="form-option" *ngFor="let option of answerOptions; let i = index">
       <input type="radio" name="multiple-choice" disabled />
       <input
         type="text"
-        [(ngModel)]="options[i]"
+        [value]="answerOptions[i]"
+        (keydown.enter)="changeOption($event, i)"
+        (blur)="changeOption($event, i)"
         placeholder="Option {{ i + 1 }}"
         class="form-option-input"
       />
@@ -53,12 +54,11 @@
       </button>
     </div>
 
-    <!-- Option hinzufügen -->
+    <!-- add AnswerOption -->
     <div class="add-option">
       <button mat-button color="primary" class="add-option-button" (click)="addOption()">
         Option hinzufügen
       </button>
-      <a href="#" class="add-other">oder "Sonstiges" hinzufügen</a>
     </div>
   </div>
 
@@ -71,9 +71,6 @@
       <button mat-icon-button>
         <mat-icon>delete</mat-icon>
       </button>
-      <label class="required-toggle">
-        Pflichtfrage
-      </label>
     </div>
   </div>
 </mat-card>
