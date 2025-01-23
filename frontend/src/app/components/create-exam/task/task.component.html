@@ -1,38 +1,23 @@
 <mat-card class="form-card">
   <!-- Question -->
   <div class="form-header">
-    <div
-      #questionField
-      contenteditable="true"
-      class="form-question"
-      (focus)="activateFormatButtons()"
-      (blur)="deactivateFormatButtons($event)"
-      (input)="updateQuestion($event)"
-      [attr.data-placeholder]="'Frage eingeben...'"
-    ></div>
+    <div #questionField contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
+      (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event)"
+      [attr.data-placeholder]="'Frage eingeben...'"></div>
   </div>
 
   <!-- Buttons for formatting -->
   <div *ngIf="isQuestionActive" class="form-toolbar">
-    <button
-      mat-icon-button
-      (mousedown)="setQuestionFormat('bold', $event)"
-      [ngStyle]="{ 'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }"
-    >
+    <button mat-icon-button (mousedown)="setQuestionFormat('bold', $event)"
+      [ngStyle]="{ 'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
       <mat-icon>format_bold</mat-icon>
     </button>
-    <button
-      mat-icon-button
-      (mousedown)="setQuestionFormat('italic', $event)"
-      [ngStyle]="{ 'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }"
-    >
+    <button mat-icon-button (mousedown)="setQuestionFormat('italic', $event)"
+      [ngStyle]="{ 'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
       <mat-icon>format_italic</mat-icon>
     </button>
-    <button
-      mat-icon-button
-      (mousedown)="setQuestionFormat('underline', $event)"
-      [ngStyle]="{ 'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }"
-    >
+    <button mat-icon-button (mousedown)="setQuestionFormat('underline', $event)"
+      [ngStyle]="{ 'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
       <mat-icon>format_underlined</mat-icon>
     </button>
   </div>
@@ -41,36 +26,32 @@
   <div class="form-body">
     <div class="form-option" *ngFor="let option of answerOptions; let i = index">
       <input type="radio" name="multiple-choice" disabled />
-      <input
-        type="text"
-        [value]="answerOptions[i]"
-        (keydown.enter)="changeOption($event, i)"
-        (blur)="changeOption($event, i)"
-        placeholder="Option {{ i + 1 }}"
-        class="form-option-input"
-      />
-      <button mat-icon-button class="remove-option-button" (click)="removeOption(i)">
-        <mat-icon>delete</mat-icon>
-      </button>
+      <input type="text" [value]="answerOptions[i]" (keydown.enter)="changeOption($event, i)"
+        (blur)="changeOption($event, i)" placeholder="Option {{ i + 1 }}" class="form-option-input" />
+
+      <div class="icon_wrapper delete_option_icon">
+        <mat-icon aria-hidden="false" fontIcon="close" (click)="removeOption(i)"></mat-icon>
+      </div>
     </div>
 
     <!-- add AnswerOption -->
     <div class="add-option">
-      <button mat-button color="primary" class="add-option-button" (click)="addOption()">
-        Option hinzufügen
-      </button>
+      <div class="icon_wrapper add_option_icon">
+        <mat-icon aria-hidden="false" fontIcon="add_circle" matTooltip="add Option" (click)="addOption()"></mat-icon>
+      </div>
     </div>
   </div>
 
   <!-- Footer -->
   <div class="form-footer">
     <div class="footer-actions">
-      <button mat-icon-button>
-        <mat-icon>content_copy</mat-icon>
-      </button>
-      <button mat-icon-button>
-        <mat-icon>delete</mat-icon>
-      </button>
+      <div class="icon_wrapper footer_icon">
+        <mat-icon aria-hidden="false" fontIcon="content_copy" matTooltip="Copy"></mat-icon>
+      </div>
+
+      <div class="icon_wrapper footer_icon_delete">
+        <mat-icon  aria-hidden="false" fontIcon="delete" matTooltip="Delete"></mat-icon>
+      </div>
     </div>
   </div>
 </mat-card>
