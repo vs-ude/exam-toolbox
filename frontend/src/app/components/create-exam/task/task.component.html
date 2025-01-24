@@ -3,29 +3,32 @@
   <div class="form-header">
     <div #questionField contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
       (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event)"
-      [attr.data-placeholder]="'Frage eingeben...'"></div>
+      [attr.data-placeholder]="'Enter Question...'"></div>
   </div>
 
   <!-- Buttons for formatting -->
-  <div *ngIf="isQuestionActive" class="form-toolbar">
-    <button mat-icon-button (mousedown)="setQuestionFormat('bold', $event)"
+  <div *ngIf="isQuestionActive" [@inOutAnimation]  class="form-toolbar">
+
+    <div class="icon_wrapper delete_option_icon" (mousedown)="setQuestionFormat('bold', $event)"
       [ngStyle]="{ 'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-      <mat-icon>format_bold</mat-icon>
-    </button>
-    <button mat-icon-button (mousedown)="setQuestionFormat('italic', $event)"
+      <mat-icon aria-hidden="false" fontIcon="format_bold"></mat-icon>
+    </div>
+
+    <div class="icon_wrapper delete_option_icon" (mousedown)="setQuestionFormat('italic', $event)"
       [ngStyle]="{ 'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-      <mat-icon>format_italic</mat-icon>
-    </button>
-    <button mat-icon-button (mousedown)="setQuestionFormat('underline', $event)"
+      <mat-icon aria-hidden="false" fontIcon="format_italic"></mat-icon>
+    </div>
+
+    <div class="icon_wrapper delete_option_icon" (mousedown)="setQuestionFormat('underline', $event)"
       [ngStyle]="{ 'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-      <mat-icon>format_underlined</mat-icon>
-    </button>
+      <mat-icon aria-hidden="false" fontIcon="format_underline"></mat-icon>
+    </div>
   </div>
 
   <!-- Answer Options -->
   <div class="form-body">
-    <div class="form-option" *ngFor="let option of answerOptions; let i = index">
-      <input type="radio" name="multiple-choice" disabled />
+    <div class="form-option" *ngFor="let option of answerOptions; let i = index" [@inOutAnimation]>
+      <input type="checkbox" name="multiple-choice"  />
       <input type="text" [value]="answerOptions[i]" (keydown.enter)="changeOption($event, i)"
         (blur)="changeOption($event, i)" placeholder="Option {{ i + 1 }}" class="form-option-input" />
 
@@ -42,6 +45,7 @@
     </div>
   </div>
 
+
   <!-- Footer -->
   <div class="form-footer">
     <div class="footer-actions">
@@ -50,7 +54,7 @@
       </div>
 
       <div class="icon_wrapper footer_icon_delete">
-        <mat-icon  aria-hidden="false" fontIcon="delete" matTooltip="Delete"></mat-icon>
+        <mat-icon aria-hidden="false" fontIcon="delete" matTooltip="Delete"></mat-icon>
       </div>
     </div>
   </div>

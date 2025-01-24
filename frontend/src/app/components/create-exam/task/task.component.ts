@@ -1,11 +1,15 @@
 import { NgFor, NgIf, NgStyle } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatRippleModule } from '@angular/material/core';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { trigger, transition, style, animate } from '@angular/animations';
+
 
 @Component({
   selector: 'app-task',
@@ -22,8 +26,32 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatTooltipModule,
   ],
   templateUrl: './task.component.html',
-  styleUrl: './task.component.scss'
+  styleUrl: './task.component.scss',
+  animations: [
+    trigger(
+      'inOutAnimation',
+      [
+        transition(
+          ':enter',
+          [
+            style({ height: 0, opacity: 0 }),
+            animate('0.2s ease-out',
+              style({ height: '*', opacity: 1 }))
+          ]
+        ),
+        transition(
+          ':leave',
+          [
+            style({ height: '*', opacity: 1 }),
+            animate('.2s ease-in',
+              style({ height: 0, opacity: 0 }))
+          ]
+        )
+      ]
+    )
+  ]
 })
+
 export class TaskComponent {
   @Input() public name!: string;
 
