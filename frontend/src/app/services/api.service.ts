@@ -9,9 +9,15 @@ import { Exam } from '../exam';
 export class ApiService {
   private apiUrl = 'http://localhost:3000/api';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient
+  ) {}
 
   generateExamLatex(exam: Exam): Observable<Blob>{
     return this.http.post(`${this.apiUrl}/generate-exam`, exam, {responseType: 'blob'})
+  }
+
+  addExam(exam: Exam): Observable<any>{
+    return this.http.post(`${this.apiUrl}/exams`, exam)
   }
 }

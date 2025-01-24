@@ -69,14 +69,16 @@ export class DebugComponent {
 
     console.log(exam);
   
-    this.api.generateExamLatex(exam).subscribe({
-      next: (examPDF: Blob) => {
-        saveAs(examPDF, `${exam.title}.pdf`)
-      },
-      error: (err) => {
-        console.error('Error downloading PDF: ', err)
-      }
-    })
+    this.api.addExam(exam)
+
+    // this.api.generateExamLatex(exam).subscribe({
+    //   next: (examPDF: Blob) => {
+    //     saveAs(examPDF, `${exam.title}.pdf`)
+    //   },
+    //   error: (err) => {
+    //     console.error('Error downloading PDF: ', err)
+    //   }
+    // })
   }
 
 }
