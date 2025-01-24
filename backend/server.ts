@@ -23,7 +23,7 @@ const exams = db.collection("exams");
 const app = new Application();
 const router = new Router();
 
-// For cross-origin requests (like CORS)
+// For cross-origin requests (for CORS)
 app.use(async (ctx, next) => {
   ctx.response.headers.set("Access-Control-Allow-Origin", "*");
   ctx.response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
@@ -60,7 +60,7 @@ router
   .post("/api/generate-exam", async (ctx) => {
     const exam: Exam = await ctx.request.body().value
     try {
-      const examPDF = await generateExamLatex(exam)
+      const examPDF = await generateExam(exam)
 
       // tell the frontend that this is an PDF
       ctx.response.headers.set("Content-Type", "application/pdf")
@@ -82,7 +82,7 @@ const port = 3000;
 await app.listen({ port });
 
 
-async function generateExamLatex(exam: Exam): Promise<Uint8Array> {
+async function generateExam(exam: Exam): Promise<Uint8Array> {
   const latexContent = `
     \\documentclass{article}
     \\begin{document}
