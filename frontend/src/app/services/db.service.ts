@@ -15,7 +15,6 @@ export class DbService {
   ) { }
 
   addExam(exam: Exam): Observable<any>{
-    console.log(exam.questions + " | " + exam.title)
     return this.http.post(this.apiUrl, exam)
   }
 }

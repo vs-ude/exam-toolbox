@@ -79,16 +79,26 @@ export class CreateExamComponent {
       questions.push({ question: question, points: 10 })
     }
 
-    const exam: Exam = new Exam(this.examName, questions);
+    // Comment in and fix when these informations like title, courseName, etc. is available here.
+    // const exam: Exam = new Exam(
+    //   examId,
+    //   title,
+    //   courseName,
+    //   examinerName,
+    //   semester,
+    //   date,
+    //   examLengthMinutes,
+    //   tasks
+    // );
 
-    this.dbService.addExam(exam).subscribe({
-      next: (response) => {
-        console.log('Exam added successfully:', response);
-      },
-      error: (error) => {
-        console.error('Error adding exam:', error);
-      }
-    })
+    // this.dbService.addExam(exam).subscribe({
+    //   next: (response) => {
+    //     console.log('Exam added successfully:', response);
+    //   },
+    //   error: (error) => {
+    //     console.error('Error adding exam:', error);
+    //   }
+    // })
   }
 
 }
