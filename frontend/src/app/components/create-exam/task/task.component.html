@@ -27,9 +27,9 @@
 
   <!-- Answer Options -->
   <div class="form-body">
-    <div class="form-option" *ngFor="let option of answerOptions; let i = index" [@inOutAnimation]>
+    <div class="form-option" *ngFor="let option of task.answerOptions; let i = index" [@inOutAnimation]>
       <input type="checkbox" name="multiple-choice"  />
-      <input type="text" [value]="answerOptions[i]" (keydown.enter)="changeOption($event, i)"
+      <input type="text" [value]="task.answerOptions[i].DE" (keydown.enter)="changeOption($event, i)"
         (blur)="changeOption($event, i)" placeholder="Option {{ i + 1 }}" class="form-option-input" />
 
       <div class="icon_wrapper delete_option_icon">
@@ -54,7 +54,7 @@
       </div>
 
       <div class="icon_wrapper footer_icon_delete">
-        <mat-icon aria-hidden="false" fontIcon="delete" matTooltip="Delete"></mat-icon>
+        <mat-icon aria-hidden="false" fontIcon="delete" matTooltip="Delete" (click)="onDelete()"></mat-icon>
       </div>
     </div>
   </div>

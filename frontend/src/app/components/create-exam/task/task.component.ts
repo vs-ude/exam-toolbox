@@ -1,14 +1,14 @@
 import { NgFor, NgIf, NgStyle } from '@angular/common';
-import { Component, Input, } from '@angular/core';
+import { Component, Input, Output, EventEmitter, AfterViewInit, OnInit, viewChild, ViewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatRippleModule } from '@angular/material/core';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { MultipleChoiceTask, Task } from '../task-interfaces';
+
 
 
 @Component({
@@ -52,39 +52,66 @@ import { trigger, transition, style, animate } from '@angular/animations';
   ]
 })
 
-export class TaskComponent {
-  @Input() public name!: string;
 
+export class TaskComponent implements OnInit, AfterViewInit {
+  @Input() public taskId!: string;
+  @Input() public preTask: Task | undefined;
+  @Output() deleteEvent = new EventEmitter<string>();
+  @Output() taskChangeEvent = new EventEmitter<MultipleChoiceTask>();
+  @ViewChild("questionField") questionField!: ElementRef;
 
-  answerOptions: string[] = ['Option 1'];
   isBold: boolean = false;
   isItalic: boolean = false;
   isUnderline: boolean = false;
   isQuestionActive: boolean = false;
 
-  private question: string = '';
+  public task: MultipleChoiceTask = {
+    taskId: "",
+    type: "multipleChoice",
+    question: {
+      DE: "",
+      EN: "",
+    },
+    answerOptions: [{ DE: "Option1", EN: "", correct: false }],
+    points: 0
+  };
+
+
+  ngOnInit(): void {
+    if (this.preTask) {
+      this.task = this.preTask as MultipleChoiceTask;
+      return;
+    }
+    this.task.taskId = this.taskId;
+    this.taskChangeEvent.emit(this.task);
+  }
+
+  ngAfterViewInit() {
+    this.questionField.nativeElement.innerHTML = this.task.question.DE;
+  }
+
 
   updateQuestion(event: Event) {
     const element = event.target as HTMLElement;
-    this.question = element.innerHTML;
-    console.log('Aktuelle Frage:', this.question);
+    this.task.question.DE = element.innerHTML;
+    this.taskChangeEvent.emit(this.task);
   }
 
 
   addOption() {
-    this.answerOptions.push('');
+    this.task.answerOptions.push({ DE: "", EN: "", correct: false });
+    this.taskChangeEvent.emit(this.task);
   }
 
   removeOption(index: number) {
-    if (this.answerOptions.length > 1) {
-      this.answerOptions.splice(index, 1);
-    }
-    console.log(this.answerOptions);
+    if (this.task.answerOptions.length <= 1) { return; }
+    this.task.answerOptions.splice(index, 1);
+    this.taskChangeEvent.emit(this.task);
   }
 
   changeOption(event: any, index: number) {
-    this.answerOptions[index] = event.target.value;
-    console.log(this.answerOptions);
+    this.task.answerOptions[index].DE = event.target.value;
+    this.taskChangeEvent.emit(this.task);
   }
 
   setQuestionFormat(format: string, event: MouseEvent) {
@@ -108,5 +135,10 @@ export class TaskComponent {
 
   public deactivateFormatButtons(event: FocusEvent) {
     this.isQuestionActive = false;
+  }
+
+  public onDelete() {
+    this.deleteEvent.emit("delete");
+    console.log("Delete Event emitted");
   }
 }

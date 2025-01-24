@@ -6,6 +6,7 @@ import { DbService } from '../../services/db.service';
 import { Exam } from '../../exam';
 import { AddTaskComponent } from './add-task/add-task.component';
 import { TaskComponent } from "./task/task.component";
+import { MultipleChoiceTask, Task } from './task-interfaces';
 
 
 @Component({
@@ -25,7 +26,7 @@ export class CreateExamComponent {
   private bodyElement: HTMLElement = document.body;
 
   public examName = "New Exam"
-  tasks: string[] = [];
+  public tasks: Task[] = [];
   public isNameChange = false
 
   @ViewChild("nameInput") nameInput?: ElementRef;
@@ -63,14 +64,44 @@ export class CreateExamComponent {
     this.bodyElement.style.cursor = "unset"
     const element = event.target as Element;
     if (this.inDropzone) {
-      this.tasks.push(element.id);
+      this.tasks.push({
+        "taskId": "multipleChoice00",
+        "type": "multipleChoice",
+        "question": {
+            "DE": "Was machen Sachen?",
+            "EN": ""
+        },
+        "answerOptions": [
+            {
+                "DE": "Hallo",
+                "EN": "",
+                "correct": false
+            },
+            {
+                "DE": "OK",
+                "EN": "",
+                "correct": false
+            },
+            {
+                "DE": "cool",
+                "EN": "",
+                "correct": false
+            }
+        ],
+        "points": 0
+    } );
     }
     this.inDropzone = false;
+    console.log(this.tasks);
   }
 
   dragOverDropzone(event: DragEvent) {
     event.preventDefault();
     this.inDropzone = true;
+  }
+
+  deleteTask(index: number) {
+    console.log(this.tasks.splice(index, 1));
   }
 
   onSave() {
@@ -99,6 +130,11 @@ export class CreateExamComponent {
     //     console.error('Error adding exam:', error);
     //   }
     // })
+  }
+
+  onTaskChange(task: Task, index: number) {
+    console.log(index, "emitted: ");
+    console.log(task);
   }
 
 }

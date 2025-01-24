@@ -5,7 +5,7 @@
                 {{ examName}}
             </span>
             <input class="name_input" *ngIf="isNameChange" [value]="examName" (keydown)="onNameChange($event)"
-                id="examName" #nameInput >
+                id="examName" #nameInput>
         </div>
         <div class="add_tasks_container">
             <app-AddTask class="task_wrapper" [name]="'Multiple Choice'" [color]="'var(--color-primary)'"
@@ -15,8 +15,9 @@
             <app-AddTask class="task_wrapper" [name]="'Short Text'" [color]="'var(--color-secondary)'"
                 [iconName]="'shortText.svg'" id="text" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-AddTask>
-            <app-AddTask class="task_wrapper" [name]="'Ranking'" [color]="'var(--color-warn)'" [iconName]="'ranking.svg'"
-                id="ranking" draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)"></app-AddTask>
+            <app-AddTask class="task_wrapper" [name]="'Ranking'" [color]="'var(--color-warn)'"
+                [iconName]="'ranking.svg'" id="ranking" draggable="true" (dragstart)="dragStart($event)"
+                (dragend)="drop($event)"></app-AddTask>
         </div>
 
     </div>
@@ -24,7 +25,7 @@
     <div class="center_container">
         <div class="viewBar_spacer"></div>
         <div class="viewBar_wrapper">
-            <div class="icon_wrapper bar_icon" >
+            <div class="icon_wrapper bar_icon">
                 <mat-icon aria-hidden="false" fontIcon="remove_red_eye" matTooltip="Preview"></mat-icon>
             </div>
             <div class="icon_wrapper bar_icon">
@@ -47,8 +48,9 @@
             </div>
 
         </div>
-        <div class="view_wrapper" cdkDropList id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
-            <app-task class="task_container" *ngFor="let task of tasks" [name]="task"></app-task>
+        <div class="view_wrapper" id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
+            <app-task class="task_container" *ngFor="let task of tasks; let i = index" [taskId]="tasks[i].taskId" [preTask]="tasks[i]"
+                (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
         </div>
     </div>
 
