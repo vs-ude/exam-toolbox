@@ -139,6 +139,9 @@ export class TaskComponent implements OnInit, AfterViewInit {
 
   public onDelete() {
     this.deleteEvent.emit("delete");
-    console.log("Delete Event emitted");
+  }
+
+  public onOptionCorrectChange() {
+    this.taskChangeEvent.emit(this.task);
   }
 }

@@ -73,7 +73,7 @@ export class CreateExamComponent {
             {
                 "DE": "Hallo",
                 "EN": "",
-                "correct": false
+                "correct": true
             },
             {
                 "DE": "OK",
@@ -99,7 +99,7 @@ export class CreateExamComponent {
   }
 
   deleteTask(index: number) {
-    console.log(this.tasks.splice(index, 1));
+    this.tasks.splice(index, 1);
   }
 
   onSave() {
