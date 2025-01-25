@@ -24,6 +24,7 @@ import { MultipleChoiceTask, Task } from '../task-interfaces';
     NgStyle,
     NgIf,
     MatTooltipModule,
+
   ],
   templateUrl: './task.component.html',
   styleUrl: './task.component.scss',
@@ -65,6 +66,8 @@ export class TaskComponent implements OnInit, AfterViewInit {
   isUnderline: boolean = false;
   isQuestionActive: boolean = false;
 
+  pointsPerOption = 1;
+
   public task: MultipleChoiceTask = {
     taskId: "",
     type: "multipleChoice",
@@ -80,6 +83,7 @@ export class TaskComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     if (this.preTask) {
       this.task = this.preTask as MultipleChoiceTask;
+      this.pointsPerOption = this.task.points / this.task.answerOptions.filter(option => option.correct).length;
       return;
     }
     this.task.taskId = this.taskId;
@@ -142,6 +146,12 @@ export class TaskComponent implements OnInit, AfterViewInit {
   }
 
   public onOptionCorrectChange() {
+    this.task.points = this.pointsPerOption * this.task.answerOptions.filter(option => option.correct).length;
+    this.taskChangeEvent.emit(this.task);
+  }
+
+  public onPointsChange() {
+    this.task.points = this.pointsPerOption * this.task.answerOptions.filter(option => option.correct).length;
     this.taskChangeEvent.emit(this.task);
   }
 }

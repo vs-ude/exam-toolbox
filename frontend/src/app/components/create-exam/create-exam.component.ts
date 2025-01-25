@@ -78,7 +78,7 @@ export class CreateExamComponent {
             {
                 "DE": "OK",
                 "EN": "",
-                "correct": false
+                "correct": true
             },
             {
                 "DE": "cool",
@@ -86,7 +86,7 @@ export class CreateExamComponent {
                 "correct": false
             }
         ],
-        "points": 0
+        "points": 2
     } );
     }
     this.inDropzone = false;

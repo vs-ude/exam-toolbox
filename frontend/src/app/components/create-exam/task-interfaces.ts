@@ -2,7 +2,7 @@
 export type Task =
     | MultipleChoiceTask
     | ShortAnswerTask
-;
+    ;
 
 
 export interface BaseTask {

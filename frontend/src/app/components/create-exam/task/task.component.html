@@ -58,5 +58,11 @@
         <mat-icon aria-hidden="false" fontIcon="delete" matTooltip="Delete" (click)="onDelete()"></mat-icon>
       </div>
     </div>
+
+    <div class="points">
+      <mat-label>Points per option</mat-label>
+      <input type="number" step="0.5" min="0.5" class="points_input" value="1" [(ngModel)]="pointsPerOption" (change)="onPointsChange()"/>
+    </div>
+  
   </div>
 </mat-card>
