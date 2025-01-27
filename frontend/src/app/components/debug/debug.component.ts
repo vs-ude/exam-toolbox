@@ -65,21 +65,6 @@ export class DebugComponent {
       tasks
     );
 
-
-@Component({
-  selector: 'app-debug',
-  standalone: true,
-  imports: [],
-  templateUrl: './debug.component.html',
-  styleUrl: './debug.component.scss'
-})
-export class DebugComponent {
-
-  constructor(
-    private api: ApiService,
-  ) { }
-
-  onAddExam() {  
     this.api.addExam(exam).subscribe(
       response => {
         console.log('Exam added successfully: ', response);
