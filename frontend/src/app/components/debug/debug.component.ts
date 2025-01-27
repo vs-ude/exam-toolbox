@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Exam } from '../../exam';
+import { Exam, Task } from '../../exam';
 import { saveAs } from 'file-saver';
 import { ApiService } from '../../services/api.service';
 
@@ -25,7 +25,7 @@ export class DebugComponent {
     const date = '2025-12-15';
     const examLengthMinutes = 120;
     
-    const tasks = [
+    const tasks:Task[] = [
       {
         taskId: 'task1',
         type: 'shortAnswer',

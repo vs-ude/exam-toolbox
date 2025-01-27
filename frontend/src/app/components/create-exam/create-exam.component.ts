@@ -2,10 +2,10 @@ import { Component, ElementRef, HostListener, viewChild, ViewChild } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgFor, NgIf, NgStyle } from '@angular/common';
-import { Exam } from '../../exam';
+import { Exam, Task } from '../../exam';
 import { AddTaskComponent } from './add-task/add-task.component';
 import { TaskComponent } from "./task/task.component";
-import { MultipleChoiceTask, Task } from './task-interfaces';
+
 
 
 @Component({
@@ -128,6 +128,10 @@ export class CreateExamComponent {
     //     console.error('Error adding exam:', error);
     //   }
     // })
+  }
+
+  buildExam(){
+
   }
 
   onTaskChange(task: Task, index: number) {

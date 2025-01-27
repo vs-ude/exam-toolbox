@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { MultipleChoiceTask, Task } from '../task-interfaces';
+import { MultipleChoiceTask, Task } from '../../../exam';
 
 
 
