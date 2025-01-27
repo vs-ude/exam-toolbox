@@ -16,7 +16,7 @@
 }
 
 /*------------ [ left ] ------------*/
-.exam_name_wrapper{
+.exam_name_wrapper {
     height: 5%;
     width: 100%;
     display: flex;
@@ -24,23 +24,23 @@
     align-items: center;
 }
 
-.exam_name{
+.exam_name {
     border-radius: 5px;
     padding: 3%
 }
 
-.exam_name:hover{
+.exam_name:hover {
     background-color: var(--border-color);
 }
 
 
-.name_input{
+.name_input {
     border-radius: 5px;
     padding: 3%;
     border-color: var(--color-primary);
 }
 
-.name_input:focus{
+.name_input:focus {
     border-color: #0768c4;
     outline: none;
 }
@@ -61,14 +61,15 @@
     box-sizing: border-box;
 }
 
-.task_wrapper{
+.task_wrapper {
     margin-left: 1%;
 }
-.task_wrapper:hover{
+
+.task_wrapper:hover {
     cursor: grab;
 }
 
-.task_wrapper:active{
+.task_wrapper:active {
     cursor: grabbing;
 }
 
@@ -81,6 +82,8 @@
     flex-direction: column;
 }
 
+
+/*------------ [ ToolBar ] ------------*/
 .viewBar_spacer {
     height: 5%;
 }
@@ -98,7 +101,25 @@
     max-height: 10%;
 }
 
-.bar_icon{
+
+.semester_wrapper {
+    display: flex;
+    align-items: center;
+    justify-content:  center;
+    flex-direction: row;
+    padding: 0 10px;
+    border-radius: 5px;
+    min-width: 20%;
+    color: var(--color-dark-gray);
+}
+
+.semester_wrapper:hover {
+    cursor: pointer;
+    background-color: #0000001a;
+}
+
+
+.bar_icon {
     color: var(--color-dark-gray);
     margin-right: 1%;
 }
@@ -131,19 +152,19 @@
 /* width */
 ::-webkit-scrollbar {
     width: 10px;
-  }
-  
-  /* Track */
-  ::-webkit-scrollbar-track {
+}
+
+/* Track */
+::-webkit-scrollbar-track {
     background: #f1f1f1;
-  }
-  
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
     background: #888;
-  }
-  
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
     background: #555;
-  }
+}

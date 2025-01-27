@@ -5,13 +5,14 @@ import { NgFor, NgIf, NgStyle } from '@angular/common';
 import { Exam, Task } from '../../exam';
 import { AddTaskComponent } from './add-task/add-task.component';
 import { TaskComponent } from "./task/task.component";
+import {MatSelectModule} from '@angular/material/select';
 
 
 
 @Component({
   selector: 'app-create-exam',
   standalone: true,
-  imports: [MatIconModule, MatTooltipModule, AddTaskComponent, TaskComponent, NgFor, NgIf, TaskComponent],
+  imports: [MatIconModule, MatTooltipModule, AddTaskComponent, TaskComponent, NgFor, NgIf, TaskComponent, MatSelectModule],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
 })
@@ -27,11 +28,14 @@ export class CreateExamComponent {
   public tasks: Task[] = [];
   public isNameChange = false
 
+  public semesters = ["SS 23", "WS 23/24", "SS 24", "WS 24/25",];
+  public selectedSemester = "";
+
   @ViewChild("nameInput") nameInput?: ElementRef;
 
   @HostListener("document:click", ["$event"])
   unselectInputs(event: MouseEvent) {
-    const elementId = (event.target as Element).id
+    const elementId = (event.target as Element).id;
 
     if (elementId === "examName") {
       return;
@@ -103,35 +107,35 @@ export class CreateExamComponent {
   }
 
   onSave() {
-    let questions = [];
-    for (let question of this.tasks) {
-      questions.push({ question: question, points: 10 })
+    this.checkIfValid();
+     const exam = this.buildExam();
+     console.log(exam);
     }
 
-    // Comment in and fix when these informations like title, courseName, etc. is available here.
-    // const exam: Exam = new Exam(
-    //   examId,
-    //   title,
-    //   courseName,
-    //   examinerName,
-    //   semester,
-    //   date,
-    //   examLengthMinutes,
-    //   tasks
-    // );
 
-    // this.dbService.addExam(exam).subscribe({
-    //   next: (response) => {
-    //     console.log('Exam added successfully:', response);
-    //   },
-    //   error: (error) => {
-    //     console.error('Error adding exam:', error);
-    //   }
-    // })
+  private buildExam(){
+    return new Exam(
+      "examId",
+      this.examName,
+      "courseName",
+      "examinerName",
+      this.selectedSemester,
+      "examDate",
+      90,
+      this.tasks
+    );
   }
 
-  buildExam(){
+  private checkIfValid(){
+    if (this.examName === "") {
+      alert("Please enter a name for the exam");
+      throw new Error("no exam name");
+    }
 
+    if (this.selectedSemester === ""){
+      alert("Please select a semester");
+      throw new Error("No semester selected");
+    }
   }
 
   onTaskChange(task: Task, index: number) {
