@@ -1,11 +1,11 @@
 import { Component, ElementRef, HostListener, viewChild, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { NgFor, NgIf, NgStyle } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { Exam, Task } from '../../exam';
 import { AddTaskComponent } from './add-task/add-task.component';
 import { TaskComponent } from "./task/task.component";
-import {MatSelectModule} from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { saveAs } from 'file-saver';
@@ -15,7 +15,17 @@ import { saveAs } from 'file-saver';
 @Component({
   selector: 'app-create-exam',
   standalone: true,
-  imports: [MatIconModule, MatTooltipModule, AddTaskComponent, TaskComponent, NgFor, NgIf, TaskComponent, MatSelectModule, FormsModule],
+  imports: [
+    MatIconModule,
+    MatTooltipModule,
+    AddTaskComponent,
+    TaskComponent,
+    NgFor,
+    NgIf,
+    TaskComponent,
+    MatSelectModule,
+    FormsModule,
+  ],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
 })
@@ -36,6 +46,7 @@ export class CreateExamComponent {
   public selectedSemester = "";
 
   public examinerName = "";
+  public examDate = "";
 
   @ViewChild("nameInput") nameInput?: ElementRef;
 
@@ -76,28 +87,28 @@ export class CreateExamComponent {
         "taskId": "multipleChoice00",
         "type": "multipleChoice",
         "question": {
-            "DE": "Was machen Sachen?",
-            "EN": ""
+          "DE": "Was machen Sachen?",
+          "EN": ""
         },
         "answerOptions": [
-            {
-                "DE": "Hallo",
-                "EN": "",
-                "correct": true
-            },
-            {
-                "DE": "OK",
-                "EN": "",
-                "correct": true
-            },
-            {
-                "DE": "cool",
-                "EN": "",
-                "correct": false
-            }
+          {
+            "DE": "Hallo",
+            "EN": "",
+            "correct": true
+          },
+          {
+            "DE": "OK",
+            "EN": "",
+            "correct": true
+          },
+          {
+            "DE": "cool",
+            "EN": "",
+            "correct": false
+          }
         ],
         "points": 2
-    } );
+      });
     }
     this.inDropzone = false;
     console.log(this.tasks);
@@ -117,6 +128,7 @@ export class CreateExamComponent {
     const exam = this.buildExam();
     console.log(exam);
 
+
     this.api.addExam(exam).subscribe(
       response => {
         console.log('Exam added successfully: ', response);
@@ -127,7 +139,7 @@ export class CreateExamComponent {
     );
   }
 
-  onPreview(){
+  onPreview() {
     this.checkIfValid()
     const exam = this.buildExam()
     console.log(exam)
@@ -143,39 +155,45 @@ export class CreateExamComponent {
   }
 
 
-  private buildExam(){
+  private buildExam() {
     return new Exam(
-      "examId", 
+      "examId",
       this.examName,
       "courseName",
       this.examinerName,
       this.selectedSemester,
-      "examDate",
+      this.examDate,
       90,
       this.tasks
     );
   }
 
-  private checkIfValid(){
+  private checkIfValid() {
     if (this.examName === "") {
       alert("Please enter a name for the exam");
       throw new Error("no exam name");
     }
 
-    if (this.selectedSemester === ""){
+    if (this.selectedSemester === "") {
       alert("Please select a semester");
       throw new Error("No semester selected");
     }
 
-    if (this.examinerName === ""){
+    if (this.examinerName === "") {
       alert("Please enter the examiner's name");
       throw new Error("No examiner name");
+    }
+
+    if (this.examDate === ""){
+      alert("Please enter the exam date");
+      throw new Error("no exam date set")
     }
   }
 
   onTaskChange(task: Task, index: number) {
+    this.tasks[index] = task;
     console.log(index, "emitted: ");
-    console.log(task);
+    console.log(this.tasks);
   }
 
 }

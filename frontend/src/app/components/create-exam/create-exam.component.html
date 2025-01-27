@@ -26,21 +26,19 @@
         <div class="viewBar_spacer"></div>
         <div class="viewBar_wrapper">
             <div class="icon_wrapper bar_icon">
-                <mat-icon aria-hidden="false" fontIcon="remove_red_eye" matTooltip="Preview" (click)="onPreview()"></mat-icon>
+                <mat-icon aria-hidden="false" fontIcon="remove_red_eye" matTooltip="Preview"
+                    (click)="onPreview()"></mat-icon>
             </div>
             <div class="icon_wrapper bar_icon">
                 <mat-icon aria-hidden="false" fontIcon="save" matTooltip="Save" (click)="onSave()"></mat-icon>
             </div>
-            <div class="icon_wrapper bar_icon">
-                <mat-icon aria-hidden="false" fontIcon="insert_link" matTooltip="Copy Link"></mat-icon>
-            </div>
-            <div class="icon_wrapper bar_icon">
-                <mat-icon aria-hidden="false" fontIcon="undo" matTooltip="Undo"></mat-icon>
-            </div>
-            <div class="icon_wrapper bar_icon">
-                <mat-icon aria-hidden="false" fontIcon="content_copy" matTooltip="Copy Task"></mat-icon>
-            </div>
 
+
+            
+            <!-- Exam Date -->
+            <div class="date_wrapper">
+                <input type="date" class="datePicker" [(ngModel)]="examDate"/>
+            </div>
 
             <!-- Examiner -->
             <div class="examiner_wrapper">
@@ -53,7 +51,7 @@
             <!-- Semester -->
             <div class="semester_wrapper">
                 <div class="icon_wrapper ">
-                    <mat-icon aria-hidden="false" fontIcon="date_range"></mat-icon>
+                    <mat-icon aria-hidden="false" fontIcon="school"></mat-icon>
                 </div>
                 <mat-select class="selectSemester" placeholder="Select Semester" [(value)]="selectedSemester">
                     <mat-option *ngFor="let semester of semesters" [value]="semester">
