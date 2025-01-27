@@ -6,19 +6,7 @@ export class Exam {
     semester: string;
     date: string;
     examLengthMinutes: number;
-    tasks: {
-        taskId: string;
-        type: string;
-        question: { DE: string; EN: string };
-        options?: { DE: string; EN: string; correct: boolean }[] | { DE1: string; EN1: string; correct1: boolean; DE2: string; EN2: string; correct2: boolean }[];
-        properties?: { DE: string; EN: string; props: string[] };
-        solution?: { DE: string; EN: string } | boolean;
-        solutions?: { DE: string; EN: string }[];
-        caption?: { DE: string; EN: string };
-        imagePath?: string;
-        solutionImagePath?: string;
-        points: number;
-    }[];
+    tasks: Task[];
 
     constructor(
         examId: string,
@@ -28,19 +16,7 @@ export class Exam {
         semester: string,
         date: string,
         examLengthMinutes: number,
-        tasks: {
-            taskId: string;
-            type: string;
-            question: { DE: string; EN: string };
-            options?: { DE: string; EN: string; correct: boolean }[] | { DE1: string; EN1: string; correct1: boolean; DE2: string; EN2: string; correct2: boolean }[];
-            properties?: { DE: string; EN: string; props: string[] };
-            solution?: { DE: string; EN: string } | boolean;
-            solutions?: { DE: string; EN: string }[];
-            caption?: { DE: string; EN: string };
-            imagePath?: string;
-            solutionImagePath?: string;
-            points: number;
-        }[]
+        tasks: Task[]
     ) {
         this.examId = examId;
         this.title = title;
@@ -51,4 +27,44 @@ export class Exam {
         this.examLengthMinutes = examLengthMinutes;
         this.tasks = tasks;
     }
+}
+
+
+export type Task =
+    | MultipleChoiceTask
+    | ShortAnswerTask
+    ;
+
+
+export interface BaseTask {
+    taskId: string;
+    type: string;
+    question: Question;
+    points: number;
+}
+
+export interface Question {
+    DE: string;
+    EN: string;
+}
+
+export interface MultipleChoiceTask extends BaseTask {
+    type: "multipleChoice";
+    answerOptions: AnswerOptions[];
+}
+
+export interface AnswerOptions {
+    DE: string;
+    EN: string;
+    correct: boolean;
+}
+
+export interface ShortAnswerTask extends BaseTask {
+    type: "shortAnswer";
+    solution: Translation;
+}
+
+export interface Translation {
+    DE: string;
+    EN: string;
 }

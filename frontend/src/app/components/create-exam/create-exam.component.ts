@@ -2,15 +2,17 @@ import { Component, ElementRef, HostListener, viewChild, ViewChild } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgFor, NgIf, NgStyle } from '@angular/common';
-import { Exam } from '../../exam';
+import { Exam, Task } from '../../exam';
 import { AddTaskComponent } from './add-task/add-task.component';
 import { TaskComponent } from "./task/task.component";
+import {MatSelectModule} from '@angular/material/select';
+
 
 
 @Component({
   selector: 'app-create-exam',
   standalone: true,
-  imports: [MatIconModule, MatTooltipModule, AddTaskComponent, TaskComponent, NgFor, NgIf, TaskComponent],
+  imports: [MatIconModule, MatTooltipModule, AddTaskComponent, TaskComponent, NgFor, NgIf, TaskComponent, MatSelectModule],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
 })
@@ -23,14 +25,17 @@ export class CreateExamComponent {
   private bodyElement: HTMLElement = document.body;
 
   public examName = "New Exam"
-  tasks: string[] = [];
+  public tasks: Task[] = [];
   public isNameChange = false
+
+  public semesters = ["SS 23", "WS 23/24", "SS 24", "WS 24/25",];
+  public selectedSemester = "";
 
   @ViewChild("nameInput") nameInput?: ElementRef;
 
   @HostListener("document:click", ["$event"])
   unselectInputs(event: MouseEvent) {
-    const elementId = (event.target as Element).id
+    const elementId = (event.target as Element).id;
 
     if (elementId === "examName") {
       return;
@@ -61,9 +66,35 @@ export class CreateExamComponent {
     this.bodyElement.style.cursor = "unset"
     const element = event.target as Element;
     if (this.inDropzone) {
-      this.tasks.push(element.id);
+      this.tasks.push({
+        "taskId": "multipleChoice00",
+        "type": "multipleChoice",
+        "question": {
+            "DE": "Was machen Sachen?",
+            "EN": ""
+        },
+        "answerOptions": [
+            {
+                "DE": "Hallo",
+                "EN": "",
+                "correct": true
+            },
+            {
+                "DE": "OK",
+                "EN": "",
+                "correct": true
+            },
+            {
+                "DE": "cool",
+                "EN": "",
+                "correct": false
+            }
+        ],
+        "points": 2
+    } );
     }
     this.inDropzone = false;
+    console.log(this.tasks);
   }
 
   dragOverDropzone(event: DragEvent) {
@@ -71,32 +102,45 @@ export class CreateExamComponent {
     this.inDropzone = true;
   }
 
+  deleteTask(index: number) {
+    this.tasks.splice(index, 1);
+  }
+
   onSave() {
-    let questions = [];
-    for (let question of this.tasks) {
-      questions.push({ question: question, points: 10 })
+    this.checkIfValid();
+     const exam = this.buildExam();
+     console.log(exam);
     }
 
-    // Comment in and fix when these informations like title, courseName, etc. is available here.
-    // const exam: Exam = new Exam(
-    //   examId,
-    //   title,
-    //   courseName,
-    //   examinerName,
-    //   semester,
-    //   date,
-    //   examLengthMinutes,
-    //   tasks
-    // );
 
-    // this.dbService.addExam(exam).subscribe({
-    //   next: (response) => {
-    //     console.log('Exam added successfully:', response);
-    //   },
-    //   error: (error) => {
-    //     console.error('Error adding exam:', error);
-    //   }
-    // })
+  private buildExam(){
+    return new Exam(
+      "examId",
+      this.examName,
+      "courseName",
+      "examinerName",
+      this.selectedSemester,
+      "examDate",
+      90,
+      this.tasks
+    );
+  }
+
+  private checkIfValid(){
+    if (this.examName === "") {
+      alert("Please enter a name for the exam");
+      throw new Error("no exam name");
+    }
+
+    if (this.selectedSemester === ""){
+      alert("Please select a semester");
+      throw new Error("No semester selected");
+    }
+  }
+
+  onTaskChange(task: Task, index: number) {
+    console.log(index, "emitted: ");
+    console.log(task);
   }
 
 }
