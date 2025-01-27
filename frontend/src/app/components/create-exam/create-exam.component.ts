@@ -47,6 +47,7 @@ export class CreateExamComponent {
 
   public examinerName = "";
   public examDate = "";
+  public examDuration = 90;
 
   @ViewChild("nameInput") nameInput?: ElementRef;
 
@@ -163,7 +164,7 @@ export class CreateExamComponent {
       this.examinerName,
       this.selectedSemester,
       this.examDate,
-      90,
+      this.examDuration,
       this.tasks
     );
   }

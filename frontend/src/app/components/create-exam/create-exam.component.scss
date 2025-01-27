@@ -101,6 +101,34 @@
     max-height: 10%;
 }
 
+.duration_wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    padding: 0 10px;
+    border-radius: 5px;
+    min-width: auto;
+    color: var(--color-dark-gray);
+}
+
+.duration_picker {
+    width: 50px;
+    padding: 4px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    outline: none;
+    text-align: center;
+}
+
+
+.duration_picker:focus {
+    border-color: #4285f4;
+    box-shadow: 0 0 4px rgba(66, 133, 244, 0.5);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+
 .date_wrapper {
     display: flex;
     align-items: center;
@@ -108,7 +136,7 @@
     flex-direction: row;
     padding: 0 10px;
     border-radius: 5px;
-    min-width: 20%;
+    min-width: auto;
     color: var(--color-dark-gray);
 }
 
@@ -131,8 +159,6 @@
 .datePicker:focus {
     outline: 1px solid #0768c4;
 }
-
-
 
 
 .examiner_wrapper {
@@ -232,6 +258,7 @@
     padding-left: 30px;
     padding-right: 10px;
 }
+
 .mx-icon-calendar {
     left: 8px
 }

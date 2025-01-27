@@ -34,10 +34,18 @@
             </div>
 
 
-            
+            <!-- Duration -->
+            <div class="duration_wrapper">
+                <div class="icon_wrapper">
+                    <mat-icon aria-hidden="false" fontIcon="access_time" ></mat-icon>
+                </div>
+                <input class="duration_picker" type="number" min="0"  step="10" [(ngModel)]="examDuration">
+            </div>
+
+
             <!-- Exam Date -->
             <div class="date_wrapper">
-                <input type="date" class="datePicker" [(ngModel)]="examDate"/>
+                <input type="date" class="datePicker" [(ngModel)]="examDate" />
             </div>
 
             <!-- Examiner -->
