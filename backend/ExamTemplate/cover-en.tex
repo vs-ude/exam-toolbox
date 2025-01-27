@@ -1,0 +1,87 @@
+\ifthenelse{\equal{\interactive}{Y}}{
+    % \hspace{0pt}
+    % \vfill
+    % {\Large\textbf{Declaration of Independence}}
+
+    % \enquote{I, \textbf{\vollername}, hereby assure that I will work on the written examination \textbf{\veranstaltung} independently and only using the permitted aids in the specified working time. 
+
+    % In particular, I assure that I will not use any unauthorized help of other persons and that I will not communicate with any other person during the examination except the examination supervisor. 
+
+    % I am aware that an untrue statement may have \underline{legal consequences} and, in particular, may result in the written examination being assessed as failed. Furthermore, I am aware that the examiner can make oral inquiries about the subject matter within the assessment period in cases of reasonablesuspicion.}
+
+    % %\vspace{2cm}
+
+    % \begin{center}
+    %     \underline{I, \textbf{\vollername}, hereby confirm the declaration above:}
+
+    %     \textbf{{\color{red} {CHECK THIS BOX} \myarrow \declerationbox }}
+    % \end{center}
+    % %\vspace{0.3cm}
+     
+    % \vfill
+    % \hspace{0pt}
+
+    % \newpage
+    \hspace{0pt}
+    \vfill
+    \begin{center}
+        \textbf{EXAM in \veranstaltung}
+
+        \textbf{Duration: 90 MINUTES}\\
+		\textit{Submission deadline: 10 minutes after end of exam}
+    \end{center}
+    \vspace{-0.3cm}
+    The exam consists of \pageref{LastPage} pages in total. 
+    There are some single and multiple response questions for which you need to mark the correct statements. The method used for scoring is explicitly described in each task.
+
+    The exam is provided in German and an English translation for your convenience. Please use either the English \underline{or} the German one for writing your solution! Keep in mind that the German version is the legally binding one. You may give your answers in German or English.
+
+    To solve the exam you may use \underline{your personal notes and materials provided by us}. You may use a dictionary. Use of additional aids is prohibited. The working time is 90 minutes.
+	Afterwards you have 10 minutes to upload your solution through the form mentioned below.
+    \hspace{0pt}
+
+	\ifthenelse{\equal{\uploadurl}{}}{}{
+        \vspace*{\fill}
+        \fbox{\parbox{\textwidth}{%
+            \begin{center}
+                {\color{red}\textbf{\Large YOUR UPLOAD URL ‒ DO NOT SHARE}}
+                \vspace*{10mm}
+
+                {\large\url{https://vs.uni-due.de/uploadexam/\uploadurl}}
+
+                \vspace*{10mm}
+				{Submit this PDF using the form at the given URL after you are finished. Further information can be found in the info materials provided in the Moodle course.}
+            \end{center}
+        }}
+        \vspace*{\fill}
+        \newpage
+    }
+    \vfill
+}
+{
+    \begin{center}
+        \textbf{EXAM in \veranstaltung}
+        
+        \textbf{Duration: 90 MINUTES}
+    \end{center}
+        \ifthenelse{\equal{\vollername}{}}{%
+        Please fill in the cover page before you start on the exam and check for the completeness of the assignment sheets.}{%
+        Please check whether the name on the cover page is yours before you start on the exam and check for the completeness of the assignment sheets.}
+        There are a total of \pageref{LastPage} pages. There are blank pages at the end of the exam for your personal notes. You may use these pages for your answers if the provided solution space is not enough. Please write down a page reference under the assignment and note in your solution to which assignment number you are referring. If we cannot match your solution to an assignment, it will not be graded.
+        
+        There are some single and multiple response questions for which you need to mark the correct statements. If you mark a wrong statement you will get 0 points for your answer, even if you additionally marked the correct statement. Please mark your answer with a cross. Should you need to cancel your answer, cancel the whole column of boxes \underline{clearly} and draw a new column of boxes.
+        
+        \begin{center}
+        \includegraphics[width=0.43\textwidth]{kreuze.png}
+        \end{center}
+        
+        % (CB) Print only if both versions are provided
+        \ifthenelse{\equal{\englishandgerman}{yes}}
+        {The exam is provided in German and an English translation for your convenience. Please use either the English \underline{or} the German one for writing your solution! Remember, that the German version is the legally binding one! You may give your answers in German or English.}
+        {}
+        
+        For the exam no teaching aids are allowed (\underline{closed book exam}). Any kind of portable communication device is forbidden. You may, however, use a language dictionary book. The duration is 90 minutes.
+        
+        Answers in unreadable handwriting cannot be graded. Please use permanent ink pens (no pencils). At the end of the exam, leave all paper on the desk, no matter whether the paper has been written on or not. Do not remove any material from the room. Deceits and disturbances are treated accordingly to the examination regulations (Prüfungsordnung).
+}
+

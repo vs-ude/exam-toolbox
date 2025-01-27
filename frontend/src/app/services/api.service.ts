@@ -13,7 +13,7 @@ export class ApiService {
     private http: HttpClient
   ) {}
 
-  generateExam(exam: Exam): Observable<Blob>{
+  generateExam(exam?: Exam): Observable<Blob>{
     return this.http.post(`${this.apiUrl}/generate-exam`, exam, {responseType: 'blob'})
   }
 

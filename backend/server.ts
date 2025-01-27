@@ -1,17 +1,9 @@
 import { Application, Router } from "https://deno.land/x/oak@v10.5.0/mod.ts";
 import { MongoClient } from "https://deno.land/x/mongo/mod.ts";
 import { latrex } from "https://deno.land/x/latrex/mod.ts";
+import { Exam } from "./exam.ts";
 
 
-export class Exam{
-  title: string;
-  questions: {question: string; points: number}[];
-
-  constructor(title: string, questions: { question: string; points: number }[]) {
-      this.title = title;
-      this.questions = questions;
-  }
-}
 
 // MongoDB setup
 const client = new MongoClient();
@@ -82,22 +74,73 @@ const port = 3000;
 await app.listen({ port });
 
 
-async function generateExam(exam: Exam): Promise<Uint8Array> {
-  const latexContent = `
-    \\documentclass{article}
-    \\begin{document}
-    \\title{${exam.title}}
-    \\maketitle
-    ${exam.questions.map((q) => `\\section*{Question:} ${q.question} \\hfill ${q.points} points`).join("\n")}
-    \\end{document}`;
 
+async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
+  let exam: Exam
   try {
-    console.log("Generating PDF from LaTeX content: " + latexContent)
-    const pdfBuffer = await latrex(latexContent, {returnLogs: true})
-    console.log("PDF generation successful")
-    return pdfBuffer
+    // Directory for templates
+    const basePath = "/app/ExamTemplate"
+    const metaPath = `${basePath}/meta-exam.tex`
+    const examTemplatePath = `${basePath}/exam.tex`
+
+    if(examGiven == undefined){
+      // fetch latest exam from db 
+      const latestExam = await exams.find().sort({ _id: -1 }).limit(1).toArray();
+      if (latestExam.length === 0) {
+        throw new Error("No exams found in the database.");
+      }
+      exam = latestExam[0] as Exam;
+    }
+    else{
+      exam = examGiven
+    }
+
+    // Extract data from JSON
+    const { examId, title, courseName, examinerName, semester, date, examLengthMinutes, tasks } = exam;
+
+    // Read meta-exam.tex
+    const metaTemplate = await Deno.readTextFile(metaPath);
+
+    // Replace placeholders in meta-exam.tex
+    const updatedMeta = metaTemplate
+      .replace(/\\newcommand\{\\veranstaltung\}\{.*?\}/, `\\newcommand{\\veranstaltung}{${courseName.replace(/ /g, '\\ ')}}`)
+      .replace(/\\newcommand\{\\semester\}\{.*?\}/, `\\newcommand{\\semester}{${semester.replace(/ /g, '\\ ')}}`)
+      .replace(/\\newcommand\{\\pruefer\}\{.*?\}/, `\\newcommand{\\pruefer}{${examinerName.replace(/ /g, '\\ ')}}`)
+      .replace(/\\newcommand\{\\datum\}\{.*?\}/, `\\newcommand{\\datum}{${date}}`);
+
+    // Update meta-exam.tex
+    await Deno.writeTextFile(metaPath, updatedMeta);
+
+    // Read exam.tex
+    const examTemplate = await Deno.readTextFile(examTemplatePath);
+
+    // Set name and path for new exam LaTeX file
+    const newExamFilename = `${examId}.tex`;
+    const newExamPath = `${basePath}/${newExamFilename}`
+    console.log("Path for new exam:", newExamPath);
+
+    // Create new exam LaTeX file
+    await Deno.writeTextFile(newExamPath, examTemplate);
+    console.log(`New LaTeX file created: ${newExamFilename}`);
+
+
+    const errorLogsPath = `${basePath}/${examId}_error.log`
+
+    // Generate PDF from the new LaTeX file
+    console.log("Generating PDF from LaTeX content...");
+    Deno.chdir(basePath)
+    const pdfBuffer = await latrex(newExamPath, {
+      returnLogs: true,
+      errorLogsPath,
+      cwd: basePath,
+      inputs: [basePath],
+    });
+    console.log("PDF generation successful");
+
+    return pdfBuffer;
+
   } catch (error) {
     console.error("Error during LaTeX document generation:", error);
-    throw new Error("LaTeX Document generation failed")
+    throw new Error("LaTeX Document generation failed");
   }
 }

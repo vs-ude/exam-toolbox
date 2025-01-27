@@ -1,0 +1,206 @@
+\input{vs-exams.tex}
+
+\graphicspath{{img/}}
+
+% (CB) Counter-Anpassung für ungerade Zahlen: 2 für .5er Schritte, 4 für 0.25er Schritte
+\COPY{4}{\anpassung}
+
+% (CB) Background Image
+\newcommand{\pageBorderFactor}{0.9235}
+\ifthenelse{\equal{\zeigeloesung}{yes}}{\backgroundsetup{
+	scale=\pageBorderFactor,
+	color=black,
+	angle=0,
+	opacity=1,
+	contents={%
+		\includegraphics[width=\paperwidth,height=\paperheight]{background-svg-muster-first}
+	}
+}}{\backgroundsetup{
+	scale=\pageBorderFactor,
+	color=black,
+	angle=0,
+	opacity=1,
+	contents={%
+		\includegraphics[width=\paperwidth,height=\paperheight]{background-svg}
+		%\includesvg{background-svg}
+	}
+}}
+\typeout{VSEXAM: {'Typ':'borderGeo', 'borderFactor': '\pageBorderFactor'}}%
+
+\begin{document}
+\begin{Form}
+
+%%% Lecker Listings usw.
+\definecolor{gray}{gray}{0.5}
+\lstset{
+	basicstyle=\ttfamily\small,
+	%numbersep=10pt,
+	numberstyle=\ttfamily\color{gray}\scriptsize,
+	numbers=left,
+	numberblanklines = false,
+	escapechar=\%,
+	breaklines=true,
+	%frame=lines,
+}
+
+\begin{titlepage}
+\begin{center}
+
+		\ifthenelse{\equal{\zeigeloesung}{yes}}
+		{\begin{color}{red}\large \normalfont\itshape MUSTERLÖSUNG
+		\end{color}
+		}
+		{}
+    
+    \vfill 
+    	%\vspace*{2cm}	
+    {\large\normalfont\bfseries \klausur}
+    \vspace{0.1cm}
+
+    {\Large\normalfont\bfseries \veranstaltung}
+
+    {\large\normalfont\itshape \pruefer}
+
+    \semester \\ \datum
+
+
+  % Create 20 Assignments Counters
+  \newtotcounter{pointsforassignment1}
+  \newtotcounter{pointsforassignment2}
+  \newtotcounter{pointsforassignment3}
+  \newtotcounter{pointsforassignment4}
+  \newtotcounter{pointsforassignment5}
+  \newtotcounter{pointsforassignment6}
+  \newtotcounter{pointsforassignment7}
+  \newtotcounter{pointsforassignment8}
+  \newtotcounter{pointsforassignment9}
+  \newtotcounter{pointsforassignment10}
+  \newtotcounter{pointsforassignment11}
+  \newtotcounter{pointsforassignment12}
+  \newtotcounter{pointsforassignment13}
+  %\newtotcounter{pointsforassignment14}
+  %\newtotcounter{pointsforassignment15}
+  %\newtotcounter{pointsforassignment16}
+  %\newtotcounter{pointsforassignment17}
+  %\newtotcounter{pointsforassignment18}
+  %\newtotcounter{pointsforassignment19}
+  %\newtotcounter{pointsforassignment20}
+  
+  % Counter für die Punkte
+  \newtotcounter{numberofassignments}
+  \newtotcounter{exampoints}
+  
+  %  \large
+
+  
+  \def\totpagecount{\getpagerefnumber{LastPage}}
+  \DIVIDE{\totvalue{exampoints}}{\anpassung}{\div}
+
+    \gesamtpunktzahl: \ifthenelse{\totvalue{exampoints}<0}{\textcolor{red}{\textbf{RECOMPILE}}}{\div}\\
+    \totalpages: \totpagecount
+    
+    \vspace{1.5cm}
+  \escapedStringTypeout{VSEXAM: {'Typ':'mainQR', 'content': {'v':'\removebs{\veranstaltung}','s':'\semester','d':'\datum','l':'\sprache','c':\totpagecount,'t':\div,'r':\randomexamnumber}}}%
+  \qrcode[height=4cm,level=H]{\{'v':'\removebs{\veranstaltung}','s':'\semester','d':'\datum','l':'\sprache','c':\totpagecount,'t':\div,'r':'\randomexamnumber'\}}
+  \\
+  \ifthenelse{\equal{\vollername}{}}{%
+  \vspace{0.4cm}
+  \barcode[code=Code39,X=.35mm]{\randomexamnumber} 
+  \\
+  \vspace{0.4cm}
+  }{%
+  \vspace{1.2cm}
+  }
+  
+  \#\textbf{\randomexamnumber}
+  \ifthenelse{\equal{\vollername}{}}{}{\\[0.5em]
+  \seqnr:\ \textbf{\ifthenelse{\equal{\sequenznummer}{}}{\SequenznummerFehlt}{\sequenznummer}}}
+  
+  % Ausnutzen der vollen Seitengroesse
+  \vfill
+
+	\vspace{0.2cm}
+
+\begingroup
+\setlength\extrarowheight{6pt}
+
+	\begin{tabular}{|c|c|}
+      \hline	
+	  ~~\note~~  & ~~~~~~~~~~ \\
+      \hline
+	\end{tabular}
+
+    \vspace{0.2cm}
+    \ifthenelse{\equal{\vollername}{}}{%
+    \begin{tabular}{|p{0.5\textwidth}|c|}
+      \hline
+      % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+      Name & \stud \\ \hline
+       &  \\
+      \hline
+    \end{tabular}}{%
+    \begin{tabular}{rl}
+      % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+      \large Name: & \textbf{\vollername} \\
+      \large \mtr: & \textbf{\ifthenelse{\equal{\matrikelnummer}{}}{\MatrikelnummerFehlt}{\matrikelnummer}} \\
+    \end{tabular}
+    }
+	%\def\pagetotalnew{\pageref{LastPage}}
+	
+	\ifthenelse{\equal{\vollername}{}}{%
+  \vspace{0.2cm}
+	\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+		\hline
+		%\multicolumn{13}{|c|}{\mtr} \\	\hline
+		\mtr & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ & ~ \\ \hline
+	\end{tabular}
+	}{\vspace{1.3cm}}
+
+\endgroup % reset \extrarowheight to default
+
+	\begin{figure} [ht]
+		\centering
+			\includegraphics[height=2cm]{Unilogo.jpg}
+		\includegraphics[height=2cm]{vslogo.png}
+	\end{figure}
+
+\end{center}
+\end{titlepage}
+
+\ifthenelse{\equal{\zeigeloesung}{yes}}{\backgroundsetup{
+	scale=\pageBorderFactor,
+	color=black,
+	angle=0,
+	opacity=1,
+	contents={%
+		\includegraphics[width=\paperwidth,height=\paperheight]{background-svg-muster}
+	}
+}}{}
+
+% prints the cover sheet in the right language
+\printcover
+
+\setlength{\parskip}{0ex} % Abstand zwischen Absaetzen
+
+% prints aufgaben-en.tex or aufgaben.de.tex, depending on language setting
+\printaufgaben
+
+% Counter für Schmierblätter Ausgleich am Ende der Klausur
+\newtotcounter{lastpageexam}
+\setcounter{lastpageexam}{\thepage}
+\SUBTRACT{\value{lastpageexam}}{1}{\subtr}
+\setcounter{lastpageexam}{\subtr}
+%\thelastpageexam
+%\addtocounter{lastpageexam}{\SUBTRACT{\value{page}}{1}{\subtr}\subtr}
+
+\schmierblaetter
+
+\donottouchpage
+
+%\includepdf{TargetMachine.pdf}
+%\includepdf{ATMEL_1.pdf}
+%\includepdf{ATMEL_2.pdf}
+%
+\end{Form}
+\end{document}
+\endinput
