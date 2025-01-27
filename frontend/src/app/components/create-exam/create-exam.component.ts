@@ -6,13 +6,14 @@ import { Exam, Task } from '../../exam';
 import { AddTaskComponent } from './add-task/add-task.component';
 import { TaskComponent } from "./task/task.component";
 import {MatSelectModule} from '@angular/material/select';
+import { FormsModule, } from '@angular/forms';
 
 
 
 @Component({
   selector: 'app-create-exam',
   standalone: true,
-  imports: [MatIconModule, MatTooltipModule, AddTaskComponent, TaskComponent, NgFor, NgIf, TaskComponent, MatSelectModule],
+  imports: [MatIconModule, MatTooltipModule, AddTaskComponent, TaskComponent, NgFor, NgIf, TaskComponent, MatSelectModule, FormsModule],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
 })
@@ -30,6 +31,8 @@ export class CreateExamComponent {
 
   public semesters = ["SS 23", "WS 23/24", "SS 24", "WS 24/25",];
   public selectedSemester = "";
+
+  public examinerName = "";
 
   @ViewChild("nameInput") nameInput?: ElementRef;
 
@@ -107,7 +110,7 @@ export class CreateExamComponent {
   }
 
   onSave() {
-    this.checkIfValid();
+    this.checkIfExamValid();
      const exam = this.buildExam();
      console.log(exam);
     }
@@ -115,10 +118,10 @@ export class CreateExamComponent {
 
   private buildExam(){
     return new Exam(
-      "examId",
+      "examId", 
       this.examName,
       "courseName",
-      "examinerName",
+      this.examinerName,
       this.selectedSemester,
       "examDate",
       90,
@@ -126,8 +129,8 @@ export class CreateExamComponent {
     );
   }
 
-  private checkIfValid(){
-    if (this.examName === "") {
+  private checkIfExamValid(){
+    if (this.examName === "" || this.examName === "New Exam" ) {
       alert("Please enter a name for the exam");
       throw new Error("no exam name");
     }
@@ -135,6 +138,11 @@ export class CreateExamComponent {
     if (this.selectedSemester === ""){
       alert("Please select a semester");
       throw new Error("No semester selected");
+    }
+
+    if (this.examinerName === ""){
+      alert("Please enter the examiner's name");
+      throw new Error("No examiner name");
     }
   }
 

@@ -41,16 +41,22 @@
                 <mat-icon aria-hidden="false" fontIcon="content_copy" matTooltip="Copy Task"></mat-icon>
             </div>
 
-            <div class="icon_wrapper bar_icon">
-                <mat-icon aria-hidden="false" fontIcon="print" matTooltip="Print"></mat-icon>
+
+            <!-- Examiner -->
+            <div class="examiner_wrapper">
+                <div class="icon_wrapper ">
+                    <mat-icon aria-hidden="false" fontIcon="person"></mat-icon>
+                </div>
+                <input class="examiner_input" placeholder="Enter Examiner's Name" [(ngModel)]="examinerName">
             </div>
 
+            <!-- Semester -->
             <div class="semester_wrapper">
                 <div class="icon_wrapper ">
                     <mat-icon aria-hidden="false" fontIcon="date_range"></mat-icon>
                 </div>
                 <mat-select class="selectSemester" placeholder="Select Semester" [(value)]="selectedSemester">
-                    <mat-option *ngFor="let semester of semesters" [value]="semester" >
+                    <mat-option *ngFor="let semester of semesters" [value]="semester">
                         {{ semester }}
                     </mat-option>
                 </mat-select>
