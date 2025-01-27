@@ -76,27 +76,27 @@ await app.listen({ port });
 
 
 async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
+  let exam: Exam
   try {
     // Directory for templates
     const basePath = "/app/ExamTemplate"
     const metaPath = `${basePath}/meta-exam.tex`
     const examTemplatePath = `${basePath}/exam.tex`
 
-    console.log("Paths:");
-    console.log("Base Path:", basePath);
-    console.log("Meta Path:", metaPath);
-    console.log("Exam Template Path:", examTemplatePath);
-
-    // fetch latest exam from db 
-    const latestExam = await exams.find().sort({ _id: -1 }).limit(1).toArray();
-    if (latestExam.length === 0) {
-      throw new Error("No exams found in the database.");
+    if(examGiven == undefined){
+      // fetch latest exam from db 
+      const latestExam = await exams.find().sort({ _id: -1 }).limit(1).toArray();
+      if (latestExam.length === 0) {
+        throw new Error("No exams found in the database.");
+      }
+      exam = latestExam[0] as Exam;
+    }
+    else{
+      exam = examGiven
     }
 
     // Extract data from JSON
-    const exam: Exam = latestExam[0] as Exam;
     const { examId, title, courseName, examinerName, semester, date, examLengthMinutes, tasks } = exam;
-    console.log(examId + ", " + title + ", " + courseName + ", " + examinerName + ", " + semester + ", " + date + ", " + examLengthMinutes + ", " + tasks);
 
     // Read meta-exam.tex
     const metaTemplate = await Deno.readTextFile(metaPath);
@@ -107,9 +107,6 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
       .replace(/\\newcommand\{\\semester\}\{.*?\}/, `\\newcommand{\\semester}{${semester.replace(/ /g, '\\ ')}}`)
       .replace(/\\newcommand\{\\pruefer\}\{.*?\}/, `\\newcommand{\\pruefer}{${examinerName.replace(/ /g, '\\ ')}}`)
       .replace(/\\newcommand\{\\datum\}\{.*?\}/, `\\newcommand{\\datum}{${date}}`);
-
-
-    console.log(updatedMeta)
 
     // Update meta-exam.tex
     await Deno.writeTextFile(metaPath, updatedMeta);
