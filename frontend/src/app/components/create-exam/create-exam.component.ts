@@ -6,6 +6,8 @@ import { Exam, Task } from '../../exam';
 import { AddTaskComponent } from './add-task/add-task.component';
 import { TaskComponent } from "./task/task.component";
 import {MatSelectModule} from '@angular/material/select';
+import { ApiService } from '../../services/api.service';
+import { saveAs } from 'file-saver';
 
 
 
@@ -19,6 +21,7 @@ import {MatSelectModule} from '@angular/material/select';
 export class CreateExamComponent {
 
   constructor(
+    private api: ApiService,
   ) { }
 
   public inDropzone = false;
@@ -108,9 +111,33 @@ export class CreateExamComponent {
 
   onSave() {
     this.checkIfValid();
-     const exam = this.buildExam();
-     console.log(exam);
-    }
+    const exam = this.buildExam();
+    console.log(exam);
+
+    this.api.addExam(exam).subscribe(
+      response => {
+        console.log('Exam added successfully: ', response);
+      },
+      error => {
+        console.error('Error adding exam: ', error);
+      }
+    );
+  }
+
+  onPreview(){
+    this.checkIfValid()
+    const exam = this.buildExam()
+    console.log(exam)
+
+    this.api.generateExam(exam).subscribe({
+      next: (examPDF: Blob) => {
+        saveAs(examPDF, `${exam.title}.pdf`)
+      },
+      error: (err) => {
+        console.error('Error downloading PDF: ', err)
+      }
+    })
+  }
 
 
   private buildExam(){
