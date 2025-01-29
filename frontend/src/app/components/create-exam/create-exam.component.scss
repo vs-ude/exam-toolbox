@@ -76,7 +76,7 @@
 
 /*------------ [ center ] ------------*/
 .center_container {
-    width: 55%;
+    width: 60%;
     padding: 10px 32px 10px 32px;
     display: flex;
     flex-direction: column;
@@ -226,13 +226,28 @@
 
 /*------------ [ right ] ------------*/
 .right_container {
-    width: 15%;
+    width: 25%;
     border-left: solid 1px;
     border-color: var(--border-color);
     padding: 10px 1% 10px 1%;
+    flex-direction: column;
 }
 
 
+
+.task_pool_container {
+    background-color: #F5F5F5;
+    height: 70%;
+    border-radius: 15px;
+    padding: 10px 32px 10px 32px;
+    box-sizing: border-box;
+}
+
+
+
+
+
+/*------------ [ Custom Scrollbar ] ------------*/
 /* width */
 ::-webkit-scrollbar {
     width: 10px;
@@ -251,14 +266,4 @@
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
-}
-
-
-.mx-input {
-    padding-left: 30px;
-    padding-right: 10px;
-}
-
-.mx-icon-calendar {
-    left: 8px
 }

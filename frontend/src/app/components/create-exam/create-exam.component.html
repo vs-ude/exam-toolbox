@@ -9,14 +9,14 @@
         </div>
         <div class="add_tasks_container">
             <app-AddTask class="task_wrapper" [name]="'Multiple Choice'" [color]="'var(--color-primary)'"
-                [iconName]="'multipleChoice.svg'" id="multipleChoice" draggable="true" (dragstart)="dragStart($event)"
+                [iconName]="'multipleChoice.svg'" id="new_multipleChoice" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)">
             </app-AddTask>
             <app-AddTask class="task_wrapper" [name]="'Short Text'" [color]="'var(--color-secondary)'"
-                [iconName]="'shortText.svg'" id="text" draggable="true" (dragstart)="dragStart($event)"
+                [iconName]="'shortText.svg'" id="new_text" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-AddTask>
             <app-AddTask class="task_wrapper" [name]="'Ranking'" [color]="'var(--color-warn)'"
-                [iconName]="'ranking.svg'" id="ranking" draggable="true" (dragstart)="dragStart($event)"
+                [iconName]="'ranking.svg'" id="new_ranking" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-AddTask>
         </div>
 
@@ -37,9 +37,9 @@
             <!-- Duration -->
             <div class="duration_wrapper">
                 <div class="icon_wrapper">
-                    <mat-icon aria-hidden="false" fontIcon="access_time" ></mat-icon>
+                    <mat-icon aria-hidden="false" fontIcon="access_time"></mat-icon>
                 </div>
-                <input class="duration_picker" type="number" min="0"  step="10" [(ngModel)]="examDuration">
+                <input class="duration_picker" type="number" min="0" step="10" [(ngModel)]="examDuration">
             </div>
 
 
@@ -78,5 +78,18 @@
 
 
 
-    <div class="right_container">pool</div>
+    <div class="right_container">pool
+        <div class="task_pool_container">
+            <app-AddTask class="task_wrapper" [name]="'Example Task'" [color]="'var(--color-warn)'"
+                [iconName]="'multipleChoice.svg'" id="pool_task" draggable="true" (dragstart)="dragStart($event)"
+                (dragend)="drop($event)">
+            </app-AddTask>
+
+            <app-AddTask class="task_wrapper" [name]="'Example Task'" [color]="'var(--color-warn)'"
+                [iconName]="'multipleChoice.svg'" id="pool_task" draggable="true" (dragstart)="dragStart($event)"
+                (dragend)="drop($event)">
+            </app-AddTask>
+
+        </div>
+    </div>
 </div>

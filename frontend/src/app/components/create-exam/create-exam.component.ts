@@ -83,36 +83,66 @@ export class CreateExamComponent {
     this.bodyElement.classList.remove("inheritCursors");
     this.bodyElement.style.cursor = "unset"
     const element = event.target as Element;
+    console.log(element.id);
+
     if (this.inDropzone) {
+      if (element.id.slice(0, 4) === "new_") {
+        this.pushNewTask(element.id);
+      } else {
+        this.pushPoolTask(element.id);
+      }
+    }
+    this.inDropzone = false;
+  }
+
+  private pushNewTask(taskType: string) {
+    if (taskType === "new_multipleChoice") {
       this.tasks.push({
-        "taskId": "multipleChoice00",
+        "taskId": "multipleChoice",
         "type": "multipleChoice",
         "question": {
-          "DE": "Was machen Sachen?",
+          "DE": "",
           "EN": ""
         },
         "answerOptions": [
           {
-            "DE": "Hallo",
+            "DE": "",
             "EN": "",
             "correct": true
           },
-          {
-            "DE": "OK",
-            "EN": "",
-            "correct": true
-          },
-          {
-            "DE": "cool",
-            "EN": "",
-            "correct": false
-          }
         ],
-        "points": 2
+        "points": 1
       });
     }
-    this.inDropzone = false;
-    console.log(this.tasks);
+  }
+
+  private pushPoolTask(taskName: string){
+    this.tasks.push({
+      "taskId": "multipleChoice00",
+      "type": "multipleChoice",
+      "question": {
+        "DE": "Was ist rot und schlecht für die Zähne?",
+        "EN": ""
+      },
+      "answerOptions": [
+        {
+          "DE": "Zahnpasta",
+          "EN": "",
+          "correct": false
+        },
+        {
+          "DE": "Backstein",
+          "EN": "",
+          "correct": true
+        },
+        {
+          "DE": "Zahnbürste",
+          "EN": "",
+          "correct": false
+        }
+      ],
+      "points": 2
+    });
   }
 
   dragOverDropzone(event: DragEvent) {
@@ -160,7 +190,7 @@ export class CreateExamComponent {
     return new Exam(
       "examId",
       this.examName,
-      "courseName",
+      this.examName,      //course Name here
       this.examinerName,
       this.selectedSemester,
       this.examDate,
@@ -171,6 +201,7 @@ export class CreateExamComponent {
 
   private checkIfValid() {
     if (this.examName === "") {
+      -
       alert("Please enter a name for the exam");
       throw new Error("no exam name");
     }
@@ -185,7 +216,7 @@ export class CreateExamComponent {
       throw new Error("No examiner name");
     }
 
-    if (this.examDate === ""){
+    if (this.examDate === "") {
       alert("Please enter the exam date");
       throw new Error("no exam date set")
     }
