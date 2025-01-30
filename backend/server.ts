@@ -1,7 +1,10 @@
+// @ts-ignore
 import { Application, Router } from "https://deno.land/x/oak@v10.5.0/mod.ts";
+// @ts-ignore
 import { MongoClient } from "https://deno.land/x/mongo/mod.ts";
+// @ts-ignore
 import { latrex } from "https://deno.land/x/latrex/mod.ts";
-import { Exam } from "./exam.ts";
+import { Exam, Task } from "./exam.ts";
 
 
 
@@ -10,6 +13,7 @@ const client = new MongoClient();
 await client.connect("mongodb://mongo:27017/examToolboxDB");
 const db = client.database("examToolboxDB");
 const exams = db.collection("exams");
+const pool = db.collection("taskPool");
 
 // Create Oak Application and Router
 const app = new Application();
@@ -62,6 +66,27 @@ router
     } catch (error) {
       ctx.response.status = 500;
       ctx.response.body = { message: 'Error generating Exam PDF', error }
+    }
+  })
+  .get("/api/taskPool", async (ctx) => {
+    try {
+      const taskList = await pool.find();
+      ctx.response.status = 200;
+      ctx.response.body = taskList;
+    } catch (error) {
+      ctx.response.status = 500;
+      ctx.response.body = { message: 'Error fetching tasks', error };
+    }
+  })
+  .post("/api/taskPool", async (ctx) => {
+    const task: Task = await ctx.request.body().value
+    try {
+      await pool.insertOne(task);
+      ctx.response.status = 200;
+      ctx.response.body = { message: 'Task added to pool' };
+    } catch (err) {
+      ctx.response.status = 500;
+      ctx.response.body = { message: 'Error adding to pool', error: err };
     }
   })
 

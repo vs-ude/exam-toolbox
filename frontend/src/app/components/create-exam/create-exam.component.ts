@@ -98,50 +98,26 @@ export class CreateExamComponent {
   private pushNewTask(taskType: string) {
     if (taskType === "new_multipleChoice") {
       this.tasks.push({
-        "taskId": "multipleChoice",
-        "type": "multipleChoice",
-        "question": {
-          "DE": "",
-          "EN": ""
-        },
-        "answerOptions": [
-          {
-            "DE": "",
-            "EN": "",
-            "correct": true
-          },
-        ],
-        "points": 1
+        taskId: "multipleChoice",
+        type: "multipleChoice",
+        question: { DE: "", EN: "" },
+        answerOptions: [{ DE: "", EN: "", correct: true },],
+        points: 1
       });
     }
   }
 
-  private pushPoolTask(taskName: string){
+  private pushPoolTask(taskName: string) {
     this.tasks.push({
-      "taskId": "multipleChoice00",
-      "type": "multipleChoice",
-      "question": {
-        "DE": "Was ist rot und schlecht für die Zähne?",
-        "EN": ""
-      },
-      "answerOptions": [
-        {
-          "DE": "Zahnpasta",
-          "EN": "",
-          "correct": false
-        },
-        {
-          "DE": "Backstein",
-          "EN": "",
-          "correct": true
-        },
-        {
-          "DE": "Zahnbürste",
-          "EN": "",
-          "correct": false
-        }
+      taskId: "multipleChoice00",
+      type: "multipleChoice",
+      question: { DE: "Was ist rot und schlecht für die Zähne?", EN: "" },
+      answerOptions: [
+        { DE: "Zahnpasta", EN: "", correct: false },
+        { DE: "Backstein", EN: "", correct: true },
+        {DE: "Zahnbürste",EN: "",correct: false},
       ],
-      "points": 2
+      points: 2
     });
   }
 
@@ -158,6 +134,15 @@ export class CreateExamComponent {
     this.checkIfValid();
     const exam = this.buildExam();
     console.log(exam);
+
+    this.api.addTaskToPool(this.tasks[0]).subscribe(
+      response => {
+        console.log('Task added successfully: ', response);
+      },
+      error => {
+        console.error('Error adding task: ', error);
+      }
+    )
 
 
     this.api.addExam(exam).subscribe(
@@ -202,7 +187,7 @@ export class CreateExamComponent {
   private checkIfValid() {
     if (this.examName === "") {
       -
-      alert("Please enter a name for the exam");
+        alert("Please enter a name for the exam");
       throw new Error("no exam name");
     }
 

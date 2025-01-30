@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Exam } from '../exam';
+import { Exam, Task } from '../exam';
 
 @Injectable({
   providedIn: 'root'
@@ -19,5 +19,9 @@ export class ApiService {
 
   addExam(exam: Exam): Observable<any>{
     return this.http.post(`${this.apiUrl}/exams`, exam)
+  }
+
+  addTaskToPool(task: Task){
+    return this.http.post(`${this.apiUrl}/taskPool`, task)
   }
 }
