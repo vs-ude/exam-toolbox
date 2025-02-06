@@ -132,7 +132,6 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
       .replace(/\\newcommand\{\\semester\}\{.*?\}/, `\\newcommand{\\semester}{${semester.replace(/ /g, '\\ ')}}`)
       .replace(/\\newcommand\{\\pruefer\}\{.*?\}/, `\\newcommand{\\pruefer}{${examinerName.replace(/ /g, '\\ ')}}`)
       .replace(/\\newcommand\{\\datum\}\{.*?\}/, `\\newcommand{\\datum}{${date}}`);
-
     // Update meta-exam.tex
     await Deno.writeTextFile(metaPath, updatedMeta);
 
@@ -140,7 +139,7 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
     const examTemplate = await Deno.readTextFile(examTemplatePath);
 
     // Set name and path for new exam LaTeX file
-    const newExamFilename = `${examId}.tex`;
+    const newExamFilename = `${courseName}.tex`;
     const newExamPath = `${basePath}/${newExamFilename}`
     console.log("Path for new exam:", newExamPath);
 
@@ -148,17 +147,12 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
     await Deno.writeTextFile(newExamPath, examTemplate);
     console.log(`New LaTeX file created: ${newExamFilename}`);
 
-
-    const errorLogsPath = `${basePath}/${examId}_error.log`
-
     // Generate PDF from the new LaTeX file
     console.log("Generating PDF from LaTeX content...");
     Deno.chdir(basePath)
     const pdfBuffer = await latrex(newExamPath, {
-      returnLogs: true,
-      errorLogsPath,
-      cwd: basePath,
       inputs: [basePath],
+      passes: 3, // needs multiple passes because .aux files are persisting to the second pass and the pdf can only be generated correctly when the .aux files from the pass before is used. 
     });
     console.log("PDF generation successful");
 
