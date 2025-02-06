@@ -131,7 +131,9 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
       .replace(/\\newcommand\{\\veranstaltung\}\{.*?\}/, `\\newcommand{\\veranstaltung}{${courseName.replace(/ /g, '\\ ')}}`)
       .replace(/\\newcommand\{\\semester\}\{.*?\}/, `\\newcommand{\\semester}{${semester.replace(/ /g, '\\ ')}}`)
       .replace(/\\newcommand\{\\pruefer\}\{.*?\}/, `\\newcommand{\\pruefer}{${examinerName.replace(/ /g, '\\ ')}}`)
-      .replace(/\\newcommand\{\\datum\}\{.*?\}/, `\\newcommand{\\datum}{${date}}`);
+      .replace(/\\newcommand\{\\datum\}\{.*?\}/, `\\newcommand{\\datum}{${date}}`)
+      .replace(/\\newcommand\{\\zeigeloesung\}\{.*?\}/, `\\newcommand{\\zeigeloesung}{yes}`)
+    
     // Update meta-exam.tex
     await Deno.writeTextFile(metaPath, updatedMeta);
 
@@ -155,6 +157,8 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
       passes: 3, // needs multiple passes because .aux files are persisting to the second pass and the pdf can only be generated correctly when the .aux files from the pass before is used. 
     });
     console.log("PDF generation successful");
+
+    await Deno.remove(newExamPath)
 
     return pdfBuffer;
 
