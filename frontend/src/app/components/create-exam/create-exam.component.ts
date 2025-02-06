@@ -31,23 +31,36 @@ import { saveAs } from 'file-saver';
 })
 export class CreateExamComponent {
 
-  constructor(
-    private api: ApiService,
-  ) { }
-
   public inDropzone = false;
+  public isNameChange = false
   private bodyElement: HTMLElement = document.body;
+  public taskColor: {[key:string]: string} = {multipleChoice:"var(--color-primary)", shortQuestion: "var(--color-warn)", misc: "var(--color-secondary)"}
+
+  public taskPool: Task[] = [];
 
   public examName = "New Exam"
   public tasks: Task[] = [];
-  public isNameChange = false
-
   public semesters = ["SS 23", "WS 23/24", "SS 24", "WS 24/25",];
   public selectedSemester = "";
-
   public examinerName = "";
   public examDate = "";
   public examDuration = 90;
+
+  constructor(
+    private api: ApiService,
+  ) {
+    this.api.getTasksFromPool().subscribe(
+      response => {
+        this.taskPool = response;
+        console.log(response)
+
+      },
+      error => {
+        console.error(error);
+      })
+  }
+
+
 
   @ViewChild("nameInput") nameInput?: ElementRef;
 
@@ -107,18 +120,12 @@ export class CreateExamComponent {
     }
   }
 
-  private pushPoolTask(taskName: string) {
-    this.tasks.push({
-      taskId: "multipleChoice00",
-      type: "multipleChoice",
-      question: { DE: "Was ist rot und schlecht für die Zähne?", EN: "" },
-      answerOptions: [
-        { DE: "Zahnpasta", EN: "", correct: false },
-        { DE: "Backstein", EN: "", correct: true },
-        {DE: "Zahnbürste",EN: "",correct: false},
-      ],
-      points: 2
-    });
+  private pushPoolTask(taskId: string) {
+    const task = this.taskPool.find(element => element.taskId === taskId);
+    if (task == undefined){
+      console.warn("couldn't find task");
+      return;}
+    this.tasks.push(task);
   }
 
   dragOverDropzone(event: DragEvent) {

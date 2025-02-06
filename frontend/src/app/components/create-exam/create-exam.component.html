@@ -80,14 +80,9 @@
 
     <div class="right_container">pool
         <div class="task_pool_container">
-            <app-AddTask class="task_wrapper" [name]="'Example Task'" [color]="'var(--color-warn)'"
-                [iconName]="'multipleChoice.svg'" id="pool_task" draggable="true" (dragstart)="dragStart($event)"
-                (dragend)="drop($event)">
-            </app-AddTask>
-
-            <app-AddTask class="task_wrapper" [name]="'Example Task'" [color]="'var(--color-warn)'"
-                [iconName]="'multipleChoice.svg'" id="pool_task" draggable="true" (dragstart)="dragStart($event)"
-                (dragend)="drop($event)">
+            <app-AddTask *ngFor="let task of taskPool" class="task_wrapper" [name]="task.taskId" [color]="taskColor[task.type]"
+                [iconName]="task.type + '.svg'" id="{{task.taskId}}" draggable="true" (dragstart)="dragStart($event)"
+                (dragend)="drop($event)" matTooltip="{{task.question.DE}}" [matTooltipShowDelay]="800">
             </app-AddTask>
 
         </div>

@@ -70,7 +70,7 @@ router
   })
   .get("/api/taskPool", async (ctx) => {
     try {
-      const taskList = await pool.find();
+      const taskList = await pool.find().toArray();
       ctx.response.status = 200;
       ctx.response.body = taskList;
     } catch (error) {

@@ -24,4 +24,8 @@ export class ApiService {
   addTaskToPool(task: Task){
     return this.http.post(`${this.apiUrl}/taskPool`, task)
   }
+
+  getTasksFromPool(){
+    return this.http.get<Task[]>(`${this.apiUrl}/taskPool`)
+  }
 }
