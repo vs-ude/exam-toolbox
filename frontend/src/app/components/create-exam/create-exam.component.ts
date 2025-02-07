@@ -37,6 +37,7 @@ export class CreateExamComponent {
   public taskColor: {[key:string]: string} = {multipleChoice:"var(--color-primary)", shortQuestion: "var(--color-warn)", misc: "var(--color-secondary)"}
 
   public taskPool: Task[] = [];
+  public totalPoints = 0;
 
   public examName = "New Exam"
   public tasks: Task[] = [];
@@ -118,6 +119,7 @@ export class CreateExamComponent {
         points: 1
       });
     }
+    this.adjustTotalPoints();
   }
 
   private pushPoolTask(taskId: string) {
@@ -126,6 +128,7 @@ export class CreateExamComponent {
       console.warn("couldn't find task");
       return;}
     this.tasks.push(task);
+    this.adjustTotalPoints();
   }
 
   dragOverDropzone(event: DragEvent) {
@@ -135,6 +138,7 @@ export class CreateExamComponent {
 
   deleteTask(index: number) {
     this.tasks.splice(index, 1);
+    this.adjustTotalPoints();
   }
 
   onSave() {
@@ -214,8 +218,14 @@ export class CreateExamComponent {
     }
   }
 
+  private adjustTotalPoints(){
+    console.log("adjust")
+    this.totalPoints = this.tasks.reduce((accumulator:number, task) => accumulator += task.points, 0)
+  }
+
   onTaskChange(task: Task, index: number) {
     this.tasks[index] = task;
+    this.adjustTotalPoints();
     console.log(index, "emitted: ");
     console.log(this.tasks);
   }
