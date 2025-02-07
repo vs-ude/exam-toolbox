@@ -128,9 +128,9 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
 
     // Replace placeholders in meta-exam.tex
     const updatedMeta = metaTemplate
-      .replace(/\\newcommand\{\\veranstaltung\}\{.*?\}/, `\\newcommand{\\veranstaltung}{${courseName.replace(/ /g, '\\ ')}}`)
+      .replace(/\\newcommand\{\\veranstaltung\}\{.*?\}/, `\\newcommand{\\veranstaltung}{${courseName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')}}`)
       .replace(/\\newcommand\{\\semester\}\{.*?\}/, `\\newcommand{\\semester}{${semester.replace(/ /g, '\\ ')}}`)
-      .replace(/\\newcommand\{\\pruefer\}\{.*?\}/, `\\newcommand{\\pruefer}{${examinerName.replace(/ /g, '\\ ')}}`)
+      .replace(/\\newcommand\{\\pruefer\}\{.*?\}/, `\\newcommand{\\pruefer}{${examinerName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')}}`)
       .replace(/\\newcommand\{\\datum\}\{.*?\}/, `\\newcommand{\\datum}{${date}}`)
       .replace(/\\newcommand\{\\zeigeloesung\}\{.*?\}/, `\\newcommand{\\zeigeloesung}{yes}`)
     
@@ -141,7 +141,7 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
     const examTemplate = await Deno.readTextFile(examTemplatePath);
 
     // Set name and path for new exam LaTeX file
-    const newExamFilename = `${courseName}.tex`;
+    const newExamFilename = `newExam.tex`;
     const newExamPath = `${basePath}/${newExamFilename}`
     console.log("Path for new exam:", newExamPath);
 
