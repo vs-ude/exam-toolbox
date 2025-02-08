@@ -143,6 +143,7 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
     const basePath = "/app/ExamTemplate"
     const metaPath = `${basePath}/meta-exam.tex`
     const examTemplatePath = `${basePath}/exam.tex`
+    const tasksPath = `${basePath}/aufgaben.tex`
 
     if(examGiven == undefined){
       // fetch latest exam from db 
@@ -157,7 +158,7 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
     }
 
     // Extract data from JSON
-    const { examId, title, courseName, examinerName, semester, date, examLengthMinutes, tasks } = exam;
+    const { courseName, examinerName, semester, date, examLengthMinutes, tasks } = exam;
 
     // Read meta-exam.tex
     const metaTemplate = await Deno.readTextFile(metaPath);
@@ -172,6 +173,12 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
     
     // Update meta-exam.tex
     await Deno.writeTextFile(metaPath, updatedMeta);
+
+
+    // generates latex for the tasks and updates aufgaben.tex in the templates
+    const tasksContentLatex = generateTasksLatex(tasks)
+    await Deno.writeTextFile(tasksPath, tasksContentLatex)
+
 
     // Read exam.tex
     const examTemplate = await Deno.readTextFile(examTemplatePath);
@@ -202,4 +209,47 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
     console.error("Error during LaTeX document generation:", error);
     throw new Error("LaTeX Document generation failed");
   }
+}
+
+// for escaping special characters in latex
+function escapeLatex(text?: string): string {
+  if (!text) return ""
+  return text.replace(/([&%$#_{}~^\\])/g, '\\$1')
+}
+
+// generates the latex for the tasks
+function generateTasksLatex(tasks: Task[]): string {
+  let latexContent = ""
+
+  tasks.forEach((task) => {
+      // Ensure required fields exist with fallbacks
+      const questionDE = task.question.DE
+      const questionEN = task.question.EN
+      
+      latexContent += `\\aufgabe{${escapeLatex(questionDE)}}{${escapeLatex(questionEN)}}\n`;
+      latexContent += `\\aufgabenteil{${task.points ?? 0}}\n`;
+      latexContent += `{${escapeLatex(questionDE)}}\n`;
+      latexContent += `{${escapeLatex(questionEN)}}\n\n`;
+
+      if (task.type === "multipleChoice") {
+          const answerOptions = task.answerOptions
+          const correctAnswers = answerOptions.filter(opt => opt.correct).length
+          const pointsPerCorrect = task.points * correctAnswers
+
+          latexContent += `\\fortype{A}{\n\\mcstart[${pointsPerCorrect}]{${correctAnswers}}\n`;
+          
+          answerOptions.forEach(option => {
+              const de = escapeLatex(option.DE);
+              const en = escapeLatex(option.EN);
+              const correctness = option.correct ? "w" : "f";
+              latexContent += `\\mcline{${de}}{${en}}{${correctness}}\n`;
+          });
+          
+          latexContent += `\\mcend\n}\n`;
+      }
+
+      latexContent += "\\aufgabenteilende\n\n";
+  });
+
+  return latexContent;
 }
