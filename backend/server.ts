@@ -5,6 +5,7 @@ import { MongoClient } from "https://deno.land/x/mongo/mod.ts";
 // @ts-ignore
 import { latrex } from "https://deno.land/x/latrex/mod.ts";
 import { Exam, Task } from "./exam.ts";
+import { ObjectId } from "https://deno.land/x/mongo@v0.33.0/deps.ts";
 
 
 
@@ -53,6 +54,41 @@ router
       ctx.response.body = { message: 'Error saving exam', error: err };
     }
   })
+  .post("/api/exams/update", async (ctx) => {
+    try {
+      const { examId, updatedExam } = await ctx.request.body().value;
+      console.log("Incoming request body:", await ctx.request.body().value);
+  
+      // validate examId and updatedExamData are provided
+      if (!examId || !updatedExam) {
+        ctx.response.status = 400;
+        ctx.response.body = { message: "Exam ID and updated data are required" };
+        return;
+      }
+  
+      // Convert the examId to an ObjectId (MongoDB uses ObjectId for the _id field)
+      const mongoId = new ObjectId(examId)
+  
+      // Updating the Exam with the provided id
+      const result = await exams.updateOne(
+        { _id: mongoId },  // finds exam
+        { $set: updatedExam }  // updates just the changed fields in the exam
+      );
+  
+      // If no matching exam found, return 404
+      if (result.matchedCount === 0) {
+        ctx.response.status = 404;
+        ctx.response.body = { message: "Exam not found" };
+        return;
+      }
+  
+      ctx.response.status = 200;
+      ctx.response.body = { message: "Exam updated successfully" };
+    } catch (error) {
+      ctx.response.status = 500;
+      ctx.response.body = { message: "Error updating exam", error };
+    }
+  })
   .post("/api/generate-exam", async (ctx) => {
     const exam: Exam = await ctx.request.body().value
     try {
@@ -60,7 +96,7 @@ router
 
       // tell the frontend that this is an PDF
       ctx.response.headers.set("Content-Type", "application/pdf")
-      ctx.response.headers.set("Content-Disposition", `attachment; filename="${exam.title}.pdf"`)
+      ctx.response.headers.set("Content-Disposition", `attachment; filename="${exam.courseName}.pdf"`)
 
       ctx.response.body = examPDF
     } catch (error) {

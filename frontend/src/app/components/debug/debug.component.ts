@@ -46,7 +46,6 @@ const exam: Exam = new Exam(
   date,
   examLengthMinutes,
   tasks
-
 );
 
 @Component({
@@ -82,6 +81,19 @@ export class DebugComponent {
         console.error('Error downloading PDF: ', err)
       }
     })
+  }
+
+  onUpdateExam(){
+    let id: string = '67a77bdea72f7082a9a4283a' // An id of an Exam in your DB. Needs to be updated for testing if you don't have a Exam with this ID.
+    
+    this.api.updateExam(id, exam).subscribe(
+      response => {
+        console.log('Exam updated successfully: ', response);
+      },
+      error => {
+        console.error('Error updating exam: ', error);
+      }
+    )   
   }
   
 }
