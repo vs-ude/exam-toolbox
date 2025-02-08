@@ -25,7 +25,7 @@ export class DashboardComponent {
     private api: ApiService
   ) { }
 
-  
+
   ngOnInit(){
     this.api.getExams().subscribe(res => {
       this.exams = res
@@ -55,6 +55,10 @@ export class DashboardComponent {
 
   onDebug(){
     this.router.navigate(['/debug'])
+  }
+
+  onExamClick(exam: Exam){
+    console.log('Exam clicked: ' + exam.courseName + ', ' + exam.semester + ', ' + exam._id)
   }
 
 }

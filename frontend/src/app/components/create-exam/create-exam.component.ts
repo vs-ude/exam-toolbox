@@ -173,7 +173,7 @@ export class CreateExamComponent {
 
     this.api.generateExam(exam).subscribe({
       next: (examPDF: Blob) => {
-        saveAs(examPDF, `${exam.title}.pdf`)
+        saveAs(examPDF, `${exam.courseName}.pdf`)
       },
       error: (err) => {
         console.error('Error downloading PDF: ', err)
@@ -184,8 +184,6 @@ export class CreateExamComponent {
 
   private buildExam() {
     return new Exam(
-      "examId",
-      this.examName,
       this.examName,      //course Name here
       this.examinerName,
       this.selectedSemester,
