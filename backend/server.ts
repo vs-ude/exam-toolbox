@@ -34,7 +34,7 @@ router
   })
   .get("/api/exams", async (ctx) => {
     try {
-      const examList = await exams.find();
+      const examList = await exams.find().toArray();
       ctx.response.status = 200;
       ctx.response.body = examList;
     } catch (error) {

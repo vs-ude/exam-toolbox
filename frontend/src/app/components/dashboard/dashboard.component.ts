@@ -4,6 +4,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { ExamCardComponent } from "../exam-card/exam-card.component";
 import { NgClass, NgFor } from '@angular/common';
 import { Router } from '@angular/router';
+import { ApiService } from '../../services/api.service';
+import { Exam } from '../../exam';
 
 
 @Component({
@@ -15,10 +17,21 @@ import { Router } from '@angular/router';
 })
 export class DashboardComponent {
 
+  exams: Exam[] = []
+
 
   constructor(
     private router: Router,
+    private api: ApiService
   ) { }
+
+  
+  ngOnInit(){
+    this.api.getExams().subscribe(res => {
+      this.exams = res
+      console.table(this.exams)
+    })
+  }
 
 
   @HostListener("document:click", ["$event"])
@@ -35,16 +48,6 @@ export class DashboardComponent {
   }
 
   public showDropdowns = { sorting: false, filter: false, }
-
-  public examNames = [
-    "Cloud Web Mobile",
-    "Rechnernetze",
-    "Betriebssysteme",
-    "Verteilte Systeme",
-    "Sicherheit in Kommunikationsnetzen",
-    "Rechnerarchitektur",
-  ]
-
 
   onAddExam(){
     this.router.navigate(['/create-exam']);  

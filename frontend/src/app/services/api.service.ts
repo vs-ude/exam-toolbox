@@ -25,6 +25,10 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/taskPool`, task)
   }
 
+  getExams(){
+    return this.http.get<Exam[]>(`${this.apiUrl}/exams`)
+  }
+
   getTasksFromPool(){
     return this.http.get<Task[]>(`${this.apiUrl}/taskPool`)
   }

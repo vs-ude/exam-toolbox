@@ -180,7 +180,7 @@
 
 
     <div class="fileBrowser_view">
-        <div class="fileBrowser_item" *ngFor="let exam of examNames"><app-exam-card [name]="exam"></app-exam-card></div>
+        <div class="fileBrowser_item" *ngFor="let exam of exams"><app-exam-card [name]="exam.courseName"></app-exam-card></div>
     </div>
 
 </div>
