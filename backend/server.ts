@@ -5,6 +5,7 @@ import { MongoClient } from "https://deno.land/x/mongo/mod.ts";
 // @ts-ignore
 import { latrex } from "https://deno.land/x/latrex/mod.ts";
 import { Exam, Task } from "./exam.ts";
+import { ObjectId } from "https://deno.land/x/mongo@v0.33.0/deps.ts";
 
 
 
@@ -34,7 +35,7 @@ router
   })
   .get("/api/exams", async (ctx) => {
     try {
-      const examList = await exams.find();
+      const examList = await exams.find().toArray();
       ctx.response.status = 200;
       ctx.response.body = examList;
     } catch (error) {
@@ -53,6 +54,41 @@ router
       ctx.response.body = { message: 'Error saving exam', error: err };
     }
   })
+  .post("/api/exams/update", async (ctx) => {
+    try {
+      const { examId, updatedExam } = await ctx.request.body().value;
+      console.log("Incoming request body:", await ctx.request.body().value);
+  
+      // validate examId and updatedExamData are provided
+      if (!examId || !updatedExam) {
+        ctx.response.status = 400;
+        ctx.response.body = { message: "Exam ID and updated data are required" };
+        return;
+      }
+  
+      // Convert the examId to an ObjectId (MongoDB uses ObjectId for the _id field)
+      const mongoId = new ObjectId(examId)
+  
+      // Updating the Exam with the provided id
+      const result = await exams.updateOne(
+        { _id: mongoId },  // finds exam
+        { $set: updatedExam }  // updates just the changed fields in the exam
+      );
+  
+      // If no matching exam found, return 404
+      if (result.matchedCount === 0) {
+        ctx.response.status = 404;
+        ctx.response.body = { message: "Exam not found" };
+        return;
+      }
+  
+      ctx.response.status = 200;
+      ctx.response.body = { message: "Exam updated successfully" };
+    } catch (error) {
+      ctx.response.status = 500;
+      ctx.response.body = { message: "Error updating exam", error };
+    }
+  })
   .post("/api/generate-exam", async (ctx) => {
     const exam: Exam = await ctx.request.body().value
     try {
@@ -60,7 +96,7 @@ router
 
       // tell the frontend that this is an PDF
       ctx.response.headers.set("Content-Type", "application/pdf")
-      ctx.response.headers.set("Content-Disposition", `attachment; filename="${exam.title}.pdf"`)
+      ctx.response.headers.set("Content-Disposition", `attachment; filename="${exam.courseName}.pdf"`)
 
       ctx.response.body = examPDF
     } catch (error) {
@@ -107,6 +143,7 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
     const basePath = "/app/ExamTemplate"
     const metaPath = `${basePath}/meta-exam.tex`
     const examTemplatePath = `${basePath}/exam.tex`
+    const tasksPath = `${basePath}/aufgaben.tex`
 
     if(examGiven == undefined){
       // fetch latest exam from db 
@@ -121,7 +158,7 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
     }
 
     // Extract data from JSON
-    const { examId, title, courseName, examinerName, semester, date, examLengthMinutes, tasks } = exam;
+    const { courseName, examinerName, semester, date, examLengthMinutes, tasks } = exam;
 
     // Read meta-exam.tex
     const metaTemplate = await Deno.readTextFile(metaPath);
@@ -136,6 +173,12 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
     
     // Update meta-exam.tex
     await Deno.writeTextFile(metaPath, updatedMeta);
+
+
+    // generates latex for the tasks and updates aufgaben.tex in the templates
+    const tasksContentLatex = generateTasksLatex(tasks)
+    await Deno.writeTextFile(tasksPath, tasksContentLatex)
+
 
     // Read exam.tex
     const examTemplate = await Deno.readTextFile(examTemplatePath);
@@ -166,4 +209,47 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
     console.error("Error during LaTeX document generation:", error);
     throw new Error("LaTeX Document generation failed");
   }
+}
+
+// for escaping special characters in latex
+function escapeLatex(text?: string): string {
+  if (!text) return ""
+  return text.replace(/([&%$#_{}~^\\])/g, '\\$1')
+}
+
+// generates the latex for the tasks
+function generateTasksLatex(tasks: Task[]): string {
+  let latexContent = ""
+
+  tasks.forEach((task) => {
+      // Ensure required fields exist with fallbacks
+      const questionDE = task.question.DE
+      const questionEN = task.question.EN
+      
+      latexContent += `\\aufgabe{${escapeLatex(questionDE)}}{${escapeLatex(questionEN)}}\n`;
+      latexContent += `\\aufgabenteil{${task.points ?? 0}}\n`;
+      latexContent += `{${escapeLatex(questionDE)}}\n`;
+      latexContent += `{${escapeLatex(questionEN)}}\n\n`;
+
+      if (task.type === "multipleChoice") {
+          const answerOptions = task.answerOptions
+          const correctAnswers = answerOptions.filter(opt => opt.correct).length
+          const pointsPerCorrect = task.points * correctAnswers
+
+          latexContent += `\\fortype{A}{\n\\mcstart[${pointsPerCorrect}]{${correctAnswers}}\n`;
+          
+          answerOptions.forEach(option => {
+              const de = escapeLatex(option.DE);
+              const en = escapeLatex(option.EN);
+              const correctness = option.correct ? "w" : "f";
+              latexContent += `\\mcline{${de}}{${en}}{${correctness}}\n`;
+          });
+          
+          latexContent += `\\mcend\n}\n`;
+      }
+
+      latexContent += "\\aufgabenteilende\n\n";
+  });
+
+  return latexContent;
 }

@@ -1,6 +1,5 @@
 export class Exam {
-    examId: string;
-    title: string;
+    _id?: string = undefined;
     courseName: string;
     examinerName: string;
     semester: string;
@@ -9,17 +8,14 @@ export class Exam {
     tasks: Task[];
 
     constructor(
-        examId: string,
-        title: string,
         courseName: string,
         examinerName: string,
         semester: string,
         date: string,
         examLengthMinutes: number,
-        tasks: Task[]
+        tasks: Task[],
+        _id?: string,
     ) {
-        this.examId = examId;
-        this.title = title;
         this.courseName = courseName;
         this.examinerName = examinerName;
         this.semester = semester;

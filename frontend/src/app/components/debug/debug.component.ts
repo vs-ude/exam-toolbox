@@ -4,53 +4,49 @@ import { saveAs } from 'file-saver';
 import { ApiService } from '../../services/api.service';
 
 
-const examId = 'exam123';
-  const title = 'Cloud Web Mobile Development Exam';
-  const courseName = 'Introduction to Cloud, Web, and Mobile Development';
-  const examinerName = 'Dr. Jane Smith';
-  const semester = 'Fall 2025';
-  const date = '2025-12-15';
-  const examLengthMinutes = 120;
+const courseName = 'Cloud Web Mobile Development Exam';
+const examinerName = 'Dr. Jane Smith';
+const semester = 'Fall 2025';
+const date = '2025-12-15';
+const examLengthMinutes = 120;
     
-  const tasks:Task[] = [
-    {
-      taskId: 'task1',
-      type: 'shortAnswer',
-      question: {
-        DE: 'Was ist Cloud?',
-        EN: 'What is Cloud?'
-      },
-      solution: {
-        DE: '',
-        EN: ''
-      },
-      points: 4
+const tasks:Task[] = [
+  {
+    taskId: 'task1',
+    type: 'shortAnswer',
+    question: {
+      DE: 'Was ist Cloud?',
+      EN: 'What is Cloud?'
     },
-    {
-      taskId: 'task2',
-      type: 'shortAnswer',
-      question: {
-        DE: 'Was ist Web Mobile?',
-        EN: 'What is Web Mobile?'
-      },
-      solution: {
-        DE: '',
-        EN: ''
-      },
-      points: 6
-    }
-  ];
+    solution: {
+      DE: '',
+      EN: ''
+    },
+    points: 4
+  },
+  {
+    taskId: 'task2',
+    type: 'shortAnswer',
+    question: {
+      DE: 'Was ist Web Mobile?',
+      EN: 'What is Web Mobile?'
+    },
+    solution: {
+      DE: '',
+      EN: ''
+    },
+    points: 6
+  }
+];
 
-  const exam: Exam = new Exam(
-    examId,
-    title,
-    courseName,
-    examinerName,
-    semester,
-    date,
-    examLengthMinutes,
-    tasks
-  );
+const exam: Exam = new Exam(
+  courseName,
+  examinerName,
+  semester,
+  date,
+  examLengthMinutes,
+  tasks
+);
 
 @Component({
   selector: 'app-debug',
@@ -79,12 +75,25 @@ export class DebugComponent {
   onGenerateExam(){
     this.api.generateExam(exam).subscribe({
       next: (examPDF: Blob) => {
-        saveAs(examPDF, `${exam.title}.pdf`)
+        saveAs(examPDF, `${exam.courseName}.pdf`)
       },
       error: (err) => {
         console.error('Error downloading PDF: ', err)
       }
     })
+  }
+
+  onUpdateExam(){
+    let id: string = '67a77bdea72f7082a9a4283a' // An id of an Exam in your DB. Needs to be updated for testing if you don't have a Exam with this ID.
+    
+    this.api.updateExam(id, exam).subscribe(
+      response => {
+        console.log('Exam updated successfully: ', response);
+      },
+      error => {
+        console.error('Error updating exam: ', error);
+      }
+    )   
   }
   
 }
