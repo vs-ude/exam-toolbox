@@ -7,12 +7,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { MultipleChoiceTask, Task } from '../../../exam';
+import { MultipleChoiceTask, Task } from '../../../../exam';
 
 
 
 @Component({
-  selector: 'app-task',
+  selector: 'app-multiplechoiceTask',
   standalone: true,
   imports: [
     FormsModule,
@@ -26,8 +26,8 @@ import { MultipleChoiceTask, Task } from '../../../exam';
     MatTooltipModule,
 
   ],
-  templateUrl: './task.component.html',
-  styleUrl: './task.component.scss',
+  templateUrl: './multiplechoice-task.component.html',
+  styleUrl: './multiplechoice-task.component.scss',
   animations: [
     trigger(
       'inOutAnimation',
@@ -77,7 +77,7 @@ import { MultipleChoiceTask, Task } from '../../../exam';
 })
 
 
-export class TaskComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
+export class MultiplechoiceTaskComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
   @Input() public taskId!: string;
   @Input() public preTask?: Task;
   @Input() public bilingual?: boolean;

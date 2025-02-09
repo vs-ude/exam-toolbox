@@ -4,12 +4,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgFor, NgIf } from '@angular/common';
 import { Exam, Task } from '../../exam';
 import { AddTaskComponent } from './add-task/add-task.component';
-import { TaskComponent } from "./task/task.component";
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { saveAs } from 'file-saver';
 import {MatTabsModule} from '@angular/material/tabs';
+import { MultiplechoiceTaskComponent } from './tasks/multipleChoiceTask/multiplechoice-task.component';
 
 
 
@@ -21,10 +21,9 @@ import {MatTabsModule} from '@angular/material/tabs';
     MatIconModule,
     MatTooltipModule,
     AddTaskComponent,
-    TaskComponent,
+    MultiplechoiceTaskComponent,
     NgFor,
     NgIf,
-    TaskComponent,
     MatSelectModule,
     FormsModule,
     MatTabsModule,

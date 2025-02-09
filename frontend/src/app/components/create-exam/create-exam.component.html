@@ -78,7 +78,7 @@
 
 
         <div class="view_wrapper" id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
-            <app-task class="task_container" *ngFor="let task of tasks; let i = index" [taskId]="tasks[i].taskId"
+            <app-multiplechoiceTask class="task_container" *ngFor="let task of tasks; let i = index" [taskId]="tasks[i].taskId"
                 [preTask]="tasks[i]" [bilingual]="bilingual" (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
         </div>
     </div>
