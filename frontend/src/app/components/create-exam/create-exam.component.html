@@ -71,12 +71,15 @@
                     </mat-option>
                 </mat-select>
             </div>
+
+
+            <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"><img src="{{ bilingual? 'german.svg': 'english.svg'}}" /></span>
         </div>
 
 
         <div class="view_wrapper" id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
             <app-task class="task_container" *ngFor="let task of tasks; let i = index" [taskId]="tasks[i].taskId"
-                [preTask]="tasks[i]" (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
+                [preTask]="tasks[i]" [bilingual]="bilingual" (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
         </div>
     </div>
 

@@ -208,6 +208,15 @@
     background-color: #0000001a;
 }
 
+.language_icon{
+    user-select: none;
+}
+
+.language_icon:hover{
+    cursor: pointer;
+    background-color: #0000001a;
+}
+
 
 .bar_icon {
     color: var(--color-dark-gray);

@@ -1,5 +1,5 @@
 import { NgFor, NgIf, NgStyle } from '@angular/common';
-import { Component, Input, Output, EventEmitter, AfterViewInit, OnInit, viewChild, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, AfterViewInit, OnInit, viewChild, ViewChild, ElementRef, OnChanges, SimpleChanges, AfterViewChecked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -48,23 +48,49 @@ import { MultipleChoiceTask, Task } from '../../../exam';
               style({ height: 0, opacity: 0 }))
           ]
         )
-      ]
-    )
+      ],
+      
+    ),
+    trigger(
+      'leftRightAnimation',
+      [
+        transition(
+          ':enter',
+          [
+            style({ height: 0, opacity: 0, transform:'translateX(-100%)' }),
+            animate('0.1s ease-out',
+              style({ height: '*', opacity: 1,  transform:'translateX(0%)' }))
+          ]
+        ),
+        transition(
+          ':leave',
+          [
+            style({ height: '*', opacity: 1 ,  transform:'translateX(0%)'}),
+            animate('0.1s ease-in',
+              style({ height: 0, opacity: 0,  transform:'translateX(100%)' }))
+          ]
+        )
+      ],
+      
+    ),
   ]
 })
 
 
-export class TaskComponent implements OnInit, AfterViewInit {
+export class TaskComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
   @Input() public taskId!: string;
-  @Input() public preTask: Task | undefined;
+  @Input() public preTask?: Task;
+  @Input() public bilingual?: boolean;
   @Output() deleteEvent = new EventEmitter<string>();
   @Output() taskChangeEvent = new EventEmitter<MultipleChoiceTask>();
-  @ViewChild("questionField") questionField!: ElementRef;
+  @ViewChild("questionFieldDE") questionFieldDE!: ElementRef;
+  @ViewChild("questionFieldEN") questionFieldEN?: ElementRef;
 
   isBold: boolean = false;
   isItalic: boolean = false;
   isUnderline: boolean = false;
   isQuestionActive: boolean = false;
+  languageChanged:boolean = false;
 
   pointsPerOption = 1;
 
@@ -91,13 +117,44 @@ export class TaskComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.questionField.nativeElement.innerHTML = this.task.question.DE;
+    this.questionFieldDE.nativeElement.innerHTML = this.task.question.DE;
+
+    if (this.questionFieldEN == undefined) { return; }
+    this.questionFieldEN.nativeElement.innerHTML = this.task.question.EN;
+
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    for (const propName in changes) {
+      if (changes.hasOwnProperty(propName)) {
+        switch (propName) {
+          case 'bilingual': {
+            this.languageChanged = true;
+          }
+        }
+      }
+    }
+    
+  }
 
-  updateQuestion(event: Event) {
+  ngAfterViewChecked(): void {
+    if (!this.languageChanged){return;}
+    this.languageChanged = false;
+
+    this.questionFieldDE.nativeElement.innerHTML = this.task.question.DE;
+
+    if (this.questionFieldEN == undefined) { return; }
+    this.questionFieldEN.nativeElement.innerHTML = this.task.question.EN;
+  }
+
+  updateQuestion(event: Event, language: string) {
     const element = event.target as HTMLElement;
-    this.task.question.DE = element.innerHTML;
+    if (language === "DE") {
+      this.task.question.DE = element.innerHTML;
+    } else {
+      this.task.question.EN = element.innerHTML;
+    }
+
     this.taskChangeEvent.emit(this.task);
   }
 
@@ -113,8 +170,13 @@ export class TaskComponent implements OnInit, AfterViewInit {
     this.taskChangeEvent.emit(this.task);
   }
 
-  changeOption(event: any, index: number) {
-    this.task.answerOptions[index].DE = event.target.value;
+  changeOption(event: any, index: number, language: string) {
+    if (language === "DE") {
+      this.task.answerOptions[index].DE = event.target.value;
+    } else {
+      this.task.answerOptions[index].EN = event.target.value;
+    }
+
     this.taskChangeEvent.emit(this.task);
   }
 

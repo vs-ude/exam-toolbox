@@ -1,9 +1,27 @@
 <mat-card class="form-card">
   <!-- Question -->
   <div class="form-header">
-    <div #questionField contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
-      (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event)"
-      [attr.data-placeholder]="'Enter Question...'"></div>
+
+    <!-- Bilingual -->
+    <div *ngIf="bilingual"  class="question-container" [@leftRightAnimation]>
+      <div class="question-language-wrapper">
+        <span class="language_icon"><img src="german.svg" /></span>
+        <div #questionFieldDE contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
+          (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event,'DE')"
+          [attr.data-placeholder]="'Frage Eingeben...'"></div>
+      </div>
+      <div class="question-language-wrapper">
+        <span class="language_icon"><img src="english.svg" /></span>
+        <div #questionFieldEN contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
+          (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event, 'EN')"
+          [attr.data-placeholder]="'Enter Question...'"></div>
+      </div>
+    </div>
+
+    <!-- German -->
+    <div *ngIf="!bilingual" #questionFieldDE contenteditable="true" class="form-question" 
+      (focus)="activateFormatButtons()" (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event,'DE')"
+      [attr.data-placeholder]="'Frage Eingeben...'"></div>
   </div>
 
   <!-- Buttons for formatting -->
@@ -30,8 +48,28 @@
     <div class="form-option" *ngFor="let option of task.answerOptions; let i = index" [@inOutAnimation]>
       <input type="checkbox" name="multiple-choice" [(ngModel)]="task.answerOptions[i].correct"
         (change)="onOptionCorrectChange()" />
-      <input type="text" [value]="task.answerOptions[i].DE" (keydown.enter)="changeOption($event, i)"
-        (blur)="changeOption($event, i)" placeholder="Option {{ i + 1 }}" class="form-option-input" />
+
+
+      <!-- Bilingual -->
+      <div class="option_language_container" *ngIf="bilingual" >
+        <div class="option_language_wrapper">
+          <span class="language_icon"><img src="german.svg" /></span>
+          <input type="text" [value]="task.answerOptions[i].DE" (keydown.enter)="changeOption($event, i, 'DE' )"
+            (blur)="changeOption($event, i, 'DE')" placeholder="Option {{ i + 1 }}" class="form-option-input" />
+        </div>
+        <div class="option_language_wrapper">
+          <span class="language_icon"><img src="english.svg" /></span>
+          <input type="text" [value]="task.answerOptions[i].EN" (keydown.enter)="changeOption($event, i, 'EN')"
+            (blur)="changeOption($event, i, 'EN')" placeholder="Option {{ i + 1 }}" class="form-option-input" />
+        </div>
+      </div>
+
+      <!-- German -->
+      <input *ngIf="!bilingual" type="text" [value]="task.answerOptions[i].DE" 
+        (keydown.enter)="changeOption($event, i, 'DE' )" (blur)="changeOption($event, i, 'DE')"
+        placeholder="Option {{ i + 1 }}" class="form-option-input" />
+
+
 
       <div class="icon_wrapper delete_option_icon">
         <mat-icon aria-hidden="false" fontIcon="close" (click)="removeOption(i)"></mat-icon>
@@ -61,8 +99,9 @@
 
     <div class="points">
       <mat-label>Points per option</mat-label>
-      <input type="number" step="0.5" min="0.5" class="points_input" value="1" [(ngModel)]="pointsPerOption" (change)="onPointsChange()"/>
+      <input type="number" step="0.5" min="0.5" class="points_input" value="1" [(ngModel)]="pointsPerOption"
+        (change)="onPointsChange()" />
     </div>
-  
+
   </div>
 </mat-card>

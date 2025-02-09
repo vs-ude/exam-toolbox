@@ -9,6 +9,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { saveAs } from 'file-saver';
+import {MatTabsModule} from '@angular/material/tabs';
+
 
 
 
@@ -25,6 +27,7 @@ import { saveAs } from 'file-saver';
     TaskComponent,
     MatSelectModule,
     FormsModule,
+    MatTabsModule,
   ],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
@@ -38,6 +41,7 @@ export class CreateExamComponent {
 
   public taskPool: Task[] = [];
   public totalPoints = 0;
+  public bilingual = false;
 
   public examName = "New Exam"
   public tasks: Task[] = [];
@@ -197,7 +201,6 @@ export class CreateExamComponent {
 
   private checkIfValid() {
     if (this.examName === "") {
-      -
         alert("Please enter a name for the exam");
       throw new Error("no exam name");
     }
@@ -219,8 +222,7 @@ export class CreateExamComponent {
   }
 
   private adjustTotalPoints(){
-    console.log("adjust")
-    this.totalPoints = this.tasks.reduce((accumulator:number, task) => accumulator += task.points, 0)
+    this.totalPoints = this.tasks.reduce((accumulator:number, task) => accumulator += task.points, 0);
   }
 
   onTaskChange(task: Task, index: number) {
@@ -228,6 +230,11 @@ export class CreateExamComponent {
     this.adjustTotalPoints();
     console.log(index, "emitted: ");
     console.log(this.tasks);
+  }
+
+  test(event:any){
+    console.log(event);
+    
   }
 
 }
