@@ -184,7 +184,6 @@ export class MultiplechoiceTaskComponent implements OnInit, AfterViewInit, After
     event.preventDefault();
     document.execCommand(format);
     this.updateButtonStates();
-
   }
 
   updateButtonStates() {

@@ -9,11 +9,11 @@
         </div>
         <div class="add_tasks_container">
             <app-AddTask class="task_wrapper" [name]="'Multiple Choice'" [color]="'var(--color-primary)'"
-                [iconName]="'multipleChoice.svg'" id="new_multipleChoice" draggable="true" (dragstart)="dragStart($event)"
-                (dragend)="drop($event)">
+                [iconName]="'multipleChoice.svg'" id="new_multipleChoice" draggable="true"
+                (dragstart)="dragStart($event)" (dragend)="drop($event)">
             </app-AddTask>
-            <app-AddTask class="task_wrapper" [name]="'Short Text'" [color]="'var(--color-secondary)'"
-                [iconName]="'shortText.svg'" id="new_text" draggable="true" (dragstart)="dragStart($event)"
+            <app-AddTask class="task_wrapper" [name]="'Short Answer'" [color]="'var(--color-secondary)'"
+                [iconName]="'shortAnswer.svg'" id="new_text" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-AddTask>
             <app-AddTask class="task_wrapper" [name]="'Ranking'" [color]="'var(--color-warn)'"
                 [iconName]="'ranking.svg'" id="new_ranking" draggable="true" (dragstart)="dragStart($event)"
@@ -73,13 +73,29 @@
             </div>
 
 
-            <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"><img src="{{ bilingual? 'german.svg': 'english.svg'}}" /></span>
+            <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"><img
+                    src="{{ bilingual? 'english.svg': 'german.svg'}}" /></span>
         </div>
 
 
         <div class="view_wrapper" id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
-            <app-multiplechoiceTask class="task_container" *ngFor="let task of tasks; let i = index" [taskId]="tasks[i].taskId"
-                [preTask]="tasks[i]" [bilingual]="bilingual" (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
+            <div *ngFor="let task of tasks; let i = index">
+
+                <!-- Multiple Choice-->
+                <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'">
+                    <app-multiplechoiceTask class="task_container" [taskId]="tasks[i].taskId" [preTask]="tasks[i]"
+                        [bilingual]="bilingual" (deleteEvent)="deleteTask(i)"
+                        (taskChangeEvent)="onTaskChange($event,i)" />
+                </mat-card>
+
+                <!-- short Answer -->
+                <mat-card class="form-card" *ngIf="task.type === 'shortAnswer'">
+                    <app-short-answer-task class="task_container" [taskId]="tasks[i].taskId" [preTask]="tasks[i]"
+                        [bilingual]="bilingual" (deleteEvent)="deleteTask(i)"
+                        (taskChangeEvent)="onTaskChange($event,i)" />
+                </mat-card>
+
+            </div>
         </div>
     </div>
 
@@ -87,9 +103,10 @@
 
     <div class="right_container">pool
         <div class="task_pool_container">
-            <app-AddTask *ngFor="let task of taskPool" class="task_wrapper" [name]="task.taskId" [color]="taskColor[task.type]"
-                [iconName]="task.type + '.svg'" id="{{task.taskId}}" draggable="true" (dragstart)="dragStart($event)"
-                (dragend)="drop($event)" matTooltip="{{task.question.DE}}" [matTooltipShowDelay]="800">
+            <app-AddTask *ngFor="let task of taskPool" class="task_wrapper" [name]="task.taskId"
+                [color]="taskColor[task.type]" [iconName]="task.type + '.svg'" id="{{task.taskId}}" draggable="true"
+                (dragstart)="dragStart($event)" (dragend)="drop($event)" matTooltip="{{task.question.DE}}"
+                [matTooltipShowDelay]="800">
             </app-AddTask>
 
         </div>

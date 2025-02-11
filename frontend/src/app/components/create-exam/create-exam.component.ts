@@ -8,8 +8,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { saveAs } from 'file-saver';
-import {MatTabsModule} from '@angular/material/tabs';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MultiplechoiceTaskComponent } from './tasks/multipleChoiceTask/multiplechoice-task.component';
+import { ShortAnswerTaskComponent } from "./tasks/short-answer-task/short-answer-task.component";
+import { MatCardModule } from '@angular/material/card';
+
 
 
 
@@ -26,7 +29,9 @@ import { MultiplechoiceTaskComponent } from './tasks/multipleChoiceTask/multiple
     NgIf,
     MatSelectModule,
     FormsModule,
+    MatCardModule,
     MatTabsModule,
+    ShortAnswerTaskComponent,
   ],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
@@ -36,7 +41,7 @@ export class CreateExamComponent {
   public inDropzone = false;
   public isNameChange = false
   private bodyElement: HTMLElement = document.body;
-  public taskColor: {[key:string]: string} = {multipleChoice:"var(--color-primary)", shortQuestion: "var(--color-warn)", misc: "var(--color-secondary)"}
+  public taskColor: { [key: string]: string } = { multipleChoice: "var(--color-primary)", shortAnswer: "var(--color-warn)", misc: "var(--color-secondary)" }
 
   public taskPool: Task[] = [];
   public totalPoints = 0;
@@ -113,23 +118,39 @@ export class CreateExamComponent {
   }
 
   private pushNewTask(taskType: string) {
-    if (taskType === "new_multipleChoice") {
-      this.tasks.push({
-        taskId: "multipleChoice",
-        type: "multipleChoice",
-        question: { DE: "", EN: "" },
-        answerOptions: [{ DE: "", EN: "", correct: true },],
-        points: 1
-      });
+    switch (taskType) {
+      case "new_multipleChoice":
+        this.tasks.push({
+          taskId: "multipleChoice",
+          type: "multipleChoice",
+          question: { DE: "", EN: "" },
+          answerOptions: [{ DE: "", EN: "", correct: true },],
+          points: 1
+        });
+        break;
+      case "new_text":
+        this.tasks.push({
+          taskId: "shortText",
+          type: "shortAnswer",
+          question: {DE: "", EN: ""},
+          solution: {DE: "", EN: ""},
+          points: 1
+        });
+        break;
+
+      default:
+        break;
     }
+
     this.adjustTotalPoints();
   }
 
   private pushPoolTask(taskId: string) {
     const task = this.taskPool.find(element => element.taskId === taskId);
-    if (task == undefined){
+    if (task == undefined) {
       console.warn("couldn't find task");
-      return;}
+      return;
+    }
     this.tasks.push(task);
     this.adjustTotalPoints();
   }
@@ -198,7 +219,7 @@ export class CreateExamComponent {
 
   private checkIfValid() {
     if (this.examName === "") {
-        alert("Please enter a name for the exam");
+      alert("Please enter a name for the exam");
       throw new Error("no exam name");
     }
 
@@ -218,8 +239,8 @@ export class CreateExamComponent {
     }
   }
 
-  private adjustTotalPoints(){
-    this.totalPoints = this.tasks.reduce((accumulator:number, task) => accumulator += task.points, 0);
+  private adjustTotalPoints() {
+    this.totalPoints = this.tasks.reduce((accumulator: number, task) => accumulator += task.points, 0);
   }
 
   onTaskChange(task: Task, index: number) {
@@ -229,9 +250,9 @@ export class CreateExamComponent {
     console.log(this.tasks);
   }
 
-  test(event:any){
+  test(event: any) {
     console.log(event);
-    
+
   }
 
 }
