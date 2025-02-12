@@ -121,7 +121,7 @@ export class CreateExamComponent {
     switch (taskType) {
       case "new_multipleChoice":
         this.tasks.push({
-          taskId: "multipleChoice",
+          taskId: "multipleChoice" + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
           type: "multipleChoice",
           question: { DE: "", EN: "" },
           answerOptions: [{ DE: "", EN: "", correct: true },],
@@ -130,7 +130,7 @@ export class CreateExamComponent {
         break;
       case "new_text":
         this.tasks.push({
-          taskId: "shortText",
+          taskId: "shortText" + + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
           type: "shortAnswer",
           question: {DE: "", EN: ""},
           solution: {DE: "", EN: ""},

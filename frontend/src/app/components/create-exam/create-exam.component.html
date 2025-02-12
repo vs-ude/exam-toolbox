@@ -80,6 +80,7 @@
 
         <div class="view_wrapper" id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
             <div *ngFor="let task of tasks; let i = index">
+                <span class="task_number">Aufgabe 1.{{i}}</span>
 
                 <!-- Multiple Choice-->
                 <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'">
