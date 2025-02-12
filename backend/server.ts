@@ -144,6 +144,19 @@ router
       ctx.response.body = { message: 'Error adding to pool', error: err };
     }
   })
+  .delete("/api/exams", async (ctx) => {
+    try {
+      const result = await exams.deleteMany({})
+      ctx.response.status = 200;
+      ctx.response.body = {
+        message: `${result} exams deleted successfully!`,
+        deletedCount: result,
+      };
+    } catch (error) {
+      ctx.response.status = 500;
+      ctx.response.body = { message: "Error deleting exams", error };
+    }
+  })
 
 // Use the Router
 app.use(router.routes());

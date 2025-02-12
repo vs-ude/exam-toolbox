@@ -44,4 +44,8 @@ export class ApiService {
     });
   }
 
+  deleteExams(){
+    return this.http.delete(`${this.apiUrl}/exams`)
+  }
+
 }

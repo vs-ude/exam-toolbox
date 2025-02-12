@@ -95,5 +95,16 @@ export class DebugComponent {
       }
     )   
   }
+
+  onDeleteExams(){
+    this.api.deleteExams().subscribe(
+      res => {
+        console.log('Exams deleted successfully: ', res)
+      },
+      err => {
+        console.error('Error deleting exams: ', err)
+      }
+    )
+  }
   
 }
