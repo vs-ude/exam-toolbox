@@ -43,6 +43,25 @@ router
       ctx.response.body = { message: 'Error fetching exams', error };
     }
   })
+  .get("/api/exam/:id", async (ctx) => {
+    try {
+      const examId = ctx.params.id;
+      const mongoId = new ObjectId(examId);
+      const exam = await exams.findOne({ _id: mongoId });
+
+      if (!exam) {
+        ctx.response.status = 404;
+        ctx.response.body = { message: "Exam not found" };
+        return;
+      }
+
+      ctx.response.status = 200;
+      ctx.response.body = exam;
+    } catch (error) {
+      ctx.response.status = 500;
+      ctx.response.body = { message: "Error fetching exam", error };
+    }
+  })
   .post("/api/exams", async (ctx) => {
     const exam: Exam = await ctx.request.body().value
     try {

@@ -58,7 +58,20 @@ export class DashboardComponent {
   }
 
   onExamClick(exam: Exam){
+    console.log(this.router.url)
     console.log('Exam clicked: ' + exam.courseName + ', ' + exam.semester + ', ' + exam._id)
+    if(exam._id == undefined){
+      console.warn(`Exam ${exam.courseName} ${exam.semester} has no ExamID`);
+      return;
+    };
+    this.api.getExam(exam._id).subscribe(
+      response => {
+        console.log('Fetched Exam successfully ', response);
+      },
+      error => {
+        console.error('Error fetching exam: ', error);
+      }
+    )
   }
 
 }
