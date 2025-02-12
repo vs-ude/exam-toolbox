@@ -304,7 +304,7 @@ function generateTasksLatex(tasks: Task[]): string {
       const numberLn = Math.max(numberLnDE, numberLnEN)
 
       latexContent += `\\vspace{${numberLn}cm}\n` // normally \loesung should set the vertial space for the text but it does not, this is why it is done like this. 
-      latexContent += `\\loesung{${numberLn}}{${solutionDE} \\\\ ${solutionEN}}\n\n`
+      latexContent += `\\loesung{${numberLn}}{${solutionDE}${solutionEN}}\n\n`
     }
 
     latexContent += "\\aufgabenteilende\n\n\n"
