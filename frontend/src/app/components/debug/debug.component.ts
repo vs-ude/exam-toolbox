@@ -106,5 +106,16 @@ export class DebugComponent {
       }
     )
   }
+
+  onDeleteTaskPool(){
+    this.api.deleteTaskPool().subscribe(
+      res => {
+        console.log('Task-Pool deleted successfully: ', res)
+      },
+      err => {
+        console.error('Error deleting Task-Pool: ', err)
+      }
+    )
+  }
   
 }

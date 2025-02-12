@@ -159,6 +159,19 @@ router
       ctx.response.body = { message: "Error deleting exams", error };
     }
   })
+  .delete("/api/taskPool", async (ctx) => {
+    try {
+      const result = await pool.deleteMany({})
+      ctx.response.status = 200;
+      ctx.response.body = {
+        message: `${result} task-pool deleted successfully!`,
+        deletedCount: result,
+      };
+    } catch (error) {
+      ctx.response.status = 500;
+      ctx.response.body = { message: "Error deleting task-pool", error };
+    }
+  })
 
 // Use the Router
 app.use(router.routes());

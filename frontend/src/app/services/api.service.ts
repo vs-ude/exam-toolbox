@@ -48,4 +48,8 @@ export class ApiService {
     return this.http.delete(`${this.apiUrl}/exams`)
   }
 
+  deleteTaskPool(){
+    return this.http.delete(`${this.apiUrl}/taskPool`)
+  }
+
 }
