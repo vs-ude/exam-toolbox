@@ -241,34 +241,47 @@ function generateTasksLatex(tasks: Task[]): string {
   let latexContent = ""
 
   tasks.forEach((task) => {
-      // Ensure required fields exist with fallbacks
-      const questionDE = task.question.DE
-      const questionEN = task.question.EN
-      
-      latexContent += `\\aufgabe{${escapeLatex(questionDE)}}{${escapeLatex(questionEN)}}\n`;
-      latexContent += `\\aufgabenteil{${task.points ?? 0}}\n`;
-      latexContent += `{${escapeLatex(questionDE)}}\n`;
-      latexContent += `{${escapeLatex(questionEN)}}\n\n`;
+    const questionDE = task.question.DE
+    const questionEN = task.question.EN
+    
+    latexContent += `\\aufgabe{${escapeLatex(questionDE)}}{${escapeLatex(questionEN)}}\n`
+    latexContent += `\\aufgabenteil{${task.points ?? 0}}\n`
+    latexContent += `{${escapeLatex(questionDE)}}\n`
+    latexContent += `{${escapeLatex(questionEN)}}\n\n`
+    
+    if (task.type === "multipleChoice") {
+      const answerOptions = task.answerOptions
+      const correctAnswers = answerOptions.filter(opt => opt.correct).length
+      const pointsPerCorrect = task.points * correctAnswers
 
-      if (task.type === "multipleChoice") {
-          const answerOptions = task.answerOptions
-          const correctAnswers = answerOptions.filter(opt => opt.correct).length
-          const pointsPerCorrect = task.points * correctAnswers
+      latexContent += `\\fortype{A}{\n\\mcstart[${pointsPerCorrect}]{${correctAnswers}}\n`
 
-          latexContent += `\\fortype{A}{\n\\mcstart[${pointsPerCorrect}]{${correctAnswers}}\n`;
-          
-          answerOptions.forEach(option => {
-              const de = escapeLatex(option.DE);
-              const en = escapeLatex(option.EN);
-              const correctness = option.correct ? "w" : "f";
-              latexContent += `\\mcline{${de}}{${en}}{${correctness}}\n`;
-          });
-          
-          latexContent += `\\mcend\n}\n`;
-      }
+      answerOptions.forEach(option => {
+        const de = escapeLatex(option.DE)
+        const en = escapeLatex(option.EN)
+        const correctness = option.correct ? "w" : "f"
+        latexContent += `\\mcline{${de}}{${en}}{${correctness}}\n`
+      })
 
-      latexContent += "\\aufgabenteilende\n\n";
-  });
+      latexContent += `\\mcend\n}\n`
+    }
 
+    if(task.type === "shortAnswer"){
+      const solutionDE = escapeLatex(task.solution.DE)
+      const solutionEN = escapeLatex(task.solution.EN)
+
+      // esitmates numer of lines needed based on the solution. Better more lines than less. 
+      const numberLnDE = Math.max(3, Math.ceil(solutionDE.length / 50))
+      const numberLnEN = Math.max(3, Math.ceil(solutionEN.length / 50))
+      const numberLn = Math.max(numberLnDE, numberLnEN)
+
+      latexContent += `\\vspace{${numberLn}cm}\n` // normally \loesung should set the vertial space for the text but it does not, this is why it is done like this. 
+      latexContent += `\\loesung{${numberLn}}{${solutionDE} \\\\ ${solutionEN}}\n\n`
+    }
+
+    latexContent += "\\aufgabenteilende\n\n\n"
+  })
+
+  // console.log(latexContent)
   return latexContent;
 }
