@@ -34,7 +34,8 @@
                     (click)="onPreview()"></mat-icon>
             </div>
             <div class="icon_wrapper bar_icon">
-                <mat-icon aria-hidden="false" fontIcon="save" matTooltip="Save" (click)="onSave()"></mat-icon>
+                <mat-icon *ngIf="!isUpdateMode" aria-hidden="false" fontIcon="save" matTooltip="Save" (click)="onSave()"></mat-icon>
+                <mat-icon *ngIf="isUpdateMode" aria-hidden="false" fontIcon="update" matTooltip="Update" (click)="onUpdate()"></mat-icon> 
             </div>
 
 

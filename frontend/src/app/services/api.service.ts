@@ -37,8 +37,8 @@ export class ApiService {
     return this.http.get<Task[]>(`${this.apiUrl}/taskPool`)
   }
 
-  updateExam(examId: string, updatedExam: Exam) {
-    return this.http.post(`${this.apiUrl}/exams/update`, {
+  updateExam(examId: (string | undefined), updatedExam: Exam) {
+    return this.http.put(`${this.apiUrl}/exams/update`, {
       examId,
       updatedExam
     });

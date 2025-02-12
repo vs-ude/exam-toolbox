@@ -65,18 +65,20 @@ router
   .post("/api/exams", async (ctx) => {
     const exam: Exam = await ctx.request.body().value
     try {
-      await exams.insertOne(exam);
+      const result = await exams.insertOne(exam);
       ctx.response.status = 200;
-      ctx.response.body = { message: 'Exam saved successfully!' };
+      ctx.response.body = { 
+        message: 'Exam saved successfully! ', 
+        insertedId: result // also returns the _id of the created Exam
+      }
     } catch (err) {
       ctx.response.status = 500;
-      ctx.response.body = { message: 'Error saving exam', error: err };
+      ctx.response.body = { message: 'Error saving exam', error: err }
     }
   })
-  .post("/api/exams/update", async (ctx) => {
+  .put("/api/exams/update", async (ctx) => {
     try {
       const { examId, updatedExam } = await ctx.request.body().value;
-      console.log("Incoming request body:", await ctx.request.body().value);
   
       // validate examId and updatedExamData are provided
       if (!examId || !updatedExam) {

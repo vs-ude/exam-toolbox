@@ -55,7 +55,9 @@ export class CreateExamComponent {
   public examinerName = "";
   public examDate = "";
   public examDuration = 90;
-  public examID?:string = undefined
+  public examID?: string = undefined
+
+  public isUpdateMode = false
 
   constructor(
     private api: ApiService,
@@ -179,6 +181,7 @@ export class CreateExamComponent {
     this.api.addExam(exam).subscribe(
       response => {
         console.log('Exam added successfully: ', response);
+        this.router.navigate([`/create-exam/${response.insertedId}`]) // uses the id inserted by mongodb to navigate to a detailed view of this exam
       },
       error => {
         console.error('Error adding exam: ', error);
@@ -247,11 +250,27 @@ export class CreateExamComponent {
     console.log(this.tasks);
   }
 
+  onUpdate(){
+    this.checkIfValid()
+    const exam = this.buildExam()
+    this.api.updateExam(this.examID, exam).subscribe(
+      response => {
+        console.log('Exam updated successfully: ', response);
+      },
+      error => {
+        console.error('Error updating exam: ', error);
+      }
+    )  
+  }
+
   private importExam(){
     const lastURLPart = this.router.url.split("/").pop();
     if (lastURLPart === "create-exam" || lastURLPart == undefined) {
+      this.isUpdateMode = false
       return;
     }
+    this.examID = lastURLPart
+    this.isUpdateMode = true
     this.api.getExam(lastURLPart).subscribe(
       response => {
         this.examName = response.courseName;
