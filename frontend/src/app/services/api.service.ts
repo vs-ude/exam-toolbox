@@ -11,37 +11,37 @@ export class ApiService {
 
   constructor(
     private http: HttpClient
-  ) {}
+  ) { }
 
-  generateExam(exam?: Exam): Observable<Blob>{
-    return this.http.post(`${this.apiUrl}/generate-exam`, exam, {responseType: 'blob'})
+  generateExam(exam?: Exam): Observable<Blob> {
+    return this.http.post(`${this.apiUrl}/generate-exam`, exam, { responseType: 'blob' })
   }
 
-  addExam(exam: Exam): Observable<any>{
+  addExam(exam: Exam): Observable<any> {
     return this.http.post(`${this.apiUrl}/exams`, exam)
   }
 
-  addTaskToPool(task: Task){
+  addTaskToPool(task: Task) {
     return this.http.post(`${this.apiUrl}/taskPool`, task)
   }
 
-  getExams(){
+  getExams() {
     return this.http.get<Exam[]>(`${this.apiUrl}/exams`)
   }
 
-  getExam(examId: string){
+  getExam(examId: string) {
     return this.http.get<Exam>(`${this.apiUrl}/exam/${examId}`)
   }
 
-  getTasksFromPool(){
+  getTasksFromPool() {
     return this.http.get<Task[]>(`${this.apiUrl}/taskPool`)
   }
 
-updateExam(examId: string, updatedExam: Exam) {
-  return this.http.post(`${this.apiUrl}/exams/update`, { 
-    examId, 
-    updatedExam 
-  });
-}
-  
+  updateExam(examId: string, updatedExam: Exam) {
+    return this.http.post(`${this.apiUrl}/exams/update`, {
+      examId,
+      updatedExam
+    });
+  }
+
 }

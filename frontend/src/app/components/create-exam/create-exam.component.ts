@@ -12,6 +12,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MultiplechoiceTaskComponent } from './tasks/multipleChoiceTask/multiplechoice-task.component';
 import { ShortAnswerTaskComponent } from "./tasks/short-answer-task/short-answer-task.component";
 import { MatCardModule } from '@angular/material/card';
+import { Router } from '@angular/router';
 
 
 
@@ -54,19 +55,14 @@ export class CreateExamComponent {
   public examinerName = "";
   public examDate = "";
   public examDuration = 90;
+  public examID?:string = undefined
 
   constructor(
     private api: ApiService,
+    private router: Router,
   ) {
-    this.api.getTasksFromPool().subscribe(
-      response => {
-        this.taskPool = response;
-        console.log(response)
-
-      },
-      error => {
-        console.error(error);
-      })
+    this.importExam();
+    this.importPoolTasks();
   }
 
 
@@ -132,8 +128,8 @@ export class CreateExamComponent {
         this.tasks.push({
           taskId: "shortText" + + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
           type: "shortAnswer",
-          question: {DE: "", EN: ""},
-          solution: {DE: "", EN: ""},
+          question: { DE: "", EN: "" },
+          solution: { DE: "", EN: "" },
           points: 1
         });
         break;
@@ -213,7 +209,8 @@ export class CreateExamComponent {
       this.selectedSemester,
       this.examDate,
       this.examDuration,
-      this.tasks
+      this.tasks,
+      this.examID
     );
   }
 
@@ -250,9 +247,33 @@ export class CreateExamComponent {
     console.log(this.tasks);
   }
 
-  test(event: any) {
-    console.log(event);
+  private importExam(){
+    const lastURLPart = this.router.url.split("/").pop();
+    if (lastURLPart === "create-exam" || lastURLPart == undefined) {
+      return;
+    }
+    this.api.getExam(lastURLPart).subscribe(
+      response => {
+        this.examName = response.courseName;
+        this.examDate = response.date;
+        this.examDuration = response.examLengthMinutes;
+        this.examinerName = response.examinerName;
+        this.selectedSemester = response.semester;
+        this.tasks = response.tasks;
+      },
+      error => {
+        console.error(error);
+      })
+  }
 
+  private importPoolTasks() {
+    this.api.getTasksFromPool().subscribe(
+      response => {
+        this.taskPool = response;
+      },
+      error => {
+        console.error(error);
+      })
   }
 
 }
