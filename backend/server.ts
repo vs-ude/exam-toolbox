@@ -265,10 +265,10 @@ function escapeLatex(text?: string): string {
 }
 
 // generates the latex for the tasks
-function generateTasksLatex(tasks: Task[]): string {
+function generateTasksLatex(tasks: [Task[]]): string {
   let latexContent = ""
 
-  tasks.forEach((task) => {
+  tasks[0].forEach((task) => {
     const questionDE = task.question.DE
     const questionEN = task.question.EN
     

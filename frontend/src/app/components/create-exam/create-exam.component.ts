@@ -212,7 +212,7 @@ export class CreateExamComponent {
       this.selectedSemester,
       this.examDate,
       this.examDuration,
-      this.tasks,
+      [this.tasks],
       this.examID
     );
   }
@@ -278,7 +278,7 @@ export class CreateExamComponent {
         this.examDuration = response.examLengthMinutes;
         this.examinerName = response.examinerName;
         this.selectedSemester = response.semester;
-        this.tasks = response.tasks;
+        this.tasks = response.tasks[0];
       },
       error => {
         console.error(error);

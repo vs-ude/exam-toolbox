@@ -45,7 +45,7 @@ const exam: Exam = new Exam(
   semester,
   date,
   examLengthMinutes,
-  tasks
+  [tasks]
 );
 
 @Component({

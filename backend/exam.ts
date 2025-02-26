@@ -5,7 +5,7 @@ export class Exam {
     semester: string;
     date: string;
     examLengthMinutes: number;
-    tasks: Task[];
+    tasks: [Task[]];
 
     constructor(
         courseName: string,
@@ -13,7 +13,7 @@ export class Exam {
         semester: string,
         date: string,
         examLengthMinutes: number,
-        tasks: Task[],
+        tasks: [Task[]],
         _id?: string,
     ) {
         this.courseName = courseName;
