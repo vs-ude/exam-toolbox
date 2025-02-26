@@ -83,11 +83,21 @@
 
 
         <div class="view_wrapper" id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
-            <div style="display: flex; justify-content: center; flex-direction:row ;">
-                <button (click)="changeTab(i)" *ngFor="let tab of [].constructor(exam.tasks.length); let i = index"> 
+            <div class="tab_holder">
+                <button class="tab" (click)="changeTab(i)" *ngFor="let tab of [].constructor(exam.tasks.length); let i = index"> 
                     Aufgabe {{i + 1}}
+                    <div *ngIf="i === 0" class="tab_slider" [style.transform]="'translateX(' + ((currentGroupView) * 100) + '%)'"></div>
                 </button>
-                <button (click)="addTab()">add Tab</button>
+                <button class= "tab" (click)="addTab()" matTooltip="add Group" [matTooltipShowDelay]="800">
+                    <mat-icon aria-hidden="false" fontIcon="add"></mat-icon>
+                </button>
+                
+            </div>
+
+            <div *ngIf="exam.tasks[currentGroupView].length === 0" class="empty_group_holder">
+                No tasks in this group yet. Drag and drop tasks from the sides to add tasks <br>
+                or <br>
+                <span (click)="deleteTab()" class="delete_group"><u>delete this group</u> </span>
             </div>
 
 

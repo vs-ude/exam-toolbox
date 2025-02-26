@@ -49,7 +49,7 @@ export class CreateExamComponent {
   public taskPool: Task[] = [];
   public totalPoints = 0;
   public bilingual = false;
-  public exam = new Exam("", "", "", "", 0, []);
+  public exam = new Exam("", "", "", "", 0, [[]]);
 
   public currentGroupView = 0;
 
@@ -144,7 +144,7 @@ export class CreateExamComponent {
       console.warn("couldn't find task");
       return;
     }
-    this.exam.tasks[0].push(task);
+    this.exam.tasks[this.currentGroupView].push(task);
     this.adjustTotalPoints();
   }
 
@@ -154,7 +154,7 @@ export class CreateExamComponent {
   }
 
   deleteTask(index: number) {
-    this.exam.tasks[0].splice(index, 1);
+    this.exam.tasks[this.currentGroupView].splice(index, 1);
     this.adjustTotalPoints();
   }
 
@@ -162,7 +162,7 @@ export class CreateExamComponent {
     this.checkIfValid();
     console.log(this.exam);
 
-    this.api.addTaskToPool(this.exam.tasks[0][0]).subscribe(
+    this.api.addTaskToPool(this.exam.tasks[this.currentGroupView][0]).subscribe(
       response => {
         console.log('Task added successfully: ', response);
       },
@@ -221,14 +221,14 @@ export class CreateExamComponent {
   }
 
   private adjustTotalPoints() {
-    this.totalPoints = this.exam.tasks[0].reduce((accumulator: number, task) => accumulator += task.points, 0);
+    this.totalPoints = this.exam.tasks.flat().reduce((accumulator: number, task) => accumulator += task.points, 0);
   }
 
   onTaskChange(task: Task, index: number) {
-    this.exam.tasks[0][index] = task;
+    this.exam.tasks[this.currentGroupView][index] = task;
     this.adjustTotalPoints();
     console.log(index, "emitted: ");
-    console.log(this.exam.tasks[0]);
+    console.log(this.exam.tasks);
   }
 
   onUpdate() {
@@ -254,6 +254,7 @@ export class CreateExamComponent {
     this.api.getExam(lastURLPart).subscribe(
       response => {
         this.exam = response;
+        this.adjustTotalPoints();
       },
       error => {
         console.error(error);
@@ -277,7 +278,17 @@ export class CreateExamComponent {
 
   public addTab() {
     this.exam.tasks.push(new Array<Task>());
+    this.currentGroupView = this.exam.tasks.length - 1;
   }
+
+  public deleteTab() {
+    if (this.exam.tasks.length === 1) {
+      return;
+    }
+    this.exam.tasks.splice(this.currentGroupView, 1);
+    this.currentGroupView--;
+  }
+
 
   public changeTab(index: number) {
     this.currentGroupView = index;
