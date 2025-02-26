@@ -2,9 +2,9 @@
     <div class="left_container">
         <div class="exam_name_wrapper" id="examName">
             <span class="exam_name" (click)="isNameChange = true" *ngIf="!isNameChange" id="examName">
-                {{ examName}}
+                {{ exam.courseName}}
             </span>
-            <input class="name_input" *ngIf="isNameChange" [value]="examName" (keydown)="onNameChange($event)"
+            <input class="name_input" *ngIf="isNameChange" [value]="exam.courseName" (keydown)="onNameChange($event)"
                 id="examName" #nameInput>
         </div>
         <div class="add_tasks_container">
@@ -44,13 +44,13 @@
                 <div class="icon_wrapper">
                     <mat-icon aria-hidden="false" fontIcon="access_time"></mat-icon>
                 </div>
-                <input class="duration_picker" type="number" min="0" step="10" [(ngModel)]="examDuration">
+                <input class="duration_picker" type="number" min="0" step="10" [(ngModel)]="exam.examLengthMinutes">
             </div>
 
 
             <!-- Exam Date -->
             <div class="date_wrapper">
-                <input type="date" class="datePicker" [(ngModel)]="examDate" />
+                <input type="date" class="datePicker" [(ngModel)]="exam.date" />
             </div>
 
             <!-- Examiner -->
@@ -58,7 +58,7 @@
                 <div class="icon_wrapper ">
                     <mat-icon aria-hidden="false" fontIcon="person"></mat-icon>
                 </div>
-                <input class="examiner_input" placeholder="Enter Examiner's Name" [(ngModel)]="examinerName">
+                <input class="examiner_input" placeholder="Enter Examiner's Name" [(ngModel)]="exam.examinerName">
             </div>
 
             <!-- Semester -->
@@ -66,7 +66,7 @@
                 <div class="icon_wrapper ">
                     <mat-icon aria-hidden="false" fontIcon="school"></mat-icon>
                 </div>
-                <mat-select class="selectSemester" placeholder="Select Semester" [(value)]="selectedSemester">
+                <mat-select class="selectSemester" placeholder="Select Semester" [(value)]="exam.semester">
                     <mat-option *ngFor="let semester of semesters" [value]="semester">
                         {{ semester }}
                     </mat-option>
@@ -80,19 +80,19 @@
 
 
         <div class="view_wrapper" id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
-            <div *ngFor="let task of tasks; let i = index">
+            <div *ngFor="let task of exam.tasks[0]; let i = index">
                 <span class="task_number">Aufgabe 1.{{i}}</span>
 
                 <!-- Multiple Choice-->
                 <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'">
-                    <app-multiplechoiceTask class="task_container" [taskId]="tasks[i].taskId" [preTask]="tasks[i]"
+                    <app-multiplechoiceTask class="task_container" [taskId]="exam.tasks[0][i].taskId" [preTask]="exam.tasks[0][i]"
                         [bilingual]="bilingual" (deleteEvent)="deleteTask(i)"
                         (taskChangeEvent)="onTaskChange($event,i)" />
                 </mat-card>
 
                 <!-- short Answer -->
                 <mat-card class="form-card" *ngIf="task.type === 'shortAnswer'">
-                    <app-short-answer-task class="task_container" [taskId]="tasks[i].taskId" [preTask]="tasks[i]"
+                    <app-short-answer-task class="task_container" [taskId]="exam.tasks[0][i].taskId " [preTask]="exam.tasks[0][i]"
                         [bilingual]="bilingual" (deleteEvent)="deleteTask(i)"
                         (taskChangeEvent)="onTaskChange($event,i)" />
                 </mat-card>
