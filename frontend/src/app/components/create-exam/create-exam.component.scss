@@ -237,7 +237,8 @@
     display: flex;
     flex-direction: column;
     max-height: 85%;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .tab_holder {
@@ -256,7 +257,6 @@
     border: none;
     padding: 10px 20px;
     position: relative;
-
     cursor: pointer;
 }
 
@@ -268,7 +268,8 @@
     background-color: #0000002a;
 }
 
-.tab_slider {
+.tab_slider{
+    pointer-events: none;
     height: 2px;
     background-color: var(--color-primary);
     position: absolute;
@@ -296,6 +297,10 @@
 
 .delete_group:hover{
     color: var(--color-warn);
+}
+
+.delete_group:active{
+    color: darkred;
 }
 
 
