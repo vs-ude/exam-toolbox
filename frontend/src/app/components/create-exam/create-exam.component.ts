@@ -49,7 +49,9 @@ export class CreateExamComponent {
   public taskPool: Task[] = [];
   public totalPoints = 0;
   public bilingual = false;
-  public exam = new Exam("", "", "", "", 0, [[]]);
+  public exam = new Exam("", "", "", "", 0, []);
+
+  public currentGroupView = 0;
 
 
   constructor(
@@ -111,7 +113,7 @@ export class CreateExamComponent {
   private pushNewTask(taskType: string) {
     switch (taskType) {
       case "new_multipleChoice":
-        this.exam.tasks[0].push({
+        this.exam.tasks[this.currentGroupView].push({
           taskId: "multipleChoice" + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
           type: "multipleChoice",
           question: { DE: "", EN: "" },
@@ -120,7 +122,7 @@ export class CreateExamComponent {
         });
         break;
       case "new_text":
-        this.exam.tasks[0].push({
+        this.exam.tasks[this.currentGroupView].push({
           taskId: "shortText" + + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
           type: "shortAnswer",
           question: { DE: "", EN: "" },
@@ -255,7 +257,8 @@ export class CreateExamComponent {
       },
       error => {
         console.error(error);
-      })
+      }
+    );
   }
 
   private importPoolTasks() {
@@ -266,6 +269,18 @@ export class CreateExamComponent {
       error => {
         console.error(error);
       })
+  }
+
+  public mapToChar(index: number) {
+    return String.fromCharCode(97 + index%26);
+  }
+
+  public addTab() {
+    this.exam.tasks.push(new Array<Task>());
+  }
+
+  public changeTab(index: number) {
+    this.currentGroupView = index;
   }
 
 }

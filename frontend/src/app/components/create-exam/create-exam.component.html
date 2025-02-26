@@ -34,8 +34,10 @@
                     (click)="onPreview()"></mat-icon>
             </div>
             <div class="icon_wrapper bar_icon">
-                <mat-icon *ngIf="!isUpdateMode" aria-hidden="false" fontIcon="save" matTooltip="Save" (click)="onSave()"></mat-icon>
-                <mat-icon *ngIf="isUpdateMode" aria-hidden="false" fontIcon="update" matTooltip="Update" (click)="onUpdate()"></mat-icon> 
+                <mat-icon *ngIf="!isUpdateMode" aria-hidden="false" fontIcon="save" matTooltip="Save"
+                    (click)="onSave()"></mat-icon>
+                <mat-icon *ngIf="isUpdateMode" aria-hidden="false" fontIcon="update" matTooltip="Update"
+                    (click)="onUpdate()"></mat-icon>
             </div>
 
 
@@ -79,22 +81,31 @@
         </div>
 
 
+
         <div class="view_wrapper" id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
-            <div *ngFor="let task of exam.tasks[0]; let i = index">
-                <span class="task_number">Aufgabe 1.{{i}}</span>
+            <div style="display: flex; justify-content: center; flex-direction:row ;">
+                <button (click)="changeTab(i)" *ngFor="let tab of [].constructor(exam.tasks.length); let i = index"> 
+                    Aufgabe {{i + 1}}
+                </button>
+                <button (click)="addTab()">add Tab</button>
+            </div>
+
+
+            <div *ngFor="let task of exam.tasks[currentGroupView]; let i = index; ">
+                <span class="task_number">Aufgabe {{currentGroupView + 1}}.{{mapToChar(i)}}</span>
 
                 <!-- Multiple Choice-->
                 <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'">
-                    <app-multiplechoiceTask class="task_container" [taskId]="exam.tasks[0][i].taskId" [preTask]="exam.tasks[0][i]"
-                        [bilingual]="bilingual" (deleteEvent)="deleteTask(i)"
-                        (taskChangeEvent)="onTaskChange($event,i)" />
+                    <app-multiplechoiceTask class="task_container" [taskId]="exam.tasks[currentGroupView][i].taskId"
+                        [preTask]="exam.tasks[currentGroupView][i]" [bilingual]="bilingual"
+                        (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
                 </mat-card>
 
                 <!-- short Answer -->
                 <mat-card class="form-card" *ngIf="task.type === 'shortAnswer'">
-                    <app-short-answer-task class="task_container" [taskId]="exam.tasks[0][i].taskId " [preTask]="exam.tasks[0][i]"
-                        [bilingual]="bilingual" (deleteEvent)="deleteTask(i)"
-                        (taskChangeEvent)="onTaskChange($event,i)" />
+                    <app-short-answer-task class="task_container" [taskId]="exam.tasks[currentGroupView][i].taskId "
+                        [preTask]="exam.tasks[currentGroupView][i]" [bilingual]="bilingual"
+                        (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
                 </mat-card>
 
             </div>
