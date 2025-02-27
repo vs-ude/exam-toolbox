@@ -6,8 +6,13 @@ import { MongoClient } from "https://deno.land/x/mongo/mod.ts";
 import { latrex } from "https://deno.land/x/latrex/mod.ts";
 import { Exam, Task } from "./exam.ts";
 import { ObjectId } from "https://deno.land/x/mongo@v0.33.0/deps.ts";
+import { ZipWriter } from "https://deno.land/x/zipjs/index.js";
+import { walk } from "https://deno.land/std/fs/walk.ts";
 
 
+
+
+const basePath = "/app/ExamTemplate"
 
 // MongoDB setup
 const client = new MongoClient();
@@ -125,6 +130,102 @@ router
       ctx.response.body = { message: 'Error generating Exam PDF', error }
     }
   })
+  .post("/api/generate-exams", async (ctx) => {
+    const tempDir = await Deno.makeTempDir({
+      dir: `${basePath}`,
+      prefix: "exam_gen_"
+    });
+    const tasksPath = `${basePath}/aufgaben.tex`
+
+    try {
+      const body = ctx.request.body({ type: "form-data" })
+      const formData = await body.value.read({maxSize: 10 * 1024 * 1024})
+
+      const examJson = JSON.parse(formData.fields.exam)
+
+      const file = formData.files?.find(f => f.name === "list")
+      console.log(examJson)
+      console.log(file)
+
+      if (!file || !examJson) {
+        ctx.response.status = 400
+        ctx.response.body = { message: "Missing file or exam" }
+        return
+      }
+
+      const tempDir = await Deno.makeTempDir({
+        dir: `${basePath}`,
+        prefix: "exam_gen_"
+      });
+
+      const pythonOutDir = `${tempDir}/out`;
+      await Deno.mkdir(pythonOutDir);
+      console.log("Created pythonOutDir: ", pythonOutDir);
+
+      const tempFilePath = `${tempDir}/${file.originalName}`
+
+      if (!file.content) {
+        ctx.response.status = 400
+        ctx.response.body = { message: "Missing list content" }
+        return
+      }
+      await Deno.writeFile(tempFilePath, file.content)
+
+      updateMetaTemplate(examJson)
+      const tasksContentLatex = generateTasksLatex(examJson)
+      await Deno.writeTextFile(tasksPath, tasksContentLatex)
+
+      const pythonScriptPath = `${basePath}/scripts/generate_mass_exam.py`
+
+      // run python script for generating mass exam
+      const pythonResult = await executePythonScript(pythonScriptPath, tempFilePath, pythonOutDir, basePath)
+      
+      if (pythonResult.code !== 0) {
+        await Deno.remove(tempDir, { recursive: true })
+        ctx.response.status = 500
+        ctx.response.body = {
+          message: "Exam generation failed",
+          error: pythonResult.stderr
+        }
+        return
+      }
+
+      const zipFilePath = `${tempDir}/exams_output.zip`
+
+      // outdir to zip
+      try {
+        await createZipArchiveFromDirectory(pythonOutDir, zipFilePath)
+      } catch (zipError) {
+        console.error("Zip creation error:", zipError)
+        await Deno.remove(tempDir, { recursive: true }).catch(e => console.error("Error cleaning up temp dir after zip error:", e))
+        ctx.response.status = 500
+        ctx.response.body = { message: "Error creating ZIP archive", error: zipError instanceof Error ? zipError.message : String(zipError) }
+        return
+      }
+
+      // read zipfile of mass-exam
+      const zipFileBytes = await Deno.readFile(zipFilePath)
+      console.log("Zip file created:", zipFilePath)
+
+      ctx.response.headers.set("Content-Type", "application/zip")
+      ctx.response.headers.set("Content-Disposition", `attachment; filename="all-exams.zip"`)
+      ctx.response.body = zipFileBytes
+
+    } catch (error) {
+      console.error('Error generating Mass-Exams - FULL ERROR:')
+      console.error(error);
+      if (error instanceof Error) {
+        console.error('Error Stack Trace:', error.stack);
+      }
+      ctx.response.status = 500;
+      ctx.response.body = {
+        message: 'Error generating all Exams',
+        error: error instanceof Error ? error.message : String(error),
+      };
+    } finally {
+      await Deno.remove(tempDir, { recursive: true }).catch(e => console.error("Error cleaning up temp dir in finally:", e));
+    }
+  })
   .get("/api/taskPool", async (ctx) => {
     try {
       const taskList = await pool.find().toArray();
@@ -187,74 +288,42 @@ async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
   let exam: Exam
   try {
     // Directory for templates
-    const basePath = "/app/ExamTemplate"
-    const metaPath = `${basePath}/meta-exam.tex`
     const examTemplatePath = `${basePath}/exam.tex`
     const tasksPath = `${basePath}/aufgaben.tex`
 
     if(examGiven == undefined){
       // fetch latest exam from db 
-      const latestExam = await exams.find().sort({ _id: -1 }).limit(1).toArray();
+      const latestExam = await exams.find().sort({ _id: -1 }).limit(1).toArray()
       if (latestExam.length === 0) {
-        throw new Error("No exams found in the database.");
+        throw new Error("No exams found in the database.")
       }
-      exam = latestExam[0] as Exam;
+      exam = latestExam[0] as Exam
     }
     else{
       exam = examGiven
     }
 
-    // Extract data from JSON
-    const { courseName, examinerName, semester, date, examLengthMinutes, tasks } = exam;
-
-    // Read meta-exam.tex
-    const metaTemplate = await Deno.readTextFile(metaPath);
-
-    // Replace placeholders in meta-exam.tex
-    const updatedMeta = metaTemplate
-      .replace(/\\newcommand\{\\veranstaltung\}\{.*?\}/, `\\newcommand{\\veranstaltung}{${courseName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')}}`)
-      .replace(/\\newcommand\{\\semester\}\{.*?\}/, `\\newcommand{\\semester}{${semester.replace(/ /g, '\\ ')}}`)
-      .replace(/\\newcommand\{\\pruefer\}\{.*?\}/, `\\newcommand{\\pruefer}{${examinerName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')}}`)
-      .replace(/\\newcommand\{\\datum\}\{.*?\}/, `\\newcommand{\\datum}{${date}}`)
-      .replace(/\\newcommand\{\\zeigeloesung\}\{.*?\}/, `\\newcommand{\\zeigeloesung}{yes}`)
-    
-    // Update meta-exam.tex
-    await Deno.writeTextFile(metaPath, updatedMeta);
-
+    // update metaTemplate
+    updateMetaTemplate(exam)
 
     // generates latex for the tasks and updates aufgaben.tex in the templates
-    const tasksContentLatex = generateTasksLatex(tasks)
+    const tasksContentLatex = generateTasksLatex(exam)
     await Deno.writeTextFile(tasksPath, tasksContentLatex)
 
-
-    // Read exam.tex
-    const examTemplate = await Deno.readTextFile(examTemplatePath);
-
-    // Set name and path for new exam LaTeX file
-    const newExamFilename = `newExam.tex`;
-    const newExamPath = `${basePath}/${newExamFilename}`
-    console.log("Path for new exam:", newExamPath);
-
-    // Create new exam LaTeX file
-    await Deno.writeTextFile(newExamPath, examTemplate);
-    console.log(`New LaTeX file created: ${newExamFilename}`);
-
     // Generate PDF from the new LaTeX file
-    console.log("Generating PDF from LaTeX content...");
+    console.log("Generating PDF from LaTeX content...")
     Deno.chdir(basePath)
-    const pdfBuffer = await latrex(newExamPath, {
+    const pdfBuffer = await latrex(examTemplatePath, {
       inputs: [basePath],
       passes: 3, // needs multiple passes because .aux files are persisting to the second pass and the pdf can only be generated correctly when the .aux files from the pass before is used. 
-    });
-    console.log("PDF generation successful");
+    })
+    console.log("PDF generation successful")
 
-    await Deno.remove(newExamPath)
-
-    return pdfBuffer;
+    return pdfBuffer
 
   } catch (error) {
-    console.error("Error during LaTeX document generation:", error);
-    throw new Error("LaTeX Document generation failed");
+    console.error("Error during LaTeX document generation:", error)
+    throw new Error("LaTeX Document generation failed")
   }
 }
 
@@ -265,7 +334,8 @@ function escapeLatex(text?: string): string {
 }
 
 // generates the latex for the tasks
-function generateTasksLatex(tasks: Task[]): string {
+function generateTasksLatex(exam: Exam): string {
+  const tasks: Task[] = exam.tasks
   let latexContent = ""
 
   tasks.forEach((task) => {
@@ -302,8 +372,7 @@ function generateTasksLatex(tasks: Task[]): string {
       const numberLnDE = Math.max(3, Math.ceil(solutionDE.length / 50))
       const numberLnEN = Math.max(3, Math.ceil(solutionEN.length / 50))
       const numberLn = Math.max(numberLnDE, numberLnEN)
-
-      latexContent += `\\vspace{${numberLn}cm}\n` // normally \loesung should set the vertial space for the text but it does not, this is why it is done like this. 
+      
       latexContent += `\\loesung{${numberLn}}{${solutionDE}${solutionEN}}\n\n`
     }
 
@@ -312,4 +381,81 @@ function generateTasksLatex(tasks: Task[]): string {
 
   // console.log(latexContent)
   return latexContent;
+}
+
+async function createZipArchiveFromDirectory(pythonOutDir: string, zipFilePath: string): Promise<void> {
+  const zipFile = await Deno.open(zipFilePath, { write: true, create: true })
+  const zipWriter = new ZipWriter(zipFile)
+
+  try {
+    for await (const entry of walk(pythonOutDir)) {
+      if (entry.isFile) {
+        const relativePath = entry.path.substring(pythonOutDir.length + 1)
+        const content = await Deno.readFile(entry.path)
+        const contentStream = new ReadableStream({
+          start(controller) {
+            controller.enqueue(content)
+            controller.close()
+          }
+        });
+        await zipWriter.add(relativePath, contentStream)
+      }
+    }
+    await zipWriter.close()
+
+  } catch (zipError) {
+    zipFile.close()
+    throw zipError
+  }
+}
+
+async function executePythonScript(
+  pythonScriptPath: string,
+  tempFilePath: string,
+  pythonOutDir: string,
+  basePath: string
+): Promise<{ stdout: string; stderr: string; code: number }> {
+  const cmd = new Deno.Command("python3", {
+    args: [
+      pythonScriptPath,
+      "--de",
+      "--en",
+      "--examlist", tempFilePath,
+      "--examdir", basePath,
+      "--outdir", pythonOutDir
+    ],
+    stdout: "piped",
+    stderr: "piped"
+  })
+
+  Deno.chdir(basePath);
+  const { code, stdout, stderr } = await cmd.output()
+  const errorOutput = new TextDecoder().decode(stderr)
+  const stdOutput = new TextDecoder().decode(stdout)
+
+  console.log("Python Script stderr: ", errorOutput)
+  console.log("Python Script stdout: ", stdOutput)
+
+  return { code, stdout: stdOutput, stderr: errorOutput }
+}
+
+async function updateMetaTemplate(exam: Exam){
+  const metaPath = `${basePath}/meta-exam.tex`
+
+  // Extract data from JSON
+  const { courseName, examinerName, semester, date, examLengthMinutes, tasks } = exam;
+
+  // Read meta-exam.tex
+  const metaTemplate = await Deno.readTextFile(metaPath);
+
+  // Replace placeholders in meta-exam.tex
+  const updatedMeta = metaTemplate
+    .replace(/\\newcommand\{\\veranstaltung\}\{.*?\}/, `\\newcommand{\\veranstaltung}{${courseName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')}}`)
+    .replace(/\\newcommand\{\\semester\}\{.*?\}/, `\\newcommand{\\semester}{${semester.replace(/ /g, '\\ ')}}`)
+    .replace(/\\newcommand\{\\pruefer\}\{.*?\}/, `\\newcommand{\\pruefer}{${examinerName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')}}`)
+    .replace(/\\newcommand\{\\datum\}\{.*?\}/, `\\newcommand{\\datum}{${date}}`)
+    .replace(/\\newcommand\{\\zeigeloesung\}\{.*?\}/, `\\newcommand{\\zeigeloesung}{yes}`)
+  
+  // Update meta-exam.tex
+  await Deno.writeTextFile(metaPath, updatedMeta)
 }

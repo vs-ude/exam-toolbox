@@ -4,7 +4,7 @@ import { saveAs } from 'file-saver';
 import { ApiService } from '../../services/api.service';
 
 
-const courseName = 'Cloud Web Mobile Development Exam';
+const courseName = 'DEBUG EXAM';
 const examinerName = 'Dr. Jane Smith';
 const semester = 'Fall 2025';
 const date = '2025-12-15';
@@ -56,6 +56,7 @@ const exam: Exam = new Exam(
   styleUrl: './debug.component.scss'
 })
 export class DebugComponent {
+  selectedFile: File | null = null
 
   constructor(
     private api: ApiService,
@@ -117,5 +118,32 @@ export class DebugComponent {
       }
     )
   }
+
+  onGenerateAllExams(){
+    if(!this.selectedFile){
+      return
+    }
+    this.api.generateAllExams(exam, this.selectedFile).subscribe({
+      next: (allExamsPDF: Blob) => {
+        saveAs(allExamsPDF, `${this.selectedFile?.name}.zip`)
+      },
+      error: (err) => {
+        console.error('Error downloading exams as ZIP: ', err)
+      }
+    })
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement
+    if (input.files && input.files.length > 0) {
+      const file: File = input.files[0]
+      this.selectedFile = file
+      console.log('Selected file:', file.name)
+      console.log('File: ', file)
+      console.log('Exam: ', exam)
+    }
+  }
+  
+  
   
 }

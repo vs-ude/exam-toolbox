@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { HostListener, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 import { Exam, Task } from '../exam';
 
 @Injectable({
@@ -50,6 +50,14 @@ export class ApiService {
 
   deleteTaskPool(){
     return this.http.delete(`${this.apiUrl}/taskPool`)
+  }
+
+  generateAllExams(exam: Exam, list: File){
+    const formData = new FormData()
+
+    formData.append('exam', JSON.stringify(exam))
+    formData.append('list', list, list.name)
+    return this.http.post(`${this.apiUrl}/generate-exams`, formData, { responseType: 'blob' }).pipe(timeout(600000))
   }
 
 }

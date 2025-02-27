@@ -3,3 +3,6 @@
 <button mat-button-raised (click)="onUpdateExam()">Update Exam</button>
 <button mat-button-raised (click)="onDeleteExams()">Delete All Exams</button>
 <button mat-button-raised (click)="onDeleteTaskPool()">Delete Task-Pool</button>
+<button mat-button-raised (click)="onGenerateAllExams()">Generate All Exams</button>
+
+<input type="file" (change)="onFileSelected($event)" accept=".xlsx" />
