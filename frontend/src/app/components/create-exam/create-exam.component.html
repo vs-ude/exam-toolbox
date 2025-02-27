@@ -2,9 +2,9 @@
     <div class="left_container">
         <div class="exam_name_wrapper" id="examName">
             <span class="exam_name" (click)="isNameChange = true" *ngIf="!isNameChange" id="examName">
-                {{ examName}}
+                {{ exam.courseName}}
             </span>
-            <input class="name_input" *ngIf="isNameChange" [value]="examName" (keydown)="onNameChange($event)"
+            <input class="name_input" *ngIf="isNameChange" [value]="exam.courseName" (keydown)="onNameChange($event)"
                 id="examName" #nameInput>
         </div>
         <div class="add_tasks_container">
@@ -34,8 +34,10 @@
                     (click)="onPreview()"></mat-icon>
             </div>
             <div class="icon_wrapper bar_icon">
-                <mat-icon *ngIf="!isUpdateMode" aria-hidden="false" fontIcon="save" matTooltip="Save" (click)="onSave()"></mat-icon>
-                <mat-icon *ngIf="isUpdateMode" aria-hidden="false" fontIcon="update" matTooltip="Update" (click)="onUpdate()"></mat-icon> 
+                <mat-icon *ngIf="!isUpdateMode" aria-hidden="false" fontIcon="save" matTooltip="Save"
+                    (click)="onSave()"></mat-icon>
+                <mat-icon *ngIf="isUpdateMode" aria-hidden="false" fontIcon="update" matTooltip="Update"
+                    (click)="onUpdate()"></mat-icon>
             </div>
 
 
@@ -44,13 +46,13 @@
                 <div class="icon_wrapper">
                     <mat-icon aria-hidden="false" fontIcon="access_time"></mat-icon>
                 </div>
-                <input class="duration_picker" type="number" min="0" step="10" [(ngModel)]="examDuration">
+                <input class="duration_picker" type="number" min="0" step="10" [(ngModel)]="exam.examLengthMinutes">
             </div>
 
 
             <!-- Exam Date -->
             <div class="date_wrapper">
-                <input type="date" class="datePicker" [(ngModel)]="examDate" />
+                <input type="date" class="datePicker" [(ngModel)]="exam.date" />
             </div>
 
             <!-- Examiner -->
@@ -58,7 +60,7 @@
                 <div class="icon_wrapper ">
                     <mat-icon aria-hidden="false" fontIcon="person"></mat-icon>
                 </div>
-                <input class="examiner_input" placeholder="Enter Examiner's Name" [(ngModel)]="examinerName">
+                <input class="examiner_input" placeholder="Enter Examiner's Name" [(ngModel)]="exam.examinerName">
             </div>
 
             <!-- Semester -->
@@ -66,7 +68,7 @@
                 <div class="icon_wrapper ">
                     <mat-icon aria-hidden="false" fontIcon="school"></mat-icon>
                 </div>
-                <mat-select class="selectSemester" placeholder="Select Semester" [(value)]="selectedSemester">
+                <mat-select class="selectSemester" placeholder="Select Semester" [(value)]="exam.semester">
                     <mat-option *ngFor="let semester of semesters" [value]="semester">
                         {{ semester }}
                     </mat-option>
@@ -79,22 +81,43 @@
         </div>
 
 
+
         <div class="view_wrapper" id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
-            <div *ngFor="let task of tasks; let i = index">
-                <span class="task_number">Aufgabe 1.{{i}}</span>
+            <div class="tab_holder">
+                <button class="tab" (click)="changeTab(i)"
+                    *ngFor="let tab of [].constructor(exam.tasks.length); let i = index">
+                    {{ exam.tasks.length < 10 ? 'Aufgabe ' + (i+1) : (i<9)? 'A 0' + (i+1): 'A ' + (i+1)}}
+                    <div *ngIf="i === 0" class="tab_slider"
+                        [style.transform]="'translateX(' + ((currentGroupView) * 100) + '%)'"></div>
+                </button>
+                <button class="tab" (click)="addTab()" matTooltip="add Group" [matTooltipShowDelay]="800">
+                    <mat-icon aria-hidden="false" fontIcon="add"></mat-icon>
+                </button>
+
+            </div>
+
+            <div *ngIf="exam.tasks[currentGroupView].length === 0" class="empty_group_holder">
+                No tasks in this group yet. Drag and drop tasks from the sides to add tasks <br>
+                or <br>
+                <span (click)="deleteTab()" class="delete_group"><u>delete this group</u> </span>
+            </div>
+
+
+            <div *ngFor="let task of exam.tasks[currentGroupView]; let i = index; ">
+                <span class="task_number">Aufgabe {{currentGroupView + 1}}.{{mapToChar(i)}}</span>
 
                 <!-- Multiple Choice-->
                 <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'">
-                    <app-multiplechoiceTask class="task_container" [taskId]="tasks[i].taskId" [preTask]="tasks[i]"
-                        [bilingual]="bilingual" (deleteEvent)="deleteTask(i)"
-                        (taskChangeEvent)="onTaskChange($event,i)" />
+                    <app-multiplechoiceTask class="task_container" [taskId]="exam.tasks[currentGroupView][i].taskId"
+                        [preTask]="exam.tasks[currentGroupView][i]" [bilingual]="bilingual"
+                        (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
                 </mat-card>
 
                 <!-- short Answer -->
                 <mat-card class="form-card" *ngIf="task.type === 'shortAnswer'">
-                    <app-short-answer-task class="task_container" [taskId]="tasks[i].taskId" [preTask]="tasks[i]"
-                        [bilingual]="bilingual" (deleteEvent)="deleteTask(i)"
-                        (taskChangeEvent)="onTaskChange($event,i)" />
+                    <app-short-answer-task class="task_container" [taskId]="exam.tasks[currentGroupView][i].taskId "
+                        [preTask]="exam.tasks[currentGroupView][i]" [bilingual]="bilingual"
+                        (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
                 </mat-card>
 
             </div>

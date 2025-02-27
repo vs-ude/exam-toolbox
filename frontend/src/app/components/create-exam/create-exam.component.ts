@@ -41,23 +41,18 @@ export class CreateExamComponent {
 
   public inDropzone = false;
   public isNameChange = false
+  public isUpdateMode = false
   private bodyElement: HTMLElement = document.body;
   public taskColor: { [key: string]: string } = { multipleChoice: "var(--color-primary)", shortAnswer: "var(--color-warn)", misc: "var(--color-secondary)" }
+  public semesters = ["SS 23", "WS 23/24", "SS 24", "WS 24/25",];
 
   public taskPool: Task[] = [];
   public totalPoints = 0;
   public bilingual = false;
+  public exam = new Exam("", "", "", "", 0, [[]]);
 
-  public examName = "New Exam"
-  public tasks: Task[] = [];
-  public semesters = ["SS 23", "WS 23/24", "SS 24", "WS 24/25",];
-  public selectedSemester = "";
-  public examinerName = "";
-  public examDate = "";
-  public examDuration = 90;
-  public examID?: string = undefined
+  public currentGroupView = 0;
 
-  public isUpdateMode = false
 
   constructor(
     private api: ApiService,
@@ -82,14 +77,14 @@ export class CreateExamComponent {
     if (!this.nameInput) { return; }
     const newName = this.nameInput.nativeElement.value;
     if (newName === "") { return }
-    this.examName = newName
+    this.exam.courseName = newName;
   }
 
   onNameChange(event: any) {
     if (event.key !== "Enter") { return }
     const newName = event.target.value;
     if (newName !== "") {
-      this.examName = event.target.value;
+      this.exam.courseName = event.target.value;
     };
     this.isNameChange = false;
   }
@@ -118,7 +113,7 @@ export class CreateExamComponent {
   private pushNewTask(taskType: string) {
     switch (taskType) {
       case "new_multipleChoice":
-        this.tasks.push({
+        this.exam.tasks[this.currentGroupView].push({
           taskId: "multipleChoice" + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
           type: "multipleChoice",
           question: { DE: "", EN: "" },
@@ -127,7 +122,7 @@ export class CreateExamComponent {
         });
         break;
       case "new_text":
-        this.tasks.push({
+        this.exam.tasks[this.currentGroupView].push({
           taskId: "shortText" + + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
           type: "shortAnswer",
           question: { DE: "", EN: "" },
@@ -149,7 +144,7 @@ export class CreateExamComponent {
       console.warn("couldn't find task");
       return;
     }
-    this.tasks.push(task);
+    this.exam.tasks[this.currentGroupView].push(task);
     this.adjustTotalPoints();
   }
 
@@ -159,16 +154,15 @@ export class CreateExamComponent {
   }
 
   deleteTask(index: number) {
-    this.tasks.splice(index, 1);
+    this.exam.tasks[this.currentGroupView].splice(index, 1);
     this.adjustTotalPoints();
   }
 
   onSave() {
     this.checkIfValid();
-    const exam = this.buildExam();
-    console.log(exam);
+    console.log(this.exam);
 
-    this.api.addTaskToPool(this.tasks[0]).subscribe(
+    this.api.addTaskToPool(this.exam.tasks[this.currentGroupView][0]).subscribe(
       response => {
         console.log('Task added successfully: ', response);
       },
@@ -178,7 +172,7 @@ export class CreateExamComponent {
     )
 
 
-    this.api.addExam(exam).subscribe(
+    this.api.addExam(this.exam).subscribe(
       response => {
         console.log('Exam added successfully: ', response);
         this.router.navigate([`/create-exam/${response.insertedId}`]) // uses the id inserted by mongodb to navigate to a detailed view of this exam
@@ -191,12 +185,11 @@ export class CreateExamComponent {
 
   onPreview() {
     this.checkIfValid()
-    const exam = this.buildExam()
-    console.log(exam)
+    console.log(this.exam)
 
-    this.api.generateExam(exam).subscribe({
+    this.api.generateExam(this.exam).subscribe({
       next: (examPDF: Blob) => {
-        saveAs(examPDF, `${exam.courseName}.pdf`)
+        saveAs(examPDF, `${this.exam.courseName}.pdf`)
       },
       error: (err) => {
         console.error('Error downloading PDF: ', err)
@@ -205,84 +198,68 @@ export class CreateExamComponent {
   }
 
 
-  private buildExam() {
-    return new Exam(
-      this.examName,      //course Name here
-      this.examinerName,
-      this.selectedSemester,
-      this.examDate,
-      this.examDuration,
-      this.tasks,
-      this.examID
-    );
-  }
-
   private checkIfValid() {
-    if (this.examName === "") {
+    if (this.exam.courseName === "") {
       alert("Please enter a name for the exam");
       throw new Error("no exam name");
     }
 
-    if (this.selectedSemester === "") {
+    if (this.exam.semester === "") {
       alert("Please select a semester");
       throw new Error("No semester selected");
     }
 
-    if (this.examinerName === "") {
+    if (this.exam.examinerName === "") {
       alert("Please enter the examiner's name");
       throw new Error("No examiner name");
     }
 
-    if (this.examDate === "") {
+    if (this.exam.date === "") {
       alert("Please enter the exam date");
       throw new Error("no exam date set")
     }
   }
 
   private adjustTotalPoints() {
-    this.totalPoints = this.tasks.reduce((accumulator: number, task) => accumulator += task.points, 0);
+    this.totalPoints = this.exam.tasks.flat().reduce((accumulator: number, task) => accumulator += task.points, 0);
   }
 
   onTaskChange(task: Task, index: number) {
-    this.tasks[index] = task;
+    this.exam.tasks[this.currentGroupView][index] = task;
     this.adjustTotalPoints();
     console.log(index, "emitted: ");
-    console.log(this.tasks);
+    console.log(this.exam.tasks);
   }
 
-  onUpdate(){
+  onUpdate() {
     this.checkIfValid()
-    const exam = this.buildExam()
-    this.api.updateExam(this.examID, exam).subscribe(
+    this.api.updateExam(this.exam._id, this.exam).subscribe(
       response => {
         console.log('Exam updated successfully: ', response);
       },
       error => {
         console.error('Error updating exam: ', error);
       }
-    )  
+    )
   }
 
-  private importExam(){
+  private importExam() {
     const lastURLPart = this.router.url.split("/").pop();
     if (lastURLPart === "create-exam" || lastURLPart == undefined) {
       this.isUpdateMode = false
       return;
     }
-    this.examID = lastURLPart
+    this.exam._id = lastURLPart
     this.isUpdateMode = true
     this.api.getExam(lastURLPart).subscribe(
       response => {
-        this.examName = response.courseName;
-        this.examDate = response.date;
-        this.examDuration = response.examLengthMinutes;
-        this.examinerName = response.examinerName;
-        this.selectedSemester = response.semester;
-        this.tasks = response.tasks;
+        this.exam = response;
+        this.adjustTotalPoints();
       },
       error => {
         console.error(error);
-      })
+      }
+    );
   }
 
   private importPoolTasks() {
@@ -293,6 +270,28 @@ export class CreateExamComponent {
       error => {
         console.error(error);
       })
+  }
+
+  public mapToChar(index: number) {
+    return String.fromCharCode(97 + index%26);
+  }
+
+  public addTab() {
+    this.exam.tasks.push(new Array<Task>());
+    this.currentGroupView = this.exam.tasks.length - 1;
+  }
+
+  public deleteTab() {
+    if (this.exam.tasks.length === 1) {
+      return;
+    }
+    this.exam.tasks.splice(this.currentGroupView, 1);
+    this.currentGroupView--;
+  }
+
+
+  public changeTab(index: number) {
+    this.currentGroupView = index;
   }
 
 }

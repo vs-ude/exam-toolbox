@@ -338,7 +338,7 @@ function generateTasksLatex(exam: Exam): string {
   const tasks: Task[] = exam.tasks
   let latexContent = ""
 
-  tasks.forEach((task) => {
+  tasks[0].forEach((task) => {
     const questionDE = task.question.DE
     const questionEN = task.question.EN
     

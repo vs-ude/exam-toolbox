@@ -237,8 +237,73 @@
     display: flex;
     flex-direction: column;
     max-height: 85%;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
+
+.tab_holder {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    border-color: var(--border-color);
+    user-select: none;
+}
+
+
+.tab {
+    font-weight: 550;
+    background-color: transparent;
+    border: none;
+    padding: 10px 20px;
+    position: relative;
+    cursor: pointer;
+}
+
+.tab:hover {
+    background-color: #F5F5F5;
+}
+
+.tab:active {
+    background-color: #0000002a;
+}
+
+.tab_slider{
+    pointer-events: none;
+    height: 2px;
+    background-color: var(--color-primary);
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    transition: transform 0.3s ease, width 0.3s ease;
+    z-index: 1;
+}
+
+.empty_group_holder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: var(--color-dark-gray);
+    text-align: center;
+    flex-direction: column;
+    user-select: none;
+}
+
+.delete_group{
+    cursor: pointer;
+}
+
+.delete_group:hover{
+    color: var(--color-warn);
+}
+
+.delete_group:active{
+    color: darkred;
+}
+
+
 
 .task_number {
     display: table;
