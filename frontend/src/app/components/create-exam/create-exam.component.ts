@@ -13,6 +13,7 @@ import { MultiplechoiceTaskComponent } from './tasks/multipleChoiceTask/multiple
 import { ShortAnswerTaskComponent } from "./tasks/short-answer-task/short-answer-task.component";
 import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
+import { TaskGroupTitleComponent } from "./task-group-title/task-group-title.component";
 
 
 
@@ -33,6 +34,7 @@ import { Router } from '@angular/router';
     MatCardModule,
     MatTabsModule,
     ShortAnswerTaskComponent,
+    TaskGroupTitleComponent
   ],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
@@ -49,7 +51,7 @@ export class CreateExamComponent {
   public taskPool: Task[] = [];
   public totalPoints = 0;
   public bilingual = false;
-  public exam = new Exam("", "", "", "", 0, [[]]);
+  public exam = new Exam("New Exam", "", "", "", 90, [{ groupNumber: 1, groupTitle: { DE: "", EN: "" }, tasks: [] }]);
 
   public currentGroupView = 0;
 
@@ -113,7 +115,7 @@ export class CreateExamComponent {
   private pushNewTask(taskType: string) {
     switch (taskType) {
       case "new_multipleChoice":
-        this.exam.tasks[this.currentGroupView].push({
+        this.exam.tasks[this.currentGroupView].tasks.push({
           taskId: "multipleChoice" + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
           type: "multipleChoice",
           question: { DE: "", EN: "" },
@@ -122,7 +124,7 @@ export class CreateExamComponent {
         });
         break;
       case "new_text":
-        this.exam.tasks[this.currentGroupView].push({
+        this.exam.tasks[this.currentGroupView].tasks.push({
           taskId: "shortText" + + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
           type: "shortAnswer",
           question: { DE: "", EN: "" },
@@ -144,7 +146,7 @@ export class CreateExamComponent {
       console.warn("couldn't find task");
       return;
     }
-    this.exam.tasks[this.currentGroupView].push(task);
+    this.exam.tasks[this.currentGroupView].tasks.push(task);
     this.adjustTotalPoints();
   }
 
@@ -154,7 +156,7 @@ export class CreateExamComponent {
   }
 
   deleteTask(index: number) {
-    this.exam.tasks[this.currentGroupView].splice(index, 1);
+    this.exam.tasks[this.currentGroupView].tasks.splice(index, 1);
     this.adjustTotalPoints();
   }
 
@@ -162,7 +164,7 @@ export class CreateExamComponent {
     this.checkIfValid();
     console.log(this.exam);
 
-    this.api.addTaskToPool(this.exam.tasks[this.currentGroupView][0]).subscribe(
+    this.api.addTaskToPool(this.exam.tasks[this.currentGroupView].tasks[0]).subscribe(
       response => {
         console.log('Task added successfully: ', response);
       },
@@ -221,14 +223,22 @@ export class CreateExamComponent {
   }
 
   private adjustTotalPoints() {
-    this.totalPoints = this.exam.tasks.flat().reduce((accumulator: number, task) => accumulator += task.points, 0);
+    this.totalPoints = this.exam.tasks
+      .map(taskGroup => taskGroup.tasks.flat())
+      .flat()
+      .reduce(
+        (accumulator: number, task) => accumulator += task.points, 0
+      );
   }
 
   onTaskChange(task: Task, index: number) {
-    this.exam.tasks[this.currentGroupView][index] = task;
+    this.exam.tasks[this.currentGroupView].tasks[index] = task;
     this.adjustTotalPoints();
-    console.log(index, "emitted: ");
-    console.log(this.exam.tasks);
+  }
+
+  onTitleChange(taskGroupTitle: { DE: string, EN: string }) {
+    this.exam.tasks[this.currentGroupView].groupTitle = taskGroupTitle;
+    console.log(this.exam)
   }
 
   onUpdate() {
@@ -273,11 +283,11 @@ export class CreateExamComponent {
   }
 
   public mapToChar(index: number) {
-    return String.fromCharCode(97 + index%26);
+    return String.fromCharCode(97 + index % 26);
   }
 
   public addTab() {
-    this.exam.tasks.push(new Array<Task>());
+    this.exam.tasks.push({ groupNumber: this.exam.tasks.length + 1, groupTitle: { DE: "", EN: "" }, tasks: [] });
     this.currentGroupView = this.exam.tasks.length - 1;
   }
 

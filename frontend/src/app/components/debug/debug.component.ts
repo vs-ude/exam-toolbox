@@ -9,8 +9,8 @@ const examinerName = 'Dr. Jane Smith';
 const semester = 'Fall 2025';
 const date = '2025-12-15';
 const examLengthMinutes = 120;
-    
-const tasks:Task[] = [
+
+const tasks: Task[] = [
   {
     taskId: 'task1',
     type: 'shortAnswer',
@@ -45,7 +45,7 @@ const exam: Exam = new Exam(
   semester,
   date,
   examLengthMinutes,
-  [tasks]
+  [{ groupNumber: 1, groupTitle: { DE: "Titel", EN: "Title" }, tasks: tasks }]
 );
 
 @Component({
@@ -73,7 +73,7 @@ export class DebugComponent {
     );
   }
 
-  onGenerateExam(){
+  onGenerateExam() {
     this.api.generateExam(exam).subscribe({
       next: (examPDF: Blob) => {
         saveAs(examPDF, `${exam.courseName}.pdf`)
@@ -84,9 +84,9 @@ export class DebugComponent {
     })
   }
 
-  onUpdateExam(){
+  onUpdateExam() {
     let id: string = '67a77bdea72f7082a9a4283a' // An id of an Exam in your DB. Needs to be updated for testing if you don't have a Exam with this ID.
-    
+
     this.api.updateExam(id, exam).subscribe(
       response => {
         console.log('Exam updated successfully: ', response);
@@ -94,10 +94,10 @@ export class DebugComponent {
       error => {
         console.error('Error updating exam: ', error);
       }
-    )   
+    )
   }
 
-  onDeleteExams(){
+  onDeleteExams() {
     this.api.deleteExams().subscribe(
       res => {
         console.log('Exams deleted successfully: ', res)
@@ -108,7 +108,7 @@ export class DebugComponent {
     )
   }
 
-  onDeleteTaskPool(){
+  onDeleteTaskPool() {
     this.api.deleteTaskPool().subscribe(
       res => {
         console.log('Task-Pool deleted successfully: ', res)
@@ -119,8 +119,8 @@ export class DebugComponent {
     )
   }
 
-  onGenerateAllExams(){
-    if(!this.selectedFile){
+  onGenerateAllExams() {
+    if (!this.selectedFile) {
       return
     }
     this.api.generateAllExams(exam, this.selectedFile).subscribe({
@@ -143,7 +143,7 @@ export class DebugComponent {
       console.log('Exam: ', exam)
     }
   }
-  
-  
-  
+
+
+
 }

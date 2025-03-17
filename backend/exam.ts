@@ -5,7 +5,7 @@ export class Exam {
     semester: string;
     date: string;
     examLengthMinutes: number;
-    tasks: Task[][];
+    tasks: TaskGroup[];
 
     constructor(
         courseName: string,
@@ -13,7 +13,7 @@ export class Exam {
         semester: string,
         date: string,
         examLengthMinutes: number,
-        tasks: Task[][],
+        tasks: TaskGroup[],
         _id?: string,
     ) {
         this.courseName = courseName;
@@ -23,6 +23,12 @@ export class Exam {
         this.examLengthMinutes = examLengthMinutes;
         this.tasks = tasks;
     }
+}
+
+export interface TaskGroup {
+    groupNumber: number;
+    groupTitle: Translation;
+    tasks: Task[];
 }
 
 
