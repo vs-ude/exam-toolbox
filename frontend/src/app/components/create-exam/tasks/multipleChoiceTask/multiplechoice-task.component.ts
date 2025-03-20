@@ -1,5 +1,5 @@
 import { NgFor, NgIf, NgStyle } from '@angular/common';
-import { Component, Input, Output, EventEmitter, AfterViewInit, OnInit, viewChild, ViewChild, ElementRef, OnChanges, SimpleChanges, AfterViewChecked } from '@angular/core';
+import { Component, Input, Output, EventEmitter, AfterViewInit, OnInit, OnChanges, AfterViewChecked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { MultipleChoiceTask, Task } from '../../../../exam';
 import { BaseTaskComponent } from '../base-task/base-task.component';
+import { TaskAnimations } from '../task-animations';
 
 
 
@@ -29,52 +30,7 @@ import { BaseTaskComponent } from '../base-task/base-task.component';
   ],
   templateUrl: './multiplechoice-task.component.html',
   styleUrls: ['./multiplechoice-task.component.scss', '../task.scss'],
-  animations: [
-    trigger(
-      'inOutAnimation',
-      [
-        transition(
-          ':enter',
-          [
-            style({ height: 0, opacity: 0 }),
-            animate('0.2s ease-out',
-              style({ height: '*', opacity: 1 }))
-          ]
-        ),
-        transition(
-          ':leave',
-          [
-            style({ height: '*', opacity: 1 }),
-            animate('.2s ease-in',
-              style({ height: 0, opacity: 0 }))
-          ]
-        )
-      ],
-      
-    ),
-    trigger(
-      'leftRightAnimation',
-      [
-        transition(
-          ':enter',
-          [
-            style({ height: 0, opacity: 0, transform:'translateX(-100%)' }),
-            animate('0.1s ease-out',
-              style({ height: '*', opacity: 1,  transform:'translateX(0%)' }))
-          ]
-        ),
-        transition(
-          ':leave',
-          [
-            style({ height: '*', opacity: 1 ,  transform:'translateX(0%)'}),
-            animate('0.1s ease-in',
-              style({ height: 0, opacity: 0,  transform:'translateX(100%)' }))
-          ]
-        )
-      ],
-      
-    ),
-  ]
+  animations: [TaskAnimations.inOutAnimation, TaskAnimations.leftRightAnimation,]
 })
 
 

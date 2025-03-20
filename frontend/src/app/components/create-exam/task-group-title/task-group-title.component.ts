@@ -3,6 +3,7 @@ import { NgIf, NgStyle } from '@angular/common';
 import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { Translation } from '../../../exam';
+import { TaskAnimations } from '../tasks/task-animations';
 
 @Component({
   selector: 'app-task-group-title',
@@ -14,52 +15,7 @@ import { Translation } from '../../../exam';
   ],
   templateUrl: './task-group-title.component.html',
   styleUrl: './task-group-title.component.scss',
-  animations: [
-    trigger(
-      'inOutAnimation',
-      [
-        transition(
-          ':enter',
-          [
-            style({ height: 0, opacity: 0 }),
-            animate('0.2s ease-out',
-              style({ height: '*', opacity: 1 }))
-          ]
-        ),
-        transition(
-          ':leave',
-          [
-            style({ height: '*', opacity: 1 }),
-            animate('.2s ease-in',
-              style({ height: 0, opacity: 0 }))
-          ]
-        )
-      ],
-
-    ),
-    trigger(
-      'leftRightAnimation',
-      [
-        transition(
-          ':enter',
-          [
-            style({ height: 0, opacity: 0, transform: 'translateX(-100%)' }),
-            animate('0.1s ease-out',
-              style({ height: '*', opacity: 1, transform: 'translateX(0%)' }))
-          ]
-        ),
-        transition(
-          ':leave',
-          [
-            style({ height: '*', opacity: 1, transform: 'translateX(0%)' }),
-            animate('0.1s ease-in',
-              style({ height: 0, opacity: 0, transform: 'translateX(100%)' }))
-          ]
-        )
-      ],
-
-    ),
-  ],
+  animations: [TaskAnimations.inOutAnimation, TaskAnimations.leftRightAnimation],
 })
 export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
   @Input() public assignmentNumber!: number;
@@ -79,7 +35,7 @@ export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
   isUnderline: boolean = false;
 
   ngOnInit(): void {
-    if (this.preTitle){
+    if (this.preTitle) {
       this.description = this.preTitle;
       return;
     }

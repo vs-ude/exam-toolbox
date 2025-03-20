@@ -1,4 +1,4 @@
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, EventEmitter, OnChanges, OnInit, Output } from '@angular/core';
 import { ShortAnswerTask, Task, } from '../../../../exam';
 import { NgIf, NgStyle } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +9,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BaseTaskComponent } from '../base-task/base-task.component';
+import { TaskAnimations } from '../task-animations';
 
 
 @Component({
@@ -25,53 +26,14 @@ import { BaseTaskComponent } from '../base-task/base-task.component';
     MatTooltipModule,
   ],
   animations: [
-    trigger(
-      'inOutAnimation',
-      [
-        transition(
-          ':enter',
-          [
-            style({ height: 0, opacity: 0 }),
-            animate('0.2s ease-out',
-              style({ height: '*', opacity: 1 }))
-          ]
-        ),
-        transition(
-          ':leave',
-          [
-            style({ height: '*', opacity: 1 }),
-            animate('.2s ease-in',
-              style({ height: 0, opacity: 0 }))
-          ]
-        )
-      ],
-
-    ),
-    trigger(
-      'leftRightAnimation',
-      [
-        transition(
-          ':enter',
-          [
-            style({ height: 0, opacity: 0, transform: 'translateX(-100%)' }),
-            animate('0.1s ease-out',
-              style({ height: '*', opacity: 1, transform: 'translateX(0%)' }))
-          ]
-        ),
-        transition(
-          ':leave',
-          [
-            style({ height: '*', opacity: 1, transform: 'translateX(0%)' }),
-            animate('0.1s ease-in',
-              style({ height: 0, opacity: 0, transform: 'translateX(100%)' }))
-          ]
-        )
-      ],
-
-    ),
+    TaskAnimations.inOutAnimation, 
+    TaskAnimations.leftRightAnimation
   ],
   templateUrl: './short-answer-task.component.html',
-  styleUrls: ['./short-answer-task.component.scss', '../task.scss']
+  styleUrls: [
+    './short-answer-task.component.scss', 
+    '../task.scss'
+  ]
 })
 export class ShortAnswerTaskComponent extends BaseTaskComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
 
