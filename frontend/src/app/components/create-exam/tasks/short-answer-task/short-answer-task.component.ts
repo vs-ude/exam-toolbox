@@ -8,6 +8,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { BaseTaskComponent } from '../base-task/base-task.component';
 
 
 @Component({
@@ -72,22 +73,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   templateUrl: './short-answer-task.component.html',
   styleUrls: ['./short-answer-task.component.scss', '../task.scss']
 })
-export class ShortAnswerTaskComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
-  @Input() public taskId!: string;
-  @Input() public preTask?: Task;
-  @Input() public bilingual?: boolean;
-  @Output() deleteEvent = new EventEmitter<string>();
-  @Output() taskChangeEvent = new EventEmitter<ShortAnswerTask>();
-  @ViewChild('questionFieldDE') questionFieldDE!: ElementRef;
-  @ViewChild('questionFieldEN') questionFieldEN?: ElementRef;
+export class ShortAnswerTaskComponent extends BaseTaskComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
 
+  @Output() taskChangeEvent = new EventEmitter<Task>();
 
-
-  isBold: boolean = false;
-  isItalic: boolean = false;
-  isUnderline: boolean = false;
-  isQuestionActive: boolean = false;
-  languageChanged: boolean = false;
 
   public task: ShortAnswerTask = {
     taskId: "",
@@ -106,72 +95,6 @@ export class ShortAnswerTaskComponent implements OnInit, AfterViewInit, AfterVie
     this.taskChangeEvent.emit(this.task);
   }
 
-  ngAfterViewInit() {
-    this.questionFieldDE.nativeElement.innerHTML = this.task.question.DE;
-
-    if (this.questionFieldEN == undefined) { return; }
-    this.questionFieldEN.nativeElement.innerHTML = this.task.question.EN;
-
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    for (const propName in changes) {
-      if (changes.hasOwnProperty(propName)) {
-        switch (propName) {
-          case 'bilingual': {
-            this.languageChanged = true;
-          }
-        }
-      }
-    }
-
-  }
-
-  ngAfterViewChecked(): void {
-    if (!this.languageChanged) { return; }
-    this.languageChanged = false;
-
-    this.questionFieldDE.nativeElement.innerHTML = this.task.question.DE;
-
-    if (this.questionFieldEN == undefined) { return; }
-    this.questionFieldEN.nativeElement.innerHTML = this.task.question.EN;
-  }
-
-
-  public activateFormatButtons() {
-    this.isQuestionActive = true;
-  }
-
-  public deactivateFormatButtons(event: FocusEvent) {
-    this.isQuestionActive = false;
-  }
-
-  public updateQuestion(event: Event, language: string) {
-    const element = event.target as HTMLElement;
-    if (language === "DE") {
-      this.task.question.DE = element.innerHTML;
-    } else {
-      this.task.question.EN = element.innerHTML;
-    }
-
-    this.taskChangeEvent.emit(this.task);
-  }
-
-  public setQuestionFormat(format: string, event: MouseEvent) {
-    event.preventDefault();
-    document.execCommand(format);
-    this.updateButtonStates();
-  }
-
-  private updateButtonStates() {
-    this.isBold = document.queryCommandState('bold');
-    this.isItalic = document.queryCommandState('italic');
-    this.isUnderline = document.queryCommandState('underline');
-  }
-
-  public onDelete() {
-    this.deleteEvent.emit("delete");
-  }
 
   public updateTask() {
     this.taskChangeEvent.emit(this.task);
@@ -179,5 +102,4 @@ export class ShortAnswerTaskComponent implements OnInit, AfterViewInit, AfterVie
 
 
 }
-// Removed the incorrect ViewChild function implementation
 

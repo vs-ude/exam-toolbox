@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { MultipleChoiceTask, Task } from '../../../../exam';
+import { BaseTaskComponent } from '../base-task/base-task.component';
 
 
 
@@ -77,20 +78,10 @@ import { MultipleChoiceTask, Task } from '../../../../exam';
 })
 
 
-export class MultiplechoiceTaskComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
-  @Input() public taskId!: string;
-  @Input() public preTask?: Task;
-  @Input() public bilingual?: boolean;
-  @Output() deleteEvent = new EventEmitter<string>();
-  @Output() taskChangeEvent = new EventEmitter<MultipleChoiceTask>();
-  @ViewChild("questionFieldDE") questionFieldDE!: ElementRef;
-  @ViewChild("questionFieldEN") questionFieldEN?: ElementRef;
+export class MultiplechoiceTaskComponent extends BaseTaskComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
 
-  isBold: boolean = false;
-  isItalic: boolean = false;
-  isUnderline: boolean = false;
-  isQuestionActive: boolean = false;
-  languageChanged:boolean = false;
+  @Output() taskChangeEvent = new EventEmitter<Task>();
+
 
   pointsPerOption = 1;
 
@@ -116,48 +107,6 @@ export class MultiplechoiceTaskComponent implements OnInit, AfterViewInit, After
     this.taskChangeEvent.emit(this.task);
   }
 
-  ngAfterViewInit() {
-    this.questionFieldDE.nativeElement.innerHTML = this.task.question.DE;
-
-    if (this.questionFieldEN == undefined) { return; }
-    this.questionFieldEN.nativeElement.innerHTML = this.task.question.EN;
-
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    for (const propName in changes) {
-      if (changes.hasOwnProperty(propName)) {
-        switch (propName) {
-          case 'bilingual': {
-            this.languageChanged = true;
-          }
-        }
-      }
-    }
-    
-  }
-
-  ngAfterViewChecked(): void {
-    if (!this.languageChanged){return;}
-    this.languageChanged = false;
-
-    this.questionFieldDE.nativeElement.innerHTML = this.task.question.DE;
-
-    if (this.questionFieldEN == undefined) { return; }
-    this.questionFieldEN.nativeElement.innerHTML = this.task.question.EN;
-  }
-
-  updateQuestion(event: Event, language: string) {
-    const element = event.target as HTMLElement;
-    if (language === "DE") {
-      this.task.question.DE = element.innerHTML;
-    } else {
-      this.task.question.EN = element.innerHTML;
-    }
-
-    this.taskChangeEvent.emit(this.task);
-  }
-
 
   addOption() {
     this.task.answerOptions.push({ DE: "", EN: "", correct: false });
@@ -178,32 +127,6 @@ export class MultiplechoiceTaskComponent implements OnInit, AfterViewInit, After
     }
 
     this.taskChangeEvent.emit(this.task);
-  }
-
-  setQuestionFormat(format: string, event: MouseEvent) {
-    event.preventDefault();
-    document.execCommand(format);
-    this.updateButtonStates();
-  }
-
-  updateButtonStates() {
-    this.isBold = document.queryCommandState('bold');
-    this.isItalic = document.queryCommandState('italic');
-    this.isUnderline = document.queryCommandState('underline');
-  }
-
-
-  public activateFormatButtons() {
-    this.isQuestionActive = true;
-  }
-
-
-  public deactivateFormatButtons(event: FocusEvent) {
-    this.isQuestionActive = false;
-  }
-
-  public onDelete() {
-    this.deleteEvent.emit("delete");
   }
 
   public onOptionCorrectChange() {
