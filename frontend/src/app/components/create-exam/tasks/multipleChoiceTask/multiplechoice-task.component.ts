@@ -27,7 +27,7 @@ import { MultipleChoiceTask, Task } from '../../../../exam';
 
   ],
   templateUrl: './multiplechoice-task.component.html',
-  styleUrl: './multiplechoice-task.component.scss',
+  styleUrls: ['./multiplechoice-task.component.scss', '../task.scss'],
   animations: [
     trigger(
       'inOutAnimation',

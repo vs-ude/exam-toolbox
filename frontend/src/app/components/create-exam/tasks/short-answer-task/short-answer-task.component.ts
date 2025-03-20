@@ -70,7 +70,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     ),
   ],
   templateUrl: './short-answer-task.component.html',
-  styleUrl: './short-answer-task.component.scss'
+  styleUrls: ['./short-answer-task.component.scss', '../task.scss']
 })
 export class ShortAnswerTaskComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
   @Input() public taskId!: string;

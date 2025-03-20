@@ -1,0 +1,127 @@
+/* Question */
+
+.question-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-question {
+    width: 100%;
+    font-size: 16px;
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 4px;
+    outline: none;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+form-question:focus {
+    background-color: rgba(0, 0, 0, .9);
+}
+
+.form-question:empty:before {
+    content: attr(data-placeholder);
+    color: #aaa;
+    display: block;
+}
+
+/* Toolbar */
+.form-toolbar {
+    display: flex;
+    gap: 8px;
+}
+
+
+mat-icon-button.active {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+}
+
+
+
+/* Footer */
+.form-footer {
+    border-top: solid 1px #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 4px;
+}
+
+.footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.form-toolbar {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+
+.icon_wrapper {
+    box-sizing: border-box;
+    padding: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+}
+
+.footer_icon {
+    color: var(--color-dark-gray);
+    margin-right: 1%;
+}
+
+.footer_icon:hover {
+    cursor: pointer;
+    background-color: #0000001a;
+}
+
+.footer_icon_delete {
+    color: #d32f2f;
+}
+
+
+.footer_icon_delete:hover {
+    cursor: pointer;
+    background-color: #ff00001a;
+}
+
+.points {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.points mat-label {
+    font-size: 14px;
+    color: #333;
+}
+
+.points_input {
+    width: 60px;
+    padding: 4px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    outline: none;
+    text-align: center;
+}
+
+.points_input:focus {
+    border-color: #4285f4;
+    box-shadow: 0 0 4px rgba(66, 133, 244, 0.5);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
