@@ -447,15 +447,17 @@ async function updateMetaTemplate(exam: Exam){
 
   // Read meta-exam.tex
   const metaTemplate = await Deno.readTextFile(metaPath);
+  console.log(metaTemplate)
 
   // Replace placeholders in meta-exam.tex
   const updatedMeta = metaTemplate
-    .replace(/\\newcommand\{\\veranstaltung\}\{.*?\}/, `\\newcommand{\\veranstaltung}{${courseName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')}}`)
+    .replace(/\\newcommand\{\\veranstaltung\}\{.*?\}/, `\\newcommand{\\veranstaltung}{String(${courseName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')})}`)
     .replace(/\\newcommand\{\\semester\}\{.*?\}/, `\\newcommand{\\semester}{${semester.replace(/ /g, '\\ ')}}`)
     .replace(/\\newcommand\{\\pruefer\}\{.*?\}/, `\\newcommand{\\pruefer}{${examinerName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')}}`)
     .replace(/\\newcommand\{\\datum\}\{.*?\}/, `\\newcommand{\\datum}{${date}}`)
     .replace(/\\newcommand\{\\zeigeloesung\}\{.*?\}/, `\\newcommand{\\zeigeloesung}{yes}`)
   
   // Update meta-exam.tex
+  console.log(updatedMeta)
   await Deno.writeTextFile(metaPath, updatedMeta)
 }
