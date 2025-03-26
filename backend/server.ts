@@ -8,6 +8,9 @@ import { Exam, Task } from "./exam.ts";
 import { ObjectId } from "https://deno.land/x/mongo@v0.33.0/deps.ts";
 import { ZipWriter } from "https://deno.land/x/zipjs/index.js";
 import { walk } from "https://deno.land/std/fs/walk.ts";
+// @ts-ignore
+import { read, utils } from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
+import { PDFDocument } from "https://cdn.skypack.dev/pdf-lib@1.17.1?dts";
 
 
 
@@ -117,8 +120,16 @@ router
   })
   .post("/api/generate-exam", async (ctx) => {
     const exam: Exam = await ctx.request.body().value
+    const tasksPath = `${basePath}/aufgaben.tex`
     try {
-      const examPDF = await generateExam(exam)
+      // update metaTemplate
+      await updateMetaTemplate(exam)
+      await updateMetaStudent({ vollername: 'Max Musterloesung', matrikelnummer: 0, zeigeloesung: 'yes', sprache: 'de' })
+
+      // generates latex for the tasks and updates aufgaben.tex in the templates
+      const tasksContentLatex = generateTasksLatex(exam)
+      await Deno.writeTextFile(tasksPath, tasksContentLatex)
+      const examPDF = await generateExam()
 
       // tell the frontend that this is an PDF
       ctx.response.headers.set("Content-Type", "application/pdf")
@@ -158,43 +169,29 @@ router
         prefix: "exam_gen_"
       });
 
-      const pythonOutDir = `${tempDir}/out`;
-      await Deno.mkdir(pythonOutDir);
-      console.log("Created pythonOutDir: ", pythonOutDir);
+      const outDir = `${tempDir}/out`;
+      await Deno.mkdir(outDir);
+      console.log("Created outDir: ", outDir);
 
-      const tempFilePath = `${tempDir}/${file.originalName}`
+      const examListPath = `${tempDir}/${file.originalName}`
 
       if (!file.content) {
         ctx.response.status = 400
         ctx.response.body = { message: "Missing list content" }
         return
       }
-      await Deno.writeFile(tempFilePath, file.content)
+      await Deno.writeFile(examListPath, file.content)
 
       updateMetaTemplate(examJson)
       const tasksContentLatex = generateTasksLatex(examJson)
       await Deno.writeTextFile(tasksPath, tasksContentLatex)
-
-      const pythonScriptPath = `${basePath}/scripts/generate_mass_exam.py`
-
-      // run python script for generating mass exam
-      const pythonResult = await executePythonScript(pythonScriptPath, tempFilePath, pythonOutDir, basePath)
-      
-      if (pythonResult.code !== 0) {
-        await Deno.remove(tempDir, { recursive: true })
-        ctx.response.status = 500
-        ctx.response.body = {
-          message: "Exam generation failed",
-          error: pythonResult.stderr
-        }
-        return
-      }
+      await generateAllExams(examListPath, basePath, outDir)
 
       const zipFilePath = `${tempDir}/exams_output.zip`
 
       // outdir to zip
       try {
-        await createZipArchiveFromDirectory(pythonOutDir, zipFilePath)
+        await createZipArchiveFromDirectory(outDir, zipFilePath)
       } catch (zipError) {
         console.error("Zip creation error:", zipError)
         await Deno.remove(tempDir, { recursive: true }).catch(e => console.error("Error cleaning up temp dir after zip error:", e))
@@ -284,47 +281,138 @@ await app.listen({ port });
 
 
 
-async function generateExam(examGiven?: Exam): Promise<Uint8Array> {
-  let exam: Exam
+async function generateExam(): Promise<Uint8Array> {
+  const examTexPath = `${basePath}/exam.tex`
+  const examPdfPath = `${basePath}/exam.pdf`
+
   try {
-    // Directory for templates
-    const examTemplatePath = `${basePath}/exam.tex`
-    const tasksPath = `${basePath}/aufgaben.tex`
+    // 3 passes of pdflatex to resolve all references
+    for (let i = 0; i < 3; i++) {
+      const cmd = new Deno.Command("pdflatex", {
+        args: [
+          "-interaction=nonstopmode", // Continue on errors without stopping
+          "-halt-on-error",
+          "-output-directory",
+          basePath,
+          examTexPath,
+        ],
+        stdout: "piped",
+        stderr: "piped",
+      });
 
-    if(examGiven == undefined){
-      // fetch latest exam from db 
-      const latestExam = await exams.find().sort({ _id: -1 }).limit(1).toArray()
-      if (latestExam.length === 0) {
-        throw new Error("No exams found in the database.")
+      const { code, stdout, stderr } = await cmd.output()
+      const stdoutStr = new TextDecoder().decode(stdout)
+      const stderrStr = new TextDecoder().decode(stderr)
+
+      console.log(`pdflatex pass ${i + 1} output:\n${stdoutStr}`)
+      if (stderrStr) {
+        console.error(`pdflatex pass ${i + 1} errors:\n${stderrStr}`)
       }
-      exam = latestExam[0] as Exam
-    }
-    else{
-      exam = examGiven
     }
 
-    // update metaTemplate
-    updateMetaTemplate(exam)
+    // verify PDF was generated
+    try {
+      await Deno.stat(examPdfPath)
+    } catch (err) {
+      throw new Error("PDF output file was not generated")
+    }
 
-    // generates latex for the tasks and updates aufgaben.tex in the templates
-    const tasksContentLatex = generateTasksLatex(exam)
-    await Deno.writeTextFile(tasksPath, tasksContentLatex)
-
-    // Generate PDF from the new LaTeX file
-    console.log("Generating PDF from LaTeX content...")
-    Deno.chdir(basePath)
-    const pdfBuffer = await latrex(examTemplatePath, {
-      inputs: [basePath],
-      passes: 3, // needs multiple passes because .aux files are persisting to the second pass and the pdf can only be generated correctly when the .aux files from the pass before is used. 
-    })
-    console.log("PDF generation successful")
-
-    return pdfBuffer
+    // Read and return the PDF
+    const pdfBytes = await Deno.readFile(examPdfPath)
+    return pdfBytes
 
   } catch (error) {
-    console.error("Error during LaTeX document generation:", error)
-    throw new Error("LaTeX Document generation failed")
+    console.error("Error during PDF generation:", error)
+    throw new Error("Failed to generate PDF: " + error.message)
   }
+}
+
+async function generateAllExams(examListPath: string, basePath: string, outDir: string) {
+  try {
+    // read excel file
+    const fileContent = await Deno.readFile(examListPath)
+    const workbook = read(fileContent, { type: "buffer" })
+    const firstSheetName = workbook.SheetNames[0]
+    const worksheet = workbook.Sheets[firstSheetName]
+
+    // process student data starting from row 6
+    const studentData = utils.sheet_to_json(worksheet, {
+      header: [
+        "examPlanId", "examNumber", "examTitle", "lastName", "firstName", "studentId",
+        "performance", "attempt", "status", "bonus", "semester", "year", "period",
+        "remark", "topic", "startTime", "plannedEnd", "actualEnd", "examType",
+        "examForm", "studyProgram", "lockVersion"
+      ],
+      range: 5, // skip first 5 rows (metadata and headers)
+    }).filter(student => student.firstName && student.lastName) // ensure that no other rows like empty rows are included
+
+    console.log("Students number:", studentData.length)
+
+    let examDE = []
+    let examEN = []
+    let examDELog = ""
+    let examENLog = ""
+    let examSolutionLog = ""
+    const logPath = `${basePath}/exam.log`
+
+    // generating german exams
+    for (const student of studentData) {
+      let fullName = `${student.firstName} ${student.lastName}`
+      await updateMetaStudent({ vollername: fullName, matrikelnummer: student.studentId, zeigeloesung: 'no', sprache: 'de' })
+      examDE.push(await generateExam())
+    }
+    examDELog = new TextDecoder().decode(await Deno.readFile(logPath)) // save log file
+
+    // generating english exams
+    for (const student of studentData) {
+      let fullName = `${student.firstName} ${student.lastName}`
+      await updateMetaStudent({ vollername: fullName, matrikelnummer: student.studentId, zeigeloesung: 'no', sprache: 'en' })
+      examEN.push(await generateExam());
+    }
+    examENLog = new TextDecoder().decode(await Deno.readFile(logPath)) // save log file
+
+    // merge all generated exams to one german and english one
+    const examDEMerged = await mergePDFs(examDE)
+    const examENMerged = await mergePDFs(examEN)
+
+    // generate solution exam
+    await updateMetaStudent({ vollername: 'Max Musterloesung', matrikelnummer: 0, zeigeloesung: 'yes', sprache: 'de' })
+    const examSolution = await generateExam();
+    examSolutionLog = new TextDecoder().decode(await Deno.readFile(logPath))
+
+    // generating anwesenheitsliste.csv
+    const csvHeader = "Sitzplatz,Random,Matrikelnr,Name,Anwesend? (X)\n"
+    let csvContent = csvHeader;
+    studentData.forEach((student, index) => {
+      const randomCode = Math.random().toString(36).substring(2, 6).toUpperCase() + "/" + Math.random().toString(36).substring(2, 6).toUpperCase()
+      csvContent += `${index + 1},${randomCode},${student.studentId},${student.firstName} ${student.lastName},\n`
+    });
+    console.log("Attendance list generated.")
+
+    // write everything to output dir
+    await Deno.writeFile(`${outDir}/exam_merged_de.pdf`, examDEMerged)
+    await Deno.writeFile(`${outDir}/exam_merged_en.pdf`, examENMerged)
+    await Deno.writeFile(`${outDir}/exam_solution_de.pdf`, examSolution)
+    await Deno.writeTextFile(`${outDir}/exam_de.log`, examDELog)
+    await Deno.writeTextFile(`${outDir}/exam_en.log`, examENLog)
+    await Deno.writeTextFile(`${outDir}/exam_solution.log`, examSolutionLog)
+    await Deno.writeTextFile(`${outDir}/anwesenheitsliste.csv`, csvContent)
+
+  } catch (error) {
+    console.error('Error generating mass exams:', error)
+  }
+}
+
+async function mergePDFs(pdfs: Uint8Array[]) {
+  const mergedPdf = await PDFDocument.create()
+  
+  for (const pdfBytes of pdfs) {
+    const pdf = await PDFDocument.load(pdfBytes)
+    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices())
+    copiedPages.forEach(page => mergedPdf.addPage(page))
+  }
+
+  return mergedPdf.save()
 }
 
 // for escaping special characters in latex
@@ -383,14 +471,14 @@ function generateTasksLatex(exam: Exam): string {
   return latexContent;
 }
 
-async function createZipArchiveFromDirectory(pythonOutDir: string, zipFilePath: string): Promise<void> {
+async function createZipArchiveFromDirectory(outDir: string, zipFilePath: string): Promise<void> {
   const zipFile = await Deno.open(zipFilePath, { write: true, create: true })
   const zipWriter = new ZipWriter(zipFile)
 
   try {
-    for await (const entry of walk(pythonOutDir)) {
+    for await (const entry of walk(outDir)) {
       if (entry.isFile) {
-        const relativePath = entry.path.substring(pythonOutDir.length + 1)
+        const relativePath = entry.path.substring(outDir.length + 1)
         const content = await Deno.readFile(entry.path)
         const contentStream = new ReadableStream({
           start(controller) {
@@ -409,36 +497,6 @@ async function createZipArchiveFromDirectory(pythonOutDir: string, zipFilePath: 
   }
 }
 
-async function executePythonScript(
-  pythonScriptPath: string,
-  tempFilePath: string,
-  pythonOutDir: string,
-  basePath: string
-): Promise<{ stdout: string; stderr: string; code: number }> {
-  const cmd = new Deno.Command("python3", {
-    args: [
-      pythonScriptPath,
-      "--de",
-      "--en",
-      "--examlist", tempFilePath,
-      "--examdir", basePath,
-      "--outdir", pythonOutDir
-    ],
-    stdout: "piped",
-    stderr: "piped"
-  })
-
-  Deno.chdir(basePath);
-  const { code, stdout, stderr } = await cmd.output()
-  const errorOutput = new TextDecoder().decode(stderr)
-  const stdOutput = new TextDecoder().decode(stdout)
-
-  console.log("Python Script stderr: ", errorOutput)
-  console.log("Python Script stdout: ", stdOutput)
-
-  return { code, stdout: stdOutput, stderr: errorOutput }
-}
-
 async function updateMetaTemplate(exam: Exam){
   const metaPath = `${basePath}/meta-exam.tex`
 
@@ -447,17 +505,51 @@ async function updateMetaTemplate(exam: Exam){
 
   // Read meta-exam.tex
   const metaTemplate = await Deno.readTextFile(metaPath);
-  console.log(metaTemplate)
 
   // Replace placeholders in meta-exam.tex
   const updatedMeta = metaTemplate
-    .replace(/\\newcommand\{\\veranstaltung\}\{.*?\}/, `\\newcommand{\\veranstaltung}{String(${courseName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')})}`)
+    .replace(/\\newcommand\{\\veranstaltung\}\{.*?\}/, `\\newcommand{\\veranstaltung}{ ${courseName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')} }`)
     .replace(/\\newcommand\{\\semester\}\{.*?\}/, `\\newcommand{\\semester}{${semester.replace(/ /g, '\\ ')}}`)
     .replace(/\\newcommand\{\\pruefer\}\{.*?\}/, `\\newcommand{\\pruefer}{${examinerName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')}}`)
     .replace(/\\newcommand\{\\datum\}\{.*?\}/, `\\newcommand{\\datum}{${date}}`)
-    .replace(/\\newcommand\{\\zeigeloesung\}\{.*?\}/, `\\newcommand{\\zeigeloesung}{yes}`)
-  
+
+    // these can also be updated, see meta-exam.tex
+    // \newcommand{\klausurtyp}{A}
+    // \newcommand{\schmierblaetteranzahl}{2} % (CB) set to 0 for no empty pages at the end. Will be filled to a even number of pages
+    // \newcommand{\interactive}{N} % Y=Yes, N=No; use PDF forms and generate info for digital exams
+    // \newcommand{\englishandgerman}{yes}
+
   // Update meta-exam.tex
-  console.log(updatedMeta)
   await Deno.writeTextFile(metaPath, updatedMeta)
 }
+
+async function updateMetaStudent(options: {
+  zeigeloesung?: boolean, 
+  sprache?: string, 
+  randomexamnumber?: string, 
+  sequenznummer?: number, 
+  vollername?: string, 
+  matrikelnummer?: number, 
+  uploadurl?: string
+  } = {}
+){
+  const { zeigeloesung, sprache, randomexamnumber, sequenznummer, vollername, matrikelnummer, uploadurl } = options
+  const metaPath = `${basePath}/meta-exam.tex`;
+
+  // Read meta-exam.tex
+  const metaTemplate = await Deno.readTextFile(metaPath);
+
+  // Replace placeholders in meta-exam.tex
+  const updatedMeta = metaTemplate
+    .replace(/\\newcommand\{\\zeigeloesung\}\{.*?\}/, `\\newcommand{\\zeigeloesung}{${zeigeloesung ? 'yes' : 'no'}}`)
+    .replace(/\\newcommand\{\\sprache\}\{.*?\}/, `\\newcommand{\\sprache}{${sprache || 'de'}}`)
+    .replace(/\\newcommand\{\\randomexamnumber\}\{.*?\}/, `\\newcommand{\\randomexamnumber}{${randomexamnumber || '7PYT'}}`)
+    .replace(/\\newcommand\{\\sequenznummer\}\{.*?\}/, `\\newcommand{\\sequenznummer}{${sequenznummer || '6'}}`)
+    .replace(/\\newcommand\{\\vollername\}\{.*?\}/, `\\newcommand{\\vollername}{${vollername ? vollername.replace(/ /g, '\\ ') : 'Tom\ Morello'}}`)
+    .replace(/\\newcommand\{\\matrikelnummer\}\{.*?\}/, `\\newcommand{\\matrikelnummer}{${matrikelnummer || '3120434'}}`)
+    .replace(/\\newcommand\{\\uploadurl\}\{.*?\}/, `\\newcommand{\\uploadurl}{${uploadurl || 'aklsjdhflkjashdflkjahsdf'}}`);
+
+  // Update meta-exam.tex
+  await Deno.writeTextFile(metaPath, updatedMeta);
+}
+
