@@ -35,6 +35,7 @@ export interface TaskGroup {
 export type Task =
     | MultipleChoiceTask
     | ShortAnswerTask
+    | PictureTask
     ;
 
 
@@ -64,6 +65,19 @@ export interface AnswerOptions {
 export interface ShortAnswerTask extends BaseTask {
     type: "shortAnswer";
     solution: Translation;
+}
+
+export interface PictureTask extends BaseTask {
+    type: "pictureTask";
+    questionPicture: Image;
+    solutionPicture: Image;
+}
+
+export interface Image {
+    urlDE: string;
+    urlEN: string;
+    altTextDE?: string;
+    altTextEN?: string;
 }
 
 export interface Translation {

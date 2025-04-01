@@ -14,6 +14,7 @@ import { ShortAnswerTaskComponent } from "./tasks/short-answer-task/short-answer
 import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
 import { TaskGroupTitleComponent } from "./task-group-title/task-group-title.component";
+import { PictureTaskComponent } from "./tasks/picture-task/picture-task.component";
 
 
 
@@ -34,7 +35,8 @@ import { TaskGroupTitleComponent } from "./task-group-title/task-group-title.com
     MatCardModule,
     MatTabsModule,
     ShortAnswerTaskComponent,
-    TaskGroupTitleComponent
+    TaskGroupTitleComponent,
+    PictureTaskComponent
   ],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
@@ -45,7 +47,12 @@ export class CreateExamComponent {
   public isNameChange = false
   public isUpdateMode = false
   private bodyElement: HTMLElement = document.body;
-  public taskColor: { [key: string]: string } = { multipleChoice: "var(--color-primary)", shortAnswer: "var(--color-warn)", misc: "var(--color-secondary)" }
+  public taskColor: { [key: string]: string } = {
+    multipleChoice: "var(--color-primary)",
+    shortAnswer: "var(--color-warn)",
+    picture: "var(--color-dark-gray)",
+    misc: "var(--color-secondary)",
+  }
   public semesters = ["SS 23", "WS 23/24", "SS 24", "WS 24/25",];
 
   public taskPool: Task[] = [];
@@ -129,6 +136,16 @@ export class CreateExamComponent {
           type: "shortAnswer",
           question: { DE: "", EN: "" },
           solution: { DE: "", EN: "" },
+          points: 1
+        });
+        break;
+      case "new_picture":
+        this.exam.tasks[this.currentGroupView].tasks.push({
+          taskId: "picture" + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
+          type: "pictureTask",
+          question: { DE: "", EN: "" },
+          questionPicture: { urlDE: "", urlEN: "" },
+          solutionPicture: { urlDE: "", urlEN: "" },
           points: 1
         });
         break;

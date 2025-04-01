@@ -18,6 +18,9 @@
             <app-AddTask class="task_wrapper" [name]="'Ranking'" [color]="'var(--color-warn)'"
                 [iconName]="'ranking.svg'" id="new_ranking" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-AddTask>
+            <app-AddTask class="task_wrapper" [name]="'Picture Task'" [color]="'var(--color-dark-gray)'"
+                [iconName]="'picture.svg'" id="new_picture" draggable="true" (dragstart)="dragStart($event)"
+                (dragend)="drop($event)"></app-AddTask>
         </div>
 
         <div class="total_points">
@@ -125,6 +128,12 @@
             <!-- short Answer -->
             <mat-card class="form-card" *ngIf="task.type === 'shortAnswer'">
                 <app-short-answer-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId "
+                    [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual" (deleteEvent)="deleteTask(i)"
+                    (taskChangeEvent)="onTaskChange($event,i)" />
+            </mat-card>
+
+            <mat-card class="form-card" *ngIf="task.type === 'pictureTask'">
+                <app-picture-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual" (deleteEvent)="deleteTask(i)"
                     (taskChangeEvent)="onTaskChange($event,i)" />
             </mat-card>
