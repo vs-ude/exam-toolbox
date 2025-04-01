@@ -2,7 +2,6 @@ import { AfterViewChecked, AfterViewInit, Component, EventEmitter, OnChanges, On
 import { ShortAnswerTask, Task, } from '../../../../exam';
 import { NgIf, NgStyle } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { trigger, transition, style, animate } from '@angular/animations';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';

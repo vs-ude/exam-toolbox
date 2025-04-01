@@ -1,6 +1,5 @@
-import { trigger, transition, style, animate } from '@angular/animations';
 import { NgIf, NgStyle } from '@angular/common';
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { Translation } from '../../../exam';
 import { TaskAnimations } from '../tasks/task-animations';

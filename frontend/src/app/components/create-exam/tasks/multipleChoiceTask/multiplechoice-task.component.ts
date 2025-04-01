@@ -1,12 +1,11 @@
 import { NgFor, NgIf, NgStyle } from '@angular/common';
-import { Component, Input, Output, EventEmitter, AfterViewInit, OnInit, OnChanges, AfterViewChecked } from '@angular/core';
+import { Component, Output, EventEmitter, AfterViewInit, OnInit, OnChanges, AfterViewChecked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { trigger, transition, style, animate } from '@angular/animations';
 import { MultipleChoiceTask, Task } from '../../../../exam';
 import { BaseTaskComponent } from '../base-task/base-task.component';
 import { TaskAnimations } from '../task-animations';
