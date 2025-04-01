@@ -9,11 +9,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PictureTask, Task } from '../../../../exam';
 import { TaskAnimations } from '../task-animations';
+import { DragAndDropDirective } from '../drag-and-drop.directive';
 
 @Component({
   selector: 'app-picture-task',
   standalone: true,
-  imports: [NgStyle, NgIf, FormsModule, MatCardModule, MatButtonToggleModule, MatIconModule, MatInputModule, MatTooltipModule],
+  imports: [NgStyle, NgIf, FormsModule, MatCardModule, MatButtonToggleModule, MatIconModule, MatInputModule, MatTooltipModule,DragAndDropDirective],
   templateUrl: './picture-task.component.html',
   styleUrls: ['./picture-task.component.scss','../task.scss'],
   animations: [
@@ -24,6 +25,8 @@ import { TaskAnimations } from '../task-animations';
 export class PictureTaskComponent extends BaseTaskComponent {
 
   @Output() taskChangeEvent = new EventEmitter<Task>();
+
+  public url = "";
 
   public task: PictureTask = {
     taskId: "",
@@ -46,5 +49,24 @@ export class PictureTaskComponent extends BaseTaskComponent {
   public updateTask() {
     this.taskChangeEvent.emit(this.task);
   }
+
+  public fileBrowseHandler(event: Event){
+    let input = event.target as HTMLInputElement;
+    this.readFile(input.files![0]);
+  }
+
+  public onFileDropped(file: File){
+    this.readFile(file);
+  }
+
+  private readFile(file: File){
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      this.url = reader.result as string;
+      console.log(this.url);
+    }
+  }
+
 
 }

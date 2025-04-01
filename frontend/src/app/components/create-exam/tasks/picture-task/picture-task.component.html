@@ -26,17 +26,17 @@
 <!-- Buttons for formatting -->
 <div *ngIf="isQuestionActive" [@inOutAnimation] class="form-toolbar">
 
-    <div class="icon_wrapper delete_option_icon" (mousedown)="setQuestionFormat('bold', $event)"
+    <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('bold', $event)"
         [ngStyle]="{ 'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
         <mat-icon aria-hidden="false" fontIcon="format_bold"></mat-icon>
     </div>
 
-    <div class="icon_wrapper delete_option_icon" (mousedown)="setQuestionFormat('italic', $event)"
+    <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('italic', $event)"
         [ngStyle]="{ 'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
         <mat-icon aria-hidden="false" fontIcon="format_italic"></mat-icon>
     </div>
 
-    <div class="icon_wrapper delete_option_icon" (mousedown)="setQuestionFormat('underline', $event)"
+    <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('underline', $event)"
         [ngStyle]="{ 'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
         <mat-icon aria-hidden="false" fontIcon="format_underline"></mat-icon>
     </div>
@@ -45,7 +45,16 @@
 
 
 
+<!-- actual Component HTML here -->
+<img [src]="url" height="200"> <br>
 
+<div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event)">
+    <input class="upload_input" type="file" #fileDropRef id="fileDropRef" (change)="fileBrowseHandler($event)" accept="image/*" />
+    <img src="">
+    <h3>Drag and Drop file here</h3>
+    <h3>or</h3>
+    <label class="browse_button" for="fileDropRef">Browse for file</label>
+</div>
 
 
 

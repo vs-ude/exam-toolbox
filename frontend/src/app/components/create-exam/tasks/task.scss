@@ -79,6 +79,16 @@ mat-icon-button.active {
     border-radius: 10px;
 }
 
+.format_icon {
+    color: var(--color-dark-gray);
+    margin-right: 1%;
+}
+
+.format_icon:hover {
+    cursor: pointer;
+    background-color: #0000001a;
+}
+
 .footer_icon {
     color: var(--color-dark-gray);
     margin-right: 1%;
