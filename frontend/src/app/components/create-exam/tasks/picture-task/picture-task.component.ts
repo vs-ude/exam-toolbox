@@ -14,11 +14,11 @@ import { DragAndDropDirective } from '../drag-and-drop.directive';
 @Component({
   selector: 'app-picture-task',
   standalone: true,
-  imports: [NgStyle, NgIf, FormsModule, MatCardModule, MatButtonToggleModule, MatIconModule, MatInputModule, MatTooltipModule,DragAndDropDirective],
+  imports: [NgStyle, NgIf, FormsModule, MatCardModule, MatButtonToggleModule, MatIconModule, MatInputModule, MatTooltipModule, DragAndDropDirective],
   templateUrl: './picture-task.component.html',
-  styleUrls: ['./picture-task.component.scss','../task.scss'],
+  styleUrls: ['./picture-task.component.scss', '../task.scss'],
   animations: [
-    TaskAnimations.inOutAnimation, 
+    TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation
   ],
 })
@@ -50,23 +50,64 @@ export class PictureTaskComponent extends BaseTaskComponent {
     this.taskChangeEvent.emit(this.task);
   }
 
-  public fileBrowseHandler(event: Event){
+  public fileBrowseHandler(event: Event, tag: string) {
     let input = event.target as HTMLInputElement;
-    this.readFile(input.files![0]);
+    const file = input.files![0];
+    this.readFile(file, tag);
   }
 
-  public onFileDropped(file: File){
-    this.readFile(file);
+  public onFileDropped(file: File, tag: string) {
+    if (!file.type.startsWith("image/")) {
+      console.error("The selected file is not an image.");
+      return;
+    }
+    this.readFile(file, tag);
   }
 
-  private readFile(file: File){
+  private readFile(file: File, tag: string) {
     let reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
       this.url = reader.result as string;
-      console.log(this.url);
+      this.saveFile(this.url, tag);
     }
   }
+
+  private saveFile(url: string, tag: string) {
+    switch (tag) {
+      case "questionDE":
+        this.task.questionPicture.urlDE = url;
+        break;
+      case "questionEN":
+        this.task.questionPicture.urlEN = url;
+        break;
+      case "solutionDE":
+        this.task.solutionPicture.urlDE = url;
+        break;
+      case "solutionEN":
+        this.task.solutionPicture.urlEN = url;
+        break;
+      default:
+        break;
+    }
+  }
+
+  public onRemovePreviewQuestionDE() {
+    this.task.questionPicture.urlDE = "";
+  }
+
+  public onRemovePreviewQuestionEN() {
+    this.task.questionPicture.urlEN = "";
+  }
+
+  public onRemovePreviewSolutionDE() {
+    this.task.solutionPicture.urlDE = "";
+  }
+
+  public onRemovePreviewSolutionEN() {
+    this.task.solutionPicture.urlEN = "";
+  }
+
 
 
 }
