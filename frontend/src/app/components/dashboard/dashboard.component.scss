@@ -4,6 +4,7 @@
 
     border-left: solid 1px;
     border-color: var(--border-color);
+    background-color: var(--color-background);
 }
 
 .recents {
@@ -42,7 +43,7 @@
     min-width: 164px;
     border-radius: 8px;
     border: 0;
-    background: f5f5f5;
+    background: var(--color-bg-accent);
     text-align: center;
     box-sizing: border-box;
     transition: .1s ease-in;
@@ -134,7 +135,7 @@
     min-width: 164px;
     border-radius: 8px;
     border: 0;
-    background: f5f5f5;
+    background: var(--color-bg-accent);
     text-align: center;
     box-sizing: border-box;
     transition: .1s ease-in;
@@ -213,7 +214,7 @@
     min-width: 164px;
     border-radius: 8px;
     border: 0;
-    background: f5f5f5;
+    background: var(--color-bg-accent);
     text-align: center;
     box-sizing: border-box;
     transition: .1s ease-in;
@@ -279,7 +280,7 @@
 
 
 /*------------------------------------------------------------------
-  [ Export Section ]*/
+  [ Import Section ]*/
 .import_exam_button {
     padding: 24px 0 24px 0;
     display: flex;
@@ -292,7 +293,7 @@
     min-width: 164px;
     border-radius: 8px;
     border: 0;
-    background: f5f5f5;
+    background: var(--color-bg-accent);
     text-align: center;
     box-sizing: border-box;
     transition: .1s ease-in;
@@ -401,7 +402,7 @@
 }
 
 .tab_select {
-    background: #f5f5f5;
+    background: var(--color-bg-accent);
     color: black;
     transition: .1s ease-in;
     font-weight: 500;

@@ -1,5 +1,5 @@
 <div class="task_container" (mouseover)="hovered=true" (mouseleave)="hovered=false"
-    [ngStyle]="{'backgroundColor': hovered ? color : '#00000010' }">
+    [ngStyle]="{'backgroundColor': hovered ? color : 'var(--color-bg-lifted)' }">
     <div class="task_icon" [ngStyle]="{'backgroundColor': hovered ? '#0000002a' : color }" >
         <img src="{{ iconName }}">
     </div>

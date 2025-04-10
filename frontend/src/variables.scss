@@ -1,0 +1,45 @@
+$bgColor_light: #faf9fd;
+$bgColor_dark: #2c2c2c;
+
+$bgColorAccent_light: #f5f5f5;
+$bgColorAccent_dark: #3a3a3a;
+
+$bgColorLifted_light: #00000010;
+$bgColorLifted_dark: #5a5a5a;
+
+$textColor_light: #000000e5;
+$textColor_dark: white;
+
+$textColorSecondary_light: #00000080;
+$textColorSecondary_dark: #ffffffb2;
+
+$iconColor_light: #757575;
+$iconColor_dark: #ffffffb2;
+
+$borderColor_light: #e6e6e6;
+$borderColor_dark: white;
+
+// mixin that enables css variables in light mode
+@mixin lighten() {
+  --color-background: #{$bgColor_light};
+  --color-text: #{$textColor_light};
+  --borderColor: #{$borderColor_light};
+  --color-text-secondary: #{$textColorSecondary_light};
+  --color-bg-accent: #{$bgColorAccent_light};
+  --color-bg-lifted: #{$bgColorLifted_light};
+  --color-icon: #{$iconColor_light};
+}
+
+// mixin that enables css variables in dark mode
+@mixin darken() {
+  --color-background: #{$bgColor_dark};
+  --color-text: #{$textColor_dark};
+  --borderColor: #{$borderColor_dark};
+  --color-text-secondary: #{$textColorSecondary_dark};
+  --color-bg-accent: #{$bgColorAccent_dark};
+  --color-bg-lifted: #{$bgColorLifted_dark};
+  --color-icon: #{$iconColor_dark};
+}
+
+
+

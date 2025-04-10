@@ -8,6 +8,7 @@
 // have to load a single css file for Angular Material in your app.
 // Be sure that you only ever include this mixin once!
 @include mat.core();
+@import "variables";
 
 // Define the theme object.
 $frontend-theme: mat.define-theme((
@@ -27,13 +28,20 @@ $frontend-theme: mat.define-theme((
 :root {
   @include mat.all-component-themes($frontend-theme);
   --border-color: #e6e6e6;
-  --color-text: #000000e5;
-  --color-text-secondary:#00000080;
   --color-primary: #0d99ff;
   --color-secondary: #9747ff;
   --color-warn: #ff5c16;
   --color-dark-gray: #757575;
 }
+
+body.dark{
+  @include darken();
+}
+
+body.light{
+  @include lighten();
+}
+
 
 body.inheritCursors * {
   cursor: inherit !important;
@@ -44,8 +52,8 @@ body.inheritCursors * {
 // @include mat.typography-hierarchy($frontend-theme);
 
 // Comment out the line below if you want to use the deprecated `color` inputs.
-// @include mat.color-variants-backwards-compatibility($frontend-theme);
+ @include mat.color-variants-backwards-compatibility($frontend-theme);
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body { height: 100%;}
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;}

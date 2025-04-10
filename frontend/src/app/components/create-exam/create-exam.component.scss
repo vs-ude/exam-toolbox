@@ -4,6 +4,7 @@
     height: 100%;
     flex-wrap: nowrap;
     color: var(--color-text);
+    background-color: var(--color-background);
 }
 
 .icon_wrapper {
@@ -54,7 +55,7 @@
 }
 
 .add_tasks_container {
-    background-color: #F5F5F5;
+    background-color: var(--color-bg-accent);
     height: 70%;
     border-radius: 15px;
     padding: 10px 32px 10px 32px;
@@ -100,7 +101,7 @@
     flex-direction: row;
     justify-content: left;
     align-items: center;
-    background-color: #F5F5F5;
+    background-color: var(--color-bg-accent);
     box-sizing: border-box;
     border-radius: 10px;
     padding: 2%;
@@ -116,7 +117,7 @@
     padding: 0 10px;
     border-radius: 5px;
     min-width: auto;
-    color: var(--color-dark-gray);
+    color: var(--color-icon);
 }
 
 .duration_picker {
@@ -144,15 +145,15 @@
     padding: 0 10px;
     border-radius: 5px;
     min-width: auto;
-    color: var(--color-dark-gray);
+    color: var(--color-icon);
 }
 
 
 .datePicker {
-    border: 1px solid var(--color-dark-gray);
+    border: 1px solid var(--color-icon);
     border-radius: 5px;
     padding: 5px;
-    color: var(--color-dark-gray);
+    color: var(--color-icon);
     background-color: var(--background-color);
     outline: none;
     box-sizing: border-box;
@@ -176,7 +177,7 @@
     padding: 0 10px;
     border-radius: 5px;
     min-width: 20%;
-    color: var(--color-dark-gray);
+    color: var(--color-icon);
 }
 
 .examiner_input {
@@ -201,7 +202,7 @@
     padding: 0 10px;
     border-radius: 5px;
     min-width: 20%;
-    color: var(--color-dark-gray);
+    color: var(--color-icon);
 }
 
 .semester_wrapper:hover {
@@ -220,7 +221,7 @@
 
 
 .bar_icon {
-    color: var(--color-dark-gray);
+    color: var(--color-icon);
     margin-right: 1%;
 }
 
@@ -261,7 +262,7 @@
 }
 
 .tab:hover {
-    background-color: #F5F5F5;
+    background-color: var(--color-bg-accent);
 }
 
 .tab:active {
@@ -340,7 +341,7 @@
 
 
 .task_pool_container {
-    background-color: #F5F5F5;
+    background-color: var(--color-bg-accent);
     height: 70%;
     border-radius: 15px;
     padding: 10px 32px 10px 32px;
