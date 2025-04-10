@@ -423,51 +423,68 @@ function escapeLatex(text?: string): string {
 
 // generates the latex for the tasks
 function generateTasksLatex(exam: Exam): string {
-  const tasks: Task[] = exam.tasks[0].tasks
+  const taskGroups = exam.tasks // get the array of task groups
   let latexContent = ""
 
-  tasks.forEach((task) => {
-    const questionDE = task.question.DE
-    const questionEN = task.question.EN
-    
-    latexContent += `\\aufgabe{${escapeLatex(questionDE)}}{${escapeLatex(questionEN)}}\n`
-    latexContent += `\\aufgabenteil{${task.points ?? 0}}\n`
-    latexContent += `{${escapeLatex(questionDE)}}\n`
-    latexContent += `{${escapeLatex(questionEN)}}\n\n`
-    
-    if (task.type === "multipleChoice") {
-      const answerOptions = task.answerOptions
-      const correctAnswers = answerOptions.filter(opt => opt.correct).length
-      const pointsPerCorrect = task.points * correctAnswers
+  // iterate over each task group
+  taskGroups.forEach((group) => {
+    const groupTitleDE = group.groupTitle.DE
+    const groupTitleEN = group.groupTitle.EN
 
-      latexContent += `\\fortype{A}{\n\\mcstart[${pointsPerCorrect}]{${correctAnswers}}\n`
+    // start a main task (\aufgabe) for the group
+    latexContent += `\\aufgabe{${escapeLatex(groupTitleDE)}}{${escapeLatex(groupTitleEN)}}\n\n`;
 
-      answerOptions.forEach(option => {
-        const de = escapeLatex(option.DE)
-        const en = escapeLatex(option.EN)
-        const correctness = option.correct ? "w" : "f"
-        latexContent += `\\mcline{${de}}{${en}}{${correctness}}\n`
-      })
+    // iterate over the sub-tasks within this group
+    group.tasks.forEach((subTask) => {
+      const questionDE = subTask.question.DE
+      const questionEN = subTask.question.EN
 
-      latexContent += `\\mcend\n}\n`
-    }
+      // start a sub-task (\aufgabenteil)
+      latexContent += `\\aufgabenteil{${subTask.points ?? 0}}\n`
+      latexContent += `{${escapeLatex(questionDE)}}\n`
+      latexContent += `{${escapeLatex(questionEN)}}\n\n`
 
-    if(task.type === "shortAnswer"){
-      const solutionDE = escapeLatex(task.solution.DE)
-      const solutionEN = escapeLatex(task.solution.EN)
+      // --- handle multiple choice task ---
+      if (subTask.type === "multipleChoice" && subTask.answerOptions) {
+        const answerOptions = subTask.answerOptions
+        const correctAnswersCount = answerOptions.filter(opt => opt.correct).length // calculate points per correct answer
+        const totalMcPoints = subTask.points
 
-      // esitmates numer of lines needed based on the solution. Better more lines than less. 
-      const numberLnDE = Math.max(3, Math.ceil(solutionDE.length / 50))
-      const numberLnEN = Math.max(3, Math.ceil(solutionEN.length / 50))
-      const numberLn = Math.max(numberLnDE, numberLnEN)
-      
-      latexContent += `\\loesung{${numberLn}}{${solutionDE}${solutionEN}}\n\n`
-    }
+        latexContent += `\\fortype{A}{\n`
+        latexContent += `\\mcstart[${totalMcPoints}]{${correctAnswersCount}}\n` // use total points for the question
 
-    latexContent += "\\aufgabenteilende\n\n\n"
-  })
+        answerOptions.forEach(option => {
+          const de = escapeLatex(option.DE)
+          const en = escapeLatex(option.EN)
+          const correctness = option.correct ? "w" : "f"
+          latexContent += `\\mcline{${de}}{${en}}{${correctness}}\n`
+        });
 
-  // console.log(latexContent)
+        latexContent += `\\mcend\n}\n\n` // end fortype and add newline
+      }
+
+      // --- handle short answer task ---
+      if (subTask.type === "shortAnswer" && subTask.solution) {
+        const solutionDE = escapeLatex(subTask.solution.DE)
+        const solutionEN = escapeLatex(subTask.solution.EN)
+
+        // Estimates number of lines needed based on the solution. Better more lines than less.
+        const numberLnDE = Math.max(3, Math.ceil(solutionDE.length / 50))
+        const numberLnEN = Math.max(3, Math.ceil(solutionEN.length / 50))
+        const numberLn = Math.max(numberLnDE, numberLnEN)
+
+        latexContent += `\\loesung{${numberLn}}{${solutionDE} / ${solutionEN}}\n\n`
+      }
+
+      latexContent += "\\aufgabenteilende\n\n\n";
+    });
+
+    // add a clearpage after each main task group if desired (optional)
+    // latexContent += "\\clearpage\n\n";
+
+  }) // end of iterating through task groups
+
+  // console.log(latexContent) // uncomment for debugging
   return latexContent;
 }
 
