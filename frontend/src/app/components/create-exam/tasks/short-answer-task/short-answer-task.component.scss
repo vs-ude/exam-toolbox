@@ -47,6 +47,9 @@ textarea {
   line-height: 1.5;
   font-family: inherit;
   max-height: 300px;
+  background-color: transparent;
+  color: var(--color-text);
+  caret-color: auto;
 }
 
 textarea:focus {

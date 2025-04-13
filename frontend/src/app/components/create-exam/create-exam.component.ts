@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, viewChild, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf, NgStyle } from '@angular/common';
 import { Exam, Task } from '../../exam';
 import { AddTaskComponent } from './add-task/add-task.component';
 import { MatSelectModule } from '@angular/material/select';
@@ -15,6 +15,7 @@ import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
 import { TaskGroupTitleComponent } from "./task-group-title/task-group-title.component";
 import { PictureTaskComponent } from "./tasks/picture-task/picture-task.component";
+import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
 
 
 
@@ -36,7 +37,7 @@ import { PictureTaskComponent } from "./tasks/picture-task/picture-task.componen
     MatTabsModule,
     ShortAnswerTaskComponent,
     TaskGroupTitleComponent,
-    PictureTaskComponent
+    PictureTaskComponent,
   ],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
@@ -61,14 +62,21 @@ export class CreateExamComponent {
   public exam = new Exam("New Exam", "", "", "", 90, [{ groupNumber: 1, groupTitle: { DE: "", EN: "" }, tasks: [] }]);
 
   public currentGroupView = 0;
+  public lightTheme: boolean = true;
 
 
   constructor(
     private api: ApiService,
     private router: Router,
+    private themeService: ThemeToggleService,
   ) {
     this.importExam();
     this.importPoolTasks();
+
+
+    this.themeService.themeChanged$.subscribe( (theme: Theme) => {
+      this.lightTheme = theme === Theme.LIGHT ? true : false;
+    })
   }
 
 

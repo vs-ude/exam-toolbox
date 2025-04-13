@@ -55,7 +55,7 @@
 
             <!-- Exam Date -->
             <div class="date_wrapper">
-                <input type="date" class="datePicker" [(ngModel)]="exam.date" />
+                <input type="date" class="datePicker" [style.color-scheme]="lightTheme ? 'light' : 'dark'" [(ngModel)]="exam.date" />
             </div>
 
             <!-- Examiner -->

@@ -19,6 +19,9 @@ $iconColor_dark: #ffffffb2;
 $borderColor_light: #e6e6e6;
 $borderColor_dark: #5a5a5a;
 
+$taskCard_bgColor_light: #ffffff;
+$taskCard_bgColor_dark: #3a3a3a;
+
 // mixin that enables css variables in light mode
 @mixin lighten() {
   --color-background: #{$bgColor_light};
@@ -28,6 +31,7 @@ $borderColor_dark: #5a5a5a;
   --color-bg-accent: #{$bgColorAccent_light};
   --color-bg-lifted: #{$bgColorLifted_light};
   --color-icon: #{$iconColor_light};
+  --color-task-card: #{$taskCard_bgColor_light};
 }
 
 // mixin that enables css variables in dark mode
@@ -39,6 +43,7 @@ $borderColor_dark: #5a5a5a;
   --color-bg-accent: #{$bgColorAccent_dark};
   --color-bg-lifted: #{$bgColorLifted_dark};
   --color-icon: #{$iconColor_dark};
+  --color-task-card: #{$taskCard_bgColor_dark};
 }
 
 
