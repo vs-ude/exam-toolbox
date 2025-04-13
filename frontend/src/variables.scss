@@ -17,14 +17,14 @@ $iconColor_light: #757575;
 $iconColor_dark: #ffffffb2;
 
 $borderColor_light: #e6e6e6;
-$borderColor_dark: white;
+$borderColor_dark: #5a5a5a;
 
 // mixin that enables css variables in light mode
 @mixin lighten() {
   --color-background: #{$bgColor_light};
   --color-text: #{$textColor_light};
-  --borderColor: #{$borderColor_light};
   --color-text-secondary: #{$textColorSecondary_light};
+  --border-color: #{$borderColor_light};
   --color-bg-accent: #{$bgColorAccent_light};
   --color-bg-lifted: #{$bgColorLifted_light};
   --color-icon: #{$iconColor_light};
@@ -34,8 +34,8 @@ $borderColor_dark: white;
 @mixin darken() {
   --color-background: #{$bgColor_dark};
   --color-text: #{$textColor_dark};
-  --borderColor: #{$borderColor_dark};
   --color-text-secondary: #{$textColorSecondary_dark};
+  --border-color: #{$borderColor_dark};
   --color-bg-accent: #{$bgColorAccent_dark};
   --color-bg-lifted: #{$bgColorLifted_dark};
   --color-icon: #{$iconColor_dark};

@@ -12,6 +12,7 @@
     border-bottom: solid 1px;
     border-color: var(--border-color);
     padding: 10px 32px 10px 32px;
+    color: var(--color-text);
 }
 
 
@@ -385,8 +386,8 @@
     line-height: 16px;
     border-radius: 5px;
     border: none;
-    background: #faf9fd;
-    color: #00000080;
+    background: var(--color-bg);
+    color: var(--color-text-secondary);
     transition: .1s ease-in;
     font-weight: normal;
 }
@@ -403,7 +404,7 @@
 
 .tab_select {
     background: var(--color-bg-accent);
-    color: black;
+    color: var(--color-text);
     transition: .1s ease-in;
     font-weight: 500;
 }
@@ -424,6 +425,7 @@
     padding-right: 17px;
     font-size: 11px;
     position: relative;
+    color: var(--color-text);
 }
 
 .sortingOptions_wrapper:hover {
@@ -438,6 +440,7 @@
     padding-right: 17px;
     font-size: 11px;
     position: relative;
+    color: var(--color-text);
 }
 
 .filterOptions_wrapper {

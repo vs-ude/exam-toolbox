@@ -205,6 +205,7 @@
     color: var(--color-icon);
 }
 
+
 .semester_wrapper:hover {
     cursor: pointer;
     background-color: #0000001a;
@@ -259,6 +260,7 @@
     padding: 10px 20px;
     position: relative;
     cursor: pointer;
+    color: var(--color-text);
 }
 
 .tab:hover {
