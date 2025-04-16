@@ -10,6 +10,23 @@
                 </svg>
             </div>
         </button>
+
+        <button class="search-button">
+            <div class="search-container">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path fill="var(--color-icon)" fill-rule="evenodd"
+                        d="M16 11.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0m-.956 4.206a5.5 5.5 0 1 1 .662-.662.5.5 0 0 1 .148.102l3 3a.5.5 0 1 1-.707.707l-3-3a.5.5 0 0 1-.103-.147"
+                        clip-rule="evenodd"></path>
+                </svg>
+                <input type="text" placeholder="Search..." class="search-input" aria-label="Search" aria-autocomplete="list"
+                    aria-controls="mat-autocomplete-0" aria-activedescendant="mat-option-0">
+            </div>
+        </button>
+
+        <div class="separator-horizontal" style="margin-top: 5%;"></div>
+
+
+
         <button routerLink="/dashboard" class="nav-item">
             <div class="icon-container">
                 <mat-icon aria-hidden="false" fontIcon="dashboard"></mat-icon>
@@ -44,9 +61,10 @@
             </div>
             Logout
         </button>
-
     </div>
-    <div class="separator"></div>
+
+
+    <div class="separator-vertical"></div>
     <div class="content">
         <router-outlet></router-outlet>
     </div>
