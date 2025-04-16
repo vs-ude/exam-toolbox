@@ -4,12 +4,13 @@ import { MatListModule } from '@angular/material/list'
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { MatButtonModule } from '@angular/material/button'
-import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
+import { ThemeToggleService } from '../../services/theme-toggle.service';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-main-view',
   standalone: true,
-  imports: [MatSidenavModule, MatListModule, RouterOutlet, MatButtonModule, RouterModule, ThemeToggleComponent],
+  imports: [MatSidenavModule, MatListModule, RouterOutlet, MatButtonModule, RouterModule, MatIcon],
   templateUrl: './main-view.component.html',
   styleUrl: './main-view.component.scss'
 })
@@ -17,9 +18,14 @@ export class MainViewComponent {
 
   constructor(
     private authService: AuthService,
+    private themeToggleService: ThemeToggleService,
   ){}
 
   onLogout(){
     this.authService.logout();
+  }
+
+  toggleTheme() {
+    this.themeToggleService.toggleTheme();
   }
 }

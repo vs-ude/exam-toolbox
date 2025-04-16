@@ -1,26 +1,110 @@
 .main {
     width: 100%;
     height: 100%;
-    position: fixed;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
 }
 
-.mat-drawer-content {
-    padding-left: 30px;
-    padding-right: 30px;
-}
-
-.sidenav{
-    background-color: #cccccc;
-    text-align: center;
+.sidenav {
+    background-color: var(--color-background);
     width: 12%;
-    min-width: 200px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.sideButton{
+.user-profile {
+    display: flex;
+    align-items: center;
     width: 90%;
+    padding: 5%;
+    background-color: var(--color-background);
+    // border-bottom: 1px solid var(--border-color);
+    align-items: baseline;
 }
 
-.mat-drawer-container{
+.dropdown-button {
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    padding: 0px;
+    cursor: pointer;
+
+    :hover {
+        background-color: var(--border-color);
+    }
+}
+
+.avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 10px;
+    font-size: 12px;
+    line-height: 24px;
+}
+
+
+
+.user-name {
+    font-size: 13px;
+    font-weight: 540;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-icon {
+    margin-left: auto;
+    font-size: 16px;
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.nav-item {
+    color: var(--color-text);
+    background-color: var(--color-background);
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    padding-left: 10px;
+    cursor: pointer;
+}
+.nav-item:hover {
+    background-color: var(--border-color);
+}
+
+.icon-container{
+    transform: scale(0.8);
+    margin-right: 10px;
+    color: var(--color-icon);
+}
+
+
+
+.separator {
+    width: 0%;
+    height: 100%;
+    border-left: solid 1px;
+    border-color: var(--border-color);
+}
+
+.content {
+    background-color: var(--color-background);
+    width: 88%;
     height: 100%;
 }

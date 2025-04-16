@@ -1,4 +1,60 @@
 <div class="main">
+    <div class="sidenav">
+        <button class="dropdown-button">
+            <div class="user-profile">
+                <div class="avatar">M</div>
+                <span class="user-name">Test User</span>
+                <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
+                    <path fill="currentColor" fill-opacity="1" fill-rule="nonzero" stroke="none"
+                        d="m.646 3.354.708-.708L4 5.293l2.646-2.647.708.708L4 6.707z"></path>
+                </svg>
+            </div>
+        </button>
+        <button routerLink="/dashboard" class="nav-item">
+            <div class="icon-container">
+                <mat-icon aria-hidden="false" fontIcon="dashboard"></mat-icon>
+            </div>
+            Dashboard
+        </button>
+
+        <button routerLink="/getting-started" class="nav-item">
+            <div class="icon-container">
+                <mat-icon aria-hidden="false" fontIcon="info"></mat-icon>
+            </div>
+            Getting Started
+        </button>
+
+        <button routerLink="/about" class="nav-item">
+            <div class="icon-container">
+                <mat-icon aria-hidden="false" fontIcon="bug_report"></mat-icon>
+            </div>
+            About
+        </button>
+
+        <button (click)="toggleTheme()" class="nav-item">
+            <div class="icon-container">
+                <mat-icon aria-hidden="false" fontIcon="format_color_fill"></mat-icon>
+            </div>
+            Theme
+        </button>
+
+        <button (click)="onLogout()" class="nav-item">
+            <div class="icon-container">
+                <mat-icon aria-hidden="false" fontIcon="logout"></mat-icon>
+            </div>
+            Logout
+        </button>
+
+    </div>
+    <div class="separator"></div>
+    <div class="content">
+        <router-outlet></router-outlet>
+    </div>
+</div>
+
+
+
+<!-- <div class="main">
     <mat-drawer-container >
         <mat-drawer mode="side" opened class="sidenav">
             <mat-selection-list>
@@ -17,4 +73,4 @@
             <router-outlet></router-outlet>
         </mat-drawer-content>
     </mat-drawer-container>
-</div>
+</div> -->
