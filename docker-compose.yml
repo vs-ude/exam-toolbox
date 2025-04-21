@@ -1,4 +1,18 @@
 services:
+  caddy:
+    build: .
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    networks:
+      - web
+    depends_on:
+      - backend
+      - frontend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   backend:
     build:
       context: ./backend
@@ -8,12 +22,16 @@ services:
       - MONGODB_URI=mongodb://mongo:27017/examToolboxDB
     depends_on:
       - mongo
+    networks:
+      - web
 
   frontend:
     build:
       context: ./frontend
     ports:
       - "4200:80"
+    networks:
+      - web
 
   mongo:
     image: mongo
@@ -22,7 +40,12 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - web
 
 volumes:
   mongodb_data: 
 
+networks:
+  web:
+    driver: bridge
