@@ -1,8 +1,22 @@
-
 localhost {
-  handle_path /api* {
-    reverse_proxy host.docker.internal:3000
-  }
-  reverse_proxy host.docker.internal:4200
-}
 
+    # set root
+    root * /srv/app
+
+    # serves static files
+    file_server
+
+    # reverse-proxy api requests to backend (backend defined in docker-compose.yml)
+    handle /api* {
+      reverse_proxy backend:3000
+    }
+
+    # optional optimization: compresses communication to browser if possible
+    encode gzip zstd
+
+    # optional logging: https://caddyserver.com/docs/caddyfile/directives/log
+    log {
+      output stdout
+      format json
+    }
+}
