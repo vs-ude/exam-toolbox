@@ -1,23 +1,27 @@
 services:
+
+  # documentation (basic usage): ofhttps://hub.docker.com/_/caddy
   caddy:
-    build: ./caddy
+    build: 
+      context: .
+      dockerfile: ./caddy/Dockerfile
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data # https://caddyserver.com/docs/conventions#data-directory
+      - caddy_config:/config # https://caddyserver.com/docs/conventions#configuration-directory
     networks:
       - web
     depends_on:
       - backend
-      - frontend
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+
   backend:
     build:
       context: ./backend
-    ports:
-      - "3000:3000"
+    # ports: # not exposed when caddy is used
+    #   - "3000:3000"
     environment:
       - MONGODB_URI=mongodb://mongo:27017/examToolboxDB
     depends_on:
@@ -25,13 +29,14 @@ services:
     networks:
       - web
 
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - "4200:80"
-    networks:
-      - web
+  # not needed when caddy hosts static frontend build files
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #   ports:
+  #     - "4200:80"
+  #   networks:
+  #     - web
 
   mongo:
     image: mongo
@@ -45,6 +50,8 @@ services:
 
 volumes:
   mongodb_data: 
+  caddy_data:
+  caddy_config:
 
 networks:
   web:
