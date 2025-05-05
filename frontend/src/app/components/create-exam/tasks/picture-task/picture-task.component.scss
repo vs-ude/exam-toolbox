@@ -32,7 +32,7 @@
 h3 {
     font-size: medium;
     font-weight: 500;
-    color: #38424c;
+    color: var(--color-icon);
 }
 
 .fileover {
@@ -44,7 +44,7 @@ h3 {
 .dropzone_header {
     font-size: 1rem;
     font-weight: bold;
-    color: #555;
+    color: var(--color-text);
     margin-bottom: 0.5rem;
     text-align: center;
 }
