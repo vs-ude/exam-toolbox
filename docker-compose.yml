@@ -1,6 +1,6 @@
 services:
   caddy:
-    build: .
+    build: ./caddy
     ports:
       - "80:80"
       - "443:443"
