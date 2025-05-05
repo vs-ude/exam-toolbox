@@ -75,8 +75,8 @@ router
     try {
       const result = await exams.insertOne(exam);
       ctx.response.status = 200;
-      ctx.response.body = { 
-        message: 'Exam saved successfully! ', 
+      ctx.response.body = {
+        message: 'Exam saved successfully! ',
         insertedId: result // also returns the _id of the created Exam
       }
     } catch (err) {
@@ -87,30 +87,30 @@ router
   .put("/api/exams/update", async (ctx) => {
     try {
       const { examId, updatedExam } = await ctx.request.body().value;
-  
+
       // validate examId and updatedExamData are provided
       if (!examId || !updatedExam) {
         ctx.response.status = 400;
         ctx.response.body = { message: "Exam ID and updated data are required" };
         return;
       }
-  
+
       // Convert the examId to an ObjectId (MongoDB uses ObjectId for the _id field)
       const mongoId = new ObjectId(examId)
-  
+
       // Updating the Exam with the provided id
       const result = await exams.updateOne(
         { _id: mongoId },  // finds exam
         { $set: updatedExam }  // updates just the changed fields in the exam
       );
-  
+
       // If no matching exam found, return 404
       if (result.matchedCount === 0) {
         ctx.response.status = 404;
         ctx.response.body = { message: "Exam not found" };
         return;
       }
-  
+
       ctx.response.status = 200;
       ctx.response.body = { message: "Exam updated successfully" };
     } catch (error) {
@@ -141,6 +141,32 @@ router
       ctx.response.body = { message: 'Error generating Exam PDF', error }
     }
   })
+  .post("/api/upload", async (ctx) => {
+    const body = ctx.request.body({ type: "form-data" });
+    const formData = await body.value.read({ maxSize: 10 * 1024 * 1024 });
+
+    if (!formData.files || formData.files.length === 0) {
+      ctx.response.status = 400;
+      ctx.response.body = { message: "No file uploaded" };
+      return;
+    }
+
+    const file = formData.files[0];
+    const uploadDir = "./uploads";
+
+    const filePath = `${uploadDir}/${file.originalName}`;
+    if (file.content) {
+      await Deno.writeFile(filePath, file.content);
+      console.log("File saved to:", filePath);
+    }
+
+    const fileUrl = `${ctx.request.url.origin}/uploads/${file.originalName}`;
+    ctx.response.body = {
+      message: "File uploaded successfully",
+      url: fileUrl,
+    };
+    ctx.response.status = 200;
+  })
   .post("/api/generate-exams", async (ctx) => {
     const tempDir = await Deno.makeTempDir({
       dir: `${basePath}`,
@@ -150,7 +176,7 @@ router
 
     try {
       const body = ctx.request.body({ type: "form-data" })
-      const formData = await body.value.read({maxSize: 10 * 1024 * 1024})
+      const formData = await body.value.read({ maxSize: 10 * 1024 * 1024 })
 
       const examJson = JSON.parse(formData.fields.exam)
 
@@ -405,7 +431,7 @@ async function generateAllExams(examListPath: string, basePath: string, outDir: 
 
 async function mergePDFs(pdfs: Uint8Array[]) {
   const mergedPdf = await PDFDocument.create()
-  
+
   for (const pdfBytes of pdfs) {
     const pdf = await PDFDocument.load(pdfBytes)
     const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices())
@@ -514,7 +540,7 @@ async function createZipArchiveFromDirectory(outDir: string, zipFilePath: string
   }
 }
 
-async function updateMetaTemplate(exam: Exam){
+async function updateMetaTemplate(exam: Exam) {
   const metaPath = `${basePath}/meta-exam.tex`
 
   // Extract data from JSON
@@ -530,26 +556,26 @@ async function updateMetaTemplate(exam: Exam){
     .replace(/\\newcommand\{\\pruefer\}\{.*?\}/, `\\newcommand{\\pruefer}{${examinerName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')}}`)
     .replace(/\\newcommand\{\\datum\}\{.*?\}/, `\\newcommand{\\datum}{${date}}`)
 
-    // these can also be updated, see meta-exam.tex
-    // \newcommand{\klausurtyp}{A}
-    // \newcommand{\schmierblaetteranzahl}{2} % (CB) set to 0 for no empty pages at the end. Will be filled to a even number of pages
-    // \newcommand{\interactive}{N} % Y=Yes, N=No; use PDF forms and generate info for digital exams
-    // \newcommand{\englishandgerman}{yes}
+  // these can also be updated, see meta-exam.tex
+  // \newcommand{\klausurtyp}{A}
+  // \newcommand{\schmierblaetteranzahl}{2} % (CB) set to 0 for no empty pages at the end. Will be filled to a even number of pages
+  // \newcommand{\interactive}{N} % Y=Yes, N=No; use PDF forms and generate info for digital exams
+  // \newcommand{\englishandgerman}{yes}
 
   // Update meta-exam.tex
   await Deno.writeTextFile(metaPath, updatedMeta)
 }
 
 async function updateMetaStudent(options: {
-  zeigeloesung?: boolean, 
-  sprache?: string, 
-  randomexamnumber?: string, 
-  sequenznummer?: number, 
-  vollername?: string, 
-  matrikelnummer?: number, 
+  zeigeloesung?: boolean,
+  sprache?: string,
+  randomexamnumber?: string,
+  sequenznummer?: number,
+  vollername?: string,
+  matrikelnummer?: number,
   uploadurl?: string
-  } = {}
-){
+} = {}
+) {
   const { zeigeloesung, sprache, randomexamnumber, sequenznummer, vollername, matrikelnummer, uploadurl } = options
   const metaPath = `${basePath}/meta-exam.tex`;
 

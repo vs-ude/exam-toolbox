@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { PictureTask, Task } from '../../../../exam';
 import { TaskAnimations } from '../task-animations';
 import { DragAndDropDirective } from '../drag-and-drop.directive';
+import { ApiService } from '../../../../services/api.service';
 
 @Component({
   selector: 'app-picture-task',
@@ -23,6 +24,9 @@ import { DragAndDropDirective } from '../drag-and-drop.directive';
   ],
 })
 export class PictureTaskComponent extends BaseTaskComponent {
+  constructor(private api: ApiService) {
+    super();
+  }
 
   @Output() taskChangeEvent = new EventEmitter<Task>();
 
@@ -54,6 +58,7 @@ export class PictureTaskComponent extends BaseTaskComponent {
     let input = event.target as HTMLInputElement;
     const file = input.files![0];
     this.readFile(file, tag);
+    this.uploadFile(file)
   }
 
   public onFileDropped(file: File, tag: string) {
@@ -62,6 +67,16 @@ export class PictureTaskComponent extends BaseTaskComponent {
       return;
     }
     this.readFile(file, tag);
+    this.uploadFile(file)
+  }
+
+  private uploadFile(file: File){
+    console.log("uploading file: ", file.name)
+    this.api.uploadFile(file).subscribe(
+      response => {console.log("File uploaded successfully: ", response);},
+      error => {console.error("Error uploading file: ", error);}
+    )
+
   }
 
   private readFile(file: File, tag: string) {

@@ -60,4 +60,10 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/generate-exams`, formData, { responseType: 'blob' }).pipe(timeout(600000))
   }
 
+  uploadFile(file: File){
+    const formData = new FormData();
+    formData.append("image", file);
+    return this.http.post(`${this.apiUrl}/upload`, formData);
+  }
+
 }
