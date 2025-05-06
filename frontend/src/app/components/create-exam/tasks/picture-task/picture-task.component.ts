@@ -87,6 +87,7 @@ export class PictureTaskComponent extends BaseTaskComponent {
   private handleNewPicture(picture: File, imageAffiliation: string) {
     this.uploadFile(picture, imageAffiliation)
     this.previewPicture(picture, imageAffiliation);
+    this.taskChangeEvent.emit(this.task);
   }
 
   private uploadFile(file: File, imageAffiliation: string) {
@@ -170,18 +171,26 @@ export class PictureTaskComponent extends BaseTaskComponent {
 
   public onRemovePreviewQuestionDE() {
     this.task.questionPicture.urlDE = "";
+    this.pictureFileUrlQuestionDE = "";
+    this.taskChangeEvent.emit(this.task);
   }
 
   public onRemovePreviewQuestionEN() {
     this.task.questionPicture.urlEN = "";
+    this.pictureFileUrlQuestionEN = "";
+    this.taskChangeEvent.emit(this.task);
   }
 
   public onRemovePreviewSolutionDE() {
     this.task.solutionPicture.urlDE = "";
+    this.pictureFileUrlSolutionDE = "";
+    this.taskChangeEvent.emit(this.task);
   }
 
   public onRemovePreviewSolutionEN() {
     this.task.solutionPicture.urlEN = "";
+    this.pictureFileUrlSolutionEN = "";
+    this.taskChangeEvent.emit(this.task);
   }
 
 
