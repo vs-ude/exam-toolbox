@@ -132,6 +132,7 @@
                     (taskChangeEvent)="onTaskChange($event,i)" />
             </mat-card>
 
+            <!-- Picture Task -->
             <mat-card class="form-card" *ngIf="task.type === 'pictureTask'">
                 <app-picture-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual" (deleteEvent)="deleteTask(i)"

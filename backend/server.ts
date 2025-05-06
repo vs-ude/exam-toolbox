@@ -160,14 +160,74 @@ router
       console.log("File saved to:", filePath);
     }
 
-    const fileUrl = `${ctx.request.url.origin}/uploads/${file.originalName}`;
+    const fileUrl = `./uploads/${file.originalName}`;
     ctx.response.body = {
       message: "File uploaded successfully",
       url: fileUrl,
     };
     ctx.response.status = 200;
-  })
-  .post("/api/generate-exams", async (ctx) => {
+    })
+    .get("/api/download", async (ctx) => {
+    const fileUrl = ctx.request.url.searchParams.get("fileUrl");
+
+    if (!fileUrl) {
+      ctx.response.status = 400;
+      ctx.response.body = { message: "File URL is required" };
+      return;
+    }
+
+    try {
+      const fileContent = await Deno.readFile(fileUrl);
+      const fileName = fileUrl.split("/").pop() || "downloaded_file";
+
+      const fileExtension = fileName.split('.').pop()?.toLowerCase();
+      let contentType = "application/octet-stream";
+
+      console.log("File extension:", fileExtension);
+
+      switch (fileExtension) {
+        case "pdf":
+          contentType = "application/pdf";
+          break;
+        case "txt":
+          contentType = "text/plain";
+          break;
+        case "csv":
+          contentType = "text/csv";
+          break;
+        case "json":
+          contentType = "application/json";
+          break;
+        case "zip":
+          contentType = "application/zip";
+          break;
+        case "jpg":
+        case "jpeg":
+          contentType = "image/jpeg";
+          break;
+        case "png":
+          contentType = "image/png";
+          break;
+        case "gif":
+          contentType = "image/gif";
+          break;
+        case "svg":
+          contentType = "image/svg+xml";
+          break;
+        default:
+          contentType = "application/octet-stream";
+      }
+
+      ctx.response.headers.set("Content-Type", contentType);
+      ctx.response.headers.set("Content-Disposition", `attachment; filename="${fileName}"`);
+      ctx.response.body = fileContent;
+    } catch (error) {
+      console.error("Error reading file:", error);
+      ctx.response.status = 500;
+      ctx.response.body = { message: "Error reading file", error: error.message };
+    }
+    })
+    .post("/api/generate-exams", async (ctx) => {
     const tempDir = await Deno.makeTempDir({
       dir: `${basePath}`,
       prefix: "exam_gen_"

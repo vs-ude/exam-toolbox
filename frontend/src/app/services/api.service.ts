@@ -66,4 +66,8 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/upload`, formData);
   }
 
+  downloadFile(fileUrl: string){
+    return this.http.get(`${this.apiUrl}/download`, { responseType: 'blob', params: { fileUrl } });
+  }
+
 }

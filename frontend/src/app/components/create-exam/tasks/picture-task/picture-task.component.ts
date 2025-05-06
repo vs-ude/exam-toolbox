@@ -30,8 +30,6 @@ export class PictureTaskComponent extends BaseTaskComponent {
 
   @Output() taskChangeEvent = new EventEmitter<Task>();
 
-  public url = "";
-
   public task: PictureTask = {
     taskId: "",
     type: "pictureTask",
@@ -41,9 +39,27 @@ export class PictureTaskComponent extends BaseTaskComponent {
     points: 2
   };
 
+  public pictureFileUrlQuestionDE: string = "";
+  public pictureFileUrlQuestionEN: string = "";
+  public pictureFileUrlSolutionDE: string = "";
+  public pictureFileUrlSolutionEN: string = "";
+
   ngOnInit(): void {
     if (this.preTask) {
       this.task = this.preTask as PictureTask;
+
+      if (this.task.questionPicture.urlDE) {
+        this.downloadFile(this.task.questionPicture.urlDE, "questionDE");
+      }
+      if (this.task.questionPicture.urlEN) {
+        this.downloadFile(this.task.questionPicture.urlEN, "questionEN");
+      }
+      if (this.task.solutionPicture.urlDE) {
+        this.downloadFile(this.task.solutionPicture.urlDE, "solutionDE");
+      }
+      if (this.task.solutionPicture.urlEN) {
+        this.downloadFile(this.task.solutionPicture.urlEN, "solutionEN");
+      }
       return;
     }
     this.task.taskId = this.taskId;
@@ -54,42 +70,38 @@ export class PictureTaskComponent extends BaseTaskComponent {
     this.taskChangeEvent.emit(this.task);
   }
 
-  public fileBrowseHandler(event: Event, tag: string) {
+  public fileBrowseHandler(event: Event, imageAffiliation: string) {
     let input = event.target as HTMLInputElement;
     const file = input.files![0];
-    this.readFile(file, tag);
-    this.uploadFile(file)
+    this.handleNewPicture(file, imageAffiliation)
   }
 
-  public onFileDropped(file: File, tag: string) {
+  public onFileDropped(file: File, imageAffiliation: string) {
     if (!file.type.startsWith("image/")) {
       console.error("The selected file is not an image.");
       return;
     }
-    this.readFile(file, tag);
-    this.uploadFile(file)
+    this.handleNewPicture(file, imageAffiliation);
   }
 
-  private uploadFile(file: File){
+  private handleNewPicture(picture: File, imageAffiliation: string) {
+    this.uploadFile(picture, imageAffiliation)
+    this.previewPicture(picture, imageAffiliation);
+  }
+
+  private uploadFile(file: File, imageAffiliation: string) {
     console.log("uploading file: ", file.name)
     this.api.uploadFile(file).subscribe(
-      response => {console.log("File uploaded successfully: ", response);},
-      error => {console.error("Error uploading file: ", error);}
+      (response: any) => {
+        console.log("File uploaded successfully: ", response.url);
+        this.saveBackendURL(response.url, imageAffiliation);
+      },
+      error => { console.error("Error uploading file: ", error); }
     )
-
   }
 
-  private readFile(file: File, tag: string) {
-    let reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      this.url = reader.result as string;
-      this.saveFile(this.url, tag);
-    }
-  }
-
-  private saveFile(url: string, tag: string) {
-    switch (tag) {
+  private saveBackendURL(url: string, imageAffiliation: string) {
+    switch (imageAffiliation) {
       case "questionDE":
         this.task.questionPicture.urlDE = url;
         break;
@@ -101,6 +113,55 @@ export class PictureTaskComponent extends BaseTaskComponent {
         break;
       case "solutionEN":
         this.task.solutionPicture.urlEN = url;
+        break;
+      default:
+        break;
+    }
+  }
+
+  private downloadFile(url: string, imageAffiliation: string) {
+    this.api.downloadFile(url).subscribe(
+      response => {
+        console.log("File downloaded successfully: ", response);
+        const newBlob = new Blob([response], { type: response.type });
+
+        let reader = new FileReader();
+        reader.readAsDataURL(newBlob);
+        reader.onload = () => {
+          const url = reader.result as string;
+          this.setPictureFrontendUrl(url, imageAffiliation);
+        }
+      },
+      error => { console.error("Error downloading file: ", error); }
+    )
+
+  }
+
+
+
+  private previewPicture(file: File, imageAffiliation: string) {
+    console.log(file.type);
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const url = reader.result as string;
+      this.setPictureFrontendUrl(url, imageAffiliation);
+    }
+  }
+
+  private setPictureFrontendUrl(url: string, imageAffiliation: string) {
+    switch (imageAffiliation) {
+      case "questionDE":
+        this.pictureFileUrlQuestionDE = url;
+        break;
+      case "questionEN":
+        this.pictureFileUrlQuestionEN = url;
+        break;
+      case "solutionDE":
+        this.pictureFileUrlSolutionDE = url;
+        break;
+      case "solutionEN":
+        this.pictureFileUrlSolutionEN = url;
         break;
       default:
         break;

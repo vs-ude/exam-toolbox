@@ -52,8 +52,8 @@
 <!-- German Version -->
 <div *ngIf="!bilingual">
     <h2 class="dropzone_header">Question Picture:</h2>
-    <div *ngIf="task.questionPicture.urlDE" class="preview_container">
-        <img [src]="task.questionPicture.urlDE" class="image_preview">
+    <div *ngIf="pictureFileUrlQuestionDE" class="preview_container">
+        <img [src]="pictureFileUrlQuestionDE" class="image_preview">
         <span class="remove_image">
             <div class="icon_wrapper footer_icon_delete">
                 <mat-icon aria-hidden="false" fontIcon="clear" matTooltip="remove" matTooltipPosition="right"
@@ -64,7 +64,7 @@
 
 
     <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event, 'questionDE')"
-        *ngIf="!task.questionPicture.urlDE">
+        *ngIf="!pictureFileUrlQuestionDE">
         <input class="upload_input" type="file" #fileDropRef id="fileDropRef"
             (change)="fileBrowseHandler($event, 'questionDE')" accept="image/*" />
         <h3>Drag and Drop picture here</h3>
@@ -75,8 +75,8 @@
 
     <h2 class="dropzone_header">Solution Picture:</h2>
 
-    <div *ngIf="task.solutionPicture.urlDE" class="preview_container">
-        <img [src]="task.solutionPicture.urlDE" class="image_preview">
+    <div *ngIf="pictureFileUrlSolutionDE" class="preview_container">
+        <img [src]="pictureFileUrlSolutionDE" class="image_preview">
         <span class="remove_image">
             <div class="icon_wrapper footer_icon_delete">
                 <mat-icon aria-hidden="false" fontIcon="clear" matTooltip="remove" matTooltipPosition="right"
@@ -86,7 +86,7 @@
     </div>
 
     <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event, 'solutionDE')"
-        *ngIf="!task.solutionPicture.urlDE">
+        *ngIf="!pictureFileUrlSolutionDE">
         <input class="upload_input" type="file" #fileDropRef id="fileDropRef"
             (change)="fileBrowseHandler($event, 'solutionDE')" accept="image/*" />
         <h3>Drag and Drop picture here</h3>
@@ -101,8 +101,8 @@
     <h2 class="dropzone_header">Question Picture:</h2>
     <div class="image_preview_container">
         <!-- German -->
-        <div *ngIf="task.questionPicture.urlDE" class="preview_container">
-            <img [src]="task.questionPicture.urlDE" class="image_preview">
+        <div *ngIf="pictureFileUrlQuestionDE" class="preview_container">
+            <img [src]="pictureFileUrlQuestionDE" class="image_preview">
             <span class="remove_image">
                 <div class="icon_wrapper footer_icon_delete">
                     <mat-icon aria-hidden="false" fontIcon="clear" matTooltip="remove" matTooltipPosition="right"
@@ -119,7 +119,7 @@
 
 
         <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event, 'questionDE')"
-            *ngIf="!task.questionPicture.urlDE">
+            *ngIf="!pictureFileUrlQuestionDE">
             <input class="upload_input" type="file" #fileDropRef id="fileDropRef"
                 (change)="fileBrowseHandler($event, 'questionDE')" accept="image/*" />
             <h3>Drag and Drop picture here</h3>
@@ -135,8 +135,8 @@
 
 
         <!-- English -->
-        <div *ngIf="task.questionPicture.urlEN" class="preview_container">
-            <img [src]="task.questionPicture.urlEN" class="image_preview">
+        <div *ngIf="pictureFileUrlQuestionEN" class="preview_container">
+            <img [src]="pictureFileUrlQuestionEN" class="image_preview">
             <span class="remove_image">
                 <div class="icon_wrapper footer_icon_delete">
                     <mat-icon aria-hidden="false" fontIcon="clear" matTooltip="remove" matTooltipPosition="right"
@@ -152,7 +152,7 @@
 
 
         <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event, 'questionEN')"
-            *ngIf="!task.questionPicture.urlEN">
+            *ngIf="!pictureFileUrlQuestionEN">
             <input class="upload_input" type="file" #fileDropRef id="fileDropRef"
                 (change)="fileBrowseHandler($event, 'questionEN')" accept="image/*" />
             <h3>Drag and Drop picture here</h3>
@@ -170,8 +170,8 @@
     <h2 class="dropzone_header">Solution Picture:</h2>
     <div class="image_preview_container">
         <!-- German -->
-        <div *ngIf="task.solutionPicture.urlDE" class="preview_container">
-            <img [src]="task.solutionPicture.urlDE" class="image_preview">
+        <div *ngIf="pictureFileUrlSolutionDE" class="preview_container">
+            <img [src]="pictureFileUrlSolutionDE" class="image_preview">
             <span class="remove_image">
                 <div class="icon_wrapper footer_icon_delete">
                     <mat-icon aria-hidden="false" fontIcon="clear" matTooltip="remove" matTooltipPosition="right"
@@ -187,7 +187,7 @@
 
 
         <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event, 'solutionDE')"
-            *ngIf="!task.solutionPicture.urlDE">
+            *ngIf="!pictureFileUrlSolutionDE">
             <input class="upload_input" type="file" #fileDropRef id="fileDropRef"
                 (change)="fileBrowseHandler($event, 'solutionDE')" accept="image/*" />
             <h3>Drag and Drop picture here</h3>
@@ -202,8 +202,8 @@
 
 
         <!-- English -->
-        <div *ngIf="task.solutionPicture.urlEN" class="preview_container">
-            <img [src]="task.solutionPicture.urlEN" class="image_preview">
+        <div *ngIf="pictureFileUrlSolutionEN" class="preview_container">
+            <img [src]="pictureFileUrlSolutionEN" class="image_preview">
             <span class="remove_image">
                 <div class="icon_wrapper footer_icon_delete">
                     <mat-icon aria-hidden="false" fontIcon="clear" matTooltip="remove" matTooltipPosition="right"
@@ -219,7 +219,7 @@
 
 
         <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event, 'solutionEN')"
-            *ngIf="!task.solutionPicture.urlEN">
+            *ngIf="!pictureFileUrlSolutionEN">
             <input class="upload_input" type="file" #fileDropRef id="fileDropRef"
                 (change)="fileBrowseHandler($event, 'solutionEN')" accept="image/*" />
             <h3>Drag and Drop picture here</h3>
