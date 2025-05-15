@@ -2,7 +2,7 @@ services:
 
   # documentation (basic usage): ofhttps://hub.docker.com/_/caddy
   caddy:
-    build: 
+    build:
       context: .
       dockerfile: ./caddy/Dockerfile
     ports:
@@ -22,6 +22,8 @@ services:
       context: ./backend
     # ports: # not exposed when caddy is used
     #   - "3000:3000"
+    volumes:
+      - ./backend/uploads:/app/uploads
     environment:
       - MONGODB_URI=mongodb://mongo:27017/examToolboxDB
     depends_on:
@@ -48,10 +50,30 @@ services:
     networks:
       - web
 
+  ldap-host:
+    image: osixia/openldap:1.1.8
+    networks:
+      web:
+    environment:
+      - LDAP_ORGANISATION="Exascan" #Login: cn=admin,dc=exascan,dc=com
+      - LDAP_DOMAIN=exascan.com
+      - LDAP_ADMIN_PASSWORD=admin
+
+  ldap-admin:
+    image: osixia/phpldapadmin:0.6.12
+    networks:
+      web:
+    ports:
+      - "6080:80"
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=ldap-host
+      - PHPLDAPADMIN_HTTPS=false
+
 volumes:
-  mongodb_data: 
+  mongodb_data:
   caddy_data:
   caddy_config:
+
 
 networks:
   web:
