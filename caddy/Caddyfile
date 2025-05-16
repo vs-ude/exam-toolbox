@@ -1,22 +1,64 @@
-localhost {
+{
+  # detailed logs for caddy (can be disabled for production)
+  debug
+}
 
-    # set root
-    root * /srv/app
-
-    # serves static files
-    file_server
-
-    # reverse-proxy api requests to backend (backend defined in docker-compose.yml)
-    handle /api* {
-      reverse_proxy backend:3000
+{$CADDY_DOMAIN} {
+  # configuration of caddy-security
+  authenticate with ldap_authenticator {
+    portal enable name default
+    portal options {
+      registration disable # users can't register account
     }
 
-    # optional optimization: compresses communication to browser if possible
-    encode gzip zstd
+    identity store local_ldap_store {
+      driver ldap
+      realm local
+      address "ldap-host:389" # default port for ldap communication
+      bind_username "cn=admin,dc=exascan,dc=com" # caddy uses this username to conntect to LDAP (for example to query users).
+      bind_password "{$LDAP_BIND_PASSWORD}"
+      search_base_dn "dc=exascan,dc=com"
+      # for the query
+      # the '&' means that everything following needs to be true
+      # uid is the username entered in the login form
+      # 'objectClass=inetOrgPerson' is the LDAP-User
+      search_filter "(&(objectClass=inetOrgPerson)(uid=%s))"
 
-    # optional logging: https://caddyserver.com/docs/caddyfile/directives/log
-    log {
-      output stdout
-      format json
+      # Result is mapped to attributes
+      # can be send to the backend with headers (for example for loading specific data for this user or for access-rights)
+      attributes id=uid username=uid email=mail name=givenName surname=sn common_name=cn groups=memberOf
     }
+  }
+
+  # definea who can authorize
+  authorize with default_auth_policy {
+    default deny
+    allow authenticated
+    # more rules can be added here. Could be based on the attributes that were mapped earlier (for example only members of a specific group can login). 
+  
+  }
+
+
+  # set root
+  root * /srv/app
+
+  # reverse-proxy api requests to backend (backend defined in docker-compose.yml)
+  handle_path /api/* {
+    reverse_proxy backend:3000
+  }
+
+  # file_server serves static files
+  # try_files ensures that an already authenticated user can use other routes on the website. In Angular every route is managed by index.html this is why it has to use index.html when the user uses routes (or even refreshes).
+  file_server {
+    try_files {path} {path}/ /index.html
+  }
+
+  # optional optimization: compresses communication to browser if possible
+  encode gzip zstd
+
+  # optional logging: https://caddyserver.com/docs/caddyfile/directives/log
+  log {
+    output stdout
+    format json
+  }
 }
