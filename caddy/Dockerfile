@@ -13,7 +13,23 @@ COPY ../frontend/ .
 RUN npm run build --configuration=production --output-path=./dist/frontend/browser
 
 
-FROM caddy:latest
 
-# copy static build files (npm run build) to /srv/app (caddy)
-COPY --from=angular_build /usr/src/app/dist/frontend/browser/ /srv/app/
+# go is is required
+FROM golang:1.24-alpine AS caddy_builder
+
+# install xcaddy
+RUN go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+
+# build caddy with caddy-security (custom caddy)
+RUN xcaddy build --with github.com/greenpau/caddy-security@latest
+
+
+
+# final caddy image with frontend (copied static files) and custom caddy
+FROM caddy:2.8.4-alpine
+
+# copy and override caddy:2.8.4-alpine with custom caddy build from step before
+COPY --from=caddy_builder /go/caddy /usr/bin/caddy
+
+# copy static frontend files to custom caddy build
+COPY --from=angular_build /usr/src/app/dist/frontend/browser/ /srv/app
