@@ -1,4 +1,4 @@
-FROM node:22 AS angular_build
+FROM node:22-alpine AS angular_build
 
 WORKDIR /usr/src/app
 
