@@ -1,6 +1,8 @@
 services:
 
   # documentation (basic usage): ofhttps://hub.docker.com/_/caddy
+  # auto-generates crypto key (https://docs.authcrunch.com/docs/authenticate/auth-cookie)
+  # also possible to set a key manually, for better persistance (and possible other advantages). Not needed here for now.
   caddy:
     build:
       context: .
@@ -16,6 +18,9 @@ services:
       - web
     depends_on:
       - backend
+    environment:
+      - LDAP_BIND_PASSWORD=${LDAP_ADMIN_SECRET} # caddy needs this pw to connect to ldap server with the admin-account. 
+      - CADDY_DOMAIN=localhost # needs to be changed for production (with domain)
 
   backend:
     build:
@@ -41,7 +46,7 @@ services:
   #     - web
 
   mongo:
-    image: mongo
+    image: mongo:6.0
     restart: unless-stopped
     ports:
       - "27017:27017"
@@ -51,16 +56,23 @@ services:
       - web
 
   ldap-host:
-    image: osixia/openldap:1.1.8
+    image: osixia/openldap:1.5.0
+    restart: unless-stopped
     networks:
       web:
     environment:
       - LDAP_ORGANISATION="Exascan" #Login: cn=admin,dc=exascan,dc=com
       - LDAP_DOMAIN=exascan.com
-      - LDAP_ADMIN_PASSWORD=admin
+      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_SECRET} # ldap-host needs the pw to create the admin-account. 
+      # - LDAP_TLS_VERIFY_CLIENT=never # for development 
+    volumes:
+      # needed to make users persistant, else everytime the docker-container is rebuild (docker-compose down && docker-compose up) all users would be deleted. Also makes the configurations persistant. 
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap/slapd.d
 
   ldap-admin:
-    image: osixia/phpldapadmin:0.6.12
+    image: osixia/phpldapadmin:0.9.0
+    restart: unless-stopped
     networks:
       web:
     ports:
@@ -68,11 +80,15 @@ services:
     environment:
       - PHPLDAPADMIN_LDAP_HOSTS=ldap-host
       - PHPLDAPADMIN_HTTPS=false
+    depends_on:
+      - ldap-host
 
 volumes:
   mongodb_data:
   caddy_data:
   caddy_config:
+  ldap_data:
+  ldap_config:
 
 
 networks:
