@@ -91,7 +91,6 @@ export class PictureTaskComponent extends BaseTaskComponent {
   }
 
   private uploadFile(file: File, imageAffiliation: string) {
-    console.log("uploading file: ", file.name)
     this.api.uploadFile(file).subscribe(
       (response: any) => {
         console.log("File uploaded successfully: ", response.url);
@@ -123,7 +122,6 @@ export class PictureTaskComponent extends BaseTaskComponent {
   private downloadFile(url: string, imageAffiliation: string) {
     this.api.downloadFile(url).subscribe(
       response => {
-        console.log("File downloaded successfully: ", response);
         const newBlob = new Blob([response], { type: response.type });
 
         let reader = new FileReader();
@@ -141,7 +139,6 @@ export class PictureTaskComponent extends BaseTaskComponent {
 
 
   private previewPicture(file: File, imageAffiliation: string) {
-    console.log(file.type);
     let reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {

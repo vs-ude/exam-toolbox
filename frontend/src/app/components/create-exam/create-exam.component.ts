@@ -74,7 +74,7 @@ export class CreateExamComponent {
     this.importPoolTasks();
 
 
-    this.themeService.themeChanged$.subscribe( (theme: Theme) => {
+    this.themeService.themeChanged$.subscribe((theme: Theme) => {
       this.lightTheme = theme === Theme.LIGHT ? true : false;
     })
   }
@@ -131,16 +131,16 @@ export class CreateExamComponent {
     switch (taskType) {
       case "new_multipleChoice":
         this.exam.tasks[this.currentGroupView].tasks.push({
-          taskId: "multipleChoice" + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
+          taskId: "multipleChoice-" + Date.now(),
           type: "multipleChoice",
           question: { DE: "", EN: "" },
           answerOptions: [{ DE: "", EN: "", correct: true },],
           points: 1
         });
         break;
-      case "new_text":
+      case "new_shortAnswer":
         this.exam.tasks[this.currentGroupView].tasks.push({
-          taskId: "shortText" + + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
+          taskId: "shortAnswer-" + Date.now(),
           type: "shortAnswer",
           question: { DE: "", EN: "" },
           solution: { DE: "", EN: "" },
@@ -149,7 +149,7 @@ export class CreateExamComponent {
         break;
       case "new_picture":
         this.exam.tasks[this.currentGroupView].tasks.push({
-          taskId: "picture" + Math.floor(Math.random() * (1000 - 0 + 1)) + 0,
+          taskId: "picture-" + Date.now(),
           type: "pictureTask",
           question: { DE: "", EN: "" },
           questionPicture: { urlDE: "", urlEN: "" },
@@ -187,18 +187,29 @@ export class CreateExamComponent {
 
   onSave() {
     this.checkIfValid();
-    console.log(this.exam);
+    this.addNewTasksToPool();
+    this.uploadExam();
+  }
 
-    this.api.addTaskToPool(this.exam.tasks[this.currentGroupView].tasks[0]).subscribe(
-      response => {
-        console.log('Task added successfully: ', response);
-      },
-      error => {
-        console.error('Error adding task: ', error);
+  private addNewTasksToPool() {
+    for (let i = 0; i < this.exam.tasks.length; i++) {
+      for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
+        const currentTaskId = this.exam.tasks[i].tasks[j].taskId;
+        if (this.taskPool.find(task => task.taskId === currentTaskId) == undefined) {
+          this.api.addTaskToPool(this.exam.tasks[i].tasks[j]).subscribe(
+            response => {
+              console.log(`Task ${currentTaskId} added to pool`, response);
+            },
+            error => {
+              console.error('Error adding task: ', error);
+            }
+          )
+        }
       }
-    )
+    }
+  }
 
-
+  private uploadExam() {
     this.api.addExam(this.exam).subscribe(
       response => {
         console.log('Exam added successfully: ', response);
@@ -263,7 +274,6 @@ export class CreateExamComponent {
 
   onTitleChange(taskGroupTitle: { DE: string, EN: string }) {
     this.exam.tasks[this.currentGroupView].groupTitle = taskGroupTitle;
-    console.log(this.exam)
   }
 
   onUpdate() {
