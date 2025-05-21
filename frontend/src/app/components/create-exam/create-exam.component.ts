@@ -50,9 +50,9 @@ export class CreateExamComponent {
   private bodyElement: HTMLElement = document.body;
   public taskColor: { [key: string]: string } = {
     multipleChoice: "var(--color-primary)",
-    shortAnswer: "var(--color-warn)",
-    picture: "var(--color-dark-gray)",
-    misc: "var(--color-secondary)",
+    shortAnswer: "var(--color-secondary)",
+    pictureTask: "var(--color-dark-gray)",
+    misc: "var(--color-warn)",
   }
   public semesters = ["SS 23", "WS 23/24", "SS 24", "WS 24/25",];
 
