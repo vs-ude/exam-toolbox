@@ -5,12 +5,17 @@ import { MongoClient } from "https://deno.land/x/mongo/mod.ts";
 // @ts-ignore
 import { latrex } from "https://deno.land/x/latrex/mod.ts";
 import { Exam, Task } from "./exam.ts";
+import { FileTracker } from "./fileTracker.ts";
 import { ObjectId } from "https://deno.land/x/mongo@v0.33.0/deps.ts";
 import { ZipWriter } from "https://deno.land/x/zipjs/index.js";
 import { walk } from "https://deno.land/std/fs/walk.ts";
 // @ts-ignore
 import { read, utils } from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
 import { PDFDocument } from "https://cdn.skypack.dev/pdf-lib@1.17.1?dts";
+
+import { crypto } from "jsr:@std/crypto";
+import { encodeHex } from "jsr:@std/encoding/hex";
+
 
 
 
@@ -23,6 +28,7 @@ await client.connect("mongodb://mongo:27017/examToolboxDB");
 const db = client.database("examToolboxDB");
 const exams = db.collection("exams");
 const pool = db.collection("taskPool");
+const fileTracker = db.collection("fileTracker");
 
 // Create Oak Application and Router
 const app = new Application();
@@ -152,6 +158,21 @@ router
     }
 
     const file = formData.files[0];
+    
+    if (!file.content) {
+      ctx.response.status = 400;
+      ctx.response.body = { message: "No file content" };
+      return;
+    }
+
+    // Compute SHA-256 hash of the file content
+    const fileHashBuffer = await crypto.subtle.digest("SHA-256", file.content);
+    const fileHash = encodeHex(fileHashBuffer);
+
+    const ext = file.originalName?.split(".").pop();
+    const hashedFileName = ext ? `${fileHash}.${ext}` : fileHash;
+
+    file.originalName = hashedFileName;
     const uploadDir = "./uploads";
 
     const filePath = `${uploadDir}/${file.originalName}`;
@@ -160,10 +181,22 @@ router
       console.log("File saved to:", filePath);
     }
 
-    const fileUrl = `./uploads/${file.originalName}`;
+    const fileTrackerEntry: FileTracker = {name: file.originalName, refs: [] , timeToLive: 7};
+    try {
+      await fileTracker.insertOne(fileTrackerEntry);
+      console.log("File tracker entry created:", fileTrackerEntry);
+    } catch (error) {
+      console.error("Error inserting file tracker entry:", error);
+      ctx.response.status = 500;
+      ctx.response.body = { message: "Error inserting file tracker entry", error }; 
+      return;
+    }
+    
+
+
     ctx.response.body = {
       message: "File uploaded successfully",
-      url: fileUrl,
+      url: `./uploads/${file.originalName}`,
     };
     ctx.response.status = 200;
   })
@@ -653,4 +686,3 @@ async function updateMetaStudent(options: {
   // Update meta-exam.tex
   await Deno.writeTextFile(metaPath, updatedMeta);
 }
-
