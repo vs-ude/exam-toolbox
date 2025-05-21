@@ -158,7 +158,7 @@ router
     }
 
     const file = formData.files[0];
-    
+
     if (!file.content) {
       ctx.response.status = 400;
       ctx.response.body = { message: "No file content" };
@@ -181,17 +181,17 @@ router
       console.log("File saved to:", filePath);
     }
 
-    const fileTrackerEntry: FileTracker = {name: file.originalName, refs: [] , timeToLive: 7};
+    const fileTrackerEntry: FileTracker = { name: file.originalName, refs: [], timeToLive: 7 };
     try {
       await fileTracker.insertOne(fileTrackerEntry);
       console.log("File tracker entry created:", fileTrackerEntry);
     } catch (error) {
       console.error("Error inserting file tracker entry:", error);
       ctx.response.status = 500;
-      ctx.response.body = { message: "Error inserting file tracker entry", error }; 
+      ctx.response.body = { message: "Error inserting file tracker entry", error };
       return;
     }
-    
+
 
 
     ctx.response.body = {
@@ -360,6 +360,25 @@ router
       ctx.response.status = 500;
       ctx.response.body = { message: 'Error adding to pool', error: err };
     }
+
+    if (task.type === "pictureTask") {
+      const fileURLs = [
+        task.questionPicture.urlDE,
+        task.questionPicture.urlEN,
+        task.solutionPicture.urlDE,
+        task.solutionPicture.urlEN,
+      ]
+      console.log("File URLs: ", fileURLs);
+      for (const fileURL of fileURLs) {
+        const fileName = fileURL.split("/").pop();
+        try {
+          await fileTracker.updateOne({ name: fileName }, { $addToSet: { refs: task.taskId } })
+        } catch (error) {
+          console.error("Error fetching file tracker enttry:", error);
+        }
+      }
+    }
+
   })
   .delete("/api/exams", async (ctx) => {
     try {
