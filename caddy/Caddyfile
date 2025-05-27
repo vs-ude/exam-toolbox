@@ -30,7 +30,7 @@
       attributes {
         id uid
         username uid
-        email mail
+        # email mail
         name givenName
         surname sn
         common_name cn
@@ -39,7 +39,7 @@
 
       # just an dummy group, should be changed
       groups {
-        "cn=dummy_group,ou=groups,dc=exascan,dc=com" "role_dummy"
+        "cn=user,ou=groups,dc=exascan,dc=com" "user"
       }
     }
 
