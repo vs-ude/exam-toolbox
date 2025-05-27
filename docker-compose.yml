@@ -23,7 +23,7 @@ services:
     # ports: # not exposed when caddy is used
     #   - "3000:3000"
     volumes:
-      - ./backend/uploads:/app/uploads
+      - uploads_data:/app/uploads
     environment:
       - MONGODB_URI=mongodb://mongo:27017/examToolboxDB
     depends_on:
@@ -73,6 +73,7 @@ volumes:
   mongodb_data:
   caddy_data:
   caddy_config:
+  uploads_data:
 
 
 networks:

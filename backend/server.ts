@@ -15,6 +15,8 @@ import { PDFDocument } from "https://cdn.skypack.dev/pdf-lib@1.17.1?dts";
 
 import { crypto } from "jsr:@std/crypto";
 import { encodeHex } from "jsr:@std/encoding/hex";
+import * as fs from "https://deno.land/std/fs/mod.ts";
+
 
 
 
@@ -177,6 +179,7 @@ router
 
     const filePath = `${uploadDir}/${file.originalName}`;
     if (file.content) {
+      await Deno.mkdir(uploadDir, { recursive: true });
       await Deno.writeFile(filePath, file.content);
       console.log("File saved to:", filePath);
     }
@@ -396,6 +399,8 @@ router
   .delete("/api/taskPool", async (ctx) => {
     try {
       const result = await pool.deleteMany({})
+      await fileTracker.deleteMany({})
+      await fs.emptyDir("./uploads");
       ctx.response.status = 200;
       ctx.response.body = {
         message: `${result} task-pool deleted successfully!`,
