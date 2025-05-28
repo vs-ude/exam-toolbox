@@ -145,5 +145,22 @@ export class DebugComponent {
   }
 
 
+  onDeleteTaskFromPool() {
 
+    this.api.getTasksFromPool().subscribe(
+      res => {
+        console.log('Tasks from pool: ', res);
+        const poolTask = res[0].taskId;
+        this.api.deleteTaskFromPool(poolTask).subscribe(
+          res => {
+            console.log('Task deleted successfully: ', res)
+          },
+          err => {
+            console.error('Error deleting task from pool: ', err)
+          }
+        )
+      },
+      err => console.error('Error getting tasks from pool: ', err)
+    )
+  }
 }

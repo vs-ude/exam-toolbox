@@ -396,6 +396,23 @@ router
       ctx.response.body = { message: "Error deleting exams", error };
     }
   })
+  .delete("/api/taskPool/:taskId", async (ctx) => {
+    try {
+      const result = await pool.deleteOne({ taskId: ctx.params.taskId });
+
+      if (result.deletedCount === 0) {
+        ctx.response.status = 404;
+        ctx.response.body = { message: "Task not found" };
+        return;
+      }
+
+      ctx.response.status = 200;
+      ctx.response.body = { message: "Task deleted successfully" };
+    } catch (error) {
+      ctx.response.status = 500;
+      ctx.response.body = { message: "Error deleting task", error };
+    }
+  })
   .delete("/api/taskPool", async (ctx) => {
     try {
       const result = await pool.deleteMany({})
@@ -411,6 +428,7 @@ router
       ctx.response.body = { message: "Error deleting task-pool", error };
     }
   })
+
 
 // Use the Router
 app.use(router.routes());

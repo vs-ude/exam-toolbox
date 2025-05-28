@@ -52,6 +52,10 @@ export class ApiService {
     return this.http.delete(`${this.apiUrl}/taskPool`)
   }
 
+  deleteTaskFromPool(taskId: string){
+    return this.http.delete(`${this.apiUrl}/taskPool/${taskId}`);
+  }
+
   generateAllExams(exam: Exam, list: File){
     const formData = new FormData()
 
