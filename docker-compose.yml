@@ -57,19 +57,20 @@ services:
 
   ldap-host:
     image: osixia/openldap:1.5.0
+    command: --copy-service # --loglevel debug # Do not overwrite custom ldif files
     restart: unless-stopped
     networks:
       web:
     environment:
-      - LDAP_ORGANISATION="Exascan" #Login: cn=admin,dc=exascan,dc=com
+      - LDAP_ORGANISATION="Exascan" # Login: cn=admin,dc=exascan,dc=com
       - LDAP_DOMAIN=exascan.com
-      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_SECRET} # ldap-host needs the pw to create the admin-account. 
-      - LDAP_OVERLAYS=memberof
+      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_SECRET} # ldap-host needs the pw to create the admin-account.
+      - LDAP_READONLY_USER=True # username: "readonly", pw: "readonly"
     volumes:
-      # needed to make users persistant, else everytime the docker-container is rebuild (docker-compose down && docker-compose up) all users would be deleted. Also makes the configurations persistant. 
+      # needed to make users persistant, else everytime the docker-container is rebuild (docker-compose down && docker-compose up) all users would be deleted. Also makes the configurations persistant.
       - ldap_data:/var/lib/ldap
       - ldap_config:/etc/ldap/slapd.d
-      - ./ldap/memberof.ldif:/container/memberof.ldif
+      - ./ldap/:/container/service/slapd/assets/config/bootstrap/ldif/custom:ro
 
   ldap-admin:
     image: osixia/phpldapadmin:0.9.0
@@ -90,7 +91,6 @@ volumes:
   caddy_config:
   ldap_data:
   ldap_config:
-
 
 networks:
   web:
