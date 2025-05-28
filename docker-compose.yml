@@ -1,5 +1,4 @@
 services:
-
   # documentation (basic usage): ofhttps://hub.docker.com/_/caddy
   # auto-generates crypto key (https://docs.authcrunch.com/docs/authenticate/auth-cookie)
   # also possible to set a key manually, for better persistance (and possible other advantages). Not needed here for now.
@@ -7,11 +6,20 @@ services:
     build:
       context: .
       dockerfile: ./caddy/Dockerfile
+    command: [
+        "caddy",
+        "run",
+        "--config",
+        "/etc/caddy/Caddyfile",
+        "--adapter",
+        "caddyfile",
+        "--watch",
+      ] # Watch only for debugging
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/conf/:/etc/caddy/
       - caddy_data:/data # https://caddyserver.com/docs/conventions#data-directory
       - caddy_config:/config # https://caddyserver.com/docs/conventions#configuration-directory
     networks:
@@ -19,8 +27,9 @@ services:
     depends_on:
       - backend
     environment:
-      - LDAP_BIND_PASSWORD=${LDAP_ADMIN_SECRET} # caddy needs this pw to connect to ldap server with the admin-account. 
+      - LDAP_BIND_PASSWORD=readonly
       - CADDY_DOMAIN=localhost # needs to be changed for production (with domain)
+      - JWT_SHARED_KEY=1999fcc6-5499-4524-9b93-f4ad2dd46e5e
 
   backend:
     build:
