@@ -53,6 +53,10 @@ export class DashboardComponent {
     this.router.navigate(['/create-exam']);  
   }
 
+  onTaskPool(){
+    this.router.navigate(['/task-pool']);
+  }
+
   onDebug(){
     this.router.navigate(['/debug'])
   }
