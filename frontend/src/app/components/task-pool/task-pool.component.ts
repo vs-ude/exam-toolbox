@@ -46,5 +46,18 @@ export class TaskPoolComponent {
         { DE: "Hamburg", EN: "Hamburg", correct: false },
         { DE: "Köln", EN: "Cologne", correct: false },
       ]
+     },
+    {
+      taskId: "multipleChoice-1748525128025",
+      type: "shortAnswer",
+      question: {
+        DE: "Was ist die Hauptstadt von Deutschland?",
+        EN: "What is the capital of Germany?"
+      },
+      points: 5,
+      solution: {
+        DE: "Berlin",
+        EN: "Berlin"
+      },
      }]
 }

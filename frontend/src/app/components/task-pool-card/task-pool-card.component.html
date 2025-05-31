@@ -1,16 +1,18 @@
-<button class="task">
-    <div class="icon_container">
+<button class="task" (mouseover)="mouseHovering=true" (mouseleave)="mouseHovering=false"
+    [ngStyle]="{'backgroundColor': mouseHovering ? taskColor : 'var(--color-bg-accent)' }">
+    <div class="icon_container" [ngStyle]="{'backgroundColor': mouseHovering ? '#0000002a' : taskColor }">
         <img src="{{ task.type + '.svg' }}" alt="Task Type Icon" class="task_icon">
+    </div>
+    <div class="description_shelf">
+        <span class="name">{{task.question.DE}}</span>
+        <span class="description"></span>
     </div>
     <div class="tag_wrapper">
         <span class="task_tag" style="background: #e57373; color: #fff;">Hard</span>
         <span class="task_tag" style="background: #ffd54f; color: #333;">Medium</span>
         <span class="task_tag" style="background: #81c784; color: #fff;">Easy</span>
     </div>
-    <div class="description_shelf">
-        <span class="name">{{task.question.DE}}</span>
-        <span class="description"></span>
-    </div>
+
     <div class="footer">
         <span class="last_used">last used: 25.01.2025</span>
         <span class="points">{{task.points}} pts.</span>

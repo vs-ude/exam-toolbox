@@ -202,3 +202,19 @@
 .hide_icon {
     visibility: hidden;
 }
+
+
+/*------------------------------------------------------------------
+  [ File Browser ]*/
+
+.task_container {
+    padding: 0 32px 0 32px;
+    display: grid;
+    grid-template-columns: 22% 22% 22% 22%;
+    gap: 4%;
+    grid-auto-rows: 25vh;
+}
+
+.task {
+    margin-bottom: 4%;
+}
