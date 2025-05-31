@@ -1,6 +1,5 @@
-
 .task {
-    padding: 24px 4px 12px ;
+    padding: 24px 4px 12px;
     display: flex;
     align-items: center;
     flex: 1;
@@ -40,6 +39,7 @@
     .footer {
         color: #ffffffcc
     }
+
     background-color:var(--color-primary);
     cursor: pointer;
 }
@@ -67,7 +67,7 @@
 }
 
 //------ Tags -----------------
-.tag_wrapper{
+.tag_wrapper {
     display: flex;
     flex-direction: row;
     gap: 4px;
@@ -117,7 +117,7 @@
 }
 
 //------ Footer -----------------
-.footer{
+.footer {
     display: flex;
     flex-direction: row;
     justify-content: space-between;

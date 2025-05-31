@@ -16,6 +16,7 @@ import { Router } from '@angular/router';
 import { TaskGroupTitleComponent } from "./task-group-title/task-group-title.component";
 import { PictureTaskComponent } from "./tasks/picture-task/picture-task.component";
 import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
+import { ColorProviderService } from '../../services/color-provider.service';
 
 
 
@@ -48,12 +49,6 @@ export class CreateExamComponent {
   public isNameChange = false
   public isUpdateMode = false
   private bodyElement: HTMLElement = document.body;
-  public taskColor: { [key: string]: string } = {
-    multipleChoice: "var(--color-primary)",
-    shortAnswer: "var(--color-secondary)",
-    pictureTask: "var(--color-dark-gray)",
-    misc: "var(--color-warn)",
-  }
   public semesters = ["SS 23", "WS 23/24", "SS 24", "WS 24/25",];
 
   public taskPool: Task[] = [];
@@ -69,6 +64,7 @@ export class CreateExamComponent {
     private api: ApiService,
     private router: Router,
     private themeService: ThemeToggleService,
+    public colorProvider: ColorProviderService,
   ) {
     this.importExam();
     this.importPoolTasks();
