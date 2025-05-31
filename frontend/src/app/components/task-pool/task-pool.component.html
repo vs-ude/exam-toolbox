@@ -106,8 +106,8 @@
     </div>
 
     <div class="Tasks_container">
-        <div class="Task" *ngFor="let task of tasks">
-            <b>ID:</b> {{task.taskId}}, <b>Frage:</b> {{task.question.DE}}, <b>Punkte:</b> {{task.points}}
+        <div class="Task" *ngFor="let task of tasks; let i = index" >
+            <app-task-pool-card [task]="task"></app-task-pool-card>
         </div>
     </div>
 

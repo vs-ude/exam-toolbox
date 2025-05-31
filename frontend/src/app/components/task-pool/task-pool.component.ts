@@ -2,11 +2,12 @@ import { NgClass, NgFor } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Task } from '../../exam';
+import { TaskPoolCardComponent } from '../task-pool-card/task-pool-card.component';
 
 @Component({
   selector: 'app-task-pool',
   standalone: true,
-  imports: [MatIconModule, NgClass, NgFor, ],
+  imports: [MatIconModule, NgClass, NgFor, TaskPoolCardComponent ],
   templateUrl: './task-pool.component.html',
   styleUrl: './task-pool.component.scss'
 })
@@ -15,8 +16,6 @@ export class TaskPoolComponent {
   constructor() { }
 
   ngOnInit() {
-    // Initialization logic can go here
-    console.log('Task Pool Component Initialized');
   }
 
   @HostListener("document:click", ["$event"])
