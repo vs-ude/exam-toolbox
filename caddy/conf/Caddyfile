@@ -1,0 +1,114 @@
+{
+  # detailed logs for caddy (can be disabled for production)
+  debug
+
+  # security block for defining caddy-security components
+  security {
+    # define LDAP identity store
+    ldap identity store exascan.com {
+      realm exascan.com
+      servers {
+        "ldap://ldap-host:389" # default port for ldap communication
+      }
+      username "cn=readonly,dc=exascan,dc=com" # caddy uses this username to connect to LDAP (for example to query users).
+      password "{$LDAP_BIND_PASSWORD}"
+      search_base_dn "ou=users,dc=exascan,dc=com"
+      # searches for the given user
+      # 'objectClass=inetOrgPerson' looks only at LDAP-User objects
+      # the search string matches against the uid or mail attribute
+      search_filter "(&(objectClass=inetOrgPerson)(|(uid=%s)(mail=%s)))"
+
+      # Result is mapped to attributes
+      # can be sent to the backend with headers (for example for loading specific data for this user or for access-rights)
+      attributes {
+        username uid
+        sub uid
+        email mail
+        name unset
+        surname sn
+        member_of memberOf
+      }
+
+      groups {
+        "cn=researcher,ou=groups,dc=exascan,dc=com" researcher
+      }
+    }
+
+    # defines authentication portal
+    authentication portal default_portal { # name of auth portal
+      crypto default token name JWT_TOKEN
+      crypto default token lifetime 2592000 # 30d
+      crypto key verify {$JWT_SHARED_KEY}
+      cookie domain {$CADDY_DOMAIN}
+      cookie lifetime 2592000 # 30d
+      cookie insecure on # TODO: disable this in prod
+      enable identity store exascan.com
+      enable source ip tracking
+
+      ui {
+        logo url "https://{$CADDY_DOMAIN}/vsLogo.svg"
+        logo description "Exascan"
+        links {
+          "My Identity" "/auth/whoami" icon "las la-user"
+          "Exascan" "/" icon "las la-pencil-ruler"
+        }
+      }
+
+      transform user {
+        match origin exascan.com
+        action add role authp/user
+      }
+    }
+
+    authorization policy default_policy {
+      crypto key verify {$JWT_SHARED_KEY}
+      crypto key token name JWT_TOKEN
+      set auth url "/auth/"
+      allow roles researcher
+      validate bearer header
+      validate source address
+      inject headers with claims
+    }
+  }
+}
+
+{$CADDY_DOMAIN} {
+  route /vsLogo.svg {
+    root * /srv/app
+    file_server
+  }
+
+  # frontend
+  route /* {
+    # defined earlier
+    authorize with default_policy
+
+    # try_files ensures that an already authenticated user can use other routes on the website. In Angular every route is managed by index.html this is why it has to use index.html when the user uses routes (or even refreshes).
+    try_files {path} {path}/ /index.html
+
+    # file_server serves static files
+    file_server {
+      root /srv/app
+    }
+  }
+
+  # reverse-proxy api requests to backend (backend defined in docker-compose.yml)
+  route /api/* {
+    authorize with default_policy
+    reverse_proxy backend:3000
+  }
+
+  # The auth portal
+  route /auth* {
+    authenticate with default_portal
+  }
+
+  # optional optimization: compresses communication to browser if possible
+  encode gzip zstd
+
+  # optional logging: https://caddyserver.com/docs/caddyfile/directives/log
+  log {
+    output stdout
+    format json
+  }
+}

@@ -1,0 +1,32 @@
+version: 1
+
+##
+# Order is important! Users first, then groups
+##
+
+dn: ou=users,{{ LDAP_BASE_DN }}
+objectclass: organizationalUnit
+objectclass: top
+ou: users
+
+dn: cn=Test Testersson,ou=users,{{ LDAP_BASE_DN }}
+cn: Test Testersson
+mail: test@example.com
+objectclass: inetOrgPerson
+objectclass: top
+givenname: Test
+sn: Testersson
+uid: test
+# This is a hash of "test"
+userpassword: {SSHA}J8g8rF8DW6VNWvZJgCGES6n5CLpWI/Oz
+
+dn: ou=groups,{{ LDAP_BASE_DN }}
+objectclass: organizationalUnit
+objectclass: top
+ou: groups
+
+dn: cn=researcher,ou=groups,{{ LDAP_BASE_DN }}
+cn: researcher
+objectclass: groupOfUniqueNames
+objectclass: top
+uniquemember: cn=Test Testersson,ou=users,{{ LDAP_BASE_DN }}
