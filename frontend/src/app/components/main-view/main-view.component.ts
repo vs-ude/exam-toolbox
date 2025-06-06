@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav'
 import { MatListModule } from '@angular/material/list'
 import { RouterOutlet, RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
 import { MatButtonModule } from '@angular/material/button'
 import { ThemeToggleService } from '../../services/theme-toggle.service';
 import { MatIcon } from '@angular/material/icon';
@@ -17,12 +16,11 @@ import { MatIcon } from '@angular/material/icon';
 export class MainViewComponent {
 
   constructor(
-    private authService: AuthService,
     private themeToggleService: ThemeToggleService,
   ){}
 
   onLogout(){
-    this.authService.logout();
+    console.log("Logging out")
   }
 
   toggleTheme() {
