@@ -31,8 +31,11 @@ $frontend-theme: mat.define-theme((
     enabled-trigger-text-color: var(--color-text),
     placeholder-text-color: var(--color-dark-gray),
     enabled-arrow-color: var(--color-dark-gray),
-
   ));
+  @include mat.table-overrides((
+    background-color: var(--color-background),
+  ));
+  ;
   --color-primary: #0d99ff;
   --color-secondary: #9747ff;
   --color-warn: #ff5c16;
