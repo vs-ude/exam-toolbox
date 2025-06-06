@@ -1,9 +1,9 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { AfterViewInit, Component, HostListener, inject, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, HostListener, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Task } from '../../exam';
 import { TaskPoolCardComponent } from '../task-pool-card/task-pool-card.component';
-import { MatSort, Sort, MatSortModule } from '@angular/material/sort'
+import { MatSort, MatSortModule } from '@angular/material/sort'
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { animate, style, transition, trigger } from '@angular/animations';
 
@@ -92,14 +92,24 @@ export class TaskPoolComponent implements AfterViewInit {
   displayedColumns: string[] = ['taskId', 'type', 'question', 'points',];
   dataSource = new MatTableDataSource<Task>(this.tasks);
 
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatSort) sort?: MatSort;
 
   ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
+    if (this.sort) {
+      this.dataSource.sort = this.sort;
+    }
   }
 
   public toggleViewMode(mode: 'list' | 'grid') {
     this.viewMode = mode;
+    if (mode === 'list') {
+      // Allow time for the view to render, then assign sort
+      setTimeout(() => {
+        if (this.sort) {
+          this.dataSource.sort = this.sort;
+        }
+      });
+    }
   }
 
 }
