@@ -22,7 +22,12 @@ const tasks: Task[] = [
       DE: '',
       EN: ''
     },
-    points: 4
+    points: 4,
+    tags: [],
+    createdBy: "placeholder",
+    createdAt: new Date(),
+    lastUsed: new Date(),
+    usedIn: [],
   },
   {
     taskId: 'task2',
@@ -35,7 +40,13 @@ const tasks: Task[] = [
       DE: '',
       EN: ''
     },
-    points: 6
+    points: 6,
+    tags: [],
+    createdBy: "placeholder",
+    createdAt: new Date(),
+    lastUsed: new Date(),
+    usedIn: [],
+    
   }
 ];
 

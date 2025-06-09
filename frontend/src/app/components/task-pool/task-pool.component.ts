@@ -73,7 +73,12 @@ export class TaskPoolComponent implements AfterViewInit {
       { DE: "München", EN: "Munich", correct: false },
       { DE: "Hamburg", EN: "Hamburg", correct: false },
       { DE: "Köln", EN: "Cologne", correct: false },
-    ]
+    ],
+    createdBy: "placeholder",
+    createdAt: new Date(),
+    lastUsed: new Date(),
+    usedIn: ["placeholder_id"],
+    tags: [{ name: "Easy", color: "#81c784", textColor: "#fff" }],
   },
   {
     taskId: "shortAnswer-1749196671991",
@@ -87,6 +92,11 @@ export class TaskPoolComponent implements AfterViewInit {
       DE: "Berlin",
       EN: "Berlin"
     },
+    createdBy: "placeholder",
+    createdAt: new Date(),
+    lastUsed: new Date(),
+    usedIn: ["placeholder_id"],
+    tags: [{ name: "Hard", color: "#e57373", textColor: "#fff" }],
   }];
 
   displayedColumns: string[] = ['taskId', 'type', 'question', 'points',];

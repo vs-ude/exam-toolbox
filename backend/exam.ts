@@ -44,6 +44,12 @@ export interface BaseTask {
     type: string;
     question: Question;
     points: number;
+    tags: Tag[];
+    createdBy: string;
+    createdAt: Date;
+    lastUsed: Date;
+    usedIn: string[];
+    parent?: string; 
 }
 
 export interface Question {
@@ -83,4 +89,10 @@ export interface Image {
 export interface Translation {
     DE: string;
     EN: string;
+}
+
+export interface Tag {
+    name: string;
+    color: string;
+    textColor: string;
 }

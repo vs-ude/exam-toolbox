@@ -2,12 +2,12 @@ import { Component, Input, input } from '@angular/core';
 import { Task } from '../../exam';
 import { MatIconModule } from '@angular/material/icon';
 import { ColorProviderService } from '../../services/color-provider.service';
-import { NgStyle } from '@angular/common';
+import { NgFor, NgStyle } from '@angular/common';
 
 @Component({
   selector: 'app-task-pool-card',
   standalone: true,
-  imports: [MatIconModule, NgStyle],
+  imports: [MatIconModule, NgStyle, NgFor],
   templateUrl: './task-pool-card.component.html',
   styleUrl: './task-pool-card.component.scss'
 })

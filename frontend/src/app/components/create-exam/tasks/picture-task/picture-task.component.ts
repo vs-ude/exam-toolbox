@@ -36,7 +36,12 @@ export class PictureTaskComponent extends BaseTaskComponent {
     question: { DE: "", EN: "" },
     questionPicture: { urlDE: "", urlEN: "" },
     solutionPicture: { urlDE: "", urlEN: "" },
-    points: 2
+    points: 2,
+    tags: [],
+    createdBy: "placeholder",
+    createdAt: new Date(),
+    lastUsed: new Date(),
+    usedIn: [],
   };
 
   public pictureFileUrlQuestionDE: string = "";

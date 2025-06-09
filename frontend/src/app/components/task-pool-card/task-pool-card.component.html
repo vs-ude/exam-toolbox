@@ -7,10 +7,10 @@
         <span class="name">{{task.question.DE}}</span>
         <span class="description"></span>
     </div>
-    <div class="tag_wrapper">
-        <span class="task_tag" style="background: #e57373; color: #fff;">Hard</span>
-        <span class="task_tag" style="background: #ffd54f; color: #333;">Medium</span>
-        <span class="task_tag" style="background: #81c784; color: #fff;">Easy</span>
+    <div class="tag_wrapper" *ngFor="let tag of task.tags">
+        <span class="task_tag" [ngStyle]="{'backgroundColor': tag.color, 'color': tag.textColor}">
+            {{tag.name}}
+        </span>
     </div>
 
     <div class="footer">

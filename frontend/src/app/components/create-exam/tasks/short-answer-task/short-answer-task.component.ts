@@ -44,7 +44,12 @@ export class ShortAnswerTaskComponent extends BaseTaskComponent implements OnIni
     type: "shortAnswer",
     question: { DE: "", EN: "" },
     solution: { DE: "", EN: "" },
-    points: 2
+    points: 2,
+    tags: [],
+    createdBy: "placeholder",
+    createdAt: new Date(),
+    lastUsed: new Date(),
+    usedIn: [],
   };
 
   ngOnInit(): void {

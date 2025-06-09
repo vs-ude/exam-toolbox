@@ -131,7 +131,13 @@ export class CreateExamComponent {
           type: "multipleChoice",
           question: { DE: "", EN: "" },
           answerOptions: [{ DE: "", EN: "", correct: true },],
-          points: 1
+          points: 1,
+          createdBy: "placeholder",
+          createdAt: new Date(),
+          lastUsed: new Date(),
+          usedIn: [this.exam._id || "placeholder_id"],
+          tags: [],
+
         });
         break;
       case "new_shortAnswer":
@@ -140,7 +146,12 @@ export class CreateExamComponent {
           type: "shortAnswer",
           question: { DE: "", EN: "" },
           solution: { DE: "", EN: "" },
-          points: 1
+          points: 1,
+          createdBy: "placeholder",
+          createdAt: new Date(),
+          lastUsed: new Date(),
+          usedIn: [this.exam._id || "placeholder_id"],
+          tags: [],
         });
         break;
       case "new_picture":
@@ -150,7 +161,12 @@ export class CreateExamComponent {
           question: { DE: "", EN: "" },
           questionPicture: { urlDE: "", urlEN: "" },
           solutionPicture: { urlDE: "", urlEN: "" },
-          points: 1
+          points: 1,
+          createdBy: "placeholder",
+          createdAt: new Date(),
+          lastUsed: new Date(),
+          usedIn: [this.exam._id || "placeholder_id"],
+          tags: [],
         });
         break;
 
