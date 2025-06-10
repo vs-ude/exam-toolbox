@@ -8,9 +8,14 @@
     <!-- Bar for filtering  -->
     <div class="viewBar_wrapper">
         <div class="viewBar_left">
-            <button class="tab_button tab_select">All Tasks</button>
-            <button class="tab_button">Recently Used</button>
-            <button class="tab_button">Created by me</button>
+            <button class="tab_button" [ngClass]="{'tab_select': filterState === 'all'}" (click)="showAllTasks()">
+                AllTasks
+            </button>
+            <button class="tab_button" [ngClass]="{'tab_select': filterState === 'recentlyUsed'}">Recently Used</button>
+            <button class="tab_button" [ngClass]="{'tab_select': filterState === 'createdByMe'}"
+                (click)="showCreatedByMe()">
+                Created by me
+            </button>
         </div>
 
         <div class="viewBar_right">
@@ -112,7 +117,7 @@
 
     <div class="task_view_container" *ngIf="viewMode === 'list'">
         <table mat-table [dataSource]="dataSource" matSort class="taskTable" *ngIf="viewMode === 'list'"
-            @leftRightAnimation >
+            @leftRightAnimation>
 
             <!-- Task ID Column -->
             <ng-container matColumnDef="taskId">

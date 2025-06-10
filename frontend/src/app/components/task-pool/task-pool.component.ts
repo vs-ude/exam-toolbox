@@ -60,6 +60,7 @@ export class TaskPoolComponent implements AfterViewInit {
 
   public showDropdowns = { sorting: false, filter: false, }
   public viewMode: 'list' | 'grid' = 'grid';
+  public filterState: "all" | "createdByMe" | "recentlyUsed" = "all"
 
   public tasks: Task[] = [{
     taskId: "multipleChoice-1748525128025",
@@ -136,6 +137,32 @@ export class TaskPoolComponent implements AfterViewInit {
         }
       });
     }
+  }
+
+  public showCreatedByMe(){
+    this.filterState = "createdByMe";
+    this.apiService.getTaskWithUserIdFromPool("placeholder").subscribe(
+      res => {
+        this.tasks = res as Task[];
+        this.dataSource = new MatTableDataSource<Task>(this.tasks);
+      },
+      error => {
+        console.error('Error fetching tasks by user:', error);
+      }
+    )
+  }
+
+  public showAllTasks() {
+    this.filterState = "all";
+    this.apiService.getTasksFromPool().subscribe(
+      res => {
+        this.tasks = res as Task[];
+        this.dataSource = new MatTableDataSource<Task>(this.tasks);
+      },
+      error => {
+        console.error('Error fetching all tasks:', error);
+      }
+    )
   }
 
 }

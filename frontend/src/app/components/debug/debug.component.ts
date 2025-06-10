@@ -23,8 +23,8 @@ const tasks: Task[] = [
       EN: ''
     },
     points: 4,
-    tags: [],
-    createdBy: "placeholder",
+    tags: [{ name: 'Cloud', color: '#4caf50', textColor: '#fff' }],
+    createdBy: "Hans Wurst",
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
@@ -173,5 +173,16 @@ export class DebugComponent {
       },
       err => console.error('Error getting tasks from pool: ', err)
     )
+  }
+
+  onCreateTask() {
+    this.api.addTaskToPool(tasks[0]).subscribe(
+      res => {
+        console.log('Task added successfully: ', res);
+      },
+      error => {
+        console.error('Error adding task to pool: ', error);
+      }
+    );
   }
 }
