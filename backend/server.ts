@@ -364,6 +364,17 @@ router
       ctx.response.body = { message: 'Error fetching tasks by type', error };
     }
   })
+  .get("/api/taskPool/tags/:tag", async (ctx) => {
+    const tag = ctx.params.tag;
+    try {
+      const taskList = await pool.find({ tags: { $elemMatch: { name: tag } } }).toArray();
+      ctx.response.status = 200;
+      ctx.response.body = taskList;
+    } catch (error) {
+      ctx.response.status = 500;
+      ctx.response.body = { message: 'Error fetching tasks by tag', error };
+    }
+  })
   .post("/api/taskPool", async (ctx) => {
     const task: Task = await ctx.request.body().value
     try {

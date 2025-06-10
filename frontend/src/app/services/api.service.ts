@@ -78,4 +78,8 @@ export class ApiService {
     return this.http.get<Task[]>(`${this.apiUrl}/taskPool/type/${type}`);
   }
 
+  getTaskWithTagFromPool(tag: string): Observable<Task[]> {
+    return this.http.get<Task[]>(`${this.apiUrl}/taskPool/tag/${tag}`);
+  }
+
 }
