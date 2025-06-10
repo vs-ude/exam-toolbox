@@ -1,6 +1,11 @@
 {
   # detailed logs for caddy (can be disabled for production)
   debug
+  log {
+    output stdout
+    level DEBUG
+    format json
+  }
 
   # security block for defining caddy-security components
   security {

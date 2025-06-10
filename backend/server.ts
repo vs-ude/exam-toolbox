@@ -39,10 +39,39 @@ const router = new Router();
 // For cross-origin requests (for CORS)
 app.use(async (ctx, next) => {
   ctx.response.headers.set("Access-Control-Allow-Origin", "*");
-  ctx.response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  ctx.response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Auth-Uid, X-Auth-Email, X-Auth-Member-Of");
+
+  // for preflight request
+  if (ctx.request.method === "OPTIONS") {
+    ctx.response.status = 204; // success
+    return; // stop
+  }
+
+  // get user information of logged-in user with AuthCrunch default headers
+  const userId = ctx.request.headers.get("X-Token-Subject")
+  const userEmail = ctx.request.headers.get("X-Token-User-Email")
+  const userRolesHeader = ctx.request.headers.get("X-Token-User-Roles")
+
+  // puts the roles in an array
+  const userRoles = userRolesHeader ? userRolesHeader.split(' ').map(role => role.trim()).filter(role => role !== '') : []
+
+  ctx.state.user = {
+    id: userId,
+    email: userEmail,
+    roles: userRoles,
+  }
+
+  console.log("Authenticated User: ")
+  console.log(userId)
+  // for debugging (can be removed in production)
+  if (userId) {
+    console.log(`Authenticated User: ID=${userId}, Email=${userEmail}, Roles=[${userRoles.join(', ')}]`);
+  }
+
   await next();
 });
+
 
 // Routes
 router
