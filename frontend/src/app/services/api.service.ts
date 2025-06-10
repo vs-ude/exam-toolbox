@@ -21,20 +21,12 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/exams`, exam)
   }
 
-  addTaskToPool(task: Task) {
-    return this.http.post(`${this.apiUrl}/taskPool`, task)
-  }
-
   getExams() {
     return this.http.get<Exam[]>(`${this.apiUrl}/exams`)
   }
 
   getExam(examId: string) {
     return this.http.get<Exam>(`${this.apiUrl}/exam/${examId}`)
-  }
-
-  getTasksFromPool() {
-    return this.http.get<Task[]>(`${this.apiUrl}/taskPool`)
   }
 
   updateExam(examId: (string | undefined), updatedExam: Exam) {
@@ -44,19 +36,11 @@ export class ApiService {
     });
   }
 
-  deleteExams(){
+  deleteExams() {
     return this.http.delete(`${this.apiUrl}/exams`)
   }
 
-  deleteTaskPool(){
-    return this.http.delete(`${this.apiUrl}/taskPool`)
-  }
-
-  deleteTaskFromPool(taskId: string){
-    return this.http.delete(`${this.apiUrl}/taskPool/${taskId}`);
-  }
-
-  generateAllExams(exam: Exam, list: File){
+  generateAllExams(exam: Exam, list: File) {
     const formData = new FormData()
 
     formData.append('exam', JSON.stringify(exam))
@@ -64,14 +48,34 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/generate-exams`, formData, { responseType: 'blob' }).pipe(timeout(600000))
   }
 
-  uploadFile(file: File){
+  uploadFile(file: File) {
     const formData = new FormData();
     formData.append("image", file);
     return this.http.post(`${this.apiUrl}/upload`, formData);
   }
 
-  downloadFile(fileUrl: string){
+  downloadFile(fileUrl: string) {
     return this.http.get(`${this.apiUrl}/download`, { responseType: 'blob', params: { fileUrl } });
+  }
+
+  addTaskToPool(task: Task) {
+    return this.http.post(`${this.apiUrl}/taskPool`, task)
+  }
+
+  getTasksFromPool() {
+    return this.http.get<Task[]>(`${this.apiUrl}/taskPool`)
+  }
+
+  deleteTaskPool() {
+    return this.http.delete(`${this.apiUrl}/taskPool`)
+  }
+
+  deleteTaskFromPool(taskId: string) {
+    return this.http.delete(`${this.apiUrl}/taskPool/${taskId}`);
+  }
+
+  getTaskWithTypeFromPool(type: string): Observable<Task[]> {
+    return this.http.get<Task[]>(`${this.apiUrl}/taskPool/type/${type}`);
   }
 
 }
