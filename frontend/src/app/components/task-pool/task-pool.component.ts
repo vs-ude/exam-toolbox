@@ -6,12 +6,13 @@ import { TaskPoolCardComponent } from '../task-pool-card/task-pool-card.componen
 import { MatSort, MatSortModule } from '@angular/material/sort'
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { ApiService } from '../../services/api.service';
 
 
 @Component({
   selector: 'app-task-pool',
   standalone: true,
-  imports: [MatIconModule, NgClass, NgFor, TaskPoolCardComponent, MatTableModule, MatSortModule, NgIf],
+  imports: [MatIconModule, NgClass, NgFor, TaskPoolCardComponent, MatTableModule, MatSortModule, NgIf,],
   templateUrl: './task-pool.component.html',
   styleUrl: './task-pool.component.scss',
   animations: [
@@ -103,6 +104,21 @@ export class TaskPoolComponent implements AfterViewInit {
   dataSource = new MatTableDataSource<Task>(this.tasks);
 
   @ViewChild(MatSort) sort?: MatSort;
+
+  constructor(private apiService: ApiService) {}
+
+  ngOnInit() {
+    this.apiService.getTasksFromPool().subscribe(
+      res => {
+        this.tasks = res as Task[];
+        this.dataSource = new MatTableDataSource<Task>(this.tasks);
+        console.log(this.tasks);
+      },
+      error => {
+        console.error('Error fetching tasks from pool:', error);
+      }
+    )
+  }
 
   ngAfterViewInit() {
     if (this.sort) {
