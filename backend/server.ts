@@ -375,6 +375,17 @@ router
       ctx.response.body = { message: 'Error fetching tasks by tag', error };
     }
   })
+  .get("/api/taskPool/user/:userId", async (ctx) => {
+    const userId = ctx.params.userId;
+    try {
+      const taskList = await pool.find({ createdBy: userId }).toArray();
+      ctx.response.status = 200;
+      ctx.response.body = taskList;
+    } catch (error) {
+      ctx.response.status = 500;
+      ctx.response.body = { message: 'Error fetching tasks by user', error };
+    }
+  })
   .post("/api/taskPool", async (ctx) => {
     const task: Task = await ctx.request.body().value
     try {

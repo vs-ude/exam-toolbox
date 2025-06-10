@@ -82,4 +82,8 @@ export class ApiService {
     return this.http.get<Task[]>(`${this.apiUrl}/taskPool/tag/${tag}`);
   }
 
+  getTaskWithUserIdFromPool(userId: string): Observable<Task[]> {
+    return this.http.get<Task[]>(`${this.apiUrl}/taskPool/user/${userId}`);
+  }
+
 }
