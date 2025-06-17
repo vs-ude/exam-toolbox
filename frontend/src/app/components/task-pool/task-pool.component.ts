@@ -1,4 +1,4 @@
-import { NgClass, NgFor, NgIf } from '@angular/common';
+import { NgClass, NgFor, NgIf, NgStyle } from '@angular/common';
 import { AfterViewInit, Component, HostListener, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Task } from '../../exam';
@@ -12,7 +12,7 @@ import { ApiService } from '../../services/api.service';
 @Component({
   selector: 'app-task-pool',
   standalone: true,
-  imports: [MatIconModule, NgClass, NgFor, TaskPoolCardComponent, MatTableModule, MatSortModule, NgIf,],
+  imports: [MatIconModule, NgClass, NgFor, TaskPoolCardComponent, MatTableModule, MatSortModule, NgIf, NgStyle],
   templateUrl: './task-pool.component.html',
   styleUrl: './task-pool.component.scss',
   animations: [
@@ -101,7 +101,7 @@ export class TaskPoolComponent implements AfterViewInit {
     tags: [{ name: "Hard", color: "#e57373", textColor: "#fff" }],
   }];
 
-  displayedColumns: string[] = ['taskId', 'type', 'question', 'points',];
+  displayedColumns: string[] = ['taskId', 'type', 'question', 'points', "tags", "createdBy", "lastUsed", ];
   dataSource = new MatTableDataSource<Task>(this.tasks);
 
   @ViewChild(MatSort) sort?: MatSort;
