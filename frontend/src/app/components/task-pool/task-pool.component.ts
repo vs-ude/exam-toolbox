@@ -101,12 +101,12 @@ export class TaskPoolComponent implements AfterViewInit {
     tags: [{ name: "Hard", color: "#e57373", textColor: "#fff" }],
   }];
 
-  displayedColumns: string[] = ['taskId', 'type', 'question', 'points', "tags", "createdBy", "lastUsed", ];
+  displayedColumns: string[] = ['taskId', 'type', 'question', 'points', "tags", "createdBy", "lastUsed",];
   dataSource = new MatTableDataSource<Task>(this.tasks);
 
   @ViewChild(MatSort) sort?: MatSort;
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService) { }
 
   ngOnInit() {
     this.apiService.getTasksFromPool().subscribe(
@@ -139,7 +139,7 @@ export class TaskPoolComponent implements AfterViewInit {
     }
   }
 
-  public showCreatedByMe(){
+  public showCreatedByMe() {
     this.filterState = "createdByMe";
     this.apiService.getTaskWithUserIdFromPool("placeholder").subscribe(
       res => {
@@ -163,6 +163,11 @@ export class TaskPoolComponent implements AfterViewInit {
         console.error('Error fetching all tasks:', error);
       }
     )
+  }
+
+  public stringifyDate(date: any): string {
+    const d = date instanceof Date ? date : new Date(date);
+    return d.toLocaleDateString('de-DE');
   }
 
 }
