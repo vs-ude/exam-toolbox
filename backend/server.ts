@@ -2,8 +2,6 @@
 import { Application, Router } from "https://deno.land/x/oak@v10.5.0/mod.ts";
 // @ts-ignore
 import { MongoClient } from "https://deno.land/x/mongo/mod.ts";
-// @ts-ignore
-import { latrex } from "https://deno.land/x/latrex/mod.ts";
 import { Exam, Task } from "./exam.ts";
 import { FileTracker } from "./fileTracker.ts";
 import { ObjectId } from "https://deno.land/x/mongo@v0.33.0/deps.ts";
@@ -12,7 +10,6 @@ import { walk } from "https://deno.land/std/fs/walk.ts";
 // @ts-ignore
 import { read, utils } from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
 import { PDFDocument } from "https://cdn.skypack.dev/pdf-lib@1.17.1?dts";
-
 import { crypto } from "jsr:@std/crypto";
 import { encodeHex } from "jsr:@std/encoding/hex";
 import * as fs from "https://deno.land/std/fs/mod.ts";
@@ -39,15 +36,60 @@ const router = new Router();
 // For cross-origin requests (for CORS)
 app.use(async (ctx, next) => {
   ctx.response.headers.set("Access-Control-Allow-Origin", "*");
-  ctx.response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  ctx.response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Auth-Uid, X-Auth-Email, X-Auth-Member-Of");
+
+  // for preflight request
+  if (ctx.request.method === "OPTIONS") {
+    ctx.response.status = 204; // success
+    return; // stop
+  }
+
+  // get user information of logged-in user with AuthCrunch default headers
+  const userId = ctx.request.headers.get("X-Token-Subject")
+  const userEmail = ctx.request.headers.get("X-Token-User-Email")
+  const userRolesHeader = ctx.request.headers.get("X-Token-User-Roles")
+
+  // puts the roles in an array
+  const userRoles = userRolesHeader ? userRolesHeader.split(' ').map(role => role.trim()).filter(role => role !== '') : []
+
+  ctx.state.user = {
+    id: userId,
+    email: userEmail,
+    roles: userRoles,
+  }
+
+  console.log("Authenticated User: ")
+  console.log(userId)
+  // for debugging (can be removed in production)
+  if (userId) {
+    console.log(`Authenticated User: ID=${userId}, Email=${userEmail}, Roles=[${userRoles.join(', ')}]`);
+  }
+
   await next();
 });
+
 
 // Routes
 router
   .get("/", (ctx) => {
     ctx.response.body = "API is running...";
+  })
+  .get("/api/user", (ctx) => {
+    const user = ctx.state.user
+
+    if (!user || !user.id) {
+      ctx.response.status = 401
+      ctx.response.body = { message: "Not authenticated" }
+      return;
+    }
+
+    ctx.response.status = 200
+    ctx.response.body = {
+      id: user.id,
+      email: user.email,
+      roles: user.roles
+    }
   })
   .get("/api/exams", async (ctx) => {
     try {

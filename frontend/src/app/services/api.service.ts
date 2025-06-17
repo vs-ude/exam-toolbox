@@ -1,7 +1,8 @@
-import { HostListener, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, timeout } from 'rxjs';
 import { Exam, Task } from '../exam';
+import { User } from '../user'
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +28,10 @@ export class ApiService {
 
   getExam(examId: string) {
     return this.http.get<Exam>(`${this.apiUrl}/exam/${examId}`)
+  }
+
+  getUser(){
+    return this.http.get<User>(`/api/user`)
   }
 
   updateExam(examId: (string | undefined), updatedExam: Exam) {
