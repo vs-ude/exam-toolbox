@@ -17,6 +17,7 @@ import { TaskGroupTitleComponent } from "./task-group-title/task-group-title.com
 import { PictureTaskComponent } from "./tasks/picture-task/picture-task.component";
 import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
 import { ColorProviderService } from '../../services/color-provider.service';
+import { LatexTaskComponent } from './tasks/latex-task/latex-task.component';
 
 
 
@@ -39,6 +40,7 @@ import { ColorProviderService } from '../../services/color-provider.service';
     ShortAnswerTaskComponent,
     TaskGroupTitleComponent,
     PictureTaskComponent,
+    LatexTaskComponent,
   ],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
@@ -167,6 +169,24 @@ export class CreateExamComponent {
           lastUsed: new Date(),
           usedIn: [this.exam._id || "placeholder_id"],
           tags: [],
+        });
+        break;
+      case "new_latex":
+        this.exam.tasks[this.currentGroupView].tasks.push({
+          taskId: "latex-" + Date.now(),
+          type: "latexTask",
+          question: {
+            DE: "",
+            EN: "",
+          },
+          questionLatex: { DE: "", EN: "" },
+          solutionLatex: { DE: "", EN: "" },
+          points: 0,
+          tags: [],
+          createdBy: "placeholder",
+          createdAt: new Date(),
+          lastUsed: new Date(),
+          usedIn: []
         });
         break;
 
