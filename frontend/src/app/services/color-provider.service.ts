@@ -9,6 +9,8 @@ export class ColorProviderService {
     multipleChoice: "var(--color-primary)",
     shortAnswer: "var(--color-secondary)",
     pictureTask: "var(--color-dark-gray)",
+    ranking: "var(--color-warn)",
+    latex: "#6B21A8",
     misc: "var(--color-warn)",
   }
 

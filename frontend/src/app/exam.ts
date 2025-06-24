@@ -88,7 +88,7 @@ export interface Image {
 }
 
 export interface LatexTask extends BaseTask {
-    type: "latexTask";
+    type: "latex";
     questionLatex: Translation;
     solutionLatex: Translation;
 }

@@ -174,7 +174,7 @@ export class CreateExamComponent {
       case "new_latex":
         this.exam.tasks[this.currentGroupView].tasks.push({
           taskId: "latex-" + Date.now(),
-          type: "latexTask",
+          type: "latex",
           question: {
             DE: "",
             EN: "",

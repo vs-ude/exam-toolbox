@@ -8,21 +8,22 @@
                 id="examName" #nameInput>
         </div>
         <div class="add_tasks_container">
-            <app-AddTask class="task_wrapper" [name]="'Multiple Choice'" [color]="'var(--color-primary)'"
-                [iconName]="'multipleChoice.svg'" id="new_multipleChoice" draggable="true"
-                (dragstart)="dragStart($event)" (dragend)="drop($event)">
+            <app-AddTask class="task_wrapper" [name]="'Multiple Choice'"
+                [color]="colorProvider.getTaskColor('multipleChoice')" [iconName]="'multipleChoice.svg'"
+                id="new_multipleChoice" draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)">
             </app-AddTask>
-            <app-AddTask class="task_wrapper" [name]="'Short Answer'" [color]="'var(--color-secondary)'"
-                [iconName]="'shortAnswer.svg'" id="new_shortAnswer" draggable="true" (dragstart)="dragStart($event)"
+            <app-AddTask class="task_wrapper" [name]="'Short Answer'"
+                [color]="colorProvider.getTaskColor('shortAnswer')" [iconName]="'shortAnswer.svg'"
+                id="new_shortAnswer" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-AddTask>
-            <app-AddTask class="task_wrapper" [name]="'Ranking'" [color]="'var(--color-warn)'"
+            <app-AddTask class="task_wrapper" [name]="'Ranking'" [color]="colorProvider.getTaskColor('ranking')"
                 [iconName]="'ranking.svg'" id="new_ranking" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-AddTask>
-            <app-AddTask class="task_wrapper" [name]="'Picture Task'" [color]="'var(--color-dark-gray)'"
-                [iconName]="'pictureTask.svg'" id="new_picture" draggable="true" (dragstart)="dragStart($event)"
-                (dragend)="drop($event)"></app-AddTask>
-            <app-AddTask class="task_wrapper" [name]="'Latex Task'" [color]="'var(--color-text)'"
-                [iconName]="'latexTask.svg'" id="new_latex" draggable="true" (dragstart)="dragStart($event)"
+            <app-AddTask class="task_wrapper" [name]="'Picture Task'"
+                [color]="colorProvider.getTaskColor('pictureTask')" [iconName]="'pictureTask.svg'" id="new_picture"
+                draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)"></app-AddTask>
+            <app-AddTask class="task_wrapper" [name]="'Latex Task'" [color]="colorProvider.getTaskColor('latex')"
+                [iconName]="'latex.svg'" id="new_latex" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-AddTask>
         </div>
 
@@ -146,7 +147,7 @@
             </mat-card>
 
             <!-- Latex Task -->
-            <mat-card class="form-card" *ngIf="task.type === 'latexTask'">
+            <mat-card class="form-card" *ngIf="task.type === 'latex'">
                 <app-latex-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />

@@ -24,7 +24,7 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
 
   public task: LatexTask = {
     taskId: "",
-    type: "latexTask",
+    type: "latex",
     question: {
       DE: "",
       EN: "",
