@@ -66,10 +66,9 @@
   <span class="latex_input_label" matTooltip="Code has to be wrapped in '\(' '\)'">LaTeX Solution:</span>
   <textarea class="latex_input" [(ngModel)]="task.solutionLatex.DE" (blur)="updateTask()"></textarea>
 
-  <div>
+  <div *ngIf="isValidMathString(task.solutionLatex.DE)">
     <span class="latex_input_label">Preview:</span>
-    <app-math-jax-paragraph *ngIf="isValidMathString(task.solutionLatex.DE)"
-      mathString="{{ task.solutionLatex.DE }}"></app-math-jax-paragraph>
+    <app-math-jax-paragraph mathString="{{ task.solutionLatex.DE }}"></app-math-jax-paragraph>
   </div>
 
 </div>
