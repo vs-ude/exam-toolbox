@@ -48,17 +48,32 @@
 
 
 <!-- Latex Question Input -->
- <div class="form-body" *ngIf="!bilingual">
-  <span class="latex_input_label">LaTeX Question:</span>
+<div class="form-body" *ngIf="!bilingual">
+  <span class="latex_input_label" matTooltip="Code has to be wrapped in '\(' '\)'">LaTeX Question:</span>
   <textarea class="latex_input" [(ngModel)]="this.task.questionLatex.DE" (blur)="updateTask()"></textarea>
+  <div *ngIf=" isValidMathString(task.questionLatex.DE) " class="latex_preview_container">
+    <span class="latex_input_label">Preview:</span>
+    <app-math-jax-paragraph mathString="{{ task.questionLatex.DE }}"></app-math-jax-paragraph>
+  </div>
+
 </div>
+
+
 
 
 <!-- Latex Solution Input -->
 <div class="form-body" *ngIf="!bilingual">
-  <span class="latex_input_label">Solution:</span>
-  <textarea class="latex_input" [(ngModel)]="this.task.solutionLatex.DE" (blur)="updateTask()"></textarea>
+  <span class="latex_input_label" matTooltip="Code has to be wrapped in '\(' '\)'">LaTeX Solution:</span>
+  <textarea class="latex_input" [(ngModel)]="task.solutionLatex.DE" (blur)="updateTask()"></textarea>
+
+  <div>
+    <span class="latex_input_label">Preview:</span>
+    <app-math-jax-paragraph *ngIf="isValidMathString(task.solutionLatex.DE)"
+      mathString="{{ task.solutionLatex.DE }}"></app-math-jax-paragraph>
+  </div>
+
 </div>
+
 
 
 

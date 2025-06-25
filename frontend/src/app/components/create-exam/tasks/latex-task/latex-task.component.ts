@@ -6,16 +6,20 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatLabel } from '@angular/material/form-field';
 import { TaskAnimations } from '../task-animations';
+import { MathJaxParagraphComponent } from '../../../math-jax-paragraph/math-jax-paragraph.component';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-latex-task',
   standalone: true,
   imports: [
-    NgIf, 
-    NgStyle, 
-    MatIconModule, 
-    FormsModule, 
-    MatLabel
+    NgIf,
+    NgStyle,
+    MatIconModule,
+    FormsModule,
+    MatLabel,
+    MathJaxParagraphComponent,
+    MatTooltip
   ],
   templateUrl: './latex-task.component.html',
   styleUrls: [
@@ -59,6 +63,12 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
 
   public updateTask() {
     this.taskChangeEvent.emit(this.task);
+  }
+
+  public isValidMathString(mathString: string): boolean {
+    return mathString.length !== 0 &&
+      mathString.startsWith('\\(') &&
+      mathString.endsWith('\\)');
   }
 
 }
