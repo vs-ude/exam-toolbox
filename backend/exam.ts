@@ -36,6 +36,7 @@ export type Task =
     | MultipleChoiceTask
     | ShortAnswerTask
     | PictureTask
+    | LatexTask
     ;
 
 
@@ -84,6 +85,12 @@ export interface Image {
     urlEN: string;
     altTextDE?: string;
     altTextEN?: string;
+}
+
+export interface LatexTask extends BaseTask {
+    type: "latex";
+    questionLatex: Translation;
+    solutionLatex: Translation;
 }
 
 export interface Translation {

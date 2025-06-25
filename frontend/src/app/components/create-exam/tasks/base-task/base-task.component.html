@@ -25,48 +25,24 @@
   <!-- Buttons for formatting -->
   <div *ngIf="isQuestionActive" [@inOutAnimation] class="form-toolbar">
   
-    <div class="icon_wrapper style_icon" (mousedown)="setQuestionFormat('bold', $event)"
+    <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('bold', $event)"
       [ngStyle]="{ 'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
       <mat-icon aria-hidden="false" fontIcon="format_bold"></mat-icon>
     </div>
   
-    <div class="icon_wrapper style_icon" (mousedown)="setQuestionFormat('italic', $event)"
+    <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('italic', $event)"
       [ngStyle]="{ 'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
       <mat-icon aria-hidden="false" fontIcon="format_italic"></mat-icon>
     </div>
   
-    <div class="icon_wrapper style_icon" (mousedown)="setQuestionFormat('underline', $event)"
+    <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('underline', $event)"
       [ngStyle]="{ 'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
       <mat-icon aria-hidden="false" fontIcon="format_underline"></mat-icon>
     </div>
   </div>
   
-  
-  <!-- Solution -->
-  <div class="form-body" *ngIf="!bilingual">
-    <span class="solution_input_label">Solution:</span>
-    <textarea class="solution_input" [(ngModel)]="this.task.solution.DE" (blur)="updateTask()"></textarea>
-  </div>
-  
-  <!-- Bilingual -->
-  <div class="form-body solution_container" *ngIf="bilingual">
-  
-  
-    <span class="solution_input_label">
-      <span class="language_icon"><img src="german.svg" /></span>
-      Lösung:
-    </span>
-    <textarea class="solution_input" [(ngModel)]="this.task.solution.DE" (blur)="updateTask()"></textarea>
-  
-    <span class="solution_input_label" style="margin-top: 16px;">
-      <span class="language_icon"><img src="english.svg" /></span>
-      Solution:
-    </span>
-    <textarea class="solution_input" [(ngModel)]="this.task.solution.EN" (blur)="updateTask()"></textarea>
-  </div>
-  
-  
-  
+
+
   
   <!-- Footer -->
   <div class="form-footer">

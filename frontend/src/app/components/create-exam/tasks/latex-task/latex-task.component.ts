@@ -10,9 +10,18 @@ import { TaskAnimations } from '../task-animations';
 @Component({
   selector: 'app-latex-task',
   standalone: true,
-  imports: [NgIf, NgStyle, MatIconModule, FormsModule, MatLabel],
+  imports: [
+    NgIf, 
+    NgStyle, 
+    MatIconModule, 
+    FormsModule, 
+    MatLabel
+  ],
   templateUrl: './latex-task.component.html',
-  styleUrl: './latex-task.component.scss',
+  styleUrls: [
+    './latex-task.component.scss',
+    '../task.scss'
+  ],
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation
