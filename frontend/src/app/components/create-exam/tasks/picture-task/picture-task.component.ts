@@ -71,10 +71,6 @@ export class PictureTaskComponent extends BaseTaskComponent {
     this.taskChangeEvent.emit(this.task);
   }
 
-  public updateTask() {
-    this.taskChangeEvent.emit(this.task);
-  }
-
   public fileBrowseHandler(event: Event, imageAffiliation: string) {
     let input = event.target as HTMLInputElement;
     const file = input.files![0];

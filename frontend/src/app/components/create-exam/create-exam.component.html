@@ -13,9 +13,8 @@
                 id="new_multipleChoice" draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)">
             </app-AddTask>
             <app-AddTask class="task_wrapper" [name]="'Short Answer'"
-                [color]="colorProvider.getTaskColor('shortAnswer')" [iconName]="'shortAnswer.svg'"
-                id="new_shortAnswer" draggable="true" (dragstart)="dragStart($event)"
-                (dragend)="drop($event)"></app-AddTask>
+                [color]="colorProvider.getTaskColor('shortAnswer')" [iconName]="'shortAnswer.svg'" id="new_shortAnswer"
+                draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)"></app-AddTask>
             <app-AddTask class="task_wrapper" [name]="'Ranking'" [color]="colorProvider.getTaskColor('ranking')"
                 [iconName]="'ranking.svg'" id="new_ranking" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-AddTask>
@@ -24,6 +23,9 @@
                 draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)"></app-AddTask>
             <app-AddTask class="task_wrapper" [name]="'Latex Task'" [color]="colorProvider.getTaskColor('latex')"
                 [iconName]="'latex.svg'" id="new_latex" draggable="true" (dragstart)="dragStart($event)"
+                (dragend)="drop($event)"></app-AddTask>
+            <app-AddTask class="task_wrapper" [name]="'Table Task'" [color]="colorProvider.getTaskColor('table')"
+                [iconName]="'table.svg'" id="new_table" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-AddTask>
         </div>
 
@@ -149,6 +151,13 @@
             <!-- Latex Task -->
             <mat-card class="form-card" *ngIf="task.type === 'latex'">
                 <app-latex-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
+                    [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
+                    (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
+            </mat-card>
+
+            <!-- Table Task -->
+            <mat-card class="form-card" *ngIf="task.type === 'table'">
+                <app-table-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
             </mat-card>

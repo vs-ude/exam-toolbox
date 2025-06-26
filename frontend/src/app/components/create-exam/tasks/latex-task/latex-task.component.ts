@@ -19,7 +19,7 @@ import { MatTooltip } from '@angular/material/tooltip';
     FormsModule,
     MatLabel,
     MathJaxParagraphComponent,
-    MatTooltip
+    MatTooltip,
   ],
   templateUrl: './latex-task.component.html',
   styleUrls: [
@@ -58,10 +58,6 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
       return;
     }
     this.task.taskId = this.taskId;
-    this.taskChangeEvent.emit(this.task);
-  }
-
-  public updateTask() {
     this.taskChangeEvent.emit(this.task);
   }
 

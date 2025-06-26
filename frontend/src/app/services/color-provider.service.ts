@@ -11,6 +11,7 @@ export class ColorProviderService {
     pictureTask: "var(--color-dark-gray)",
     ranking: "var(--color-warn)",
     latex: "#6B21A8",
+    table: "#00C2A8",
     misc: "var(--color-warn)",
   }
 

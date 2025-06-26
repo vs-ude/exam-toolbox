@@ -61,11 +61,5 @@ export class ShortAnswerTaskComponent extends BaseTaskComponent implements OnIni
     this.taskChangeEvent.emit(this.task);
   }
 
-
-  public updateTask() {
-    this.taskChangeEvent.emit(this.task);
-  }
-
-
 }
 

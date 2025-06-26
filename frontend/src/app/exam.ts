@@ -37,6 +37,7 @@ export type Task =
     | ShortAnswerTask
     | PictureTask
     | LatexTask
+    | TableTask
     ;
 
 
@@ -91,6 +92,13 @@ export interface LatexTask extends BaseTask {
     type: "latex";
     questionLatex: Translation;
     solutionLatex: Translation;
+}
+
+export interface TableTask extends BaseTask {
+    type: "table"
+    numberOfColumns: number;
+    numberOfRows: number;
+    tableData: Translation[][];
 }
 
 export interface Translation {

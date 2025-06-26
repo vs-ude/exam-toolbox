@@ -92,4 +92,8 @@ export abstract class BaseTaskComponent {
     this.taskChangeEvent.emit(this.task);
   }
 
+  public updateTask() {
+    this.taskChangeEvent.emit(this.task);
+  }
+
 }

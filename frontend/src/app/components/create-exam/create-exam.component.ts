@@ -18,6 +18,7 @@ import { PictureTaskComponent } from "./tasks/picture-task/picture-task.componen
 import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
 import { ColorProviderService } from '../../services/color-provider.service';
 import { LatexTaskComponent } from './tasks/latex-task/latex-task.component';
+import { TableTaskComponent } from './tasks/table-task/table-task.component';
 
 
 
@@ -41,6 +42,7 @@ import { LatexTaskComponent } from './tasks/latex-task/latex-task.component';
     TaskGroupTitleComponent,
     PictureTaskComponent,
     LatexTaskComponent,
+    TableTaskComponent,
   ],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
@@ -189,6 +191,23 @@ export class CreateExamComponent {
           usedIn: []
         });
         break;
+      case "new_table":
+        this.exam.tasks[this.currentGroupView].tasks.push({
+          taskId: "table-" + Date.now(),
+          type: "table",
+          question: { "DE": "", "EN": "" },
+          numberOfColumns: 0,
+          numberOfRows: 0,
+          tableData: [],
+          points: 0,
+          tags: [],
+          createdBy: "placeholder",
+          createdAt: new Date(),
+          lastUsed: new Date(),
+          usedIn: [],
+
+        });
+        break;
 
       default:
         break;
@@ -302,6 +321,7 @@ export class CreateExamComponent {
   onTaskChange(task: Task, index: number) {
     this.exam.tasks[this.currentGroupView].tasks[index] = task;
     this.adjustTotalPoints();
+    console.log(task)
   }
 
   onTitleChange(taskGroupTitle: { DE: string, EN: string }) {
