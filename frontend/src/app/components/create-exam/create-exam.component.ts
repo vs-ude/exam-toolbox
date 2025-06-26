@@ -19,6 +19,7 @@ import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
 import { ColorProviderService } from '../../services/color-provider.service';
 import { LatexTaskComponent } from './tasks/latex-task/latex-task.component';
 import { TableTaskComponent } from './tasks/table-task/table-task.component';
+import { TaskBuilderService } from '../../services/task-builder.service';
 
 
 
@@ -69,6 +70,7 @@ export class CreateExamComponent {
     private router: Router,
     private themeService: ThemeToggleService,
     public colorProvider: ColorProviderService,
+    private taskBuilder: TaskBuilderService,
   ) {
     this.importExam();
     this.importPoolTasks();
@@ -77,6 +79,7 @@ export class CreateExamComponent {
     this.themeService.themeChanged$.subscribe((theme: Theme) => {
       this.lightTheme = theme === Theme.LIGHT ? true : false;
     })
+
   }
 
 
@@ -128,91 +131,9 @@ export class CreateExamComponent {
   }
 
   private pushNewTask(taskType: string) {
-    switch (taskType) {
-      case "new_multipleChoice":
-        this.exam.tasks[this.currentGroupView].tasks.push({
-          taskId: "multipleChoice-" + Date.now(),
-          type: "multipleChoice",
-          question: { DE: "", EN: "" },
-          answerOptions: [{ DE: "", EN: "", correct: true },],
-          points: 1,
-          createdBy: "placeholder",
-          createdAt: new Date(),
-          lastUsed: new Date(),
-          usedIn: [this.exam._id || "placeholder_id"],
-          tags: [],
-
-        });
-        break;
-      case "new_shortAnswer":
-        this.exam.tasks[this.currentGroupView].tasks.push({
-          taskId: "shortAnswer-" + Date.now(),
-          type: "shortAnswer",
-          question: { DE: "", EN: "" },
-          solution: { DE: "", EN: "" },
-          points: 1,
-          createdBy: "placeholder",
-          createdAt: new Date(),
-          lastUsed: new Date(),
-          usedIn: [this.exam._id || "placeholder_id"],
-          tags: [],
-        });
-        break;
-      case "new_picture":
-        this.exam.tasks[this.currentGroupView].tasks.push({
-          taskId: "picture-" + Date.now(),
-          type: "pictureTask",
-          question: { DE: "", EN: "" },
-          questionPicture: { urlDE: "", urlEN: "" },
-          solutionPicture: { urlDE: "", urlEN: "" },
-          points: 1,
-          createdBy: "placeholder",
-          createdAt: new Date(),
-          lastUsed: new Date(),
-          usedIn: [this.exam._id || "placeholder_id"],
-          tags: [],
-        });
-        break;
-      case "new_latex":
-        this.exam.tasks[this.currentGroupView].tasks.push({
-          taskId: "latex-" + Date.now(),
-          type: "latex",
-          question: {
-            DE: "",
-            EN: "",
-          },
-          questionLatex: { DE: "", EN: "" },
-          solutionLatex: { DE: "", EN: "" },
-          points: 0,
-          tags: [],
-          createdBy: "placeholder",
-          createdAt: new Date(),
-          lastUsed: new Date(),
-          usedIn: []
-        });
-        break;
-      case "new_table":
-        this.exam.tasks[this.currentGroupView].tasks.push({
-          taskId: "table-" + Date.now(),
-          type: "table",
-          question: { "DE": "", "EN": "" },
-          numberOfColumns: 0,
-          numberOfRows: 0,
-          tableData: [],
-          points: 0,
-          tags: [],
-          createdBy: "placeholder",
-          createdAt: new Date(),
-          lastUsed: new Date(),
-          usedIn: [],
-
-        });
-        break;
-
-      default:
-        break;
-    }
-
+    let task = this.taskBuilder.createTask(taskType)
+    task.usedIn = [this.exam._id || "placeholder_id"];
+    this.exam.tasks[this.currentGroupView].tasks.push(task)
     this.adjustTotalPoints();
   }
 
