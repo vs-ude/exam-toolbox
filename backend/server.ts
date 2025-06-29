@@ -13,6 +13,7 @@ import { PDFDocument } from "https://cdn.skypack.dev/pdf-lib@1.17.1?dts";
 import { crypto } from "jsr:@std/crypto";
 import { encodeHex } from "jsr:@std/encoding/hex";
 import * as fs from "https://deno.land/std/fs/mod.ts";
+import { Resend } from "npm:resend@2.0.0";
 
 
 
@@ -365,6 +366,23 @@ router
       // read zipfile of mass-exam
       const zipFileBytes = await Deno.readFile(zipFilePath)
       console.log("Zip file created:", zipFilePath)
+
+      // send Email
+      console.log("Attempting to send email...");
+
+      try {
+        await sendEmail(
+          ctx.state.user.email, // Dynamic recipient in real usage
+          "Your exam is ready for download",
+          `<p>Hello,</p>
+          <p>Your generated exams are ready for download.</p>`
+        );
+        console.log("Email sent successfully");
+      } catch (error) {
+        console.error("Sending the Email failed:", error)
+      }
+
+      console.log("After email send attempt");
 
       ctx.response.headers.set("Content-Type", "application/zip")
       ctx.response.headers.set("Content-Disposition", `attachment; filename="all-exams.zip"`)
@@ -802,4 +820,27 @@ async function updateMetaStudent(options: {
 
   // Update meta-exam.tex
   await Deno.writeTextFile(metaPath, updatedMeta);
+}
+
+async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  
+  if (!RESEND_API_KEY) {
+    console.error("RESEND_API_KEY is not set");
+    return;
+  }
+
+  const resend = new Resend(RESEND_API_KEY);
+  
+  try {
+    await resend.emails.send({
+      from: "ExamToolbox <onboarding@resend.dev>",
+      to,
+      subject,
+      html,
+    });
+    console.log("Email sent via Resend");
+  } catch (error) {
+    console.error("Resend error:", error);
+  }
 }
