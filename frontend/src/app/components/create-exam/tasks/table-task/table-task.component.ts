@@ -102,7 +102,10 @@ export class TableTaskComponent extends BaseTaskComponent {
       for (let row of this.task.tableData) {
         row.push({ DE: '', EN: '' });
       }
+      this.task.tableHeaders.push({ DE: '', EN: '' });
+
     }
+
     this.updateTask();
   }
 
