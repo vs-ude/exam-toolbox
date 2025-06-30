@@ -1,64 +1,128 @@
 <div class="form-header">
 
-    <!-- Bilingual -->
-    <div *ngIf="bilingual" class="question-container" [@leftRightAnimation]>
-      <div class="question-language-wrapper">
-        <span class="language_icon"><img src="german.svg" /></span>
-        <div #questionFieldDE contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
-          (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event,'DE')"
-          [attr.data-placeholder]="'Frage Eingeben...'"></div>
-      </div>
-      <div class="question-language-wrapper">
-        <span class="language_icon"><img src="english.svg" /></span>
-        <div #questionFieldEN contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
-          (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event, 'EN')"
-          [attr.data-placeholder]="'Enter Question...'"></div>
-      </div>
+  <!-- Bilingual -->
+  <div *ngIf="bilingual" class="question-container" [@leftRightAnimation]>
+    <div class="question-language-wrapper">
+      <span class="language_icon"><img src="german.svg" /></span>
+      <div #questionFieldDE contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
+        (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event,'DE')"
+        [attr.data-placeholder]="'Frage Eingeben...'"></div>
     </div>
-  
-    <!-- German -->
-    <div *ngIf="!bilingual" #questionFieldDE contenteditable="true" class="form-question"
-      (focus)="activateFormatButtons()" (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event,'DE')"
-      [attr.data-placeholder]="'Enter Question...'"></div>
-  </div>
-  
-  <!-- Buttons for formatting -->
-  <div *ngIf="isQuestionActive" [@inOutAnimation] class="form-toolbar">
-  
-    <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('bold', $event)"
-      [ngStyle]="{ 'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-      <mat-icon aria-hidden="false" fontIcon="format_bold"></mat-icon>
-    </div>
-  
-    <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('italic', $event)"
-      [ngStyle]="{ 'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-      <mat-icon aria-hidden="false" fontIcon="format_italic"></mat-icon>
-    </div>
-  
-    <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('underline', $event)"
-      [ngStyle]="{ 'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-      <mat-icon aria-hidden="false" fontIcon="format_underline"></mat-icon>
+    <div class="question-language-wrapper">
+      <span class="language_icon"><img src="english.svg" /></span>
+      <div #questionFieldEN contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
+        (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event, 'EN')"
+        [attr.data-placeholder]="'Enter Question...'"></div>
     </div>
   </div>
-  
+
+  <!-- German -->
+  <div *ngIf="!bilingual" #questionFieldDE contenteditable="true" class="form-question"
+    (focus)="activateFormatButtons()" (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event,'DE')"
+    [attr.data-placeholder]="'Enter Question...'"></div>
+</div>
+
+<!-- Buttons for formatting -->
+<div *ngIf="isQuestionActive" [@inOutAnimation] class="form-toolbar">
+
+  <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('bold', $event)"
+    [ngStyle]="{ 'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
+    <mat-icon aria-hidden="false" fontIcon="format_bold"></mat-icon>
+  </div>
+
+  <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('italic', $event)"
+    [ngStyle]="{ 'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
+    <mat-icon aria-hidden="false" fontIcon="format_italic"></mat-icon>
+  </div>
+
+  <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('underline', $event)"
+    [ngStyle]="{ 'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
+    <mat-icon aria-hidden="false" fontIcon="format_underline"></mat-icon>
+  </div>
+</div>
 
 
-  
-  <!-- Footer -->
-  <div class="form-footer">
-    <div class="footer-actions">
-      <div class="icon_wrapper footer_icon">
-        <mat-icon aria-hidden="false" fontIcon="content_copy" matTooltip="Copy"></mat-icon>
-      </div>
-  
-      <div class="icon_wrapper footer_icon_delete">
-        <mat-icon aria-hidden="false" fontIcon="delete" matTooltip="Delete" (click)="onDelete()"></mat-icon>
-      </div>
+<div class="table-task-container" style="display: flex; align-items: flex-start;">
+  <table class="editable-table" style="flex: 1;">
+    <thead *ngIf="hasHeader">
+      <tr>
+        <th *ngFor="let cell of task.tableData[0]; let i = index" class="table-header">
+          <div class="header-input-container">
+            <input type="text" class="header-input" [(ngModel)]="task.tableHeaders[i].DE" (ngModelChange)="updateTask()"
+              (keydown.enter)="blurOnEnter($event)" />
+            <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
+              <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+            </button>
+          </div>
+        </th>
+        <th>
+          <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
+            <span style="font-size: 1.5em; color: #81c784;">+</span>
+          </button>
+        </th>
+      </tr>
+    </thead>
+    <thead *ngIf="!hasHeader">
+      <tr>
+        <th *ngFor="let cell of task.tableData[0]; let i = index" class="table-header">
+          <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
+            <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+          </button>
+        </th>
+        <th>
+          <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
+            <span style="font-size: 1.5em; color: #81c784;">+</span>
+          </button>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of task.tableData; let i = index; trackBy: trackByIndex">
+        <td *ngFor="let cell of row; let j = index" class="table-cell">
+          <div class="cell-input-container">
+            <input type="text" class="cell-input" [(ngModel)]="task.tableData[i][j].DE" (ngModelChange)="updateTask()"
+              (keydown.enter)="blurOnEnter($event)" />
+          </div>
+        </td>
+        <td>
+          <button type="button" class="remove-row-btn" (click)="removeRow(i)">
+            <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td [attr.colspan]="(task.tableData[0] ? task.tableData[0].length : 0) + 1">
+          <button type="button" class="add-row-btn" (click)="addRow()">
+            <span style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch;">+</span> Add Row
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="header-row-toggle" style="margin: 1em 0;">
+  <label>
+    <input type="checkbox" [(ngModel)]="hasHeader" (change)="updateTask()" />
+    Use Header Row
+  </label>
+</div>
+
+<!-- Footer -->
+<div class="form-footer">
+  <div class="footer-actions">
+    <div class="icon_wrapper footer_icon">
+      <mat-icon aria-hidden="false" fontIcon="content_copy" matTooltip="Copy"></mat-icon>
     </div>
-  
-    <div class="points">
-      <mat-label>Points</mat-label>
-      <input type="number" step="0.5" min="0.5" class="points_input" value="1" [(ngModel)]="this.task.points"
-        (change)="updateTask()" />
+
+    <div class="icon_wrapper footer_icon_delete">
+      <mat-icon aria-hidden="false" fontIcon="delete" matTooltip="Delete" (click)="onDelete()"></mat-icon>
     </div>
   </div>
+
+  <div class="points">
+    <mat-label>Points</mat-label>
+    <input type="number" step="0.5" min="0.5" class="points_input" value="1" [(ngModel)]="this.task.points"
+      (change)="updateTask()" />
+  </div>
+</div>
