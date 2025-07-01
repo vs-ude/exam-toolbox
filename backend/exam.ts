@@ -96,8 +96,10 @@ export interface LatexTask extends BaseTask {
 
 export interface TableTask extends BaseTask {
     type: "table"
-    tableHeaders: Translation[];
-    tableData: Translation[][];
+    tableHeadersQuestion: Translation[];
+    tableDataQuestion: Translation[][];
+    tableHeadersSolution: Translation[];
+    tableDataSolution: Translation[][];
 }
 
 export interface Translation {

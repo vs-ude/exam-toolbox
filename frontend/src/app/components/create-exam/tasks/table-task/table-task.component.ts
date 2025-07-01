@@ -40,8 +40,10 @@ export class TableTaskComponent extends BaseTaskComponent {
     taskId: "",
     type: "table",
     question: { "DE": "", "EN": "" },
-    tableHeaders: [],
-    tableData: [],
+    tableHeadersQuestion: [],
+    tableDataQuestion: [],
+    tableDataSolution: [],
+    tableHeadersSolution: [],
     points: 0,
     tags: [],
     createdBy: "placeholder",
@@ -54,7 +56,7 @@ export class TableTaskComponent extends BaseTaskComponent {
     if (this.preTask) {
       this.task = this.preTask as TableTask;
       console.log(this.task)
-      this.hasHeader = !!this.task.tableHeaders && this.task.tableHeaders.length > 0;
+      this.hasHeader = !!this.task.tableHeadersQuestion && this.task.tableHeadersQuestion.length > 0;
       return;
     }
     this.task.taskId = this.taskId;
@@ -67,43 +69,56 @@ export class TableTaskComponent extends BaseTaskComponent {
   }
 
   addRow() {
-    if (!this.task.tableData.length) {
-      // If table is empty, add a header row and one data row with 2 columns by default
-      this.task.tableData = [
+    if (!this.task.tableDataQuestion.length) {
+      this.task.tableDataQuestion = [
+        [{ DE: '', EN: '' }, { DE: '', EN: '' }],
+        [{ DE: '', EN: '' }, { DE: '', EN: '' }]
+      ];
+      this.task.tableDataSolution = [
         [{ DE: '', EN: '' }, { DE: '', EN: '' }],
         [{ DE: '', EN: '' }, { DE: '', EN: '' }]
       ];
     } else {
-      const numberOfColumns = this.task.tableData[0].length;
+      const numberOfColumns = this.task.tableDataQuestion[0].length;
       const newRow = Array(numberOfColumns).fill(0).map(() => ({ DE: '', EN: '' }));
-      this.task.tableData.push(newRow);
+      this.task.tableDataQuestion.push(newRow);
+      this.task.tableDataSolution.push(newRow.map(() => ({ DE: '', EN: '' })));
     }
     this.updateTask();
   }
 
   removeRow(rowIdx: number) {
-    if (this.task.tableData.length > 1) {
-      this.task.tableData.splice(rowIdx, 1);
+    if (this.task.tableDataQuestion.length > 1) {
+      this.task.tableDataQuestion.splice(rowIdx, 1);
+      this.task.tableDataSolution.splice(rowIdx, 1);
       this.updateTask();
       return;
     }
-    this.task.tableData = [];
+    this.task.tableDataQuestion = [];
+    this.task.tableDataSolution = [];
   }
 
 
   addColumn() {
-    if (!this.task.tableData.length) {
-      // If table is empty, add a header row and one data row with 1 column
-      this.task.tableData = [
-        [{ DE: '', EN: '' }],
-        [{ DE: '', EN: '' }]
+    if (!this.task.tableDataQuestion.length) {
+      this.task.tableDataQuestion = [
+        [{ DE: '', EN: '' }, { DE: '', EN: '' }],
+        [{ DE: '', EN: '' }, { DE: '', EN: '' }],
       ];
+      this.task.tableDataSolution = [
+        [{ DE: '', EN: '' }, { DE: '', EN: '' }],
+        [{ DE: '', EN: '' }, { DE: '', EN: '' }]
+      ];
+
     } else {
-      for (let row of this.task.tableData) {
+      for (let row of this.task.tableDataQuestion) {
         row.push({ DE: '', EN: '' });
       }
-      this.task.tableHeaders.push({ DE: '', EN: '' });
-
+      for (let row of this.task.tableDataSolution) {
+        row.push({ DE: '', EN: '' });
+      }
+      this.task.tableHeadersQuestion.push({ DE: '', EN: '' });
+      this.task.tableHeadersSolution.push({ DE: '', EN: '' });
     }
 
     this.updateTask();
@@ -111,14 +126,22 @@ export class TableTaskComponent extends BaseTaskComponent {
 
 
   removeColumn(colIdx: number) {
-    if (this.task.tableData[0].length > 1) {
-      for (let row of this.task.tableData) {
+    if (this.task.tableDataQuestion[0].length > 1) {
+      for (let row of this.task.tableDataQuestion) {
+        row.splice(colIdx, 1);
+      }
+      for (let row of this.task.tableDataSolution) {
         row.splice(colIdx, 1);
       }
       this.updateTask();
+      this.task.tableHeadersQuestion.splice(colIdx, 1);
+      this.task.tableHeadersSolution.splice(colIdx, 1);
       return;
     }
-    this.task.tableData = [];
+    this.task.tableDataQuestion = [];
+    this.task.tableDataSolution = [];
+    this.task.tableHeadersQuestion = [];
+    this.task.tableHeadersSolution = [];
   }
 
   blurOnEnter(event: Event) {

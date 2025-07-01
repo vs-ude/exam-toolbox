@@ -90,11 +90,16 @@ export class TaskBuilderService {
           taskId: "table-" + Date.now(),
           type: "table",
           question: { "DE": "", "EN": "" },
-          tableHeaders: [{ DE: '', EN: '' }, { DE: '', EN: '' }],
-          tableData: [
+          tableHeadersQuestion: [{ DE: '', EN: '' }, { DE: '', EN: '' }],
+          tableDataQuestion: [
             [{ DE: '', EN: '' }, { DE: '', EN: '' }],
             [{ DE: '', EN: '' }, { DE: '', EN: '' }],
-        ], 
+          ],
+          tableHeadersSolution: [{ DE: '', EN: '' }, { DE: '', EN: '' }],
+          tableDataSolution: [
+            [{ DE: '', EN: '' }, { DE: '', EN: '' }],
+            [{ DE: '', EN: '' }, { DE: '', EN: '' }],
+          ],
           points: 0,
           tags: [],
           createdBy: this.user.id,
