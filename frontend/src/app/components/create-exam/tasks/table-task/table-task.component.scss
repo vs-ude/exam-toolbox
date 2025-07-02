@@ -165,8 +165,18 @@
 }
 
 
+// other stuff
+
 .table-header{
     font-size: smaller;
     color: var(--color-dark-gray);
     margin-top: 1em;
+}
+
+.bilingual-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    padding: 0.5em;
+    border: 1px solid var(--border-color);
 }
