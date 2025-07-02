@@ -149,10 +149,14 @@ router
       // Convert the examId to an ObjectId (MongoDB uses ObjectId for the _id field)
       const mongoId = new ObjectId(examId)
 
+      // create update object without id
+      const updateData = { ...updatedExam };
+      delete updateData._id;  // remove id
+
       // Updating the Exam with the provided id
       const result = await exams.updateOne(
         { _id: mongoId },  // finds exam
-        { $set: updatedExam }  // updates just the changed fields in the exam
+        { $set: updateData }  // updates just the changed fields in the exam
       );
 
       // If no matching exam found, return 404

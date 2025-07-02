@@ -35,6 +35,7 @@ export class ApiService {
   }
 
   updateExam(examId: (string | undefined), updatedExam: Exam) {
+    console.log("Exam ID: " + examId)
     return this.http.put(`${this.apiUrl}/exams/update`, {
       examId,
       updatedExam
