@@ -716,7 +716,7 @@ function generateTasksLatex(exam: Exam): string {
       }
 
       // --- handle short answer task ---
-      if (subTask.type === "shortAnswer" && subTask.solution) {
+      else if (subTask.type === "shortAnswer" && subTask.solution) {
         const solutionDE = escapeLatex(subTask.solution.DE)
         const solutionEN = escapeLatex(subTask.solution.EN)
 
@@ -726,6 +726,39 @@ function generateTasksLatex(exam: Exam): string {
         const numberLn = Math.max(numberLnDE, numberLnEN)
 
         latexContent += `\\loesung{${numberLn}}{${solutionDE} / ${solutionEN}}\n\n`
+      }
+
+      // --- handle latex task ---
+      else if (subTask.type === "latex") {
+        // Insert raw LaTeX content directly
+        if (subTask.questionLatex?.DE) {
+          latexContent += subTask.questionLatex.DE + "\n\n";
+        }
+        if (subTask.questionLatex?.EN) {
+          latexContent += subTask.questionLatex.EN + "\n\n";
+        }
+
+        // Handle solutions using the existing \loesung command
+        if (subTask.solutionLatex) {
+          let solutionText = "";
+          
+          if (subTask.solutionLatex.DE) {
+            solutionText += `\\textbf{L\\"osung:}\\\\ ${subTask.solutionLatex.DE}`;
+          }
+          if (subTask.solutionLatex.EN) {
+            if (solutionText) solutionText += " / ";
+            solutionText += `\\textbf{Solution:}\\\\ ${subTask.solutionLatex.EN}`;
+          }
+          
+          // Estimate lines needed
+          const contentLength = Math.max(
+            subTask.solutionLatex.DE?.length || 0,
+            subTask.solutionLatex.EN?.length || 0
+          );
+          const numberLn = Math.max(3, Math.ceil(contentLength / 50));
+          
+          latexContent += `\\loesung{${numberLn}}{${solutionText}}\n\n`;
+        }
       }
 
       latexContent += "\\aufgabenteilende\n\n\n";
