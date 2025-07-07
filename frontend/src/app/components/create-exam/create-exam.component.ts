@@ -20,6 +20,7 @@ import { ColorProviderService } from '../../services/color-provider.service';
 import { LatexTaskComponent } from './tasks/latex-task/latex-task.component';
 import { TableTaskComponent } from './tasks/table-task/table-task.component';
 import { TaskBuilderService } from '../../services/task-builder.service';
+import { ManualTextComponent } from './tasks/manual-text/manual-text.component';
 
 
 
@@ -44,6 +45,7 @@ import { TaskBuilderService } from '../../services/task-builder.service';
     PictureTaskComponent,
     LatexTaskComponent,
     TableTaskComponent,
+    ManualTextComponent,
   ],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
@@ -54,7 +56,7 @@ export class CreateExamComponent {
   public isNameChange = false
   public isUpdateMode = false
   private bodyElement: HTMLElement = document.body;
-  public semesters = ["SS 23", "WS 23/24", "SS 24", "WS 24/25",];
+  public semesters = ["WS 23/24", "SS 24", "WS 24/25", "SS 25"];
 
   public taskPool: Task[] = [];
   public totalPoints = 0;
@@ -290,10 +292,6 @@ export class CreateExamComponent {
       })
   }
 
-  public mapToChar(index: number) {
-    return String.fromCharCode(97 + index % 26);
-  }
-
   public addTab() {
     this.exam.tasks.push({ groupNumber: this.exam.tasks.length + 1, groupTitle: { DE: "", EN: "" }, tasks: [] });
     this.currentGroupView = this.exam.tasks.length - 1;
@@ -310,6 +308,21 @@ export class CreateExamComponent {
 
   public changeTab(index: number) {
     this.currentGroupView = index;
+  }
+
+  public calcTaskChar(index: number): string {
+    // ignore manual text tasks when calculating the task number
+    let manualTextCount = 0;
+    const tasks = this.exam.tasks[this.currentGroupView].tasks;
+    for (let i = 0; i < index; i++) {
+      if (tasks[i].type === 'manualText') manualTextCount++;
+    }
+
+    return this.mapTaskIndexToChar(index - manualTextCount);
+  }
+
+  private mapTaskIndexToChar(index: number) {
+    return String.fromCharCode(97 + index % 26);
   }
 
 }

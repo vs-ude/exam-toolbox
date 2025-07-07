@@ -38,6 +38,7 @@ export type Task =
     | PictureTask
     | LatexTask
     | TableTask
+    | ManualText
     ;
 
 
@@ -100,6 +101,11 @@ export interface TableTask extends BaseTask {
     tableDataQuestion: Translation[][];
     tableHeadersSolution: Translation[];
     tableDataSolution: Translation[][];
+}
+
+export interface ManualText extends BaseTask {
+    type: "manualText"
+    points: 0; // Manual texts do not have points
 }
 
 export interface Translation {

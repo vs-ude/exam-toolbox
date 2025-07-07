@@ -27,6 +27,9 @@
             <app-AddTask class="task_wrapper" [name]="'Table Task'" [color]="colorProvider.getTaskColor('table')"
                 [iconName]="'table.svg'" id="new_table" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-AddTask>
+            <app-AddTask class="task_wrapper" [name]="'Manual Text'" [color]="colorProvider.getTaskColor('manualText')"
+                [iconName]="'manualText.svg'" id="new_manualText" draggable="true" (dragstart)="dragStart($event)"
+                (dragend)="drop($event)"></app-AddTask>
         </div>
 
         <div class="total_points">
@@ -114,8 +117,7 @@
             or <br>
             <span (click)="deleteTab()" class="delete_group"><u>delete this group</u> </span>
         </div>
-
-
+       
         <div *ngFor="let task of exam.tasks[currentGroupView].tasks; let i = index; ">
 
             <mat-card class="task_group_title form-card" *ngIf="i === 0" style="border-color: var(--color-text);">
@@ -125,7 +127,8 @@
             </mat-card>
 
 
-            <span class="task_number">Assignment {{currentGroupView + 1}}.{{mapToChar(i)}}</span>
+            <span *ngIf="task.type !== 'manualText'" class="task_number">Assignment {{currentGroupView + 1}}.{{calcTaskChar(i)}}</span>
+            <span *ngIf="task.type === 'manualText'" class="task_number">Manual Text </span>
 
             <!-- Multiple Choice-->
             <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'">
@@ -158,6 +161,13 @@
             <!-- Table Task -->
             <mat-card class="form-card" *ngIf="task.type === 'table'">
                 <app-table-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
+                    [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
+                    (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
+            </mat-card>
+
+            <!-- Manual Text  -->
+            <mat-card class="form-card" *ngIf="task.type === 'manualText'">
+                <app-manual-text class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
             </mat-card>
