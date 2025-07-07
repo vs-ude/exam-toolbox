@@ -695,6 +695,14 @@ function generateTasksLatex(exam: Exam): string {
       const questionDE = subTask.question.DE
       const questionEN = subTask.question.EN
 
+      if (subTask.type === "manualText") {
+        // Handle manual text task separately because it does not start with "\aufgabenteil"
+        latexContent += `\\manualText\n`
+        latexContent += `{${escapeLatex(questionDE)}}\n`
+        latexContent += `{${escapeLatex(questionEN)}}\n\n`
+        return; 
+      }
+
       // start a sub-task (\aufgabenteil)
       latexContent += `\\aufgabenteil{${subTask.points ?? 0}}\n`
       latexContent += `{${escapeLatex(questionDE)}}\n`
@@ -773,7 +781,7 @@ function generateTasksLatex(exam: Exam): string {
 
   }) // end of iterating through task groups
 
-  // console.log(latexContent) // uncomment for debugging
+  console.log(latexContent) // uncomment for debugging
   return latexContent;
 }
 
