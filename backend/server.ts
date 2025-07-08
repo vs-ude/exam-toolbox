@@ -182,7 +182,7 @@ router
       await updateMetaStudent({ vollername: 'Max Musterloesung', matrikelnummer: 0, zeigeloesung: 'yes', sprache: 'de' })
 
       // generates latex for the tasks and updates aufgaben.tex in the templates
-      const tasksContentLatex = generateTasksLatex(exam)
+      const tasksContentLatex = await generateTasksLatex(exam)
       await Deno.writeTextFile(tasksPath, tasksContentLatex)
       const examPDF = await generateExam()
 
@@ -265,21 +265,10 @@ router
 
       const fileExtension = fileName.split('.').pop()?.toLowerCase();
       let contentType = "application/octet-stream";
+      // extract all formats that are supported by LaTeX
       switch (fileExtension) {
         case "pdf":
           contentType = "application/pdf";
-          break;
-        case "txt":
-          contentType = "text/plain";
-          break;
-        case "csv":
-          contentType = "text/csv";
-          break;
-        case "json":
-          contentType = "application/json";
-          break;
-        case "zip":
-          contentType = "application/zip";
           break;
         case "jpg":
         case "jpeg":
@@ -287,12 +276,6 @@ router
           break;
         case "png":
           contentType = "image/png";
-          break;
-        case "gif":
-          contentType = "image/gif";
-          break;
-        case "svg":
-          contentType = "image/svg+xml";
           break;
         default:
           contentType = "application/octet-stream";
@@ -350,7 +333,7 @@ router
       await Deno.writeFile(examListPath, file.content)
 
       updateMetaTemplate(examJson)
-      const tasksContentLatex = generateTasksLatex(examJson)
+      const tasksContentLatex = await generateTasksLatex(examJson)
       await Deno.writeTextFile(tasksPath, tasksContentLatex)
       await generateAllExams(examListPath, basePath, outDir)
 
@@ -678,12 +661,12 @@ function escapeLatex(text?: string): string {
 }
 
 // generates the latex for the tasks
-function generateTasksLatex(exam: Exam): string {
+async function generateTasksLatex(exam: Exam): Promise<string> {
   const taskGroups = exam.tasks // get the array of task groups
   let latexContent = ""
 
   // iterate over each task group
-  taskGroups.forEach((group) => {
+  for (let group of taskGroups) {
     const groupTitleDE = group.groupTitle.DE
     const groupTitleEN = group.groupTitle.EN
 
@@ -691,7 +674,7 @@ function generateTasksLatex(exam: Exam): string {
     latexContent += `\\aufgabe{${escapeLatex(groupTitleDE)}}{${escapeLatex(groupTitleEN)}}\n\n`;
 
     // iterate over the sub-tasks within this group
-    group.tasks.forEach((subTask) => {
+    for (let subTask of group.tasks) {
       const questionDE = subTask.question.DE
       const questionEN = subTask.question.EN
 
@@ -700,7 +683,7 @@ function generateTasksLatex(exam: Exam): string {
         latexContent += `\\manualText\n`
         latexContent += `{${escapeLatex(questionDE)}}\n`
         latexContent += `{${escapeLatex(questionEN)}}\n\n`
-        return; 
+        continue; // skip to the next sub-task
       }
 
       // start a sub-task (\aufgabenteil)
@@ -753,7 +736,7 @@ function generateTasksLatex(exam: Exam): string {
         // Handle solutions using the existing \loesung command
         if (subTask.solutionLatex) {
           let solutionText = "";
-          
+
           if (subTask.solutionLatex.DE) {
             solutionText += `\\textbf{L\\"osung:}\\\\ ${subTask.solutionLatex.DE}`;
           }
@@ -761,25 +744,38 @@ function generateTasksLatex(exam: Exam): string {
             if (solutionText) solutionText += " / ";
             solutionText += `\\textbf{Solution:}\\\\ ${subTask.solutionLatex.EN}`;
           }
-          
+
           // Estimate lines needed
           const contentLength = Math.max(
             subTask.solutionLatex.DE?.length || 0,
             subTask.solutionLatex.EN?.length || 0
           );
           const numberLn = Math.max(3, Math.ceil(contentLength / 50));
-          
+
           latexContent += `\\loesung{${numberLn}}{${solutionText}}\n\n`;
         }
       }
 
+      else if (subTask.type === "pictureTask") {
+        // copy the images to the img folder
+        const questionImageName = subTask.questionPicture.urlDE.split('/').pop()
+        const solutionImageName = subTask.solutionPicture.urlDE.split('/').pop()
+        await Deno.copyFile(subTask.questionPicture.urlDE, `${basePath}/img/${questionImageName}`);
+        await Deno.copyFile(subTask.solutionPicture.urlDE, `${basePath}/img/${solutionImageName}`);
+
+
+        latexContent += `\\bildAufgabe{}`
+        latexContent += `{0.3\\textwidth}{img/${questionImageName}}{img/${solutionImageName}}\n`
+        latexContent += `\\manualText{${subTask.questionPicture.altTextDE || ""}}{${subTask.questionPicture.altTextEN || ""}}\n\n`
+      }
+
       latexContent += "\\aufgabenteilende\n\n\n";
-    });
+    };
 
     // add a clearpage after each main task group if desired (optional)
     // latexContent += "\\clearpage\n\n";
 
-  }) // end of iterating through task groups
+  } // end of iterating through task groups
 
   console.log(latexContent) // uncomment for debugging
   return latexContent;
@@ -869,14 +865,14 @@ async function updateMetaStudent(options: {
 
 async function sendEmail(to: string, subject: string, html: string): Promise<void> {
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  
+
   if (!RESEND_API_KEY) {
     console.error("RESEND_API_KEY is not set");
     return;
   }
 
   const resend = new Resend(RESEND_API_KEY);
-  
+
   try {
     await resend.emails.send({
       from: "ExamToolbox <onboarding@resend.dev>",
