@@ -769,6 +769,44 @@ async function generateTasksLatex(exam: Exam): Promise<string> {
         latexContent += `\\manualText{${subTask.questionPicture.altTextDE || ""}}{${subTask.questionPicture.altTextEN || ""}}\n\n`
       }
 
+      else if (subTask.type === "table") {
+        if (!subTask.tableDataQuestion || !subTask.tableDataSolution) {
+          console.warn("Table task missing data:", subTask.taskId);
+          continue; // skip this task if data is missing
+        }
+        const numberOfRows = subTask.tableDataQuestion[0].length;
+        const numberOfColumns = subTask.tableDataQuestion.length;
+
+        let tableFormat = "";   // e.g. "|l|l|l|l|l|l"
+        for (let i = 0; i < numberOfRows; i++) {
+          tableFormat += "|l";
+        }
+
+
+        latexContent += `\\begin{center}\n`
+        latexContent += `\\begin{tabular}`
+        latexContent += `{${tableFormat}|}\n`
+
+        latexContent += `\\hline\n`
+
+        for (let i = 0; i < numberOfColumns; i++) {
+          latexContent += `%line ${i + 1}\n`
+          for (let j = 0; j < numberOfRows; j++) {
+
+            // add & between columns
+            latexContent += j === 0 ? "" : " & ";
+
+            latexContent += `\\lineloesung`;
+            latexContent += `{~~~~~~}`;
+            latexContent += `{ ${escapeLatex(subTask.tableDataSolution[i][j].DE)} }`;
+          }
+          latexContent += ` \\\\ \\hline\n`
+        }
+
+        latexContent += `\\end{tabular}\n`
+        latexContent += `\\end{center}\n\n`
+      }
+
       latexContent += "\\aufgabenteilende\n\n\n";
     };
 
