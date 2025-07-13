@@ -179,7 +179,7 @@ router
     try {
       // update metaTemplate
       await updateMetaTemplate(exam)
-      await updateMetaStudent({ vollername: 'Max Musterloesung', matrikelnummer: 0, zeigeloesung: 'yes', sprache: 'de' })
+      await updateMetaStudent({ vollername: 'Max Musterloesung', matrikelnummer: 0, zeigeloesung: 'no', sprache: 'de' })
 
       // generates latex for the tasks and updates aufgaben.tex in the templates
       const tasksContentLatex = await generateTasksLatex(exam)
@@ -889,7 +889,7 @@ async function updateMetaStudent(options: {
 
   // Replace placeholders in meta-exam.tex
   const updatedMeta = metaTemplate
-    .replace(/\\newcommand\{\\zeigeloesung\}\{.*?\}/, `\\newcommand{\\zeigeloesung}{${zeigeloesung ? 'yes' : 'no'}}`)
+    .replace(/\\newcommand\{\\zeigeloesung\}\{.*?\}/, `\\newcommand{\\zeigeloesung}{${zeigeloesung === 'yes' ? 'yes' : 'no'}}`)
     .replace(/\\newcommand\{\\sprache\}\{.*?\}/, `\\newcommand{\\sprache}{${sprache || 'de'}}`)
     .replace(/\\newcommand\{\\randomexamnumber\}\{.*?\}/, `\\newcommand{\\randomexamnumber}{${randomexamnumber || '7PYT'}}`)
     .replace(/\\newcommand\{\\sequenznummer\}\{.*?\}/, `\\newcommand{\\sequenznummer}{${sequenznummer || '6'}}`)
