@@ -2,7 +2,7 @@
 import { Application, Router } from "https://deno.land/x/oak@v10.5.0/mod.ts";
 // @ts-ignore
 import { MongoClient } from "https://deno.land/x/mongo/mod.ts";
-import { Exam, Task } from "./exam.ts";
+import { Exam, Task, Translation } from "./exam.ts";
 import { FileTracker } from "./fileTracker.ts";
 import { ObjectId } from "https://deno.land/x/mongo@v0.33.0/deps.ts";
 import { ZipWriter } from "https://deno.land/x/zipjs/index.js";
@@ -179,7 +179,7 @@ router
     try {
       // update metaTemplate
       await updateMetaTemplate(exam)
-      await updateMetaStudent({ vollername: 'Max Musterloesung', matrikelnummer: 0, zeigeloesung: 'no', sprache: 'de' })
+      await updateMetaStudent({ vollername: 'Max Musterloesung', matrikelnummer: 0, zeigeloesung: 'yes', sprache: 'de' })
 
       // generates latex for the tasks and updates aufgaben.tex in the templates
       const tasksContentLatex = await generateTasksLatex(exam)
@@ -782,6 +782,19 @@ async function generateTasksLatex(exam: Exam): Promise<string> {
           tableFormat += "|l";
         }
 
+        //find longest solution text to set the column width
+        const longestSolution =
+          subTask.tableDataSolution
+            .map((col) =>
+              col.reduce(
+                (maxLength, cell) =>
+                  maxLength.DE.length > cell.DE.length ? maxLength : cell
+              )
+            )
+            .reduce(
+              (maxLength, cell) =>
+                maxLength.DE.length > cell.DE.length ? maxLength : cell
+            ).DE.length;
 
         latexContent += `\\begin{center}\n`
         latexContent += `\\begin{tabular}`
@@ -797,7 +810,7 @@ async function generateTasksLatex(exam: Exam): Promise<string> {
             latexContent += j === 0 ? "" : " & ";
 
             latexContent += `\\lineloesung`;
-            latexContent += `{~~~~~~}`;
+            latexContent += `{${"~".repeat(longestSolution)}}`;
             latexContent += `{ ${escapeLatex(subTask.tableDataSolution[i][j].DE)} }`;
           }
           latexContent += ` \\\\ \\hline\n`
