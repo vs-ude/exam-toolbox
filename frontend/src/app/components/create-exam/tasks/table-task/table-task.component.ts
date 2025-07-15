@@ -34,7 +34,7 @@ export class TableTaskComponent extends BaseTaskComponent {
 
   @Output() taskChangeEvent = new EventEmitter<Task>();
 
-  public hasHeader: boolean = true;
+  public hasHeader: boolean = false;
 
   public task: TableTask = {
     taskId: "",
@@ -56,7 +56,7 @@ export class TableTaskComponent extends BaseTaskComponent {
     if (this.preTask) {
       this.task = this.preTask as TableTask;
       console.log(this.task)
-      this.hasHeader = !!this.task.tableHeadersQuestion && this.task.tableHeadersQuestion.length > 0;
+      //this.hasHeader = !!this.task.tableHeadersQuestion && this.task.tableHeadersQuestion.length > 0;
       return;
     }
     this.task.taskId = this.taskId;

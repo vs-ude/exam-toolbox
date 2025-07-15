@@ -810,7 +810,11 @@ async function generateTasksLatex(exam: Exam): Promise<string> {
             latexContent += j === 0 ? "" : " & ";
 
             latexContent += `\\lineloesung`;
-            latexContent += `{${"~".repeat(longestSolution)}}`;
+            if (subTask.tableDataQuestion[i][j].DE) {
+              latexContent += `{${escapeLatex(subTask.tableDataQuestion[i][j].DE)}}`
+            } else {
+              latexContent += `{${"~".repeat(longestSolution)}}`;
+            }
             latexContent += `{ ${escapeLatex(subTask.tableDataSolution[i][j].DE)} }`;
           }
           latexContent += ` \\\\ \\hline\n`
