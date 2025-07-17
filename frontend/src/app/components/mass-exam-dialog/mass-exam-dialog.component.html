@@ -1,0 +1,7 @@
+<h1>Generate Exams</h1>
+<hr><br>
+<mat-dialog-content class="mat-typography">
+  <p>Upload a list of students to generate individual exams.</p>
+  <input type="file" (change)="onFileSelected($event)" /><br><br>
+  <button mat-button color="primary" (click)="generate()">Generate & Download ZIP</button>
+</mat-dialog-content>

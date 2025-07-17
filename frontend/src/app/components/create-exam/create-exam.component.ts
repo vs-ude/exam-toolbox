@@ -21,6 +21,8 @@ import { LatexTaskComponent } from './tasks/latex-task/latex-task.component';
 import { TableTaskComponent } from './tasks/table-task/table-task.component';
 import { TaskBuilderService } from '../../services/task-builder.service';
 import { ManualTextComponent } from './tasks/manual-text/manual-text.component';
+import { MatDialog } from '@angular/material/dialog';
+import { MassExamDialogComponent } from '../mass-exam-dialog/mass-exam-dialog.component';
 
 
 
@@ -73,6 +75,7 @@ export class CreateExamComponent {
     private themeService: ThemeToggleService,
     public colorProvider: ColorProviderService,
     private taskBuilder: TaskBuilderService,
+    private dialog: MatDialog,
   ) {
     this.importExam();
     this.importPoolTasks();
@@ -323,6 +326,16 @@ export class CreateExamComponent {
 
   private mapTaskIndexToChar(index: number) {
     return String.fromCharCode(97 + index % 26);
+  }
+
+  onMassExam(){
+    this.checkIfValid()
+
+    this.dialog.open(MassExamDialogComponent, {
+      width: '50%', 
+      height: '80%',
+      data: { exam: this.exam }
+    })
   }
 
 }
