@@ -43,7 +43,6 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
       EN: "",
     },
     questionLatex: { DE: "", EN: "" },
-    solutionLatex: { DE: "", EN: "" },
     points: 0,
     tags: [],
     createdBy: "placeholder",

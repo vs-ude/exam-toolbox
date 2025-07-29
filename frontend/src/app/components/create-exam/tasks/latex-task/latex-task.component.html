@@ -48,73 +48,15 @@
 
 
 <!-- Latex Question Input -->
-<div class="form-body" *ngIf="!bilingual">
-  <span class="latex_input_label" matTooltip="Code has to be wrapped in '\(' '\)'">LaTeX Question:</span>
+<div class="form-body" >
+  <span class="latex_input_label">LaTeX content in this format ->  \\(  content \\):</span>
   <textarea class="latex_input" [(ngModel)]="this.task.questionLatex.DE" (blur)="updateTask()"></textarea>
-  <div *ngIf=" isValidMathString(task.questionLatex.DE) " class="latex_preview_container">
+  <div  class="latex_preview_container">
     <span class="latex_input_label">Preview:</span>
     <app-math-jax-paragraph mathString="{{ task.questionLatex.DE }}"></app-math-jax-paragraph>
   </div>
 
 </div>
-
-
-
-
-<!-- Latex Solution Input -->
-<div class="form-body" *ngIf="!bilingual">
-  <span class="latex_input_label" matTooltip="Code has to be wrapped in '\(' '\)'">LaTeX Solution:</span>
-  <textarea class="latex_input" [(ngModel)]="task.solutionLatex.DE" (blur)="updateTask()"></textarea>
-
-  <div *ngIf="isValidMathString(task.solutionLatex.DE)">
-    <span class="latex_input_label">Preview:</span>
-    <app-math-jax-paragraph mathString="{{ task.solutionLatex.DE }}"></app-math-jax-paragraph>
-  </div>
-
-</div>
-
-
-
-
-
-
-
-
-<!-- Bilingual -->
-<!-- Latex Question Input -->
-<div class="form-body bilingual_input_container" *ngIf="bilingual">
-
-  <span class="latex_input_label">
-    <span class="language_icon"><img src="german.svg" /></span>
-    LaTeX Frage:
-  </span>
-  <textarea class="latex_input" [(ngModel)]="this.task.questionLatex.DE" (blur)="updateTask()"></textarea>
-
-  <span class="latex_input_label" style="margin-top: 16px;">
-    <span class="language_icon"><img src="english.svg" /></span>
-    LaTeX Question:
-  </span>
-  <textarea class="latex_input" [(ngModel)]="this.task.questionLatex.EN" (blur)="updateTask()"></textarea>
-</div>
-
-<!-- Latex Solution Input -->
-<div class="form-body bilingual_input_container" *ngIf="bilingual">
-
-  <span class="latex_input_label">
-    <span class="language_icon"><img src="german.svg" /></span>
-    LaTeX Lösung:
-  </span>
-  <textarea class="latex_input" [(ngModel)]="this.task.solutionLatex.DE" (blur)="updateTask()"></textarea>
-
-  <span class="latex_input_label" style="margin-top: 16px;">
-    <span class="language_icon"><img src="english.svg" /></span>
-    LaTeX Solution:
-  </span>
-  <textarea class="latex_input" [(ngModel)]="this.task.solutionLatex.EN" (blur)="updateTask()"></textarea>
-
-</div>
-
-
 
 
 
