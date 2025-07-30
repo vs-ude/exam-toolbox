@@ -86,7 +86,7 @@
                 <div class="icon_wrapper ">
                     <mat-icon aria-hidden="false" fontIcon="school"></mat-icon>
                 </div>
-                <mat-select class="selectSemester" placeholder="Select Semester" [(value)]="exam.semester"
+                <mat-select class="selectSemester" placeholder="Select Semester" [(ngModel)]="exam.semester"
                     panelClass="semesterSelect">
                     <mat-option *ngFor="let semester of semesters" [value]="semester">
                         {{ semester }}

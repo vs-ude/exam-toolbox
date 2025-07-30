@@ -79,11 +79,14 @@ export class CreateExamComponent {
   ) {
     this.importExam();
     this.importPoolTasks();
+    this.semesters = this.getSemesters();
 
 
     this.themeService.themeChanged$.subscribe((theme: Theme) => {
       this.lightTheme = theme === Theme.LIGHT ? true : false;
     })
+
+    
 
   }
 
@@ -328,15 +331,41 @@ export class CreateExamComponent {
     return String.fromCharCode(97 + index % 26);
   }
 
-  onMassExam(){
+  onMassExam() {
     this.checkIfValid()
 
     this.dialog.open(MassExamDialogComponent, {
-      width: '50%', 
+      width: '50%',
       height: '80%',
       data: { exam: this.exam }
     })
   }
+
+  private getSemesters() {
+    const currentDate = new Date();
+    const month = currentDate.getMonth() + 1; // getMonth() returns 0-11, so we add 1
+    const year = currentDate.getFullYear();
+
+    let formatYear = (year: number): string => {
+      return year.toString().slice(-2); 
+    }
+
+    if (month >= 10 || month <= 3) {
+      return [
+      `WS ${formatYear(year)}/${formatYear(year + 1)}`,
+      `SS ${formatYear(year + 1)}`,
+      `WS ${formatYear(year + 1)}/${formatYear(year + 2)}`
+      ];
+    } else {
+      return [
+      `SS ${formatYear(year)}`,
+      `WS ${formatYear(year)}/${formatYear(year + 1)}`,
+      `SS ${formatYear(year + 1)}`
+      ];
+    }
+  }
+
+
 
 }
 
