@@ -92,7 +92,6 @@ export interface Image {
 export interface LatexTask extends BaseTask {
     type: "latex";
     questionLatex: Translation;
-    solutionLatex: Translation;
 }
 
 export interface TableTask extends BaseTask {

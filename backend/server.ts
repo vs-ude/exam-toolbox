@@ -732,28 +732,6 @@ async function generateTasksLatex(exam: Exam): Promise<string> {
         if (subTask.questionLatex?.EN) {
           latexContent += subTask.questionLatex.EN + "\n\n";
         }
-
-        // Handle solutions using the existing \loesung command
-        if (subTask.solutionLatex) {
-          let solutionText = "";
-
-          if (subTask.solutionLatex.DE) {
-            solutionText += `\\textbf{L\\"osung:}\\\\ ${subTask.solutionLatex.DE}`;
-          }
-          if (subTask.solutionLatex.EN) {
-            if (solutionText) solutionText += " / ";
-            solutionText += `\\textbf{Solution:}\\\\ ${subTask.solutionLatex.EN}`;
-          }
-
-          // Estimate lines needed
-          const contentLength = Math.max(
-            subTask.solutionLatex.DE?.length || 0,
-            subTask.solutionLatex.EN?.length || 0
-          );
-          const numberLn = Math.max(3, Math.ceil(contentLength / 50));
-
-          latexContent += `\\loesung{${numberLn}}{${solutionText}}\n\n`;
-        }
       }
 
       else if (subTask.type === "pictureTask") {
