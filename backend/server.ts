@@ -594,19 +594,28 @@ async function generateAllExams(examListPath: string, basePath: string, outDir: 
     let examSolutionLog = ""
     const logPath = `${basePath}/exam.log`
 
+    const counterStart = Math.floor(Math.random() * 100)
+    let counter = counterStart + 1
+
     // generating german exams
     for (const student of studentData) {
       let fullName = `${student.firstName} ${student.lastName}`
-      await updateMetaStudent({ vollername: fullName, matrikelnummer: student.studentId, zeigeloesung: 'no', sprache: 'de' })
+      let randomNumber = genRandomNumber('de', counter)
+      await updateMetaStudent({ vollername: fullName, matrikelnummer: student.studentId, zeigeloesung: 'no', sprache: 'de', randomexamnumber: randomNumber })
       examDE.push(await generateExam())
+      counter++
     }
     examDELog = new TextDecoder().decode(await Deno.readFile(logPath)) // save log file
+
+    counter = counterStart + 1
 
     // generating english exams
     for (const student of studentData) {
       let fullName = `${student.firstName} ${student.lastName}`
-      await updateMetaStudent({ vollername: fullName, matrikelnummer: student.studentId, zeigeloesung: 'no', sprache: 'en' })
-      examEN.push(await generateExam());
+      let randomNumber = genRandomNumber('en', counter)
+      await updateMetaStudent({ vollername: fullName, matrikelnummer: student.studentId, zeigeloesung: 'no', sprache: 'en', randomexamnumber: randomNumber })
+      examEN.push(await generateExam())
+      counter++
     }
     examENLog = new TextDecoder().decode(await Deno.readFile(logPath)) // save log file
 
@@ -895,7 +904,7 @@ async function updateMetaStudent(options: {
   sequenznummer?: number,
   vollername?: string,
   matrikelnummer?: number,
-  uploadurl?: string
+  uploadurl?: string,
 } = {}
 ) {
   const { zeigeloesung, sprache, randomexamnumber, sequenznummer, vollername, matrikelnummer, uploadurl } = options
@@ -939,4 +948,41 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
   } catch (error) {
     console.error("Resend error:", error);
   }
+}
+
+// Calculate the checksum. A valid number should have a checksum of 1.
+function checksum(number: string): number {
+  const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const modulus = alphabet.length
+  let check = Math.floor(modulus / 2)
+  
+  for (const char of number) {
+    const charIndex = alphabet.indexOf(char)
+    if (charIndex === -1) continue // ignores chars not in the alphabet
+    const val = check || modulus
+    check = (((val * 2) % (modulus + 1)) + charIndex) % modulus
+  }
+  
+  return check
+}
+
+// With the provided number, calculate the extra digit that should be appended to make it a valid number.
+function calc_check_digit(number: string): string {
+  const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const modulus = alphabet.length
+  const cs = checksum(number) || modulus
+  
+  let index = (1 - (cs * 2) % (modulus + 1))
+  index = ((index % modulus) + modulus) % modulus // makes sure the index is not negative, because Typescript modulo is not really modulo (with negative numbers).
+
+  return alphabet[index]
+}
+
+// generates a random exam number
+function genRandomNumber(lang: 'de'|'en', counter: number): string {
+  const paddedCount = counter.toString().padStart(4, "0")
+  const langPrefix = lang === 'de' ? '1' : '2'
+  const num = parseInt(langPrefix + paddedCount, 10).toString(36).toUpperCase()
+  const parity = calc_check_digit(num)
+  return num + parity
 }
