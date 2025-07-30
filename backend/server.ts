@@ -594,6 +594,10 @@ async function generateAllExams(examListPath: string, basePath: string, outDir: 
     let examSolutionLog = ""
     const logPath = `${basePath}/exam.log`
 
+    // to add them into the csv at the end
+    let deRandomExamNumbers: string[] = []
+    let enRandomExamNumbers: string[] = []
+
     const counterStart = Math.floor(Math.random() * 100)
     let counter = counterStart + 1
 
@@ -601,6 +605,7 @@ async function generateAllExams(examListPath: string, basePath: string, outDir: 
     for (const student of studentData) {
       let fullName = `${student.firstName} ${student.lastName}`
       let randomNumber = genRandomNumber('de', counter)
+      deRandomExamNumbers.push(randomNumber) // for adding the number in the csv later
       await updateMetaStudent({ vollername: fullName, matrikelnummer: student.studentId, zeigeloesung: 'no', sprache: 'de', randomexamnumber: randomNumber })
       examDE.push(await generateExam())
       counter++
@@ -613,6 +618,7 @@ async function generateAllExams(examListPath: string, basePath: string, outDir: 
     for (const student of studentData) {
       let fullName = `${student.firstName} ${student.lastName}`
       let randomNumber = genRandomNumber('en', counter)
+      enRandomExamNumbers.push(randomNumber) // for adding the number in the csv later
       await updateMetaStudent({ vollername: fullName, matrikelnummer: student.studentId, zeigeloesung: 'no', sprache: 'en', randomexamnumber: randomNumber })
       examEN.push(await generateExam())
       counter++
@@ -632,7 +638,7 @@ async function generateAllExams(examListPath: string, basePath: string, outDir: 
     const csvHeader = "Sitzplatz,Random,Matrikelnr,Name,Anwesend? (X)\n"
     let csvContent = csvHeader;
     studentData.forEach((student, index) => {
-      const randomCode = Math.random().toString(36).substring(2, 6).toUpperCase() + "/" + Math.random().toString(36).substring(2, 6).toUpperCase()
+      const randomCode = deRandomExamNumbers[index] + "/" + enRandomExamNumbers[index]
       csvContent += `${index + 1},${randomCode},${student.studentId},${student.firstName} ${student.lastName},\n`
     });
     console.log("Attendance list generated.")
