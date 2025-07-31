@@ -662,6 +662,8 @@ function escapeLatex(text?: string): string {
 
 // generates the latex for the tasks
 async function generateTasksLatex(exam: Exam): Promise<string> {
+  await clearLatexIMGFolder() // remove old images from previous runs
+
   const taskGroups = exam.tasks // get the array of task groups
   let latexContent = ""
 
@@ -916,5 +918,22 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
     console.log("Email sent via Resend");
   } catch (error) {
     console.error("Resend error:", error);
+  }
+}
+
+async function clearLatexIMGFolder() {
+  try {
+    const imgPath = `${basePath}/img`;
+    for await (const entry of Deno.readDir(imgPath)) {
+      if (
+        entry.isFile &&
+        !["kreuze.png", "Unilogo.jpg", "vslogo.png", "background-svg.pdf", "background-svg-muster.pdf", "background-svg-muster-first.pdf"].includes(entry.name)
+      ) {
+        await Deno.remove(`${imgPath}/${entry.name}`);
+      }
+    }
+
+  } catch (error) {
+    console.error("Error clearing latex img folder:", error);
   }
 }
