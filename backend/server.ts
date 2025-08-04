@@ -585,6 +585,7 @@ async function generateAllExams(examListPath: string, basePath: string, outDir: 
       range: 5, // skip first 5 rows (metadata and headers)
     }).filter(student => student.firstName && student.lastName) // ensure that no other rows like empty rows are included
 
+    studentData.sort((a, b) => a.studentId - b.studentId);
     console.log("Students number:", studentData.length)
 
     let examDE = []
@@ -602,11 +603,19 @@ async function generateAllExams(examListPath: string, basePath: string, outDir: 
     let counter = counterStart + 1
 
     // generating german exams
-    for (const student of studentData) {
+    for (const [index, student] of studentData.entries()) {
+      const seatNumber = index + 1; // generate seat number (1-based index)
       let fullName = `${student.firstName} ${student.lastName}`
       let randomNumber = genRandomNumber('de', counter)
-      deRandomExamNumbers.push(randomNumber) // for adding the number in the csv later
-      await updateMetaStudent({ vollername: fullName, matrikelnummer: student.studentId, zeigeloesung: 'no', sprache: 'de', randomexamnumber: randomNumber })
+      deRandomExamNumbers.push(randomNumber)
+      await updateMetaStudent({
+        vollername: fullName,
+        matrikelnummer: student.studentId,
+        zeigeloesung: 'no',
+        sprache: 'de',
+        randomexamnumber: randomNumber,
+        sequenznummer: seatNumber // Pass seat number to meta
+      })
       examDE.push(await generateExam())
       counter++
     }
@@ -615,22 +624,35 @@ async function generateAllExams(examListPath: string, basePath: string, outDir: 
     counter = counterStart + 1
 
     // generating english exams
-    for (const student of studentData) {
+    for (const [index, student] of studentData.entries()) {
+      const seatNumber = index + 1; // Same seat number as for German exam
       let fullName = `${student.firstName} ${student.lastName}`
       let randomNumber = genRandomNumber('en', counter)
-      enRandomExamNumbers.push(randomNumber) // for adding the number in the csv later
-      await updateMetaStudent({ vollername: fullName, matrikelnummer: student.studentId, zeigeloesung: 'no', sprache: 'en', randomexamnumber: randomNumber })
+      enRandomExamNumbers.push(randomNumber)
+      await updateMetaStudent({
+        vollername: fullName,
+        matrikelnummer: student.studentId,
+        zeigeloesung: 'no',
+        sprache: 'en',
+        randomexamnumber: randomNumber,
+        sequenznummer: seatNumber // Pass seat number to meta
+      })
       examEN.push(await generateExam())
       counter++
     }
-    examENLog = new TextDecoder().decode(await Deno.readFile(logPath)) // save log file
+    examENLog = new TextDecoder().decode(await Deno.readFile(logPath))
 
     // merge all generated exams to one german and english one
     const examDEMerged = await mergePDFs(examDE)
     const examENMerged = await mergePDFs(examEN)
 
-    // generate solution exam
-    await updateMetaStudent({ vollername: 'Max Musterloesung', matrikelnummer: 0, zeigeloesung: 'yes', sprache: 'de' })
+    // generate solution exam (no seat number)
+    await updateMetaStudent({
+      vollername: 'Max Musterloesung',
+      matrikelnummer: 0,
+      zeigeloesung: 'yes',
+      sprache: 'de'
+    })
     const examSolution = await generateExam();
     examSolutionLog = new TextDecoder().decode(await Deno.readFile(logPath))
 
@@ -638,8 +660,9 @@ async function generateAllExams(examListPath: string, basePath: string, outDir: 
     const csvHeader = "Sitzplatz,Random,Matrikelnr,Name,Anwesend? (X)\n"
     let csvContent = csvHeader;
     studentData.forEach((student, index) => {
+      const seatNumber = index + 1;
       const randomCode = deRandomExamNumbers[index] + "/" + enRandomExamNumbers[index]
-      csvContent += `${index + 1},${randomCode},${student.studentId},${student.firstName} ${student.lastName},\n`
+      csvContent += `${seatNumber},${randomCode},${student.studentId},${student.firstName} ${student.lastName},\n`
     });
     console.log("Attendance list generated.")
 
