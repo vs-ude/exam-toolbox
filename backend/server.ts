@@ -14,13 +14,12 @@ import { crypto } from "jsr:@std/crypto";
 import { encodeHex } from "jsr:@std/encoding/hex";
 import * as fs from "https://deno.land/std/fs/mod.ts";
 import { Resend } from "npm:resend@2.0.0";
-
-
-
-
+import { copy } from "https://deno.land/std@0.224.0/fs/copy.ts";
 
 
 const basePath = "/app/ExamTemplate"
+
+let isGenerating = false;
 
 // MongoDB setup
 const client = new MongoClient();
@@ -174,17 +173,31 @@ router
     }
   })
   .post("/api/generate-exam", async (ctx) => {
-    const exam: Exam = await ctx.request.body().value
-    const tasksPath = `${basePath}/aufgaben.tex`
+    if (isGenerating) { // avoids race conditions when button is presses repeatedly
+        ctx.response.status = 429; // statuscode for too many requests
+        ctx.response.body = { message: "Another exam generation is already in progress. Please wait." };
+        return;
+    }
+    isGenerating = true
+
     try {
+      const exam: Exam = await ctx.request.body().value
+      
+      // temp dir for avoiding race conditions when generating the PDF's is paralelized
+      const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
+      await copy(basePath, tempDir, { overwrite: true });
+      
+      const tasksPath = `${tempDir}/aufgaben.tex`;
+
       // update metaTemplate
-      await updateMetaTemplate(exam)
-      await updateMetaStudent({ vollername: 'Max Musterloesung', matrikelnummer: 0, zeigeloesung: 'yes', sprache: 'de' })
+      await updateMetaTemplate(exam, tempDir)
+      await updateMetaStudent({ vollername: 'Max Musterloesung', matrikelnummer: 0, zeigeloesung: 'yes', sprache: 'de' }, tempDir)
 
       // generates latex for the tasks and updates aufgaben.tex in the templates
-      const tasksContentLatex = await generateTasksLatex(exam)
+      const tasksContentLatex = await generateTasksLatex(exam, tempDir)
       await Deno.writeTextFile(tasksPath, tasksContentLatex)
-      const examPDF = await generateExam()
+      
+      const examPDF = await generateExam(tempDir)
 
       // tell the frontend that this is an PDF
       ctx.response.headers.set("Content-Type", "application/pdf")
@@ -194,6 +207,8 @@ router
     } catch (error) {
       ctx.response.status = 500;
       ctx.response.body = { message: 'Error generating Exam PDF', error }
+    } finally {
+        isGenerating = false
     }
   })
   .post("/api/upload", async (ctx) => {
@@ -292,84 +307,78 @@ router
     }
   })
   .post("/api/generate-exams", async (ctx) => {
-    const tempDir = await Deno.makeTempDir({
-      dir: `${basePath}`,
-      prefix: "exam_gen_"
+    if (isGenerating) { // avoids race conditions when button is presses repeatedly
+      ctx.response.status = 429; // statuscode for too many requests
+      ctx.response.body = { message: "Another exam generation is already in progress. Please wait." };
+      return;
+    }
+    isGenerating = true
+
+    // temp dir for mass-generation
+    const mainTempDir = await Deno.makeTempDir({
+        dir: Deno.cwd(), // use current working directory
+        prefix: "exam_gen_main_"
     });
-    const tasksPath = `${basePath}/aufgaben.tex`
 
     try {
       const body = ctx.request.body({ type: "form-data" })
       const formData = await body.value.read({ maxSize: 10 * 1024 * 1024 })
 
       const examJson = JSON.parse(formData.fields.exam)
-
       const file = formData.files?.find(f => f.name === "list")
-      console.log(examJson)
-      console.log(file)
 
       if (!file || !examJson) {
         ctx.response.status = 400
         ctx.response.body = { message: "Missing file or exam" }
         return
       }
-
-      const tempDir = await Deno.makeTempDir({
-        dir: `${basePath}`,
-        prefix: "exam_gen_"
-      });
-
-      const outDir = `${tempDir}/out`;
-      await Deno.mkdir(outDir);
-      console.log("Created outDir: ", outDir);
-
-      const examListPath = `${tempDir}/${file.originalName}`
-
+      
+      const outDir = `${mainTempDir}/out`
+      await Deno.mkdir(outDir)
+      console.log("Created outDir: ", outDir)
+      
+      const examListPath = `${mainTempDir}/${file.originalName}`
       if (!file.content) {
-        ctx.response.status = 400
-        ctx.response.body = { message: "Missing list content" }
-        return
+          ctx.response.status = 400;
+          ctx.response.body = { message: "Missing list content" }
+          return
       }
       await Deno.writeFile(examListPath, file.content)
 
-      updateMetaTemplate(examJson)
-      const tasksContentLatex = await generateTasksLatex(examJson)
-      await Deno.writeTextFile(tasksPath, tasksContentLatex)
-      await generateAllExams(examListPath, basePath, outDir)
+      // set what is common over all exams
+      const templateDir = `${mainTempDir}/template`
+      await copy(basePath, templateDir, { overwrite: true })
+      await updateMetaTemplate(examJson, templateDir)
+      const tasksContentLatex = await generateTasksLatex(examJson, templateDir)
+      await Deno.writeTextFile(`${templateDir}/aufgaben.tex`, tasksContentLatex)
 
-      const zipFilePath = `${tempDir}/exams_output.zip`
+      await generateAllExams(examListPath, templateDir, outDir)
+      
+      const zipFilePath = `${mainTempDir}/exams_output.zip`
 
-      // outdir to zip
       try {
         await createZipArchiveFromDirectory(outDir, zipFilePath)
       } catch (zipError) {
         console.error("Zip creation error:", zipError)
-        await Deno.remove(tempDir, { recursive: true }).catch(e => console.error("Error cleaning up temp dir after zip error:", e))
         ctx.response.status = 500
         ctx.response.body = { message: "Error creating ZIP archive", error: zipError instanceof Error ? zipError.message : String(zipError) }
         return
       }
 
-      // read zipfile of mass-exam
       const zipFileBytes = await Deno.readFile(zipFilePath)
       console.log("Zip file created:", zipFilePath)
 
       // send Email
-      console.log("Attempting to send email...");
-
       try {
         await sendEmail(
-          ctx.state.user.email, // Dynamic recipient in real usage
+          ctx.state.user.email,
           "Your exam is ready for download",
-          `<p>Hello,</p>
-          <p>Your generated exams are ready for download.</p>`
+          `<p>Hello,</p><p>Your generated exams are ready for download.</p>`
         );
         console.log("Email sent successfully");
       } catch (error) {
         console.error("Sending the Email failed:", error)
       }
-
-      console.log("After email send attempt");
 
       ctx.response.headers.set("Content-Type", "application/zip")
       ctx.response.headers.set("Content-Disposition", `attachment; filename="all-exams.zip"`)
@@ -387,7 +396,8 @@ router
         error: error instanceof Error ? error.message : String(error),
       };
     } finally {
-      await Deno.remove(tempDir, { recursive: true }).catch(e => console.error("Error cleaning up temp dir in finally:", e));
+      await Deno.remove(mainTempDir, { recursive: true }).catch(e => console.error("Error cleaning up temp dir in finally:", e));
+      isGenerating = false
     }
   })
   .get("/api/taskPool", async (ctx) => {
@@ -520,9 +530,9 @@ await app.listen({ port });
 
 
 
-async function generateExam(): Promise<Uint8Array> {
-  const examTexPath = `${basePath}/exam.tex`
-  const examPdfPath = `${basePath}/exam.pdf`
+async function generateExam(workingDir: string): Promise<Uint8Array> {
+  const examTexPath = `${workingDir}/exam.tex`
+  const examPdfPath = `${workingDir}/exam.pdf`
 
   try {
     // 3 passes of pdflatex to resolve all references
@@ -532,7 +542,7 @@ async function generateExam(): Promise<Uint8Array> {
           "-interaction=nonstopmode", // Continue on errors without stopping
           "-halt-on-error",
           "-output-directory",
-          basePath,
+          workingDir,
           examTexPath,
         ],
         stdout: "piped",
@@ -543,9 +553,8 @@ async function generateExam(): Promise<Uint8Array> {
       const stdoutStr = new TextDecoder().decode(stdout)
       const stderrStr = new TextDecoder().decode(stderr)
 
-      console.log(`pdflatex pass ${i + 1} output:\n${stdoutStr}`)
       if (stderrStr) {
-        console.error(`pdflatex pass ${i + 1} errors:\n${stderrStr}`)
+        console.error(`pdflatex pass ${i + 1} errors in ${workingDir}:\n${stderrStr}`)
       }
     }
 
@@ -566,7 +575,8 @@ async function generateExam(): Promise<Uint8Array> {
   }
 }
 
-async function generateAllExams(examListPath: string, basePath: string, outDir: string) {
+// generates all exams (parelelized) and more
+async function generateAllExams(examListPath: string, templateDir: string, outDir: string) {
   try {
     // read excel file
     const fileContent = await Deno.readFile(examListPath)
@@ -585,76 +595,109 @@ async function generateAllExams(examListPath: string, basePath: string, outDir: 
       range: 5, // skip first 5 rows (metadata and headers)
     }).filter(student => student.firstName && student.lastName) // ensure that no other rows like empty rows are included
 
-    studentData.sort((a, b) => a.studentId - b.studentId);
+    studentData.sort((a, b) => a.studentId - b.studentId)
     console.log("Students number:", studentData.length)
 
-    let examDE = []
-    let examEN = []
     let examDELog = ""
     let examENLog = ""
     let examSolutionLog = ""
-    const logPath = `${basePath}/exam.log`
 
-    // to add them into the csv at the end
-    let deRandomExamNumbers: string[] = []
-    let enRandomExamNumbers: string[] = []
-
+    const deRandomExamNumbers: string[] = []
+    const enRandomExamNumbers: string[] = []
     const counterStart = Math.floor(Math.random() * 100)
-    let counter = counterStart + 1
 
-    // generating german exams
-    for (const [index, student] of studentData.entries()) {
-      const seatNumber = index + 1; // generate seat number (1-based index)
-      let fullName = `${student.firstName} ${student.lastName}`
-      let randomNumber = genRandomNumber('de', counter)
-      deRandomExamNumbers.push(randomNumber)
-      await updateMetaStudent({
-        vollername: fullName,
-        matrikelnummer: student.studentId,
-        zeigeloesung: 'no',
-        sprache: 'de',
-        randomexamnumber: randomNumber,
-        sequenznummer: seatNumber // Pass seat number to meta
-      })
-      examDE.push(await generateExam())
-      counter++
-    }
-    examDELog = new TextDecoder().decode(await Deno.readFile(logPath)) // save log file
+    // --- GERMAN EXAMS (PARALLEL) ---
+    console.log("Generating German exams in parallel...")
+    const germanExamPromises = studentData.map((student, index) => {
+        const seatNumber = index + 1
+        let fullName = `${student.firstName} ${student.lastName}`
+        let counter = counterStart + 1 + index
+        let randomNumber = genRandomNumber('de', counter)
+        deRandomExamNumbers[index] = randomNumber
 
-    counter = counterStart + 1
+        return (async () => {
+            const studentTempDir = await Deno.makeTempDir({ prefix: `student_de_${student.studentId}_` })
+            await copy(templateDir, studentTempDir, { overwrite: true })
+            await updateMetaStudent({
+                vollername: fullName,
+                matrikelnummer: student.studentId,
+                zeigeloesung: 'no',
+                sprache: 'de',
+                randomexamnumber: randomNumber,
+                sequenznummer: seatNumber
+            }, studentTempDir);
+            const pdfBytes = await generateExam(studentTempDir)
+            await Deno.remove(studentTempDir, { recursive: true })
+            return pdfBytes
+        })()
+    })
+    const examDE = await Promise.all(germanExamPromises)
+    console.log("All German exams generated.")
 
-    // generating english exams
-    for (const [index, student] of studentData.entries()) {
-      const seatNumber = index + 1; // Same seat number as for German exam
-      let fullName = `${student.firstName} ${student.lastName}`
-      let randomNumber = genRandomNumber('en', counter)
-      enRandomExamNumbers.push(randomNumber)
-      await updateMetaStudent({
-        vollername: fullName,
-        matrikelnummer: student.studentId,
-        zeigeloesung: 'no',
-        sprache: 'en',
-        randomexamnumber: randomNumber,
-        sequenznummer: seatNumber // Pass seat number to meta
-      })
-      examEN.push(await generateExam())
-      counter++
-    }
-    examENLog = new TextDecoder().decode(await Deno.readFile(logPath))
+    // generate one more time just to get a log file
+    const deLogDir = await Deno.makeTempDir({ prefix: "log_gen_de_" })
+    await copy(templateDir, deLogDir, { overwrite: true })
+    await updateMetaStudent({ sprache: 'de' }, deLogDir)
+    await generateExam(deLogDir)
+    examDELog = await Deno.readTextFile(`${deLogDir}/exam.log`)
+    await Deno.remove(deLogDir, { recursive: true })
+    console.log("German log file generated.")
 
-    // merge all generated exams to one german and english one
+    // --- ENGLISH EXAMS (PARALLEL) ---
+    console.log("Generating English exams in parallel...");
+    const englishExamPromises = studentData.map((student, index) => {
+        const seatNumber = index + 1
+        let fullName = `${student.firstName} ${student.lastName}`
+        let counter = counterStart + 1 + index
+        let randomNumber = genRandomNumber('en', counter)
+        enRandomExamNumbers[index] = randomNumber
+
+        return (async () => {
+            const studentTempDir = await Deno.makeTempDir({ prefix: `student_en_${student.studentId}_` })
+            await copy(templateDir, studentTempDir, { overwrite: true })
+            await updateMetaStudent({
+                vollername: fullName,
+                matrikelnummer: student.studentId,
+                zeigeloesung: 'no',
+                sprache: 'en',
+                randomexamnumber: randomNumber,
+                sequenznummer: seatNumber
+            }, studentTempDir)
+            const pdfBytes = await generateExam(studentTempDir)
+            await Deno.remove(studentTempDir, { recursive: true })
+            return pdfBytes
+        })()
+    })
+    const examEN = await Promise.all(englishExamPromises)
+    console.log("All English exams generated.")
+
+    // generate one more time just to get a log file
+    const enLogDir = await Deno.makeTempDir({ prefix: "log_gen_en_" })
+    await copy(templateDir, enLogDir, { overwrite: true })
+    await updateMetaStudent({ sprache: 'en' }, enLogDir)
+    await generateExam(enLogDir)
+    examENLog = await Deno.readTextFile(`${enLogDir}/exam.log`)
+    await Deno.remove(enLogDir, { recursive: true })
+    console.log("English log file captured.")
+
+    // --- MERGE AND SOLUTION ---
+    console.log("Merging PDFs and generating solution...")
     const examDEMerged = await mergePDFs(examDE)
     const examENMerged = await mergePDFs(examEN)
 
     // generate solution exam (no seat number)
+    const solutionTempDir = await Deno.makeTempDir({ prefix: "solution_" })
+    await copy(templateDir, solutionTempDir, { overwrite: true })
     await updateMetaStudent({
       vollername: 'Max Musterloesung',
       matrikelnummer: 0,
       zeigeloesung: 'yes',
       sprache: 'de'
-    })
-    const examSolution = await generateExam();
-    examSolutionLog = new TextDecoder().decode(await Deno.readFile(logPath))
+    }, solutionTempDir)
+    const examSolution = await generateExam(solutionTempDir)
+    examSolutionLog = await Deno.readTextFile(`${solutionTempDir}/exam.log`)
+    await Deno.remove(solutionTempDir, { recursive: true })
+    console.log("Solution exam and log file generated.")
 
     // generating anwesenheitsliste.csv
     const csvHeader = "Sitzplatz,Random,Matrikelnr,Name,Anwesend? (X)\n"
@@ -677,6 +720,7 @@ async function generateAllExams(examListPath: string, basePath: string, outDir: 
 
   } catch (error) {
     console.error('Error generating mass exams:', error)
+    throw error
   }
 }
 
@@ -698,9 +742,8 @@ function escapeLatex(text?: string): string {
   return text.replace(/([&%$#_{}~^\\])/g, '\\$1')
 }
 
-// generates the latex for the tasks
-async function generateTasksLatex(exam: Exam): Promise<string> {
-  await clearLatexIMGFolder() // remove old images from previous runs
+async function generateTasksLatex(exam: Exam, workingDir: string): Promise<string> {
+  await clearLatexIMGFolder(workingDir) // remove old images from previous runs
 
   const taskGroups = exam.tasks // get the array of task groups
   let latexContent = ""
@@ -778,8 +821,8 @@ async function generateTasksLatex(exam: Exam): Promise<string> {
         // copy the images to the img folder
         const questionImageName = subTask.questionPicture.urlDE.split('/').pop()
         const solutionImageName = subTask.solutionPicture.urlDE.split('/').pop()
-        await Deno.copyFile(subTask.questionPicture.urlDE, `${basePath}/img/${questionImageName}`);
-        await Deno.copyFile(subTask.solutionPicture.urlDE, `${basePath}/img/${solutionImageName}`);
+        await Deno.copyFile(subTask.questionPicture.urlDE, `${workingDir}/img/${questionImageName}`)
+        await Deno.copyFile(subTask.solutionPicture.urlDE, `${workingDir}/img/${solutionImageName}`)
 
 
         latexContent += `\\bildAufgabe{}`
@@ -850,7 +893,7 @@ async function generateTasksLatex(exam: Exam): Promise<string> {
 
   } // end of iterating through task groups
 
-  console.log(latexContent) // uncomment for debugging
+  // console.log(latexContent) // uncomment for debugging
   return latexContent;
 }
 
@@ -880,8 +923,8 @@ async function createZipArchiveFromDirectory(outDir: string, zipFilePath: string
   }
 }
 
-async function updateMetaTemplate(exam: Exam) {
-  const metaPath = `${basePath}/meta-exam.tex`
+async function updateMetaTemplate(exam: Exam, workingDir: string) {
+  const metaPath = `${workingDir}/meta-exam.tex`
 
   // Extract data from JSON
   const { courseName, examinerName, semester, date, examLengthMinutes, tasks } = exam;
@@ -907,17 +950,18 @@ async function updateMetaTemplate(exam: Exam) {
 }
 
 async function updateMetaStudent(options: {
-  zeigeloesung?: boolean,
+  zeigeloesung?: 'yes' | 'no',
   sprache?: string,
   randomexamnumber?: string,
   sequenznummer?: number,
   vollername?: string,
   matrikelnummer?: number,
   uploadurl?: string,
-} = {}
+} = {},
+workingDir: string
 ) {
   const { zeigeloesung, sprache, randomexamnumber, sequenznummer, vollername, matrikelnummer, uploadurl } = options
-  const metaPath = `${basePath}/meta-exam.tex`;
+  const metaPath = `${workingDir}/meta-exam.tex`
 
   // Read meta-exam.tex
   const metaTemplate = await Deno.readTextFile(metaPath);
@@ -996,9 +1040,9 @@ function genRandomNumber(lang: 'de'|'en', counter: number): string {
   return num + parity
 }
 
-async function clearLatexIMGFolder() {
+async function clearLatexIMGFolder(workingDir: string) {
   try {
-    const imgPath = `${basePath}/img`;
+    const imgPath = `${workingDir}/img`
     for await (const entry of Deno.readDir(imgPath)) {
       if (
         entry.isFile &&
