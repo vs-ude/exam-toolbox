@@ -23,6 +23,7 @@ import { TaskBuilderService } from '../../services/task-builder.service';
 import { ManualTextComponent } from './tasks/manual-text/manual-text.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MassExamDialogComponent } from '../mass-exam-dialog/mass-exam-dialog.component';
+import { LoadingService } from '../../services/loading.service';
 
 
 
@@ -76,6 +77,7 @@ export class CreateExamComponent {
     public colorProvider: ColorProviderService,
     private taskBuilder: TaskBuilderService,
     private dialog: MatDialog,
+    private loadingService: LoadingService,
   ) {
     this.importExam();
     this.importPoolTasks();
@@ -205,12 +207,15 @@ export class CreateExamComponent {
     this.checkIfValid()
     console.log(this.exam)
 
+    this.loadingService.loadingOn();
     this.api.generateExam(this.exam).subscribe({
       next: (examPDF: Blob) => {
         saveAs(examPDF, `${this.exam.courseName}.pdf`)
+        this.loadingService.loadingOff();
       },
       error: (err) => {
         console.error('Error downloading PDF: ', err)
+        this.loadingService.loadingOff();
       }
     })
   }
