@@ -8,7 +8,7 @@ import { AsyncPipe, NgIf, NgTemplateOutlet } from '@angular/common';
 @Component({
   selector: 'app-loading-indicator',
   standalone: true,
-  imports: [MatProgressSpinnerModule, AsyncPipe, NgIf, NgTemplateOutlet],
+  imports: [MatProgressSpinnerModule, AsyncPipe, NgTemplateOutlet],
   templateUrl: './loading-indicator.component.html',
   styleUrl: './loading-indicator.component.scss'
 })

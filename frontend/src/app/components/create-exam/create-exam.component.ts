@@ -58,6 +58,11 @@ export class CreateExamComponent {
   public inDropzone = false;
   public isNameChange = false
   public isUpdateMode = false
+
+  private currentReorderElement: Element | null = null;
+  private reorderIndex = 0;
+  private previousReorderIndex = 0;
+
   private bodyElement: HTMLElement = document.body;
   public semesters = ["WS 23/24", "SS 24", "WS 24/25", "SS 25"];
 
@@ -68,6 +73,7 @@ export class CreateExamComponent {
 
   public currentGroupView = 0;
   public lightTheme: boolean = true;
+  
 
 
   constructor(
@@ -84,12 +90,41 @@ export class CreateExamComponent {
     this.semesters = this.getSemesters();
 
 
+
     this.themeService.themeChanged$.subscribe((theme: Theme) => {
       this.lightTheme = theme === Theme.LIGHT ? true : false;
     })
 
-    
+  }
 
+  public onReorderStart(event: DragEvent, index: number){
+    this.reorderIndex = index
+    this.previousReorderIndex = index;
+    event.dataTransfer!.effectAllowed = "move";
+    event.dataTransfer!.setData("text/plain", "reorder");
+    this.currentReorderElement = event.target as Element;
+    console.log("Reorder started", this.currentReorderElement);
+  }
+
+  public onReorderEnd(){
+    this.currentReorderElement = null;
+  }
+
+  public onReorderDragOver(event: Event, index:number) {
+    event.preventDefault();
+    if( this.currentReorderElement === null) {
+      console.log("external element detected,")
+      return;
+    }
+    this.reorderIndex = index;
+    this.swapTasks(this.previousReorderIndex, this.reorderIndex);
+    this.previousReorderIndex = this.reorderIndex;
+  }
+
+  private swapTasks(index1: number, index2: number) {
+    const temp = this.exam.tasks[this.currentGroupView].tasks[index1];
+    this.exam.tasks[this.currentGroupView].tasks[index1] = this.exam.tasks[this.currentGroupView].tasks[index2];
+    this.exam.tasks[this.currentGroupView].tasks[index2] = temp;
   }
 
 

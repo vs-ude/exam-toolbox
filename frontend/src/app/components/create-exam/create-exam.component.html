@@ -122,7 +122,7 @@
             or <br>
             <span (click)="deleteTab()" class="delete_group"><u>delete this group</u> </span>
         </div>
-       
+
         <div *ngFor="let task of exam.tasks[currentGroupView].tasks; let i = index; ">
 
             <mat-card class="task_group_title form-card" *ngIf="i === 0" style="border-color: var(--color-text);">
@@ -132,46 +132,53 @@
             </mat-card>
 
 
-            <span *ngIf="task.type !== 'manualText'" class="task_number">Assignment {{currentGroupView + 1}}.{{calcTaskChar(i)}}</span>
+            <span *ngIf="task.type !== 'manualText'" class="task_number">Assignment {{currentGroupView +
+                1}}.{{calcTaskChar(i)}}</span>
             <span *ngIf="task.type === 'manualText'" class="task_number">Manual Text </span>
 
             <!-- Multiple Choice-->
-            <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'">
+            <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'" (dragstart)="onReorderStart($event, i)"
+                (dragover)="onReorderDragOver($event, i)" draggable="true" (dragend)="onReorderEnd()">
                 <app-multiplechoiceTask class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId "
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
             </mat-card>
 
             <!-- short Answer -->
-            <mat-card class="form-card" *ngIf="task.type === 'shortAnswer'">
+            <mat-card class="form-card" *ngIf="task.type === 'shortAnswer'" (dragstart)="onReorderStart($event, i)"
+                (dragover)="onReorderDragOver($event, i)" draggable="true" (dragend)="onReorderEnd()">
                 <app-short-answer-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId "
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
             </mat-card>
 
             <!-- Picture Task -->
-            <mat-card class="form-card" *ngIf="task.type === 'pictureTask'">
+            <mat-card class="form-card" *ngIf="task.type === 'pictureTask'" (dragstart)="onReorderStart($event, i)"
+                (dragover)="onReorderDragOver($event, i)" draggable="true" (dragend)="onReorderEnd()">
                 <app-picture-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
             </mat-card>
 
             <!-- Latex Task -->
-            <mat-card class="form-card" *ngIf="task.type === 'latex'">
+            <mat-card class="form-card" *ngIf="task.type === 'latex'" (dragstart)="onReorderStart($event, i)"
+                (dragover)="onReorderDragOver($event, i)" draggable="true" (dragend)="onReorderEnd()">
                 <app-latex-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
             </mat-card>
 
             <!-- Table Task -->
-            <mat-card class="form-card" *ngIf="task.type === 'table'">
+            <mat-card class="form-card" *ngIf="task.type === 'table'" (dragstart)="onReorderStart($event, i)"
+                (dragover)="onReorderDragOver($event, i)" draggable="true" (dragend)="onReorderEnd()">
                 <app-table-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
             </mat-card>
 
             <!-- Manual Text  -->
-            <mat-card class="form-card" *ngIf="task.type === 'manualText'">
+            <mat-card class="form-card" *ngIf="task.type === 'manualText'" (dragstart)="onReorderStart($event, i)"
+                (dragover)="onReorderDragOver($event, i)" draggable="true" (dragend)="onReorderEnd()">
                 <app-manual-text class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
