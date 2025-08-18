@@ -273,7 +273,7 @@
     background-color: #0000002a;
 }
 
-.tab_slider{
+.tab_slider {
     pointer-events: none;
     height: 2px;
     background-color: var(--color-primary);
@@ -296,20 +296,20 @@
     user-select: none;
 }
 
-.delete_group{
+.delete_group {
     cursor: pointer;
 }
 
-.delete_group:hover{
+.delete_group:hover {
     color: var(--color-warn);
 }
 
-.delete_group:active{
+.delete_group:active {
     color: darkred;
 }
 
-.task_group_title{
-    margin-top: 16px !important; 
+.task_group_title {
+    margin-top: 16px !important;
 }
 
 
@@ -331,6 +331,13 @@
     flex-direction: column;
     background-color: var(--color-task-card);
     position: relative;
+}
+
+.drag_handle {
+    position: absolute;
+    left: -24px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 
