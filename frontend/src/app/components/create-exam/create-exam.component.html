@@ -137,11 +137,15 @@
             <span *ngIf="task.type === 'manualText'" class="task_number">Manual Text </span>
 
             <!-- Multiple Choice-->
-            <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'" (dragstart)="onReorderStart($event, i)"
-                (dragover)="onReorderDragOver($event, i)" draggable="true" (dragend)="onReorderEnd()">
-                <app-multiplechoiceTask class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId "
+            <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'" draggable="true"
+                (dragstart)="onReorderStart($event, i, $event.target)" (dragover)="onReorderDragOver($event, i)"
+                (dragend)="onReorderEnd()">
+                <app-multiplechoiceTask class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
+                <div style="position: absolute; left: -24px; top: 50%; transform: translateY(-50%);">
+                    <mat-icon>drag_indicator</mat-icon>
+                </div>
             </mat-card>
 
             <!-- short Answer -->
@@ -150,6 +154,9 @@
                 <app-short-answer-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId "
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
+                <div style="position: absolute; left: -24px; top: 50%; transform: translateY(-50%);">
+                    <mat-icon>drag_indicator</mat-icon>
+                </div>
             </mat-card>
 
             <!-- Picture Task -->
@@ -158,6 +165,9 @@
                 <app-picture-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
+                <div style="position: absolute; left: -24px; top: 50%; transform: translateY(-50%);">
+                    <mat-icon>drag_indicator</mat-icon>
+                </div>
             </mat-card>
 
             <!-- Latex Task -->
@@ -166,6 +176,9 @@
                 <app-latex-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
+                <div style="position: absolute; left: -24px; top: 50%; transform: translateY(-50%);">
+                    <mat-icon>drag_indicator</mat-icon>
+                </div>
             </mat-card>
 
             <!-- Table Task -->
@@ -174,6 +187,9 @@
                 <app-table-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
+                <div style="position: absolute; left: -24px; top: 50%; transform: translateY(-50%);">
+                    <mat-icon>drag_indicator</mat-icon>
+                </div>
             </mat-card>
 
             <!-- Manual Text  -->
@@ -182,6 +198,9 @@
                 <app-manual-text class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
+                <div style="position: absolute; left: -24px; top: 50%; transform: translateY(-50%);">
+                    <mat-icon>drag_indicator</mat-icon>
+                </div>
             </mat-card>
 
         </div>

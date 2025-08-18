@@ -62,6 +62,7 @@ export class CreateExamComponent {
   private currentReorderElement: Element | null = null;
   private reorderIndex = 0;
   private previousReorderIndex = 0;
+  private dragOverTimeout: any = null;
 
   private bodyElement: HTMLElement = document.body;
   public semesters = ["WS 23/24", "SS 24", "WS 24/25", "SS 25"];
@@ -73,7 +74,7 @@ export class CreateExamComponent {
 
   public currentGroupView = 0;
   public lightTheme: boolean = true;
-  
+
 
 
   constructor(
@@ -97,28 +98,39 @@ export class CreateExamComponent {
 
   }
 
-  public onReorderStart(event: DragEvent, index: number){
-    this.reorderIndex = index
+  public onReorderStart(event: DragEvent, index: number, dragElement?: EventTarget | null) {
+    this.reorderIndex = index;
     this.previousReorderIndex = index;
     event.dataTransfer!.effectAllowed = "move";
     event.dataTransfer!.setData("text/plain", "reorder");
     this.currentReorderElement = event.target as Element;
-    console.log("Reorder started", this.currentReorderElement);
+
+    // Use the card as the drag image if available
+    if (dragElement) {
+      const element = dragElement as Element
+      event.dataTransfer!.setDragImage(element, element.clientWidth / 2, element.clientHeight / 2);
+    }
   }
 
-  public onReorderEnd(){
+  public onReorderEnd() {
     this.currentReorderElement = null;
   }
 
-  public onReorderDragOver(event: Event, index:number) {
+  public onReorderDragOver(event: Event, index: number) {
     event.preventDefault();
-    if( this.currentReorderElement === null) {
+    if (this.currentReorderElement === null) {
       console.log("external element detected,")
       return;
     }
-    this.reorderIndex = index;
-    this.swapTasks(this.previousReorderIndex, this.reorderIndex);
-    this.previousReorderIndex = this.reorderIndex;
+
+    console.log(this.previousReorderIndex, this.reorderIndex);
+    
+
+    this.dragOverTimeout = setTimeout(() => {
+      this.reorderIndex = index;
+      this.swapTasks(this.previousReorderIndex, this.reorderIndex);
+      this.previousReorderIndex = this.reorderIndex;
+    }, 300)
   }
 
   private swapTasks(index1: number, index2: number) {
@@ -387,20 +399,20 @@ export class CreateExamComponent {
     const year = currentDate.getFullYear();
 
     let formatYear = (year: number): string => {
-      return year.toString().slice(-2); 
+      return year.toString().slice(-2);
     }
 
     if (month >= 10 || month <= 3) {
       return [
-      `WS ${formatYear(year)}/${formatYear(year + 1)}`,
-      `SS ${formatYear(year + 1)}`,
-      `WS ${formatYear(year + 1)}/${formatYear(year + 2)}`
+        `WS ${formatYear(year)}/${formatYear(year + 1)}`,
+        `SS ${formatYear(year + 1)}`,
+        `WS ${formatYear(year + 1)}/${formatYear(year + 2)}`
       ];
     } else {
       return [
-      `SS ${formatYear(year)}`,
-      `WS ${formatYear(year)}/${formatYear(year + 1)}`,
-      `SS ${formatYear(year + 1)}`
+        `SS ${formatYear(year)}`,
+        `WS ${formatYear(year)}/${formatYear(year + 1)}`,
+        `SS ${formatYear(year + 1)}`
       ];
     }
   }
