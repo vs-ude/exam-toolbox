@@ -118,12 +118,15 @@
 
 
         <div *ngIf="exam.tasks[currentGroupView].tasks.length === 0" class="empty_group_holder">
-            No tasks in this group yet. Drag and drop tasks from the sides to add tasks <br>
-            or <br>
-            <span (click)="deleteTab()" class="delete_group"><u>delete this group</u> </span>
+            No tasks in this group yet. Drag and drop tasks from the sides to add tasks
+            <br>or<br>
+            <span (click)="deleteTab()" class="delete_group">
+                <u>delete this group</u>
+            </span>
         </div>
 
-        <div *ngFor="let task of exam.tasks[currentGroupView].tasks; let i = index; ">
+        <div cdkDropList (cdkDropListDropped)="reorderDrop($event)" class="task_group_container">
+            @for (task of exam.tasks[currentGroupView].tasks; track task.taskId; let i = $index) {
 
             <mat-card class="task_group_title form-card" *ngIf="i === 0" style="border-color: var(--color-text);">
                 <app-task-group-title class="task_container" [assignmentNumber]="currentGroupView + 1"
@@ -132,76 +135,72 @@
             </mat-card>
 
 
-            <span *ngIf="task.type !== 'manualText'" class="task_number">Assignment {{currentGroupView +
-                1}}.{{calcTaskChar(i)}}</span>
-            <span *ngIf="task.type === 'manualText'" class="task_number">Manual Text </span>
+            <span *ngIf="task.type !== 'manualText'" class="task_number">
+                Assignment {{currentGroupView +1}}.{{calcTaskChar(i)}}
+            </span>
+            <span *ngIf="task.type === 'manualText'" class="task_number">Manual Text
+            </span>
 
             <!-- Multiple Choice-->
-            <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'" draggable="true"
-                (dragstart)="onReorderStart($event, i, $event.target)" (dragover)="onReorderDragOver($event, i)"
-                (dragend)="onReorderEnd()">
+            <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'" cdkDrag>
                 <app-multiplechoiceTask class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
-                <div class="drag_handle">
+                <div class="drag_handle" cdkDragHandle>
                     <mat-icon>drag_indicator</mat-icon>
                 </div>
             </mat-card>
 
             <!-- short Answer -->
-            <mat-card class="form-card" *ngIf="task.type === 'shortAnswer'" (dragstart)="onReorderStart($event, i)"
-                (dragover)="onReorderDragOver($event, i)" draggable="true" (dragend)="onReorderEnd()">
+            <mat-card class="form-card" *ngIf="task.type === 'shortAnswer'" cdkDrag>
                 <app-short-answer-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId "
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
-                <div class="drag_handle">
+                <div class="drag_handle" cdkDragHandle>
                     <mat-icon>drag_indicator</mat-icon>
                 </div>
             </mat-card>
 
             <!-- Picture Task -->
-            <mat-card class="form-card" *ngIf="task.type === 'pictureTask'" (dragstart)="onReorderStart($event, i)"
-                (dragover)="onReorderDragOver($event, i)" draggable="true" (dragend)="onReorderEnd()">
+            <mat-card class="form-card" *ngIf="task.type === 'pictureTask'" cdkDrag>
                 <app-picture-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
-                <div class="drag_handle">
+                <div class="drag_handle" cdkDragHandle>
                     <mat-icon>drag_indicator</mat-icon>
                 </div>
             </mat-card>
 
             <!-- Latex Task -->
-            <mat-card class="form-card" *ngIf="task.type === 'latex'" (dragstart)="onReorderStart($event, i)"
-                (dragover)="onReorderDragOver($event, i)" draggable="true" (dragend)="onReorderEnd()">
+            <mat-card class="form-card" *ngIf="task.type === 'latex'" cdkDrag>
                 <app-latex-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
-                <div class="drag_handle">
+                <div class="drag_handle" cdkDragHandle>
                     <mat-icon>drag_indicator</mat-icon>
                 </div>
             </mat-card>
 
             <!-- Table Task -->
-            <mat-card class="form-card" *ngIf="task.type === 'table'" (dragstart)="onReorderStart($event, i)"
-                (dragover)="onReorderDragOver($event, i)" draggable="true" (dragend)="onReorderEnd()">
+            <mat-card class="form-card" *ngIf="task.type === 'table'" cdkDrag>
                 <app-table-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
-                <div class="drag_handle">
+                <div class="drag_handle" cdkDragHandle>
                     <mat-icon>drag_indicator</mat-icon>
                 </div>
             </mat-card>
 
             <!-- Manual Text  -->
-            <mat-card class="form-card" *ngIf="task.type === 'manualText'" (dragstart)="onReorderStart($event, i)"
-                (dragover)="onReorderDragOver($event, i)" draggable="true" (dragend)="onReorderEnd()">
+            <mat-card class="form-card" *ngIf="task.type === 'manualText'" cdkDrag>
                 <app-manual-text class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
                     [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
                     (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
-                <div class="drag_handle">
+                <div class="drag_handle" cdkDragHandle>
                     <mat-icon>drag_indicator</mat-icon>
                 </div>
             </mat-card>
+            }
 
         </div>
     </div>
