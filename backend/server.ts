@@ -604,7 +604,7 @@ async function generateAllExams(examListPath: string, templateDir: string, outDi
 
     const deRandomExamNumbers: string[] = []
     const enRandomExamNumbers: string[] = []
-    const counterStart = Math.floor(Math.random() * 100)
+    const counterStart = 0
 
     // --- GERMAN EXAMS (PARALLEL) ---
     console.log("Generating German exams in parallel...")
