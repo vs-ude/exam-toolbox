@@ -218,10 +218,10 @@
 
 
         <!-- Remove me -->
-        <app-AddTask class="task_wrapper"
+        <app-AddTask *ngFor="let i of [].constructor(15)" class="task_wrapper"
             [name]="'Ich bin eine verdammt lange Frage. Und wenn ich will werde ich noch länger ich werde so lang ich gehe zum Rewe und fresse da alle und dann springe ich nach Berlin über Magdeburg'"
             [color]="colorProvider.getTaskColor('multipleChoice')" [iconName]="'multipleChoice' + '.svg'"
-            id="{{'msdoifsdfniods'}}" draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)"
+            id="{{'msdoifsdfniods' + i}}" draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)"
             matTooltip="{{'Tooltip'}}" [matTooltipShowDelay]="800">
         </app-AddTask>
         <!-- end remove -->

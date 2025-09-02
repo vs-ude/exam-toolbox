@@ -369,16 +369,22 @@
     border-color: var(--border-color);
     padding: 10px 1% 10px 1%;
     flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 
 
 .task_pool_container {
     background-color: var(--color-bg-accent);
-    height: 70%;
+    height: 80%;
     border-radius: 15px;
     padding: 10px 32px 10px 32px;
     box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
 }
 
 
