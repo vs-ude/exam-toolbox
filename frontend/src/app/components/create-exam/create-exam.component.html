@@ -210,11 +210,21 @@
 
 <div class="right_container">pool
     <div class="task_pool_container">
-        <app-AddTask *ngFor="let task of taskPool" class="task_wrapper" [name]="task.taskId"
+        <app-AddTask *ngFor="let task of taskPool" class="task_wrapper" [name]="task.question.DE"
             [color]="colorProvider.getTaskColor(task.type)" [iconName]="task.type + '.svg'" id="{{task.taskId}}"
             draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)" matTooltip="{{task.question.DE}}"
             [matTooltipShowDelay]="800">
         </app-AddTask>
+
+
+        <!-- Remove me -->
+        <app-AddTask class="task_wrapper"
+            [name]="'Ich bin eine verdammt lange Frage. Und wenn ich will werde ich noch länger ich werde so lang ich gehe zum Rewe und fresse da alle und dann springe ich nach Berlin über Magdeburg'"
+            [color]="colorProvider.getTaskColor('multipleChoice')" [iconName]="'multipleChoice' + '.svg'"
+            id="{{'msdoifsdfniods'}}" draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)"
+            matTooltip="{{'Tooltip'}}" [matTooltipShowDelay]="800">
+        </app-AddTask>
+        <!-- end remove -->
 
     </div>
 </div>

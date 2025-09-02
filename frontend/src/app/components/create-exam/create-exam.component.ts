@@ -142,7 +142,6 @@ export class CreateExamComponent {
   }
 
   reorderDrop(event: CdkDragDrop<Task[]>) {
-    console.log(event);
     moveItemInArray(this.exam.tasks[this.currentGroupView].tasks, event.previousIndex, event.currentIndex);
   }
 

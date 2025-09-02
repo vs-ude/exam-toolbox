@@ -6,6 +6,7 @@
     background-color: var(--color-bg-lifted);
     user-select: none;
     min-width: 100px;
+    max-width: 100%;
 }
 
 
@@ -18,4 +19,9 @@
 .task_name{
     padding: 4px 10px 4px 10px;
     font-size: smaller;
+    overflow: hidden;
+    max-height: 40px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
 }
