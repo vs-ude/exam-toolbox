@@ -1,7 +1,58 @@
-<h1>Generate Exams</h1>
-<hr><br>
-<mat-dialog-content class="mat-typography">
-  <p>Upload a list of students to generate individual exams.</p>
-  <input type="file" (change)="onFileSelected($event)" /><br><br>
-  <button mat-button color="primary" (click)="generate()">Generate & Download ZIP</button>
+<h2 mat-dialog-title>Generate Mass Exam</h2>
+
+<mat-dialog-content>
+  <p class="dialog-description">Please select the student list file (.xlsx) to begin the generation.</p>
+
+  <!-- Initial state for file selection -->
+  <div *ngIf="!isLoading">
+    <div class="file-input-container">
+      <!-- This label acts as the custom button -->
+      <label for="file-upload" class="file-upload-label">
+        <mat-icon>attach_file</mat-icon>
+        <span>{{ selectedFile ? 'Change file' : 'Choose a file...' }}</span>
+      </label>
+      <!-- The actual input is hidden -->
+      <input id="file-upload" type="file" (change)="onFileSelected($event)" accept=".xlsx, .xls">
+    </div>
+    
+    <!-- Display the name of the selected file -->
+    <div *ngIf="selectedFile" class="file-name-display">
+      <mat-icon>description</mat-icon>
+      <span>{{ selectedFile.name }}</span>
+    </div>
+  </div>
+
+  <!-- Loading state with progress bar -->
+  <div *ngIf="isLoading" class="loading-container">
+    <p>Generating exams... Please do not close this window.</p>
+    
+    <ng-container *ngIf="jobStatus && jobStatus.progress.total > 0">
+      <mat-progress-bar 
+        mode="determinate" 
+        [value]="(jobStatus.progress.completed / jobStatus.progress.total) * 100">
+      </mat-progress-bar>
+      <p class="progress-text">{{ jobStatus.progress.completed }} / {{ jobStatus.progress.total }} tasks completed.</p>
+    </ng-container>
+
+    <!-- Initial loading state before progress is available -->
+    <ng-container *ngIf="!jobStatus">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <p class="progress-text">Starting job...</p>
+    </ng-container>
+  </div>
+
+  <!-- Error message display -->
+  <div *ngIf="errorMessage" class="error-message">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ errorMessage }}</span>
+  </div>
+
 </mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close>Cancel</button>
+  <button mat-flat-button color="primary" [disabled]="!selectedFile || isLoading" (click)="generate()">
+    <mat-icon>play_arrow</mat-icon>
+    <span>Generate</span>
+  </button>
+</mat-dialog-actions>

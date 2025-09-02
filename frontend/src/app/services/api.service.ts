@@ -2,7 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, timeout } from 'rxjs';
 import { Exam, Task } from '../exam';
-import { User } from '../user'
+import { User } from '../user';
+
+export interface JobStatus {
+  jobId: string;
+  status: 'queued' | 'processing' | 'completed' | 'failed';
+  progress: {
+    total: number;
+    completed: number;
+    failed: number;
+  };
+  downloadUrl?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +24,21 @@ export class ApiService {
   constructor(
     private http: HttpClient
   ) { }
+
+  startMassExamGeneration(exam: Exam, list: File): Observable<{ jobId: string }> {
+    const formData = new FormData();
+    formData.append('exam', JSON.stringify(exam));
+    formData.append('list', list, list.name);
+    return this.http.post<{ jobId: string }>(`${this.apiUrl}/generate-exams`, formData);
+  }
+
+  getJobStatus(jobId: string): Observable<JobStatus> {
+    return this.http.get<JobStatus>(`${this.apiUrl}/jobs/${jobId}/status`);
+  }
+
+  downloadMassExamResult(jobId: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/jobs/${jobId}/download`, { responseType: 'blob' });
+  }
 
   generateExam(exam?: Exam): Observable<Blob> {
     return this.http.post(`${this.apiUrl}/generate-exam`, exam, { responseType: 'blob' })

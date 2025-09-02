@@ -15,11 +15,118 @@ import { encodeHex } from "jsr:@std/encoding/hex";
 import * as fs from "https://deno.land/std/fs/mod.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { copy } from "https://deno.land/std@0.224.0/fs/copy.ts";
+import { updateMetaStudent, generateExam } from "./helpers.ts";
 
+
+
+// output from a successful student PDF generation
+interface StudentResult {
+    seatNumber: number
+    pdfPathDE: string
+    pdfPathEN: string
+}
+
+// how a mass-exam-generation-job is defined
+interface ExamGenerationJob {
+  jobId: string
+  userEmail: string
+  status: 'queued' | 'processing' | 'finalizing' | 'completed' | 'failed'
+  progress: {
+    total: number
+    completed: number
+    failed: number
+  }
+  jobDir: string
+  zipPath?: string
+  createdAt: Date
+  studentData: any[]
+  randomNumbers: { de: string; en: string }[]
+  studentResults: StudentResult[]
+}
 
 const basePath = "/app/ExamTemplate"
+const JOBS_DIR = "/app/jobs"
 
-let isGenerating = false;
+// a union type for all possible tasks that a worker can handle
+type GenerationTask = {type: 'student', [key: string]: any} | {type: 'solution', [key: string]: any} | {type: 'log', [key: string]: any}
+
+const jobs = new Map<string, ExamGenerationJob>() // in-memory database for tracking active and recent jobs
+const taskQueue: GenerationTask[] = [] // FIFO queue for all pending tasks
+
+const logicalCores = navigator.hardwareConcurrency // fetches number of cpu cores on host system
+const POOL_SIZE = Math.max(1, logicalCores - 1) // worker pool size is cpu cores -1 or at least 1
+const workers: { worker: Worker; isBusy: boolean }[] = []
+
+
+// creates the worker pool at startup and defines how to handle messages from them
+for (let i = 0; i < POOL_SIZE; i++) {
+  const worker = new Worker(new URL("./worker.ts", import.meta.url).href, { type: "module" })
+
+  // handles messages coming back from a worker
+  worker.onmessage = async (e) => {
+    const result = e.data
+    const workerWrapper = workers.find(w => w.worker === worker)
+    if (workerWrapper) workerWrapper.isBusy = false
+
+    if (!result.jobId) {
+        console.error("Worker message received without a jobId.")
+        processQueue()
+        return
+    }
+    const associatedJob = jobs.get(result.jobId)
+
+    // ignores messages for jobs that are already finished or failed
+    if (!associatedJob || associatedJob.status !== 'processing') {
+      processQueue()
+      return
+    }
+
+    // on success, updates progress and stores the results
+    if (result.status === 'success') {
+      associatedJob.progress.completed++
+      if (result.type === 'student') {
+        associatedJob.studentResults.push({
+            seatNumber: result.seatNumber,
+            pdfPathDE: result.pdfPathDE,
+            pdfPathEN: result.pdfPathEN,
+        })
+      }
+    // on failure, logs detailed error info and marks the entire job as failed
+    } else {
+      associatedJob.progress.failed++
+      console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+      console.error(`A worker task for job ${associatedJob.jobId} has FAILED.`)
+      console.error(`Task Type: ${result.type}`)
+      console.error(`Error Details: ${result.error}`)
+      console.error("The entire job will now be marked as failed.")
+      console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+      
+      associatedJob.status = 'failed'
+    }
+
+    console.log(`Job ${associatedJob.jobId} progress: ${associatedJob.progress.completed}/${associatedJob.progress.total}`)
+
+    // checks if all tasks for a job are complete and, if so, starts the finalization process
+    if ((associatedJob.progress.completed + associatedJob.progress.failed >= associatedJob.progress.total) && associatedJob.status === 'processing') {
+        await finalizeJob(associatedJob.jobId)
+    }
+
+    processQueue()
+  }
+
+  // handles critical worker errors, like if a worker crashes completely
+  worker.onerror = (err) => {
+    console.error("A critical error occurred in a worker, it may have crashed:", err.message)
+    const workerWrapper = workers.find(w => w.worker === worker)
+    if (workerWrapper) workerWrapper.isBusy = false
+    processQueue()
+  }
+  workers.push({ worker, isBusy: false })
+}
+console.log(`Worker pool initialized with ${POOL_SIZE} workers.`)
+await Deno.mkdir(JOBS_DIR, { recursive: true })
+
+let isGenerating = false
 
 // MongoDB setup
 const client = new MongoClient();
@@ -33,710 +140,539 @@ const fileTracker = db.collection("fileTracker");
 const app = new Application();
 const router = new Router();
 
-// For cross-origin requests (for CORS)
+
 app.use(async (ctx, next) => {
-  ctx.response.headers.set("Access-Control-Allow-Origin", "*");
-  ctx.response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Auth-Uid, X-Auth-Email, X-Auth-Member-Of");
-
-  // for preflight request
+  ctx.response.headers.set("Access-Control-Allow-Origin", "*")
+  ctx.response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+  ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Auth-Uid, X-Auth-Email, X-Auth-Member-Of")
   if (ctx.request.method === "OPTIONS") {
-    ctx.response.status = 204; // success
-    return; // stop
+    ctx.response.status = 204
+    return
   }
-
-  // get user information of logged-in user with AuthCrunch default headers
   const userId = ctx.request.headers.get("X-Token-Subject")
   const userEmail = ctx.request.headers.get("X-Token-User-Email")
   const userRolesHeader = ctx.request.headers.get("X-Token-User-Roles")
-
-  // puts the roles in an array
   const userRoles = userRolesHeader ? userRolesHeader.split(' ').map(role => role.trim()).filter(role => role !== '') : []
-
-  ctx.state.user = {
-    id: userId,
-    email: userEmail,
-    roles: userRoles,
-  }
-
+  ctx.state.user = { id: userId, email: userEmail, roles: userRoles }
   console.log("Authenticated User: ")
   console.log(userId)
-  // for debugging (can be removed in production)
   if (userId) {
-    console.log(`Authenticated User: ID=${userId}, Email=${userEmail}, Roles=[${userRoles.join(', ')}]`);
+    console.log(`Authenticated User: ID=${userId}, Email=${userEmail}, Roles=[${userRoles.join(', ')}]`)
   }
+  await next()
+})
 
-  await next();
-});
-
-
-// Routes
 router
   .get("/", (ctx) => {
-    ctx.response.body = "API is running...";
+    ctx.response.body = "API is running..."
   })
   .get("/api/user", (ctx) => {
     const user = ctx.state.user
-
     if (!user || !user.id) {
       ctx.response.status = 401
       ctx.response.body = { message: "Not authenticated" }
-      return;
+      return
     }
-
     ctx.response.status = 200
-    ctx.response.body = {
-      id: user.id,
-      email: user.email,
-      roles: user.roles
-    }
+    ctx.response.body = { id: user.id, email: user.email, roles: user.roles }
   })
   .get("/api/exams", async (ctx) => {
     try {
-      const examList = await exams.find().toArray();
-      ctx.response.status = 200;
-      ctx.response.body = examList;
+      const examList = await exams.find().toArray()
+      ctx.response.status = 200
+      ctx.response.body = examList
     } catch (error) {
-      ctx.response.status = 500;
-      ctx.response.body = { message: 'Error fetching exams', error };
+      ctx.response.status = 500
+      ctx.response.body = { message: 'Error fetching exams', error }
     }
   })
   .get("/api/exam/:id", async (ctx) => {
     try {
-      const examId = ctx.params.id;
-      const mongoId = new ObjectId(examId);
-      const exam = await exams.findOne({ _id: mongoId });
-
+      const examId = ctx.params.id
+      const mongoId = new ObjectId(examId)
+      const exam = await exams.findOne({ _id: mongoId })
       if (!exam) {
-        ctx.response.status = 404;
-        ctx.response.body = { message: "Exam not found" };
-        return;
+        ctx.response.status = 404
+        ctx.response.body = { message: "Exam not found" }
+        return
       }
-
-      ctx.response.status = 200;
-      ctx.response.body = exam;
+      ctx.response.status = 200
+      ctx.response.body = exam
     } catch (error) {
-      ctx.response.status = 500;
-      ctx.response.body = { message: "Error fetching exam", error };
+      ctx.response.status = 500
+      ctx.response.body = { message: "Error fetching exam", error }
     }
   })
   .post("/api/exams", async (ctx) => {
     const exam: Exam = await ctx.request.body().value
     try {
-      const result = await exams.insertOne(exam);
-      ctx.response.status = 200;
+      const result = await exams.insertOne(exam)
+      ctx.response.status = 200
       ctx.response.body = {
         message: 'Exam saved successfully! ',
-        insertedId: result // also returns the _id of the created Exam
+        insertedId: result
       }
     } catch (err) {
-      ctx.response.status = 500;
+      ctx.response.status = 500
       ctx.response.body = { message: 'Error saving exam', error: err }
     }
   })
   .put("/api/exams/update", async (ctx) => {
     try {
-      const { examId, updatedExam } = await ctx.request.body().value;
-
-      // validate examId and updatedExamData are provided
+      const { examId, updatedExam } = await ctx.request.body().value
       if (!examId || !updatedExam) {
-        ctx.response.status = 400;
-        ctx.response.body = { message: "Exam ID and updated data are required" };
-        return;
+        ctx.response.status = 400
+        ctx.response.body = { message: "Exam ID and updated data are required" }
+        return
       }
-
-      // Convert the examId to an ObjectId (MongoDB uses ObjectId for the _id field)
       const mongoId = new ObjectId(examId)
-
-      // create update object without id
-      const updateData = { ...updatedExam };
-      delete updateData._id;  // remove id
-
-      // Updating the Exam with the provided id
-      const result = await exams.updateOne(
-        { _id: mongoId },  // finds exam
-        { $set: updateData }  // updates just the changed fields in the exam
-      );
-
-      // If no matching exam found, return 404
+      const updateData = { ...updatedExam }
+      delete updateData._id
+      const result = await exams.updateOne({ _id: mongoId }, { $set: updateData })
       if (result.matchedCount === 0) {
-        ctx.response.status = 404;
-        ctx.response.body = { message: "Exam not found" };
-        return;
+        ctx.response.status = 404
+        ctx.response.body = { message: "Exam not found" }
+        return
       }
-
-      ctx.response.status = 200;
-      ctx.response.body = { message: "Exam updated successfully" };
+      ctx.response.status = 200
+      ctx.response.body = { message: "Exam updated successfully" }
     } catch (error) {
-      ctx.response.status = 500;
-      ctx.response.body = { message: "Error updating exam", error };
+      ctx.response.status = 500
+      ctx.response.body = { message: "Error updating exam", error }
     }
   })
   .post("/api/generate-exam", async (ctx) => {
-    if (isGenerating) { // avoids race conditions when button is presses repeatedly
-        ctx.response.status = 429; // statuscode for too many requests
-        ctx.response.body = { message: "Another exam generation is already in progress. Please wait." };
-        return;
+    if (isGenerating) {
+      ctx.response.status = 429
+      ctx.response.body = { message: "Another exam generation is already in progress. Please wait." }
+      return
     }
     isGenerating = true
-
     try {
       const exam: Exam = await ctx.request.body().value
-      
-      // temp dir for avoiding race conditions when generating the PDF's is paralelized
-      const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
-      await copy(basePath, tempDir, { overwrite: true });
-      
-      const tasksPath = `${tempDir}/aufgaben.tex`;
-
-      // update metaTemplate
+      const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" })
+      await copy(basePath, tempDir, { overwrite: true })
+      const tasksPath = `${tempDir}/aufgaben.tex`
       await updateMetaTemplate(exam, tempDir)
       await updateMetaStudent({ vollername: 'Max Musterloesung', matrikelnummer: 0, zeigeloesung: 'yes', sprache: 'de' }, tempDir)
-
-      // generates latex for the tasks and updates aufgaben.tex in the templates
       const tasksContentLatex = await generateTasksLatex(exam, tempDir)
       await Deno.writeTextFile(tasksPath, tasksContentLatex)
-      
-      const examPDF = await generateExam(tempDir)
-
-      // tell the frontend that this is an PDF
+      const { pdfBytes: examPDF } = await generateExam(tempDir)
       ctx.response.headers.set("Content-Type", "application/pdf")
       ctx.response.headers.set("Content-Disposition", `attachment; filename="${exam.courseName}.pdf"`)
-
       ctx.response.body = examPDF
     } catch (error) {
-      ctx.response.status = 500;
+      ctx.response.status = 500
       ctx.response.body = { message: 'Error generating Exam PDF', error }
     } finally {
-        isGenerating = false
+      isGenerating = false
     }
   })
   .post("/api/upload", async (ctx) => {
-    const body = ctx.request.body({ type: "form-data" });
-    const formData = await body.value.read({ maxSize: 10 * 1024 * 1024 });
+    const body = ctx.request.body({ type: "form-data" })
+    const formData = await body.value.read({ maxSize: 10 * 1024 * 1024 })
 
     if (!formData.files || formData.files.length === 0) {
-      ctx.response.status = 400;
-      ctx.response.body = { message: "No file uploaded" };
-      return;
+      ctx.response.status = 400
+      ctx.response.body = { message: "No file uploaded" }
+      return
     }
-
-    const file = formData.files[0];
-
+    const file = formData.files[0]
     if (!file.content) {
-      ctx.response.status = 400;
-      ctx.response.body = { message: "No file content" };
-      return;
+      ctx.response.status = 400
+      ctx.response.body = { message: "No file content" }
+      return
     }
-
-    // Compute SHA-256 hash of the file content
-    const fileHashBuffer = await crypto.subtle.digest("SHA-256", file.content);
-    const fileHash = encodeHex(fileHashBuffer);
-
-    const ext = file.originalName?.split(".").pop();
-    const hashedFileName = ext ? `${fileHash}.${ext}` : fileHash;
-
-    file.originalName = hashedFileName;
-    const uploadDir = "./uploads";
-
-    const filePath = `${uploadDir}/${file.originalName}`;
+    const fileHashBuffer = await crypto.subtle.digest("SHA-256", file.content)
+    const fileHash = encodeHex(fileHashBuffer)
+    const ext = file.originalName?.split(".").pop()
+    const hashedFileName = ext ? `${fileHash}.${ext}` : fileHash
+    file.originalName = hashedFileName
+    const uploadDir = "./uploads"
+    const filePath = `${uploadDir}/${file.originalName}`
     if (file.content) {
-      await Deno.mkdir(uploadDir, { recursive: true });
-      await Deno.writeFile(filePath, file.content);
-      console.log("File saved to:", filePath);
+      await Deno.mkdir(uploadDir, { recursive: true })
+      await Deno.writeFile(filePath, file.content)
+      console.log("File saved to:", filePath)
     }
-
-    const fileTrackerEntry: FileTracker = { name: file.originalName, refs: [], timeToLive: 7 };
+    const fileTrackerEntry: FileTracker = { name: file.originalName, refs: [], timeToLive: 7 }
     try {
-      await fileTracker.insertOne(fileTrackerEntry);
-      console.log("File tracker entry created:", fileTrackerEntry);
+      await fileTracker.insertOne(fileTrackerEntry)
+      console.log("File tracker entry created:", fileTrackerEntry)
     } catch (error) {
-      console.error("Error inserting file tracker entry:", error);
-      ctx.response.status = 500;
-      ctx.response.body = { message: "Error inserting file tracker entry", error };
-      return;
+      console.error("Error inserting file tracker entry:", error)
+      ctx.response.status = 500
+      ctx.response.body = { message: "Error inserting file tracker entry", error }
+      return
     }
-
-
-
-    ctx.response.body = {
-      message: "File uploaded successfully",
-      url: `./uploads/${file.originalName}`,
-    };
-    ctx.response.status = 200;
+    ctx.response.body = { message: "File uploaded successfully", url: `./uploads/${file.originalName}` }
+    ctx.response.status = 200
   })
   .get("/api/download", async (ctx) => {
-    const fileUrl = ctx.request.url.searchParams.get("fileUrl");
-
+    const fileUrl = ctx.request.url.searchParams.get("fileUrl")
     if (!fileUrl) {
-      ctx.response.status = 400;
-      ctx.response.body = { message: "File URL is required" };
-      return;
+      ctx.response.status = 400
+      ctx.response.body = { message: "File URL is required" }
+      return
     }
-
     try {
-      const fileContent = await Deno.readFile(fileUrl);
-      const fileName = fileUrl.split("/").pop() || "downloaded_file";
-
-      const fileExtension = fileName.split('.').pop()?.toLowerCase();
-      let contentType = "application/octet-stream";
-      // extract all formats that are supported by LaTeX
+      const fileContent = await Deno.readFile(fileUrl)
+      const fileName = fileUrl.split("/").pop() || "downloaded_file"
+      const fileExtension = fileName.split('.').pop()?.toLowerCase()
+      let contentType = "application/octet-stream"
       switch (fileExtension) {
-        case "pdf":
-          contentType = "application/pdf";
-          break;
-        case "jpg":
-        case "jpeg":
-          contentType = "image/jpeg";
-          break;
-        case "png":
-          contentType = "image/png";
-          break;
-        default:
-          contentType = "application/octet-stream";
+        case "pdf": contentType = "application/pdf"; break
+        case "jpg": case "jpeg": contentType = "image/jpeg"; break
+        case "png": contentType = "image/png"; break
+        default: contentType = "application/octet-stream"
       }
-
-      ctx.response.headers.set("Content-Type", contentType);
-      ctx.response.headers.set("Content-Disposition", `attachment; filename="${fileName}"`);
-      ctx.response.body = fileContent;
+      ctx.response.headers.set("Content-Type", contentType)
+      ctx.response.headers.set("Content-Disposition", `attachment; filename="${fileName}"`)
+      ctx.response.body = fileContent
       console.log("sending file: ", fileUrl)
     } catch (error) {
-      console.error("Error reading file:", error);
-      ctx.response.status = 500;
-      ctx.response.body = { message: "Error reading file", error: error.message };
+      console.error("Error reading file:", error)
+      ctx.response.status = 500
+      ctx.response.body = { message: "Error reading file", error: error.message }
     }
   })
+  // generate mass-exam by putting jobs in a queue that can be processed by workers paralelized
   .post("/api/generate-exams", async (ctx) => {
-    if (isGenerating) { // avoids race conditions when button is presses repeatedly
-      ctx.response.status = 429; // statuscode for too many requests
-      ctx.response.body = { message: "Another exam generation is already in progress. Please wait." };
-      return;
-    }
-    isGenerating = true
-
-    // temp dir for mass-generation
-    const mainTempDir = await Deno.makeTempDir({
-        dir: Deno.cwd(), // use current working directory
-        prefix: "exam_gen_main_"
-    });
-
     try {
       const body = ctx.request.body({ type: "form-data" })
       const formData = await body.value.read({ maxSize: 10 * 1024 * 1024 })
-
-      const examJson = JSON.parse(formData.fields.exam)
+      const examJson: Exam = JSON.parse(formData.fields.exam)
       const file = formData.files?.find(f => f.name === "list")
-
-      if (!file || !examJson) {
+      if (!file || !examJson || !file.content) {
         ctx.response.status = 400
-        ctx.response.body = { message: "Missing file or exam" }
-        return
-      }
-      
-      const outDir = `${mainTempDir}/out`
-      await Deno.mkdir(outDir)
-      console.log("Created outDir: ", outDir)
-      
-      const examListPath = `${mainTempDir}/${file.originalName}`
-      if (!file.content) {
-          ctx.response.status = 400;
-          ctx.response.body = { message: "Missing list content" }
-          return
-      }
-      await Deno.writeFile(examListPath, file.content)
-
-      // set what is common over all exams
-      const templateDir = `${mainTempDir}/template`
-      await copy(basePath, templateDir, { overwrite: true })
-      await updateMetaTemplate(examJson, templateDir)
-      const tasksContentLatex = await generateTasksLatex(examJson, templateDir)
-      await Deno.writeTextFile(`${templateDir}/aufgaben.tex`, tasksContentLatex)
-
-      await generateAllExams(examListPath, templateDir, outDir)
-      
-      const zipFilePath = `${mainTempDir}/exams_output.zip`
-
-      try {
-        await createZipArchiveFromDirectory(outDir, zipFilePath)
-      } catch (zipError) {
-        console.error("Zip creation error:", zipError)
-        ctx.response.status = 500
-        ctx.response.body = { message: "Error creating ZIP archive", error: zipError instanceof Error ? zipError.message : String(zipError) }
+        ctx.response.body = { message: "Missing file, file content, or exam data" }
         return
       }
 
-      const zipFileBytes = await Deno.readFile(zipFilePath)
-      console.log("Zip file created:", zipFilePath)
+      const jobId = crypto.randomUUID()
+      const jobDir = `${JOBS_DIR}/${jobId}`
+      const jobTemplatePath = `${jobDir}/template`
+      const tempOutputDir = `${jobDir}/temp_output`
+      const studentPdfDir = `${tempOutputDir}/student_pdfs`
+      await Deno.mkdir(studentPdfDir, { recursive: true })
 
-      // send Email
-      try {
-        await sendEmail(
-          ctx.state.user.email,
-          "Your exam is ready for download",
-          `<p>Hello,</p><p>Your generated exams are ready for download.</p>`
-        );
-        console.log("Email sent successfully");
-      } catch (error) {
-        console.error("Sending the Email failed:", error)
+      await copy(basePath, jobTemplatePath, { overwrite: true })
+      await updateMetaTemplate(examJson, jobTemplatePath)
+      const tasksContentLatex = await generateTasksLatex(examJson, jobTemplatePath)
+      await Deno.writeTextFile(`${jobTemplatePath}/aufgaben.tex`, tasksContentLatex)
+
+      const workbook = read(file.content, { type: "buffer" })
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]]
+      const studentData = utils.sheet_to_json(worksheet, {
+        header: ["examPlanId", "examNumber", "examTitle", "lastName", "firstName", "studentId"],
+        range: 5,
+      }).filter((student: any) => student.firstName && student.lastName)
+      
+      const totalTasks = studentData.length + 3
+
+      const newJob: ExamGenerationJob = {
+        jobId,
+        userEmail: ctx.state.user.email,
+        status: 'processing',
+        progress: { total: totalTasks, completed: 0, failed: 0 },
+        jobDir,
+        createdAt: new Date(),
+        studentData,
+        randomNumbers: [],
+        studentResults: [],
       }
+      
+      studentData.forEach((student: any, index: number) => {
+        const seatNumber = index + 1
+        const deRandomNumber = genRandomNumber('de', index + 1)
+        const enRandomNumber = genRandomNumber('en', index + 1)
+        newJob.randomNumbers.push({ de: deRandomNumber, en: enRandomNumber })
+        taskQueue.push({
+          type: 'student', 
+          jobId,
+          student, 
+          jobTemplatePath, 
+          outputDir: tempOutputDir, 
+          deRandomNumber, 
+          enRandomNumber, 
+          seatNumber
+        })
+      })
 
-      ctx.response.headers.set("Content-Type", "application/zip")
-      ctx.response.headers.set("Content-Disposition", `attachment; filename="all-exams.zip"`)
-      ctx.response.body = zipFileBytes
+      taskQueue.push({ type: 'solution', jobId, jobTemplatePath, outputDir: tempOutputDir })
+      taskQueue.push({ type: 'log', jobId, jobTemplatePath, outputDir: tempOutputDir, lang: 'de' })
+      taskQueue.push({ type: 'log', jobId, jobTemplatePath, outputDir: tempOutputDir, lang: 'en' })
+      
+      jobs.set(jobId, newJob)
+
+      workers.forEach(() => processQueue())
+
+      ctx.response.status = 202
+      ctx.response.body = { jobId, message: "Exam generation job has been started." }
 
     } catch (error) {
-      console.error('Error generating Mass-Exams - FULL ERROR:')
-      console.error(error);
-      if (error instanceof Error) {
-        console.error('Error Stack Trace:', error.stack);
-      }
-      ctx.response.status = 500;
+      console.error('Error starting mass-exam generation job:', error)
+      ctx.response.status = 500
       ctx.response.body = {
-        message: 'Error generating all Exams',
+        message: 'Error starting exam generation job',
         error: error instanceof Error ? error.message : String(error),
-      };
-    } finally {
-      await Deno.remove(mainTempDir, { recursive: true }).catch(e => console.error("Error cleaning up temp dir in finally:", e));
-      isGenerating = false
+      }
+    }
+  })
+  // frontend get status about the progress of the mass-exam generation
+  .get("/api/jobs/:jobId/status", (ctx) => {
+    const jobId = ctx.params.jobId
+    const job = jobs.get(jobId)
+    if (!job) {
+      ctx.response.status = 404
+      ctx.response.body = { message: "Job not found" }
+      return
+    }
+    ctx.response.status = 200
+    ctx.response.body = {
+      jobId: job.jobId,
+      status: job.status,
+      progress: job.progress,
+      downloadUrl: job.status === 'completed' ? `/api/jobs/${job.jobId}/download` : null,
+    }
+  })
+  // given the jobId of the mass-exam-generation the produced zip can be downloaded
+  .get("/api/jobs/:jobId/download", async (ctx) => {
+    const jobId = ctx.params.jobId
+    const job = jobs.get(jobId)
+    if (!job) {
+      ctx.response.status = 404
+      ctx.response.body = { message: "Job not found" }
+      return
+    }
+    if (job.userEmail !== ctx.state.user.email) {
+      ctx.response.status = 403
+      ctx.response.body = { message: "Forbidden" }
+      return
+    }
+    if (job.status !== 'completed' || !job.zipPath) {
+      ctx.response.status = 400
+      ctx.response.body = { message: "Job is not yet complete or the file is missing." }
+      return
+    }
+    try {
+      const zipFileBytes = await Deno.readFile(job.zipPath)
+      ctx.response.headers.set("Content-Type", "application/zip")
+      ctx.response.headers.set("Content-Disposition", `attachment; filename="exams_${jobId}.zip"`)
+      ctx.response.body = zipFileBytes
+    } catch (error) {
+      console.error(`Error sending zip file for job ${jobId}:`, error)
+      ctx.response.status = 500
+      ctx.response.body = { message: "Error reading the generated file." }
     }
   })
   .get("/api/taskPool", async (ctx) => {
     try {
-      const taskList = await pool.find().toArray();
-      ctx.response.status = 200;
-      ctx.response.body = taskList;
+      const taskList = await pool.find().toArray()
+      ctx.response.status = 200
+      ctx.response.body = taskList
     } catch (error) {
-      ctx.response.status = 500;
-      ctx.response.body = { message: 'Error fetching tasks', error };
+      ctx.response.status = 500
+      ctx.response.body = { message: 'Error fetching tasks', error }
     }
   })
   .get("/api/taskPool/type/:type", async (ctx) => {
-    const taskType = ctx.params.type;
+    const taskType = ctx.params.type
     try {
-      const taskList = await pool.find({ type: taskType }).toArray();
-      ctx.response.status = 200;
-      ctx.response.body = taskList;
+      const taskList = await pool.find({ type: taskType }).toArray()
+      ctx.response.status = 200
+      ctx.response.body = taskList
     } catch (error) {
-      ctx.response.status = 500;
-      ctx.response.body = { message: 'Error fetching tasks by type', error };
+      ctx.response.status = 500
+      ctx.response.body = { message: 'Error fetching tasks by type', error }
     }
   })
   .get("/api/taskPool/tags/:tag", async (ctx) => {
-    const tag = ctx.params.tag;
+    const tag = ctx.params.tag
     try {
-      const taskList = await pool.find({ tags: { $elemMatch: { name: tag } } }).toArray();
-      ctx.response.status = 200;
-      ctx.response.body = taskList;
+      const taskList = await pool.find({ tags: { $elemMatch: { name: tag } } }).toArray()
+      ctx.response.status = 200
+      ctx.response.body = taskList
     } catch (error) {
-      ctx.response.status = 500;
-      ctx.response.body = { message: 'Error fetching tasks by tag', error };
+      ctx.response.status = 500
+      ctx.response.body = { message: 'Error fetching tasks by tag', error }
     }
   })
   .get("/api/taskPool/user/:userId", async (ctx) => {
-    const userId = ctx.params.userId;
+    const userId = ctx.params.userId
     try {
-      const taskList = await pool.find({ createdBy: userId }).toArray();
-      ctx.response.status = 200;
-      ctx.response.body = taskList;
+      const taskList = await pool.find({ createdBy: userId }).toArray()
+      ctx.response.status = 200
+      ctx.response.body = taskList
     } catch (error) {
-      ctx.response.status = 500;
-      ctx.response.body = { message: 'Error fetching tasks by user', error };
+      ctx.response.status = 500
+      ctx.response.body = { message: 'Error fetching tasks by user', error }
     }
   })
   .post("/api/taskPool", async (ctx) => {
     const task: Task = await ctx.request.body().value
     try {
-      await pool.insertOne(task);
-      ctx.response.status = 200;
-      ctx.response.body = { message: 'Task added to pool' };
+      await pool.insertOne(task)
+      ctx.response.status = 200
+      ctx.response.body = { message: 'Task added to pool' }
     } catch (err) {
-      ctx.response.status = 500;
-      ctx.response.body = { message: 'Error adding to pool', error: err };
+      ctx.response.status = 500
+      ctx.response.body = { message: 'Error adding to pool', error: err }
     }
-
     if (task.type === "pictureTask") {
-      const fileURLs = [
-        task.questionPicture.urlDE,
-        task.questionPicture.urlEN,
-        task.solutionPicture.urlDE,
-        task.solutionPicture.urlEN,
-      ]
-      console.log("File URLs: ", fileURLs);
+      const fileURLs = [task.questionPicture.urlDE, task.questionPicture.urlEN, task.solutionPicture.urlDE, task.solutionPicture.urlEN]
+      console.log("File URLs: ", fileURLs)
       for (const fileURL of fileURLs) {
-        const fileName = fileURL.split("/").pop();
+        const fileName = fileURL.split("/").pop()
         try {
           await fileTracker.updateOne({ name: fileName }, { $addToSet: { refs: task.taskId } })
         } catch (error) {
-          console.error("Error fetching file tracker enttry:", error);
+          console.error("Error fetching file tracker enttry:", error)
         }
       }
     }
-
   })
   .delete("/api/exams", async (ctx) => {
     try {
       const result = await exams.deleteMany({})
-      ctx.response.status = 200;
+      ctx.response.status = 200
       ctx.response.body = {
         message: `${result} exams deleted successfully!`,
         deletedCount: result,
-      };
+      }
     } catch (error) {
-      ctx.response.status = 500;
-      ctx.response.body = { message: "Error deleting exams", error };
+      ctx.response.status = 500
+      ctx.response.body = { message: "Error deleting exams", error }
     }
   })
   .delete("/api/taskPool/:taskId", async (ctx) => {
     try {
-      const result = await pool.deleteOne({ taskId: ctx.params.taskId });
-
+      const result = await pool.deleteOne({ taskId: ctx.params.taskId })
       if (result.deletedCount === 0) {
-        ctx.response.status = 404;
-        ctx.response.body = { message: "Task not found" };
-        return;
+        ctx.response.status = 404
+        ctx.response.body = { message: "Task not found" }
+        return
       }
-
-      ctx.response.status = 200;
-      ctx.response.body = { message: "Task deleted successfully" };
+      ctx.response.status = 200
+      ctx.response.body = { message: "Task deleted successfully" }
     } catch (error) {
-      ctx.response.status = 500;
-      ctx.response.body = { message: "Error deleting task", error };
+      ctx.response.status = 500
+      ctx.response.body = { message: "Error deleting task", error }
     }
   })
   .delete("/api/taskPool", async (ctx) => {
     try {
       const result = await pool.deleteMany({})
       await fileTracker.deleteMany({})
-      await fs.emptyDir("./uploads");
-      ctx.response.status = 200;
+      await fs.emptyDir("./uploads")
+      ctx.response.status = 200
       ctx.response.body = {
         message: `${result} task-pool deleted successfully!`,
         deletedCount: result,
-      };
+      }
     } catch (error) {
-      ctx.response.status = 500;
-      ctx.response.body = { message: "Error deleting task-pool", error };
+      ctx.response.status = 500
+      ctx.response.body = { message: "Error deleting task-pool", error }
     }
   })
 
 
-// Use the Router
-app.use(router.routes());
-app.use(router.allowedMethods());
 
-// Start the server
-const port = 3000;
-await app.listen({ port });
+app.use(router.routes())
+app.use(router.allowedMethods())
 
+const port = 3000
+await app.listen({ port })
 
 
-async function generateExam(workingDir: string): Promise<Uint8Array> {
-  const examTexPath = `${workingDir}/exam.tex`
-  const examPdfPath = `${workingDir}/exam.pdf`
+
+// checks job queue and assigns a worker if possible
+function processQueue() {
+  if (taskQueue.length === 0)
+    return
+
+  const availableWorker = workers.find(w => !w.isBusy)
+  if (availableWorker) {
+    const task = taskQueue.shift()
+    if (task) {
+      availableWorker.isBusy = true
+      availableWorker.worker.postMessage(task)
+    }
+  }
+}
+
+// after mass-exam generation merges the exams and creates CSV
+async function finalizeJob(jobId: string) {
+  const job = jobs.get(jobId)
+  if (!job)
+    return
+
+  job.status = 'finalizing'
+  console.log(`Finalizing job ${jobId}...`)
 
   try {
-    // 3 passes of pdflatex to resolve all references
-    for (let i = 0; i < 3; i++) {
-      const cmd = new Deno.Command("pdflatex", {
-        args: [
-          "-interaction=nonstopmode", // Continue on errors without stopping
-          "-halt-on-error",
-          "-output-directory",
-          workingDir,
-          examTexPath,
-        ],
-        stdout: "piped",
-        stderr: "piped",
-      });
+    const finalOutputDir = `${job.jobDir}/final_output`
+    await Deno.mkdir(finalOutputDir, { recursive: true })
 
-      const { code, stdout, stderr } = await cmd.output()
-      const stdoutStr = new TextDecoder().decode(stdout)
-      const stderrStr = new TextDecoder().decode(stderr)
+    // sort the student results by seat number (exam number) before merging
+    job.studentResults.sort((a, b) => a.seatNumber - b.seatNumber)
+    const sortedGermanPaths = job.studentResults.map(r => r.pdfPathDE)
+    const sortedEnglishPaths = job.studentResults.map(r => r.pdfPathEN)
 
-      if (stderrStr) {
-        console.error(`pdflatex pass ${i + 1} errors in ${workingDir}:\n${stderrStr}`)
-      }
+    // merges all individual german exam PDFs into a single file
+    console.log(`Merging ${sortedGermanPaths.length} German PDFs...`)
+    const mergedPdfDE = await PDFDocument.create()
+    for (const pdfPath of sortedGermanPaths) {
+      const pdfBytes = await Deno.readFile(pdfPath)
+      const pdf = await PDFDocument.load(pdfBytes)
+      const copiedPages = await mergedPdfDE.copyPages(pdf, pdf.getPageIndices())
+      copiedPages.forEach(page => mergedPdfDE.addPage(page))
     }
+    const mergedDEBytes = await mergedPdfDE.save()
+    await Deno.writeFile(`${finalOutputDir}/exam_merged_de.pdf`, mergedDEBytes)
 
-    // verify PDF was generated
-    try {
-      await Deno.stat(examPdfPath)
-    } catch (err) {
-      throw new Error("PDF output file was not generated")
+    // merges all individual english exam PDFs into a single file
+    console.log(`Merging ${sortedEnglishPaths.length} English PDFs...`)
+    const mergedPdfEN = await PDFDocument.create()
+    for (const pdfPath of sortedEnglishPaths) {
+      const pdfBytes = await Deno.readFile(pdfPath)
+      const pdf = await PDFDocument.load(pdfBytes)
+      const copiedPages = await mergedPdfEN.copyPages(pdf, pdf.getPageIndices())
+      copiedPages.forEach(page => mergedPdfEN.addPage(page))
     }
+    const mergedENBytes = await mergedPdfEN.save()
+    await Deno.writeFile(`${finalOutputDir}/exam_merged_en.pdf`, mergedENBytes)
 
-    // Read and return the PDF
-    const pdfBytes = await Deno.readFile(examPdfPath)
-    return pdfBytes
+    // creates the attendance list CSV file
+    let csvContent = "Sitzplatz,Random,Matrikelnr,Name,Anwesend? (X)\n"
+    job.studentData.forEach((student, index) => {
+      const seatNumber = index + 1
+      const randoms = job.randomNumbers[index]
+      const randomCode = `${randoms.de}/${randoms.en}`
+      csvContent += `${seatNumber},${randomCode},${student.studentId},"${student.firstName} ${student.lastName}",\n`
+    })
+    await Deno.writeTextFile(`${finalOutputDir}/anwesenheitsliste.csv`, csvContent)
+
+    // moves the solution and log files into the final output directory
+    const tempOutputDir = `${job.jobDir}/temp_output`
+    await Deno.rename(`${tempOutputDir}/exam_solution_de.pdf`, `${finalOutputDir}/exam_solution_de.pdf`)
+    await Deno.rename(`${tempOutputDir}/exam_de.log`, `${finalOutputDir}/exam_de.log`)
+    await Deno.rename(`${tempOutputDir}/exam_en.log`, `${finalOutputDir}/exam_en.log`)
+
+    // creates the final ZIP archive containing all generated artifacts
+    const zipFilePath = `${job.jobDir}/exams_output.zip`
+    await createZipArchiveFromDirectory(finalOutputDir, zipFilePath)
+
+    job.status = 'completed'
+    job.zipPath = zipFilePath
+    console.log(`Job ${jobId} completed successfully. ZIP available at ${zipFilePath}`)
 
   } catch (error) {
-    console.error("Error during PDF generation:", error)
-    throw new Error("Failed to generate PDF: " + error.message)
+    console.error(`Failed to finalize job ${jobId}:`, error)
+    job.status = 'failed'
   }
 }
 
-// generates all exams (parelelized) and more
-async function generateAllExams(examListPath: string, templateDir: string, outDir: string) {
-  try {
-    // read excel file
-    const fileContent = await Deno.readFile(examListPath)
-    const workbook = read(fileContent, { type: "buffer" })
-    const firstSheetName = workbook.SheetNames[0]
-    const worksheet = workbook.Sheets[firstSheetName]
-
-    // process student data starting from row 6
-    const studentData = utils.sheet_to_json(worksheet, {
-      header: [
-        "examPlanId", "examNumber", "examTitle", "lastName", "firstName", "studentId",
-        "performance", "attempt", "status", "bonus", "semester", "year", "period",
-        "remark", "topic", "startTime", "plannedEnd", "actualEnd", "examType",
-        "examForm", "studyProgram", "lockVersion"
-      ],
-      range: 5, // skip first 5 rows (metadata and headers)
-    }).filter(student => student.firstName && student.lastName) // ensure that no other rows like empty rows are included
-
-    studentData.sort((a, b) => a.studentId - b.studentId)
-    console.log("Students number:", studentData.length)
-
-    let examDELog = ""
-    let examENLog = ""
-    let examSolutionLog = ""
-
-    const deRandomExamNumbers: string[] = []
-    const enRandomExamNumbers: string[] = []
-    const counterStart = 0
-
-    // --- GERMAN EXAMS (PARALLEL) ---
-    console.log("Generating German exams in parallel...")
-    const germanExamPromises = studentData.map((student, index) => {
-        const seatNumber = index + 1
-        let fullName = `${student.firstName} ${student.lastName}`
-        let counter = counterStart + 1 + index
-        let randomNumber = genRandomNumber('de', counter)
-        deRandomExamNumbers[index] = randomNumber
-
-        return (async () => {
-            const studentTempDir = await Deno.makeTempDir({ prefix: `student_de_${student.studentId}_` })
-            await copy(templateDir, studentTempDir, { overwrite: true })
-            await updateMetaStudent({
-                vollername: fullName,
-                matrikelnummer: student.studentId,
-                zeigeloesung: 'no',
-                sprache: 'de',
-                randomexamnumber: randomNumber,
-                sequenznummer: seatNumber
-            }, studentTempDir);
-            const pdfBytes = await generateExam(studentTempDir)
-            await Deno.remove(studentTempDir, { recursive: true })
-            return pdfBytes
-        })()
-    })
-    const examDE = await Promise.all(germanExamPromises)
-    console.log("All German exams generated.")
-
-    // generate one more time just to get a log file
-    const deLogDir = await Deno.makeTempDir({ prefix: "log_gen_de_" })
-    await copy(templateDir, deLogDir, { overwrite: true })
-    await updateMetaStudent({ sprache: 'de' }, deLogDir)
-    await generateExam(deLogDir)
-    examDELog = await Deno.readTextFile(`${deLogDir}/exam.log`)
-    await Deno.remove(deLogDir, { recursive: true })
-    console.log("German log file generated.")
-
-    // --- ENGLISH EXAMS (PARALLEL) ---
-    console.log("Generating English exams in parallel...");
-    const englishExamPromises = studentData.map((student, index) => {
-        const seatNumber = index + 1
-        let fullName = `${student.firstName} ${student.lastName}`
-        let counter = counterStart + 1 + index
-        let randomNumber = genRandomNumber('en', counter)
-        enRandomExamNumbers[index] = randomNumber
-
-        return (async () => {
-            const studentTempDir = await Deno.makeTempDir({ prefix: `student_en_${student.studentId}_` })
-            await copy(templateDir, studentTempDir, { overwrite: true })
-            await updateMetaStudent({
-                vollername: fullName,
-                matrikelnummer: student.studentId,
-                zeigeloesung: 'no',
-                sprache: 'en',
-                randomexamnumber: randomNumber,
-                sequenznummer: seatNumber
-            }, studentTempDir)
-            const pdfBytes = await generateExam(studentTempDir)
-            await Deno.remove(studentTempDir, { recursive: true })
-            return pdfBytes
-        })()
-    })
-    const examEN = await Promise.all(englishExamPromises)
-    console.log("All English exams generated.")
-
-    // generate one more time just to get a log file
-    const enLogDir = await Deno.makeTempDir({ prefix: "log_gen_en_" })
-    await copy(templateDir, enLogDir, { overwrite: true })
-    await updateMetaStudent({ sprache: 'en' }, enLogDir)
-    await generateExam(enLogDir)
-    examENLog = await Deno.readTextFile(`${enLogDir}/exam.log`)
-    await Deno.remove(enLogDir, { recursive: true })
-    console.log("English log file captured.")
-
-    // --- MERGE AND SOLUTION ---
-    console.log("Merging PDFs and generating solution...")
-    const examDEMerged = await mergePDFs(examDE)
-    const examENMerged = await mergePDFs(examEN)
-
-    // generate solution exam (no seat number)
-    const solutionTempDir = await Deno.makeTempDir({ prefix: "solution_" })
-    await copy(templateDir, solutionTempDir, { overwrite: true })
-    await updateMetaStudent({
-      vollername: 'Max Musterloesung',
-      matrikelnummer: 0,
-      zeigeloesung: 'yes',
-      sprache: 'de'
-    }, solutionTempDir)
-    const examSolution = await generateExam(solutionTempDir)
-    examSolutionLog = await Deno.readTextFile(`${solutionTempDir}/exam.log`)
-    await Deno.remove(solutionTempDir, { recursive: true })
-    console.log("Solution exam and log file generated.")
-
-    // generating anwesenheitsliste.csv
-    const csvHeader = "Sitzplatz,Random,Matrikelnr,Name,Anwesend? (X)\n"
-    let csvContent = csvHeader;
-    studentData.forEach((student, index) => {
-      const seatNumber = index + 1;
-      const randomCode = deRandomExamNumbers[index] + "/" + enRandomExamNumbers[index]
-      csvContent += `${seatNumber},${randomCode},${student.studentId},${student.firstName} ${student.lastName},\n`
-    });
-    console.log("Attendance list generated.")
-
-    // write everything to output dir
-    await Deno.writeFile(`${outDir}/exam_merged_de.pdf`, examDEMerged)
-    await Deno.writeFile(`${outDir}/exam_merged_en.pdf`, examENMerged)
-    await Deno.writeFile(`${outDir}/exam_solution_de.pdf`, examSolution)
-    await Deno.writeTextFile(`${outDir}/exam_de.log`, examDELog)
-    await Deno.writeTextFile(`${outDir}/exam_en.log`, examENLog)
-    await Deno.writeTextFile(`${outDir}/exam_solution.log`, examSolutionLog)
-    await Deno.writeTextFile(`${outDir}/anwesenheitsliste.csv`, csvContent)
-
-  } catch (error) {
-    console.error('Error generating mass exams:', error)
-    throw error
-  }
-}
-
-async function mergePDFs(pdfs: Uint8Array[]) {
-  const mergedPdf = await PDFDocument.create()
-
-  for (const pdfBytes of pdfs) {
-    const pdf = await PDFDocument.load(pdfBytes)
-    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices())
-    copiedPages.forEach(page => mergedPdf.addPage(page))
-  }
-
-  return mergedPdf.save()
-}
-
-// for escaping special characters in latex
 function escapeLatex(text?: string): string {
   if (!text) return ""
   return text.replace(/([&%$#_{}~^\\])/g, '\\$1')
@@ -925,14 +861,8 @@ async function createZipArchiveFromDirectory(outDir: string, zipFilePath: string
 
 async function updateMetaTemplate(exam: Exam, workingDir: string) {
   const metaPath = `${workingDir}/meta-exam.tex`
-
-  // Extract data from JSON
-  const { courseName, examinerName, semester, date, examLengthMinutes, tasks } = exam;
-
-  // Read meta-exam.tex
-  const metaTemplate = await Deno.readTextFile(metaPath);
-
-  // Replace placeholders in meta-exam.tex
+  const { courseName, examinerName, semester, date, examLengthMinutes, tasks } = exam
+  const metaTemplate = await Deno.readTextFile(metaPath)
   const updatedMeta = metaTemplate
     .replace(/\\newcommand\{\\veranstaltung\}\{.*?\}/, `\\newcommand{\\veranstaltung}{ ${courseName.replace(/([#\$%&_\{\}~^\\ ])/g, '\\$1')} }`)
     .replace(/\\newcommand\{\\semester\}\{.*?\}/, `\\newcommand{\\semester}{${semester.replace(/ /g, '\\ ')}}`)
@@ -947,37 +877,6 @@ async function updateMetaTemplate(exam: Exam, workingDir: string) {
 
   // Update meta-exam.tex
   await Deno.writeTextFile(metaPath, updatedMeta)
-}
-
-async function updateMetaStudent(options: {
-  zeigeloesung?: 'yes' | 'no',
-  sprache?: string,
-  randomexamnumber?: string,
-  sequenznummer?: number,
-  vollername?: string,
-  matrikelnummer?: number,
-  uploadurl?: string,
-} = {},
-workingDir: string
-) {
-  const { zeigeloesung, sprache, randomexamnumber, sequenznummer, vollername, matrikelnummer, uploadurl } = options
-  const metaPath = `${workingDir}/meta-exam.tex`
-
-  // Read meta-exam.tex
-  const metaTemplate = await Deno.readTextFile(metaPath);
-
-  // Replace placeholders in meta-exam.tex
-  const updatedMeta = metaTemplate
-    .replace(/\\newcommand\{\\zeigeloesung\}\{.*?\}/, `\\newcommand{\\zeigeloesung}{${zeigeloesung === 'yes' ? 'yes' : 'no'}}`)
-    .replace(/\\newcommand\{\\sprache\}\{.*?\}/, `\\newcommand{\\sprache}{${sprache || 'de'}}`)
-    .replace(/\\newcommand\{\\randomexamnumber\}\{.*?\}/, `\\newcommand{\\randomexamnumber}{${randomexamnumber || '7PYT'}}`)
-    .replace(/\\newcommand\{\\sequenznummer\}\{.*?\}/, `\\newcommand{\\sequenznummer}{${sequenznummer || '6'}}`)
-    .replace(/\\newcommand\{\\vollername\}\{.*?\}/, `\\newcommand{\\vollername}{${vollername ? vollername.replace(/ /g, '\\ ') : 'Tom\ Morello'}}`)
-    .replace(/\\newcommand\{\\matrikelnummer\}\{.*?\}/, `\\newcommand{\\matrikelnummer}{${matrikelnummer || '3120434'}}`)
-    .replace(/\\newcommand\{\\uploadurl\}\{.*?\}/, `\\newcommand{\\uploadurl}{${uploadurl || 'aklsjdhflkjashdflkjahsdf'}}`);
-
-  // Update meta-exam.tex
-  await Deno.writeTextFile(metaPath, updatedMeta);
 }
 
 async function sendEmail(to: string, subject: string, html: string): Promise<void> {
@@ -1024,7 +923,6 @@ function calc_check_digit(number: string): string {
   const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   const modulus = alphabet.length
   const cs = checksum(number) || modulus
-  
   let index = (1 - (cs * 2) % (modulus + 1))
   index = ((index % modulus) + modulus) % modulus // makes sure the index is not negative, because Typescript modulo is not really modulo (with negative numbers).
 
