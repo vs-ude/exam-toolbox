@@ -56,9 +56,6 @@ export class MainViewComponent {
     this.isNavCollapsed = !this.isNavCollapsed
     this.sidenav.nativeElement.style.width = this.isNavCollapsed ? '0' : '12%';
     this.content.nativeElement.style.width = this.isNavCollapsed ? '100%' : '88%';
-
-    console.log(this.sidenav.nativeElement.style.width)
-
   }
 
 

@@ -62,6 +62,9 @@
     border-radius: 15px;
     padding: 10px 32px 10px 32px;
     box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .task_wrapper {
