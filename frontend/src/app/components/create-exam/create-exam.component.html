@@ -57,6 +57,9 @@
                     (click)="onMassExam()"></mat-icon>
             </div>
 
+             <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"><img
+                    src="{{ bilingual? 'english.svg': 'german.svg'}}" /></span>
+
 
             <!-- Duration -->
             <div class="duration_wrapper">
@@ -94,9 +97,6 @@
                 </mat-select>
             </div>
 
-
-            <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"><img
-                    src="{{ bilingual? 'english.svg': 'german.svg'}}" /></span>
         </div>
 
 

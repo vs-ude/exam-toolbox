@@ -109,6 +109,8 @@
     padding: 2%;
     flex-grow: 1;
     max-height: 10%;
+    width: 100%;
+    flex-wrap: wrap;
 }
 
 .duration_wrapper {
@@ -178,7 +180,7 @@
     flex-direction: row;
     padding: 0 10px;
     border-radius: 5px;
-    min-width: 20%;
+    min-width: 15%;
     color: var(--color-icon);
 }
 
@@ -201,7 +203,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: row;
-    padding: 0 10px;
+    padding: 0 0px;
     border-radius: 5px;
     min-width: 20%;
     color: var(--color-icon);
