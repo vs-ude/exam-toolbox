@@ -13,6 +13,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    transition: width 0.5s ease;
+}
+
+.collapse-nav-btn{
+    border: none;
+    background-color: transparent;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 .user-profile {
@@ -146,4 +155,5 @@
     background-color: var(--color-background);
     width: 88%;
     height: 100%;
+    transition: width 0.3s ease;
 }

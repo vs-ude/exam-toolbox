@@ -1,5 +1,6 @@
 <div class="main">
-    <div class="sidenav">
+    <div class="sidenav" id="sidenav" #sidenav>
+
         <button class="dropdown-button">
             <div class="user-profile">
                 <div class="avatar">{{initialLetter}}</div>
@@ -18,14 +19,29 @@
                         d="M16 11.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0m-.956 4.206a5.5 5.5 0 1 1 .662-.662.5.5 0 0 1 .148.102l3 3a.5.5 0 1 1-.707.707l-3-3a.5.5 0 0 1-.103-.147"
                         clip-rule="evenodd"></path>
                 </svg>
-                <input type="text" placeholder="Search..." class="search-input" aria-label="Search" aria-autocomplete="list"
-                    aria-controls="mat-autocomplete-0" aria-activedescendant="mat-option-0">
+                <input type="text" placeholder="Search..." class="search-input" aria-label="Search"
+                    aria-autocomplete="list" aria-controls="mat-autocomplete-0" aria-activedescendant="mat-option-0">
             </div>
         </button>
 
         <div class="separator-horizontal" style="margin-top: 5%;"></div>
 
-
+        <button class="nav-item" (click)="toggleNavCollapse()">
+            <div class="icon-container">
+                <svg viewBox="-0.5 -0.5 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    id="Sidebar-Collapse--Streamline-Iconoir" height="22" width="22">
+                    <path d="M12.7769375 14.284625H2.2230625c-0.8326875 0 -1.5076875 -0.675 -1.5076875 -1.5076875l0 -10.553875c0
+                         -0.8326875 0.675 -1.5076875 1.5076875 -1.5076875h10.553875c0.8326875 0 1.5076875 0.675 1.5076875
+                          1.5076875v10.553875c0 0.8326875 -0.675 1.5076875 -1.5076875 1.5076875Z" stroke="currentColor"
+                        stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path>
+                    <!-- <path d="M3.9192500000000003 5.9923125 2.6 7.5l1.3192499999999998 1.5076875" stroke="currentColor"
+                        stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path> -->
+                    <path d="M5.615375 14.284625V0.7153750000000001" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-width="1.8"></path>
+                </svg>
+            </div>
+            Collapse
+        </button>
 
         <button routerLink="/dashboard" class="nav-item">
             <div class="icon-container">
@@ -64,8 +80,8 @@
     </div>
 
 
-    <div class="separator-vertical"></div>
-    <div class="content">
+    <div class="separator-vertical" *ngIf="!isNavCollapsed"></div>
+    <div class="content" #content>
         <router-outlet></router-outlet>
     </div>
 </div>
