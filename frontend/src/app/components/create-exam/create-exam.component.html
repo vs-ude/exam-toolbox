@@ -15,8 +15,8 @@
             <app-AddTask class="task_wrapper" [name]="'Short Answer'"
                 [color]="colorProvider.getTaskColor('shortAnswer')" [iconName]="'shortAnswer.svg'" id="new_shortAnswer"
                 draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)"></app-AddTask>
-            <app-AddTask class="task_wrapper" [name]="'Ranking'" [color]="colorProvider.getTaskColor('ranking')"
-                [iconName]="'ranking.svg'" id="new_ranking" draggable="true" (dragstart)="dragStart($event)"
+            <app-AddTask class="task_wrapper" [name]="'New Page'" [color]="colorProvider.getTaskColor('newPage')"
+                [iconName]="'ranking.svg'" id="new_newPage" draggable="true" (dragstart)="dragStart($event)"
                 (dragend)="drop($event)"></app-AddTask>
             <app-AddTask class="task_wrapper" [name]="'Picture Task'"
                 [color]="colorProvider.getTaskColor('pictureTask')" [iconName]="'pictureTask.svg'" id="new_picture"
@@ -57,7 +57,7 @@
                     (click)="onMassExam()"></mat-icon>
             </div>
 
-             <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"><img
+            <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"><img
                     src="{{ bilingual? 'english.svg': 'german.svg'}}" /></span>
 
 
@@ -126,8 +126,10 @@
         </div>
 
         <div cdkDropList (cdkDropListDropped)="reorderDrop($event)" class="task_group_container">
-            @for (task of exam.tasks[currentGroupView].tasks; track task.taskId; let i = $index) {
+            @for (task of exam.tasks[currentGroupView].tasks; track task.taskId; let i = $index)
+            {
 
+            <!-- Assignment Description -->
             <mat-card class="task_group_title form-card" *ngIf="i === 0" style="border-color: var(--color-text);">
                 <app-task-group-title class="task_container" [assignmentNumber]="currentGroupView + 1"
                     [bilingual]="bilingual" [preTitle]="exam.tasks[currentGroupView].groupTitle"
@@ -135,11 +137,17 @@
             </mat-card>
 
 
-            <span *ngIf="task.type !== 'manualText'" class="task_number">
+            <!-- Task Number/Header -->
+            <span *ngIf="task.type !== 'manualText' && task.type !== 'newPage'" class="task_number">
                 Assignment {{currentGroupView +1}}.{{calcTaskChar(i)}}
             </span>
-            <span *ngIf="task.type === 'manualText'" class="task_number">Manual Text
+            <span *ngIf="task.type === 'manualText'" class="task_number">
+                Manual Text
             </span>
+            <span *ngIf="task.type === 'newPage'" class ="task_number">
+                New Page
+            </span>
+            
 
             <!-- Multiple Choice-->
             <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'" cdkDrag>
@@ -200,7 +208,19 @@
                     <mat-icon>drag_indicator</mat-icon>
                 </div>
             </mat-card>
+
+            <!-- New Page  -->
+            <mat-card class="form-card" *ngIf="task.type === 'newPage'" cdkDrag>
+                <app-new-page class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
+                    [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
+                    (deleteEvent)="deleteTask(i)" (taskChangeEvent)="onTaskChange($event,i)" />
+                <div class="drag_handle" cdkDragHandle>
+                    <mat-icon>drag_indicator</mat-icon>
+                </div>
+            </mat-card>
             }
+
+
 
         </div>
     </div>
@@ -215,16 +235,5 @@
             draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)" matTooltip="{{task.question.DE}}"
             [matTooltipShowDelay]="800">
         </app-AddTask>
-
-
-        <!-- Remove me -->
-        <app-AddTask *ngFor="let i of [].constructor(15)" class="task_wrapper"
-            [name]="'Ich bin eine verdammt lange Frage. Und wenn ich will werde ich noch länger ich werde so lang ich gehe zum Rewe und fresse da alle und dann springe ich nach Berlin über Magdeburg'"
-            [color]="colorProvider.getTaskColor('multipleChoice')" [iconName]="'multipleChoice' + '.svg'"
-            id="{{'msdoifsdfniods' + i}}" draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)"
-            matTooltip="{{'Tooltip'}}" [matTooltipShowDelay]="800">
-        </app-AddTask>
-        <!-- end remove -->
-
     </div>
 </div>

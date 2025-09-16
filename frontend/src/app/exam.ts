@@ -39,6 +39,7 @@ export type Task =
     | LatexTask
     | TableTask
     | ManualText
+    | NewPage
     ;
 
 
@@ -105,6 +106,11 @@ export interface TableTask extends BaseTask {
 export interface ManualText extends BaseTask {
     type: "manualText"
     points: 0; // Manual texts do not have points
+}
+
+export interface NewPage extends BaseTask {
+    type: "newPage"
+    points: 0; // New pages do not have points
 }
 
 export interface Translation {

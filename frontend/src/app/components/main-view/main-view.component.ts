@@ -6,14 +6,13 @@ import { MatButtonModule } from '@angular/material/button'
 import { ThemeToggleService } from '../../services/theme-toggle.service';
 import { MatIcon } from '@angular/material/icon';
 import { ApiService } from '../../services/api.service';
-import { MatTooltip } from "@angular/material/tooltip";
 import { NgIf } from '@angular/common';
 
 
 @Component({
   selector: 'app-main-view',
   standalone: true,
-  imports: [MatSidenavModule, MatListModule, RouterOutlet, MatButtonModule, RouterModule, MatIcon, MatTooltip, NgIf],
+  imports: [MatSidenavModule, MatListModule, RouterOutlet, MatButtonModule, RouterModule, MatIcon, NgIf],
   templateUrl: './main-view.component.html',
   styleUrl: './main-view.component.scss'
 })

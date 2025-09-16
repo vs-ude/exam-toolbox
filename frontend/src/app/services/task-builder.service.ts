@@ -118,6 +118,18 @@ export class TaskBuilderService {
           lastUsed: new Date(),
           usedIn: [],
         };
+      case "new_newPage":
+        return {
+          taskId: "newPage-" + Date.now(),
+          type: "newPage",
+          question: { DE: "", EN: "" },
+          points: 0,
+          tags: [],
+          createdBy: this.user.id,
+          createdAt: new Date(),
+          lastUsed: new Date(),
+          usedIn: [],
+        }
       default:
         throw new Error(`Unknown task type: ${taskType}`);
     }

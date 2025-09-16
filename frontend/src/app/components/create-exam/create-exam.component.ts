@@ -25,6 +25,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MassExamDialogComponent } from '../mass-exam-dialog/mass-exam-dialog.component';
 import { LoadingService } from '../../services/loading.service';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, CdkDragHandle } from '@angular/cdk/drag-drop';
+import { NewPageComponent } from "./tasks/new-page/new-page.component";
 
 
 
@@ -53,8 +54,8 @@ import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, CdkDragHandle } fro
     CdkDrag,
     CdkDropList,
     CdkDragHandle,
-
-  ],
+    NewPageComponent
+],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
 })
@@ -327,14 +328,14 @@ export class CreateExamComponent {
   }
 
   public calcTaskChar(index: number): string {
-    // ignore manual text tasks when calculating the task number
-    let manualTextCount = 0;
+    // ignore manual text and new page tasks when calculating the task number
+    let ignoredCount = 0;
     const tasks = this.exam.tasks[this.currentGroupView].tasks;
     for (let i = 0; i < index; i++) {
-      if (tasks[i].type === 'manualText') manualTextCount++;
+      if (tasks[i].type === 'manualText' || tasks[i].type === 'newPage') ignoredCount++;
     }
 
-    return this.mapTaskIndexToChar(index - manualTextCount);
+    return this.mapTaskIndexToChar(index - ignoredCount);
   }
 
   private mapTaskIndexToChar(index: number) {
