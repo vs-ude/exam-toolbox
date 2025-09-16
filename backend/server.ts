@@ -50,8 +50,8 @@ const JOBS_DIR = "/app/jobs"
 // a union type for all possible tasks that a worker can handle
 type GenerationTask = {type: 'student', [key: string]: any} | {type: 'solution', [key: string]: any} | {type: 'log', [key: string]: any}
 
-const jobs = new Map<string, ExamGenerationJob>() // in-memory database for tracking active and recent jobs
-const taskQueue: GenerationTask[] = [] // FIFO queue for all pending tasks
+let jobs = new Map<string, ExamGenerationJob>() // in-memory database for tracking active and recent jobs
+let taskQueue: GenerationTask[] = [] // FIFO queue for all pending tasks
 
 const logicalCores = navigator.hardwareConcurrency // fetches number of cpu cores on host system
 const POOL_SIZE = Math.max(1, logicalCores - 1) // worker pool size is cpu cores -1 or at least 1
@@ -77,6 +77,7 @@ for (let i = 0; i < POOL_SIZE; i++) {
 
     // ignores messages for jobs that are already finished or failed
     if (!associatedJob || associatedJob.status !== 'processing') {
+      console.log(`Ignoring stale result from worker for job ${result.jobId} (status: ${associatedJob?.status})`)
       processQueue()
       return
     }
@@ -433,7 +434,7 @@ router
       jobId: job.jobId,
       status: job.status,
       progress: job.progress,
-      downloadUrl: job.status === 'completed' ? `/api/jobs/${job.jobId}/download` : null,
+      downloadUrl: job.status === 'completed' ? `/api/jobs/${jobId}/download` : null,
     }
   })
   // given the jobId of the mass-exam-generation the produced zip can be downloaded
@@ -464,6 +465,34 @@ router
       console.error(`Error sending zip file for job ${jobId}:`, error)
       ctx.response.status = 500
       ctx.response.body = { message: "Error reading the generated file." }
+    }
+  })
+  .delete("/api/jobs/:jobId", async (ctx) => {
+    const jobId = ctx.params.jobId
+    const job = jobs.get(jobId)
+
+    if (!job) {
+      ctx.response.status = 404
+      ctx.response.body = { message: "Job not found" }
+      return
+    }
+
+    if (job.status === 'processing' || job.status === 'queued') {
+      console.log(`Cancellation requested for job: ${jobId}`)
+      
+      job.status = 'failed' 
+
+      taskQueue = taskQueue.filter(task => task.jobId !== jobId)
+      
+      await Deno.remove(job.jobDir, { recursive: true }).catch(err => {
+        console.error(`Error during immediate cleanup for cancelled job ${jobId}:`, err)
+      })
+      
+      ctx.response.status = 200
+      ctx.response.body = { message: `Job ${jobId} has been cancelled.` }
+    } else {
+      ctx.response.status = 400
+      ctx.response.body = { message: `Job ${jobId} cannot be cancelled as it is already ${job.status}.` }
     }
   })
   .get("/api/taskPool", async (ctx) => {

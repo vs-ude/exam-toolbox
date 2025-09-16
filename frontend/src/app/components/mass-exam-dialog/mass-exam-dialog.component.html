@@ -50,7 +50,11 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-stroked-button mat-dialog-close>Cancel</button>
+  <button *ngIf="!isLoading" mat-stroked-button mat-dialog-close>Cancel</button>
+  <button *ngIf="isLoading" mat-stroked-button color="warn" (click)="cancelGeneration()">
+    <mat-icon>cancel</mat-icon>
+    <span>Stop Generation</span>
+  </button>
   <button mat-flat-button color="primary" [disabled]="!selectedFile || isLoading" (click)="generate()">
     <mat-icon>play_arrow</mat-icon>
     <span>Generate</span>
