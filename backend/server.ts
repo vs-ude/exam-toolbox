@@ -258,7 +258,7 @@ router
       await updateMetaStudent({ vollername: 'Max Musterloesung', matrikelnummer: 0, zeigeloesung: 'yes', sprache: 'de' }, tempDir)
       const tasksContentLatex = await generateTasksLatex(exam, tempDir)
       await Deno.writeTextFile(tasksPath, tasksContentLatex)
-      const { pdfBytes: examPDF } = await generateExam(tempDir)
+      const { pdfBytes: examPDF, logContent } = await generateExam(tempDir)
       ctx.response.headers.set("Content-Type", "application/pdf")
       ctx.response.headers.set("Content-Disposition", `attachment; filename="${exam.courseName}.pdf"`)
       ctx.response.body = examPDF
@@ -708,6 +708,7 @@ function escapeLatex(text?: string): string {
 }
 
 async function generateTasksLatex(exam: Exam, workingDir: string): Promise<string> {
+  console.log(exam)
   await clearLatexIMGFolder(workingDir) // remove old images from previous runs
 
   const taskGroups = exam.tasks // get the array of task groups
@@ -715,6 +716,14 @@ async function generateTasksLatex(exam: Exam, workingDir: string): Promise<strin
 
   // iterate over each task group
   for (let group of taskGroups) {
+
+    // newPage is in the tasks list but its not really a task (need to be handles differently)
+    // case for group with just newPage in it
+    if (group.tasks.length === 1 && group.tasks[0].type === "newPage"){
+      latexContent += `\\clearpage\n\n`
+      continue
+    }
+
     const groupTitleDE = group.groupTitle.DE
     const groupTitleEN = group.groupTitle.EN
 
@@ -723,6 +732,14 @@ async function generateTasksLatex(exam: Exam, workingDir: string): Promise<strin
 
     // iterate over the sub-tasks within this group
     for (let subTask of group.tasks) {
+
+      // handle newPage differently since its not really a task
+      // case for a creaPage inbetween subtasks
+      if (subTask.type === "newPage") {
+      latexContent += `\\clearpage\n`
+      continue
+    }
+
       const questionDE = subTask.question.DE
       const questionEN = subTask.question.EN
 
@@ -858,7 +875,7 @@ async function generateTasksLatex(exam: Exam, workingDir: string): Promise<strin
 
   } // end of iterating through task groups
 
-  // console.log(latexContent) // uncomment for debugging
+  console.log(latexContent) // uncomment for debugging
   return latexContent;
 }
 
