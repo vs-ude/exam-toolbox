@@ -183,7 +183,8 @@ export class CreateExamComponent {
     for (let i = 0; i < this.exam.tasks.length; i++) {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const currentTaskId = this.exam.tasks[i].tasks[j].taskId;
-        if (this.taskPool.find(task => task.taskId === currentTaskId) == undefined) {
+        if (this.taskPool.find(task => task.taskId === currentTaskId) == undefined ) {
+          if (this.exam.tasks[i].tasks[j].type === "newPage"){ continue;}
           this.api.addTaskToPool(this.exam.tasks[i].tasks[j]).subscribe(
             response => {
               console.log(`Task ${currentTaskId} added to pool`, response);
@@ -270,6 +271,7 @@ export class CreateExamComponent {
 
   onUpdate() {
     this.checkIfValid()
+    this.addNewTasksToPool();
     this.api.updateExam(this.exam._id, this.exam).subscribe(
       response => {
         console.log('Exam updated successfully: ', response);
