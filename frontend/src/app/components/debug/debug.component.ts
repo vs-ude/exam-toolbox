@@ -185,4 +185,11 @@ export class DebugComponent {
       }
     );
   }
+
+  onGetDownloadableList(){
+    this.api.getDownloadableJobs().subscribe(downloadableJobs => {
+      console.log("Downloadable Jobs: ")
+      console.table(downloadableJobs)
+    })
+  }
 }

@@ -30,6 +30,7 @@ interface StudentResult {
 // how a mass-exam-generation-job is defined
 interface ExamGenerationJob {
   jobId: string
+  examId: string
   userEmail: string
   status: 'queued' | 'processing' | 'finalizing' | 'completed' | 'failed'
   progress: {
@@ -351,6 +352,7 @@ router
         return
       }
 
+      const examId = examJson._id
       const jobId = crypto.randomUUID()
       const jobDir = `${JOBS_DIR}/${jobId}`
       const jobTemplatePath = `${jobDir}/template`
@@ -374,6 +376,7 @@ router
 
       const newJob: ExamGenerationJob = {
         jobId,
+        examId,
         userEmail: ctx.state.user.email,
         status: 'processing',
         progress: { total: totalTasks, completed: 0, failed: 0 },
@@ -623,6 +626,17 @@ router
       ctx.response.body = { message: `Error updating task ${ctx.params.taskId}`, error };
     }
   })
+  .get("/api/jobs/downloadable", async (ctx) => {
+    try {
+      const downloadableJobs = await getDownloadableJobs();
+      ctx.response.status = 200;
+      ctx.response.body = downloadableJobs;
+    } catch (error) {
+      console.error("Error fetching downloadable jobs:", error);
+      ctx.response.status = 500;
+      ctx.response.body = { message: "Error fetching downloadable jobs list" };
+    }
+  })
 
 
 
@@ -827,3 +841,36 @@ function genRandomNumber(lang: 'de' | 'en', counter: number): string {
   return num + parity
 }
 
+async function getDownloadableJobs(): Promise<{ examId: string, jobId: string }[]> {
+  const downloadableJobs: { examId: string, jobId: string }[] = [];
+  const latestJobs = new Map<string, ExamGenerationJob>();
+
+  // find latest completed job for for every examId
+  for (const job of jobs.values()) {
+    if (job.status === 'completed') {
+      const existingJob = latestJobs.get(job.examId)
+      if (!existingJob || job.createdAt > existingJob.createdAt) {
+        latestJobs.set(job.examId, job)
+      }
+    }
+  }
+
+  // check if the downloadable file for each of these latest jobs actually exists
+  for (const job of latestJobs.values()) {
+    if (job.zipPath) {
+      try {
+        await Deno.stat(job.zipPath)
+        // if the file exists, add it to final list
+        downloadableJobs.push({ examId: job.examId, jobId: job.jobId })
+      } catch (error) {
+        if (error instanceof Deno.errors.NotFound) {
+          console.log(`The latest job ${job.jobId} is completed, but its file was not found.`)
+        } else {
+          console.error(`Error checking file status for ${job.zipPath}:`, error)
+        }
+      }
+    }
+  }
+  
+  return downloadableJobs
+}

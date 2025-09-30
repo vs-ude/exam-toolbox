@@ -15,6 +15,11 @@ export interface JobStatus {
   downloadUrl?: string;
 }
 
+export interface DownloadableJob {
+  examId: string;
+  jobId: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -81,7 +86,7 @@ export class ApiService {
 
     formData.append('exam', JSON.stringify(exam))
     formData.append('list', list, list.name)
-    return this.http.post(`${this.apiUrl}/generate-exams`, formData, { responseType: 'blob' }).pipe(timeout(600000))
+    return this.http.post(`${this.apiUrl}/generate-exams`, formData, { responseType: 'blob' }).pipe()
   }
 
   uploadFile(file: File) {
@@ -126,4 +131,7 @@ export class ApiService {
     return this.http.put(`${this.apiUrl}/taskPool/${taskId}`, updatedTask);
   }
 
+  getDownloadableJobs(): Observable<DownloadableJob[]> {
+    return this.http.get<DownloadableJob[]>(`${this.apiUrl}/jobs/downloadable`);
+  }
 }
