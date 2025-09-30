@@ -22,9 +22,9 @@ import { generateTasksLatex } from "./generateTasksLatex.ts";
 
 // output from a successful student PDF generation
 interface StudentResult {
-    seatNumber: number
-    pdfPathDE: string
-    pdfPathEN: string
+  seatNumber: number
+  pdfPathDE: string
+  pdfPathEN: string
 }
 
 // how a mass-exam-generation-job is defined
@@ -49,7 +49,7 @@ const basePath = "/app/ExamTemplate"
 const JOBS_DIR = "/app/jobs"
 
 // a union type for all possible tasks that a worker can handle
-type GenerationTask = {type: 'student', [key: string]: any} | {type: 'solution', [key: string]: any} | {type: 'log', [key: string]: any}
+type GenerationTask = { type: 'student', [key: string]: any } | { type: 'solution', [key: string]: any } | { type: 'log', [key: string]: any }
 
 let jobs = new Map<string, ExamGenerationJob>() // in-memory database for tracking active and recent jobs
 let taskQueue: GenerationTask[] = [] // FIFO queue for all pending tasks
@@ -70,9 +70,9 @@ for (let i = 0; i < POOL_SIZE; i++) {
     if (workerWrapper) workerWrapper.isBusy = false
 
     if (!result.jobId) {
-        console.error("Worker message received without a jobId.")
-        processQueue()
-        return
+      console.error("Worker message received without a jobId.")
+      processQueue()
+      return
     }
     const associatedJob = jobs.get(result.jobId)
 
@@ -88,12 +88,12 @@ for (let i = 0; i < POOL_SIZE; i++) {
       associatedJob.progress.completed++
       if (result.type === 'student') {
         associatedJob.studentResults.push({
-            seatNumber: result.seatNumber,
-            pdfPathDE: result.pdfPathDE,
-            pdfPathEN: result.pdfPathEN,
+          seatNumber: result.seatNumber,
+          pdfPathDE: result.pdfPathDE,
+          pdfPathEN: result.pdfPathEN,
         })
       }
-    // on failure, logs detailed error info and marks the entire job as failed
+      // on failure, logs detailed error info and marks the entire job as failed
     } else {
       associatedJob.progress.failed++
       console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -102,7 +102,7 @@ for (let i = 0; i < POOL_SIZE; i++) {
       console.error(`Error Details: ${result.error}`)
       console.error("The entire job will now be marked as failed.")
       console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-      
+
       associatedJob.status = 'failed'
     }
 
@@ -110,7 +110,7 @@ for (let i = 0; i < POOL_SIZE; i++) {
 
     // checks if all tasks for a job are complete and, if so, starts the finalization process
     if ((associatedJob.progress.completed + associatedJob.progress.failed >= associatedJob.progress.total) && associatedJob.status === 'processing') {
-        await finalizeJob(associatedJob.jobId)
+      await finalizeJob(associatedJob.jobId)
     }
 
     processQueue()
@@ -369,7 +369,7 @@ router
         header: ["examPlanId", "examNumber", "examTitle", "lastName", "firstName", "studentId"],
         range: 5,
       }).filter((student: any) => student.firstName && student.lastName)
-      
+
       const totalTasks = studentData.length + 3
 
       const newJob: ExamGenerationJob = {
@@ -383,20 +383,20 @@ router
         randomNumbers: [],
         studentResults: [],
       }
-      
+
       studentData.forEach((student: any, index: number) => {
         const seatNumber = index + 1
         const deRandomNumber = genRandomNumber('de', index + 1)
         const enRandomNumber = genRandomNumber('en', index + 1)
         newJob.randomNumbers.push({ de: deRandomNumber, en: enRandomNumber })
         taskQueue.push({
-          type: 'student', 
+          type: 'student',
           jobId,
-          student, 
-          jobTemplatePath, 
-          outputDir: tempOutputDir, 
-          deRandomNumber, 
-          enRandomNumber, 
+          student,
+          jobTemplatePath,
+          outputDir: tempOutputDir,
+          deRandomNumber,
+          enRandomNumber,
           seatNumber
         })
       })
@@ -404,7 +404,7 @@ router
       taskQueue.push({ type: 'solution', jobId, jobTemplatePath, outputDir: tempOutputDir })
       taskQueue.push({ type: 'log', jobId, jobTemplatePath, outputDir: tempOutputDir, lang: 'de' })
       taskQueue.push({ type: 'log', jobId, jobTemplatePath, outputDir: tempOutputDir, lang: 'en' })
-      
+
       jobs.set(jobId, newJob)
 
       workers.forEach(() => processQueue())
@@ -419,6 +419,19 @@ router
         message: 'Error starting exam generation job',
         error: error instanceof Error ? error.message : String(error),
       }
+    }
+  })
+  .delete("/api/exams", async (ctx) => {
+    try {
+      const result = await exams.deleteMany({})
+      ctx.response.status = 200
+      ctx.response.body = {
+        message: `${result} exams deleted successfully!`,
+        deletedCount: result,
+      }
+    } catch (error) {
+      ctx.response.status = 500
+      ctx.response.body = { message: "Error deleting exams", error }
     }
   })
   // frontend get status about the progress of the mass-exam generation
@@ -480,15 +493,15 @@ router
 
     if (job.status === 'processing' || job.status === 'queued') {
       console.log(`Cancellation requested for job: ${jobId}`)
-      
-      job.status = 'failed' 
+
+      job.status = 'failed'
 
       taskQueue = taskQueue.filter(task => task.jobId !== jobId)
-      
+
       await Deno.remove(job.jobDir, { recursive: true }).catch(err => {
         console.error(`Error during immediate cleanup for cancelled job ${jobId}:`, err)
       })
-      
+
       ctx.response.status = 200
       ctx.response.body = { message: `Job ${jobId} has been cancelled.` }
     } else {
@@ -562,19 +575,6 @@ router
       }
     }
   })
-  .delete("/api/exams", async (ctx) => {
-    try {
-      const result = await exams.deleteMany({})
-      ctx.response.status = 200
-      ctx.response.body = {
-        message: `${result} exams deleted successfully!`,
-        deletedCount: result,
-      }
-    } catch (error) {
-      ctx.response.status = 500
-      ctx.response.body = { message: "Error deleting exams", error }
-    }
-  })
   .delete("/api/taskPool/:taskId", async (ctx) => {
     try {
       const result = await pool.deleteOne({ taskId: ctx.params.taskId })
@@ -603,6 +603,24 @@ router
     } catch (error) {
       ctx.response.status = 500
       ctx.response.body = { message: "Error deleting task-pool", error }
+    }
+  })
+  .put("/api/taskPool/:taskId", async (ctx) => {
+    try {
+      const result = await pool.updateOne(
+        { taskId: ctx.params.taskId }, { $set: await ctx.request.body().value }
+      )
+
+      if (result.modifiedCount === 0) {
+        ctx.response.status = 404
+        ctx.response.body = { message: "Task not found" }
+        return
+      }
+      ctx.response.status = 200
+      ctx.response.body = { message: `Task ${ctx.params.taskId} updated successfully` }
+    } catch (error) {
+      ctx.response.status = 500;
+      ctx.response.body = { message: `Error updating task ${ctx.params.taskId}`, error };
     }
   })
 
@@ -778,14 +796,14 @@ function checksum(number: string): number {
   const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   const modulus = alphabet.length
   let check = Math.floor(modulus / 2)
-  
+
   for (const char of number) {
     const charIndex = alphabet.indexOf(char)
     if (charIndex === -1) continue // ignores chars not in the alphabet
     const val = check || modulus
     check = (((val * 2) % (modulus + 1)) + charIndex) % modulus
   }
-  
+
   return check
 }
 
@@ -801,7 +819,7 @@ function calc_check_digit(number: string): string {
 }
 
 // generates a random exam number
-function genRandomNumber(lang: 'de'|'en', counter: number): string {
+function genRandomNumber(lang: 'de' | 'en', counter: number): string {
   const paddedCount = counter.toString().padStart(4, "0")
   const langPrefix = lang === 'de' ? '1' : '2'
   const num = parseInt(langPrefix + paddedCount, 10).toString(36).toUpperCase()

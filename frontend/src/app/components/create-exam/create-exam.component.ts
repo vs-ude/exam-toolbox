@@ -55,7 +55,7 @@ import { NewPageComponent } from "./tasks/new-page/new-page.component";
     CdkDropList,
     CdkDragHandle,
     NewPageComponent
-],
+  ],
   templateUrl: './create-exam.component.html',
   styleUrl: './create-exam.component.scss'
 })
@@ -159,6 +159,13 @@ export class CreateExamComponent {
       console.warn("couldn't find task");
       return;
     }
+
+    // update Task Metadata
+    if (!task.usedIn.includes(this.exam._id || "placeholder_id")) {
+      task.usedIn.push(this.exam._id || "placeholder_id");
+    }
+    task.lastUsed = new Date();
+
     this.exam.tasks[this.currentGroupView].tasks.push(task);
     this.adjustTotalPoints();
   }
@@ -183,8 +190,8 @@ export class CreateExamComponent {
     for (let i = 0; i < this.exam.tasks.length; i++) {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const currentTaskId = this.exam.tasks[i].tasks[j].taskId;
-        if (this.taskPool.find(task => task.taskId === currentTaskId) == undefined ) {
-          if (this.exam.tasks[i].tasks[j].type === "newPage"){ continue;}
+        if (this.taskPool.find(task => task.taskId === currentTaskId) == undefined) {
+          if (this.exam.tasks[i].tasks[j].type === "newPage") { continue; }
           this.api.addTaskToPool(this.exam.tasks[i].tasks[j]).subscribe(
             response => {
               console.log(`Task ${currentTaskId} added to pool`, response);
@@ -272,6 +279,8 @@ export class CreateExamComponent {
   onUpdate() {
     this.checkIfValid()
     this.addNewTasksToPool();
+    this.updatePoolTasks();
+    console.log("got here")
     this.api.updateExam(this.exam._id, this.exam).subscribe(
       response => {
         console.log('Exam updated successfully: ', response);
@@ -280,6 +289,24 @@ export class CreateExamComponent {
         console.error('Error updating exam: ', error);
       }
     )
+  }
+
+  private updatePoolTasks() {
+    for (let i = 0; i < this.exam.tasks.length; i++) {
+      for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
+        const task = this.exam.tasks[i].tasks[j];
+        if (this.taskPool.find(poolTask => poolTask.taskId === task.taskId) != undefined) {
+          this.api.updateTaskInPool(task.taskId, task).subscribe(
+            response => {
+              console.log(`Task ${task.taskId} updated in pool`, response);
+            },
+            error => {
+              console.error(`Error updating task ${task.taskId}: `, error);
+            }
+          )
+        }
+      }
+    }
   }
 
   private importExam() {

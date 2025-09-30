@@ -122,4 +122,8 @@ export class ApiService {
     return this.http.get<Task[]>(`${this.apiUrl}/taskPool/user/${userId}`);
   }
 
+  updateTaskInPool(taskId: string, updatedTask: Task) {
+    return this.http.put(`${this.apiUrl}/taskPool/${taskId}`, updatedTask);
+  }
+
 }
