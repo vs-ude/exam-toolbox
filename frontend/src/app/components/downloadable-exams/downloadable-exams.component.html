@@ -4,12 +4,121 @@
     </div>
 
 
+    <div class="viewBar_wrapper">
+        <div class="viewBar_left">
+            <button class="tab_button tab_select">Recently Viewed</button>
+            <button class="tab_button">My Exams</button>
+            <button class="tab_button">Relevant Exams</button>
+        </div>
+
+
+
+
+        <div class="viewBar_right">
+
+            <!-- Sorting Options -->
+            <div class="sortingOptions_wrapper" id="openSortingDropdown">
+                <span id="openSortingDropdown">Last viewed</span>
+                <div id="openSortingDropdown"><mat-icon id="openSortingDropdown" aria-hidden="false"
+                        fontIcon="arrow_drop_down"></mat-icon></div>
+                <!-- Dropdown -->
+                <div class="dropdown triangle" [ngClass]="{'hide_dropdown': !showDropdowns.sorting}">
+                    <div class="dropdown_header">Sort by</div>
+
+                    <div class="option_container">
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
+                            style="font-size: small;">done</mat-icon>
+                        <span>Alphabetical</span>
+                    </div>
+
+                    <div class="option_container">
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
+                            style="font-size: small;">done</mat-icon>
+                        <span>Created</span>
+                    </div>
+
+                    <div class="option_container">
+                        <mat-icon class="dropdown_icon_wrapper" aria-hidden="false" fontIcon=""
+                            style="font-size: small;">done</mat-icon>
+                        <span>Last Viewed</span>
+                    </div>
+
+                    <hr class="divider">
+                    <div class="dropdown_header">Order</div>
+
+                    <div class="option_container">
+                        <mat-icon class="dropdown_icon_wrapper" aria-hidden="false" fontIcon=""
+                            style="font-size: small;">done</mat-icon>
+                        <span>A-Z</span>
+                    </div>
+
+                    <div class="option_container">
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
+                            style="font-size: small;">done</mat-icon>
+                        <span>Z-A</span>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            <!-- Filter Options -->
+            <div class="filterOptions_wrapper" id="openFilterDropdown">
+                <span id="openFilterDropdown">All files</span>
+                <div id="openFilterDropdown"><mat-icon id="openFilterDropdown" aria-hidden="false"
+                        fontIcon="arrow_drop_down"></mat-icon></div>
+
+                <!-- Dropdown -->
+                <div class="dropdown triangle" [ngClass]="{'hide_dropdown': !showDropdowns.filter}">
+                    <div class="option_container">
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
+                            style="font-size: small;">done</mat-icon>
+                        <span>Alphabetical</span>
+                    </div>
+
+                    <div class="option_container">
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
+                            style="font-size: small;">done</mat-icon>
+                        <span>Created</span>
+                    </div>
+
+                    <div class="option_container">
+                        <mat-icon class="dropdown_icon_wrapper" aria-hidden="false" fontIcon=""
+                            style="font-size: small;">done</mat-icon>
+                        <span>Last Viewed</span>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- View Options -->
+            <div class="viewOptions_wrapper">
+                <div class="icon_wrapper" id="viewOption grid">
+                    <div class="viewOptions_select">
+                        <mat-icon class="icon_wrapper" aria-hidden="false"
+                            fontIcon="apps"></mat-icon><!-- Icons: view_comfy, apps, view_module-->
+                    </div>
+                </div>
+                <div class="icon_wrapper">
+                    <div class="" id="viewOption row">
+                        <mat-icon class="icon_wrapper" aria-hidden="false" fontIcon="view_headline"></mat-icon>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+
 
     <div class="examBrowser_view">
         @for (exam of exams; track exam._id){
-            <div class="examBrowser_item" (click)="onDownload(exam._id)">
-                <app-exam-card [name]="exam.courseName" />
-            </div>
+        <div class="examBrowser_item" (click)="onDownload(exam._id)">
+            <app-exam-card [name]="exam.courseName" />
+        </div>
         }
     </div>
 
