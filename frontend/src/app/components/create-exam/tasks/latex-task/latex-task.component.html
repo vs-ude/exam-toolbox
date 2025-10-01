@@ -51,10 +51,10 @@
 <div class="form-body" >
   <span class="latex_input_label">LaTeX content in this format ->  \\(  content \\):</span>
   <textarea class="latex_input" [(ngModel)]="this.task.questionLatex.DE" (blur)="updateTask()"></textarea>
-  <div  class="latex_preview_container">
+  <!-- <div  class="latex_preview_container">
     <span class="latex_input_label">Preview:</span>
     <app-math-jax-paragraph mathString="{{ task.questionLatex.DE }}"></app-math-jax-paragraph>
-  </div>
+  </div> -->
 
 </div>
 
