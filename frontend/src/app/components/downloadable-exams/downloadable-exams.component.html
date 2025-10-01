@@ -113,7 +113,13 @@
     </div>
 
 
-
+    @if (exams.length === 0) {
+    <div class="noExams_container">
+        <div class="noExams_text">
+            There are no downloadable exams available.<br> Generate exams in the Exam View to access them here.
+        </div>
+    </div>
+    }
     <div class="examBrowser_view">
         @for (exam of exams; track exam._id){
         <div class="examBrowser_item" (click)="onDownload(exam._id)">

@@ -20,7 +20,7 @@ import { NgClass } from '@angular/common';
 })
 export class DownloadableExamsComponent {
 
-  public exams: Exam[] = [new Exam("Test Course", "Test Examiner", "WS 2023/24", "2024-10-10", 90, [], "testId")];
+  public exams: Exam[] = [];
   private downloadableJobs: DownloadableJob[] = [];
 
   public showDropdowns = { sorting: false, filter: false, }
