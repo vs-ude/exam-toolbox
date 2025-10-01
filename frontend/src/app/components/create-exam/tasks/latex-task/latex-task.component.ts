@@ -48,7 +48,8 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
     createdBy: "placeholder",
     createdAt: new Date(),
     lastUsed: new Date(),
-    usedIn: []
+    usedIn: [],
+    children: [],
   };
 
   ngOnInit(): void {

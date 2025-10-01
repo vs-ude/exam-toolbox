@@ -614,7 +614,7 @@ router
         { taskId: ctx.params.taskId }, { $set: await ctx.request.body().value }
       )
 
-      if (result.modifiedCount === 0) {
+      if (result.matchedCount === 0) {
         ctx.response.status = 404
         ctx.response.body = { message: "Task not found" }
         return

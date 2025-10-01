@@ -28,6 +28,7 @@ const tasks: Task[] = [
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
+    children: [],
   },
   {
     taskId: 'task2',
@@ -46,6 +47,7 @@ const tasks: Task[] = [
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
+    children: [],
     
   }
 ];

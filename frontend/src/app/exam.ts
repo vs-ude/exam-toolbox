@@ -53,7 +53,8 @@ export interface BaseTask {
     createdAt: Date;
     lastUsed: Date;
     usedIn: string[];
-    parent?: string; 
+    parent?: string;
+    children: string[];
 }
 
 export interface Question {

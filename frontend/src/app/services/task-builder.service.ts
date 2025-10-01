@@ -39,6 +39,7 @@ export class TaskBuilderService {
           lastUsed: new Date(),
           usedIn: ["placeholder_id"],
           tags: [],
+          children: [],
 
         };
       case "new_shortAnswer":
@@ -53,6 +54,7 @@ export class TaskBuilderService {
           lastUsed: new Date(),
           usedIn: ["placeholder_id"],
           tags: [],
+          children: [],
         };
       case "new_picture":
         return {
@@ -67,6 +69,7 @@ export class TaskBuilderService {
           lastUsed: new Date(),
           usedIn: ["placeholder_id"],
           tags: [],
+          children: [],
         };
       case "new_latex":
         return {
@@ -82,7 +85,8 @@ export class TaskBuilderService {
           createdBy: this.user.id,
           createdAt: new Date(),
           lastUsed: new Date(),
-          usedIn: []
+          usedIn: [],
+          children: [],
         };
       case "new_table":
         return {
@@ -105,6 +109,7 @@ export class TaskBuilderService {
           createdAt: new Date(),
           lastUsed: new Date(),
           usedIn: [],
+          children: [],
         };
       case "new_manualText":
         return {
@@ -117,6 +122,7 @@ export class TaskBuilderService {
           createdAt: new Date(),
           lastUsed: new Date(),
           usedIn: [],
+          children: [],
         };
       case "new_newPage":
         return {
@@ -129,6 +135,7 @@ export class TaskBuilderService {
           createdAt: new Date(),
           lastUsed: new Date(),
           usedIn: [],
+          children: [],
         }
       default:
         throw new Error(`Unknown task type: ${taskType}`);

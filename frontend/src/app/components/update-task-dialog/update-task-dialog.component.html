@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>Update pool task or create a new one?</h2>
+<mat-dialog-content class="dialog_content">
+    <p>
+        You are about to update task
+        <span style="font-weight: bold; font-size: 1.2em;">
+            {{data.assignmentNumber}}
+        </span>
+        in the task pool. Do you want to update the existing task in the pool or create a new one?
+    </p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button class="update_button" [mat-dialog-close]="'update'">Update</button>
+    <button class="newTask_button" [mat-dialog-close]="'newTask'">Create a new One</button>
+</mat-dialog-actions>

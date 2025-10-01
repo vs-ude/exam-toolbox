@@ -45,6 +45,7 @@ export class ManualTextComponent extends BaseTaskComponent {
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
+    children: [],
   }
 
   ngOnInit(): void {

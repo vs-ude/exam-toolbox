@@ -81,6 +81,7 @@ export class TaskPoolComponent implements AfterViewInit {
     lastUsed: new Date(),
     usedIn: ["placeholder_id"],
     tags: [{ name: "Easy", color: "#81c784", textColor: "#fff" }],
+    children: [],
   },
   {
     taskId: "shortAnswer-1749196671991",
@@ -99,6 +100,7 @@ export class TaskPoolComponent implements AfterViewInit {
     lastUsed: new Date(),
     usedIn: ["placeholder_id"],
     tags: [{ name: "Hard", color: "#e57373", textColor: "#fff" }],
+    children: [],
   }];
 
   displayedColumns: string[] = ['taskId', 'type', 'question', 'points', "tags", "createdBy", "lastUsed",];
