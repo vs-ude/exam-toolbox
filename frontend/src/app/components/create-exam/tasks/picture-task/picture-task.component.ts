@@ -42,6 +42,7 @@ export class PictureTaskComponent extends BaseTaskComponent {
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
+    children: [],
   };
 
   public pictureFileUrlQuestionDE: string = "";

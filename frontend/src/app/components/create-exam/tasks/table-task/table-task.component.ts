@@ -50,6 +50,7 @@ export class TableTaskComponent extends BaseTaskComponent {
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
+    children: [],
   }
 
   ngOnInit(): void {

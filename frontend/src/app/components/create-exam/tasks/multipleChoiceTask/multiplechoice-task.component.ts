@@ -54,6 +54,7 @@ export class MultiplechoiceTaskComponent extends BaseTaskComponent implements On
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
+    children: [],
   };
 
 

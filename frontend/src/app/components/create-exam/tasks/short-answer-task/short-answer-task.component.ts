@@ -50,6 +50,7 @@ export class ShortAnswerTaskComponent extends BaseTaskComponent implements OnIni
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
+    children: [],
   };
 
   ngOnInit(): void {

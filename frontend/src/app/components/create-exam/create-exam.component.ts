@@ -26,6 +26,7 @@ import { MassExamDialogComponent } from '../mass-exam-dialog/mass-exam-dialog.co
 import { LoadingService } from '../../services/loading.service';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { NewPageComponent } from "./tasks/new-page/new-page.component";
+import { UpdateTaskDialogComponent } from '../update-task-dialog/update-task-dialog.component';
 
 
 
@@ -67,6 +68,7 @@ export class CreateExamComponent {
 
   private bodyElement: HTMLElement = document.body;
   public semesters = ["WS 23/24", "SS 24", "WS 24/25", "SS 25"];
+  private modifiedPoolTasks: Set<string> = new Set<string>();
 
   public taskPool: Task[] = [];
   public totalPoints = 0;
@@ -269,7 +271,14 @@ export class CreateExamComponent {
   onTaskChange(task: Task, index: number) {
     this.exam.tasks[this.currentGroupView].tasks[index] = task;
     this.adjustTotalPoints();
+    this.trackChangeInPoolTasks(task.taskId);
     console.log(task)
+  }
+
+  private trackChangeInPoolTasks(taskId: string) {
+    if (this.taskPool.find(poolTask => poolTask.taskId === taskId) != undefined) {
+      this.modifiedPoolTasks.add(taskId);
+    }
   }
 
   onTitleChange(taskGroupTitle: { DE: string, EN: string }) {
@@ -280,7 +289,6 @@ export class CreateExamComponent {
     this.checkIfValid()
     this.addNewTasksToPool();
     this.updatePoolTasks();
-    console.log("got here")
     this.api.updateExam(this.exam._id, this.exam).subscribe(
       response => {
         console.log('Exam updated successfully: ', response);
@@ -295,16 +303,69 @@ export class CreateExamComponent {
     for (let i = 0; i < this.exam.tasks.length; i++) {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const task = this.exam.tasks[i].tasks[j];
-        if (this.taskPool.find(poolTask => poolTask.taskId === task.taskId) != undefined) {
-          this.api.updateTaskInPool(task.taskId, task).subscribe(
-            response => {
-              console.log(`Task ${task.taskId} updated in pool`, response);
-            },
-            error => {
-              console.error(`Error updating task ${task.taskId}: `, error);
-            }
-          )
-        }
+        const isPoolTask = this.taskPool.find(poolTask => poolTask.taskId === task.taskId) != undefined;
+        const isModified = this.modifiedPoolTasks.has(task.taskId);
+
+        if (!isPoolTask || !isModified) continue;
+
+        const dialogRef = this.dialog.open(UpdateTaskDialogComponent, {
+          width: '50%',
+          height: '50%',
+          data: { assignmentNumber: `${i + 1}.${this.mapTaskIndexToChar(j)}`, task: task }
+        });
+
+        dialogRef.afterClosed().subscribe(status => {
+          if (status === "update") {
+            this.api.updateTaskInPool(task.taskId, task).subscribe(
+              response => {
+                console.log(`Task ${task.taskId} updated in pool`, response);
+              },
+              error => {
+                console.error(`Error updating task ${task.taskId}: `, error);
+              }
+            );
+          } else {
+            const newTask = JSON.parse(JSON.stringify(task));
+            newTask.parent = task.taskId;
+            newTask.children = [];
+            newTask.taskId = task.type + "-" + Date.now();
+            task.children.push(newTask.taskId);
+
+            // update old task in pool
+            this.api.updateTaskInPool(task.taskId, task).subscribe( 
+              response => {
+                console.log(`Task ${task.taskId} updated successfully`, response)
+              },
+              error => {
+                console.log(`Error updating Task ${task.taskId}`, error)
+              }
+            )
+
+            this.exam.tasks[i].tasks[j] = newTask;
+
+            // add new task to pool
+            this.api.addTaskToPool(newTask).subscribe(
+              response => {
+                console.log(`New Task ${newTask.taskId} added to pool`, response);
+              },
+              error => {
+                console.error(`Error adding new task ${newTask.taskId}: `, error);
+              }
+            );
+
+            // update Exam that now includes the new Task
+            this.api.updateExam(this.exam._id, this.exam).subscribe(
+              response => {
+                console.log('Exam with new Task updated successfully: ', response);
+              },
+              error => {
+                console.error('Error updating exam: ', error);
+              }
+            );
+          }
+        });
+
+        this.modifiedPoolTasks.delete(task.taskId);
       }
     }
   }
