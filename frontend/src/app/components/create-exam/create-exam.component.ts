@@ -67,6 +67,7 @@ export class CreateExamComponent {
 
   private bodyElement: HTMLElement = document.body;
   public semesters = ["WS 23/24", "SS 24", "WS 24/25", "SS 25"];
+  private modifiedPoolTasks: Set<string> = new Set<string>();
 
   public taskPool: Task[] = [];
   public totalPoints = 0;
@@ -269,7 +270,14 @@ export class CreateExamComponent {
   onTaskChange(task: Task, index: number) {
     this.exam.tasks[this.currentGroupView].tasks[index] = task;
     this.adjustTotalPoints();
+    this.trackChangeInPoolTasks(task.taskId);
     console.log(task)
+  }
+
+  private trackChangeInPoolTasks(taskId: string) {
+    if (this.taskPool.find(poolTask => poolTask.taskId === taskId) != undefined) {
+      this.modifiedPoolTasks.add(taskId);
+    }
   }
 
   onTitleChange(taskGroupTitle: { DE: string, EN: string }) {
@@ -296,6 +304,10 @@ export class CreateExamComponent {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const task = this.exam.tasks[i].tasks[j];
         if (this.taskPool.find(poolTask => poolTask.taskId === task.taskId) != undefined) {
+          if (this.modifiedPoolTasks.has(task.taskId)){
+            alert("task in pool changed would you like to update it or create a new one?")
+          }
+
           this.api.updateTaskInPool(task.taskId, task).subscribe(
             response => {
               console.log(`Task ${task.taskId} updated in pool`, response);
