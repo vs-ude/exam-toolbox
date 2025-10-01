@@ -1,8 +1,7 @@
-
 /*------------------------------------------------------------------
   [ Header ]*/
 
-.downloadable_container {
+.taskPool_container {
     width: 100%;
     height: 100%;
     border-color: var(--border-color);
@@ -33,6 +32,38 @@
 
 .examBrowser_item {
     margin-bottom: 4%;
+    position: relative; /* THIS IS CRUCIAL: Makes this the positioning context */
+    cursor: pointer;
+}
+
+/* This targets the div that wraps the MatIcon */
+.download-icon-wrapper {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10; /* Ensures the icon is on top of the card content */
+    
+    /* Styling for the background circle */
+    background-color: rgba(255, 255, 255, 0.1); /* Brighter circle */
+    border-radius: 50%; /* Makes it a circle */
+    width: 36px; /* Adjust size as needed */
+    height: 36px; /* Adjust size as needed */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Styling for the icon itself (if you want it black inside the circle) */
+    mat-icon {
+        color: black; /* Makes the icon black */
+        font-size: 20px; /* Adjust icon size as needed */
+        width: 20px;
+        height: 20px;
+    }
 }
 
 .noExams_container {

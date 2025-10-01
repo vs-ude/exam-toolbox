@@ -1,6 +1,6 @@
 <div class="taskPool_container">
     <div class="header">
-        <span>Downloadable Exams</span>
+        <span>Exams</span>
     </div>
 
 
@@ -16,30 +16,25 @@
 
         <div class="viewBar_right">
 
-            <!-- Sorting Options -->
             <div class="sortingOptions_wrapper" id="openSortingDropdown">
                 <span id="openSortingDropdown">Last viewed</span>
                 <div id="openSortingDropdown"><mat-icon id="openSortingDropdown" aria-hidden="false"
                         fontIcon="arrow_drop_down"></mat-icon></div>
-                <!-- Dropdown -->
                 <div class="dropdown triangle" [ngClass]="{'hide_dropdown': !showDropdowns.sorting}">
                     <div class="dropdown_header">Sort by</div>
 
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon="done"></mat-icon>
                         <span>Alphabetical</span>
                     </div>
 
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon="done"></mat-icon>
                         <span>Created</span>
                     </div>
 
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper" aria-hidden="false" fontIcon="done"></mat-icon>
                         <span>Last Viewed</span>
                     </div>
 
@@ -47,14 +42,12 @@
                     <div class="dropdown_header">Order</div>
 
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper" aria-hidden="false" fontIcon="done"></mat-icon>
                         <span>A-Z</span>
                     </div>
 
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon="done"></mat-icon>
                         <span>Z-A</span>
                     </div>
 
@@ -63,29 +56,24 @@
 
 
 
-            <!-- Filter Options -->
             <div class="filterOptions_wrapper" id="openFilterDropdown">
                 <span id="openFilterDropdown">All files</span>
                 <div id="openFilterDropdown"><mat-icon id="openFilterDropdown" aria-hidden="false"
                         fontIcon="arrow_drop_down"></mat-icon></div>
 
-                <!-- Dropdown -->
                 <div class="dropdown triangle" [ngClass]="{'hide_dropdown': !showDropdowns.filter}">
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon="done"></mat-icon>
                         <span>Alphabetical</span>
                     </div>
 
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon="done"></mat-icon>
                         <span>Created</span>
                     </div>
 
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper" aria-hidden="false" fontIcon="done"></mat-icon>
                         <span>Last Viewed</span>
                     </div>
 
@@ -93,12 +81,11 @@
             </div>
 
 
-            <!-- View Options -->
             <div class="viewOptions_wrapper">
                 <div class="icon_wrapper" id="viewOption grid">
                     <div class="viewOptions_select">
                         <mat-icon class="icon_wrapper" aria-hidden="false"
-                            fontIcon="apps"></mat-icon><!-- Icons: view_comfy, apps, view_module-->
+                            fontIcon="apps"></mat-icon>
                     </div>
                 </div>
                 <div class="icon_wrapper">
@@ -116,17 +103,24 @@
     @if (exams.length === 0) {
     <div class="noExams_container">
         <div class="noExams_text">
-            There are no downloadable exams available.<br> Generate exams in the Exam View to access them here.
+            There are no exams available.<br> Create and save exams in the 'Add Exam' View to access them here.
         </div>
     </div>
-    }
+    } @else {
     <div class="examBrowser_view">
         @for (exam of exams; track exam._id){
-        <div class="examBrowser_item" (click)="onDownload(exam._id)">
+        <div class="examBrowser_item" (click)="onEdit(exam._id)">
+            
+            @if (isDownloadable(exam._id)) {
+                <div class="download-icon-wrapper" title="Download Generated Exam">
+                    <mat-icon fontIcon="download" (click)="onDownload($event, exam._id)"></mat-icon>
+                </div>
+            }
+    
             <app-exam-card [name]="exam.courseName" />
+            
         </div>
         }
     </div>
-
-
+    }
 </div>

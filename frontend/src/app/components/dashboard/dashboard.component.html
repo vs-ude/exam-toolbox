@@ -9,8 +9,7 @@
             <button class="create_exam_button">
                 <div class="create_icon_container">
                     <mat-icon aria-hidden="false" fontIcon="playlist_add"></mat-icon>
-                    <!--Icons: create, add, add_box, playlist_add -->
-                </div>
+                    </div>
                 <div class="description_shelf">
                     <span class="create_name">Add Exam</span>
                     <span class="create_description">Create a new exam</span>
@@ -31,14 +30,14 @@
         </div>
 
 
-        <div class="download thumbnail" (click)="onDownload()">
+        <div class="download thumbnail" (click)="onExamsPool()">
             <button class="download_exam_button">
                 <div class="download_icon_container">
-                    <mat-icon aria-hidden="false" fontIcon="">file_download</mat-icon>
+                    <mat-icon aria-hidden="false" fontIcon="">folder_open</mat-icon>
                 </div>
                 <div class="description_shelf">
-                    <span class="download_name">Download</span>
-                    <span class="download_description">See all downloadable exams</span>
+                    <span class="download_name">Exams Pool</span>
+                    <span class="download_description">Browse all exams</span>
                 </div>
             </button>
         </div>
@@ -81,12 +80,10 @@
 
         <div class="viewBar_right">
 
-            <!-- Sorting Options -->
             <div class="sortingOptions_wrapper" id="openSortingDropdown">
                 <span id="openSortingDropdown">Last viewed</span>
                 <div id="openSortingDropdown"><mat-icon id="openSortingDropdown" aria-hidden="false"
                         fontIcon="arrow_drop_down"></mat-icon></div>
-                <!-- Dropdown -->
                 <div class="dropdown triangle" [ngClass]="{'hide_dropdown': !showDropdowns.sorting}">
                     <div class="dropdown_header">Sort by</div>
 
@@ -128,13 +125,11 @@
 
 
 
-            <!-- Filter Options -->
             <div class="filterOptions_wrapper" id="openFilterDropdown">
                 <span id="openFilterDropdown">All files</span>
                 <div id="openFilterDropdown"><mat-icon id="openFilterDropdown" aria-hidden="false"
                         fontIcon="arrow_drop_down"></mat-icon></div>
 
-                <!-- Dropdown -->
                 <div class="dropdown triangle" [ngClass]="{'hide_dropdown': !showDropdowns.filter}">
                     <div class="option_container">
                         <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
@@ -158,13 +153,11 @@
             </div>
 
 
-            <!-- View Options -->
             <div class="viewOptions_wrapper">
                 <div class="icon_wrapper" id="viewOption grid">
                     <div class="viewOptions_select">
                         <mat-icon class="icon_wrapper" aria-hidden="false"
-                            fontIcon="apps"></mat-icon><!-- Icons: view_comfy, apps, view_module-->
-                    </div>
+                            fontIcon="apps"></mat-icon></div>
                 </div>
                 <div class="icon_wrapper">
                     <div class="" id="viewOption row">

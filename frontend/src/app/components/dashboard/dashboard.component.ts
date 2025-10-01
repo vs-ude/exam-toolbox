@@ -61,8 +61,8 @@ export class DashboardComponent {
     this.router.navigate(['/debug'])
   }
 
-  onDownload(){
-    this.router.navigate(['/download'])
+  onExamsPool(){
+    this.router.navigate(['/exams-pool']);
   }
 
   onExamClick(exam: Exam){
