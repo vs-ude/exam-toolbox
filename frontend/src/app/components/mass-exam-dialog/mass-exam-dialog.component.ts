@@ -7,11 +7,22 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
 import { CommonModule } from '@angular/common';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-mass-exam-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatProgressBarModule],
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressBarModule,
+    MatSlideToggleModule,
+    FormsModule // <-- Add FormsModule here
+  ],
   templateUrl: './mass-exam-dialog.component.html',
   styleUrl: './mass-exam-dialog.component.scss'
 })
@@ -21,12 +32,15 @@ export class MassExamDialogComponent implements OnDestroy {
   jobStatus: JobStatus | null = null
   isLoading = false
   errorMessage: string | null = null
+  autoDownload = false
+  downloadSuccessful = false
   private pollingInterval: any
 
   constructor(
     private api: ApiService,
     private dialogRef: MatDialogRef<MassExamDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { exam: any }
+    @Inject(MAT_DIALOG_DATA) public data: { exam: any }, // passes exam object to dialog
+    private router: Router
   ){}
 
   onFileSelected(event: any) {
@@ -35,9 +49,7 @@ export class MassExamDialogComponent implements OnDestroy {
   }
 
   generate() {
-    if (!this.selectedFile) {
-      return
-    }
+    if (!this.selectedFile) return
     
     this.isLoading = true
     this.errorMessage = null
@@ -83,11 +95,12 @@ export class MassExamDialogComponent implements OnDestroy {
       this.api.getJobStatus(this.jobId).subscribe({
         next: (status) => {
           this.jobStatus = status
-          console.log('Job Status:', status)
-
           if (status.status === 'completed') {
             this.stopPolling()
-            this.downloadResult()
+            this.isLoading = false
+            if (this.autoDownload) {
+              this.downloadResult()
+            }
           } else if (status.status === 'failed') {
             this.stopPolling()
             this.handleError('Exam generation failed. Please check the backend logs for details.')
@@ -102,20 +115,25 @@ export class MassExamDialogComponent implements OnDestroy {
     }, 1000)
   }
 
-  private downloadResult() {
+  downloadResult() {
     if (!this.jobId) return
 
     this.api.downloadMassExamResult(this.jobId).subscribe({
       next: (zipBlob: Blob) => {
         saveAs(zipBlob, `exams_${this.jobId}.zip`)
         this.isLoading = false
-        this.dialogRef.close()
+        this.downloadSuccessful = true
       },
       error: (err) => {
         this.handleError('Failed to download the final ZIP file.')
         console.error('Download error:', err)
       }
     })
+  }
+
+  navigateToExamsPool() {
+    this.dialogRef.close()
+    this.router.navigate(['/exams-pool'])
   }
 
   private stopPolling() {

@@ -1,28 +1,30 @@
 <h2 mat-dialog-title>Generate Mass Exam</h2>
 
 <mat-dialog-content>
-  <p class="dialog-description">Please select the student list file (.xlsx) to begin the generation.</p>
+  
+  <div *ngIf="!isLoading && jobStatus?.status !== 'completed'">
+    <p class="dialog-description">Please select the student list file (.xlsx) to begin the generation.</p>
 
-  <!-- Initial state for file selection -->
-  <div *ngIf="!isLoading">
-    <div class="file-input-container">
-      <!-- This label acts as the custom button -->
-      <label for="file-upload" class="file-upload-label">
-        <mat-icon>attach_file</mat-icon>
-        <span>{{ selectedFile ? 'Change file' : 'Choose a file...' }}</span>
-      </label>
-      <!-- The actual input is hidden -->
-      <input id="file-upload" type="file" (change)="onFileSelected($event)" accept=".xlsx, .xls">
-    </div>
-    
-    <!-- Display the name of the selected file -->
-    <div *ngIf="selectedFile" class="file-name-display">
-      <mat-icon>description</mat-icon>
-      <span>{{ selectedFile.name }}</span>
+    <div class="generation-controls">
+      <div class="file-input-container">
+        <label for="file-upload" class="file-upload-label">
+          <mat-icon>attach_file</mat-icon>
+          <span>{{ selectedFile ? 'Change file' : 'Choose a file...' }}</span>
+        </label>
+        <input id="file-upload" type="file" (change)="onFileSelected($event)" accept=".xlsx, .xls">
+      </div>
+      
+      <div *ngIf="selectedFile" class="file-name-display">
+        <mat-icon>description</mat-icon>
+        <span>{{ selectedFile.name }}</span>
+      </div>
+
+      <mat-slide-toggle class="auto-download-toggle" [(ngModel)]="autoDownload">
+        Auto-download when complete
+      </mat-slide-toggle>
     </div>
   </div>
 
-  <!-- Loading state with progress bar -->
   <div *ngIf="isLoading" class="loading-container">
     <p>Generating exams... Please do not close this window.</p>
     
@@ -34,14 +36,26 @@
       <p class="progress-text">{{ jobStatus.progress.completed }} / {{ jobStatus.progress.total }} tasks completed.</p>
     </ng-container>
 
-    <!-- Initial loading state before progress is available -->
     <ng-container *ngIf="!jobStatus">
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       <p class="progress-text">Starting job...</p>
     </ng-container>
   </div>
 
-  <!-- Error message display -->
+  <div *ngIf="!isLoading && jobStatus?.status === 'completed'" class="completed-container">
+    <mat-icon class="completed-icon">check_circle</mat-icon>
+    <h3>Generation Complete</h3>
+
+    <p *ngIf="downloadSuccessful; else downloadPrompt">
+      Download started successfully!
+    </p>
+
+    <ng-template #downloadPrompt>
+      <p>Your file is ready to download.</p>
+    </ng-template>
+  </div>
+
+
   <div *ngIf="errorMessage" class="error-message">
     <mat-icon>error_outline</mat-icon>
     <span>{{ errorMessage }}</span>
@@ -50,13 +64,26 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button *ngIf="!isLoading" mat-stroked-button mat-dialog-close>Cancel</button>
+  
+  <ng-container *ngIf="!isLoading && jobStatus?.status !== 'completed'">
+    <button mat-stroked-button mat-dialog-close>Cancel</button>
+    <button mat-flat-button color="primary" [disabled]="!selectedFile" (click)="generate()">
+      <mat-icon>play_arrow</mat-icon>
+      <span>Generate</span>
+    </button>
+  </ng-container>
+  
   <button *ngIf="isLoading" mat-stroked-button color="warn" (click)="cancelGeneration()">
     <mat-icon>cancel</mat-icon>
     <span>Stop Generation</span>
   </button>
-  <button mat-flat-button color="primary" [disabled]="!selectedFile || isLoading" (click)="generate()">
-    <mat-icon>play_arrow</mat-icon>
-    <span>Generate</span>
-  </button>
+  
+  <ng-container *ngIf="!isLoading && jobStatus?.status === 'completed'">
+    <button mat-stroked-button (click)="navigateToExamsPool()">View in Exams Pool</button>
+    <button mat-flat-button color="primary" (click)="downloadResult()" [disabled]="downloadSuccessful">
+      <mat-icon>download</mat-icon>
+      <span>Download Now</span>
+    </button>
+  </ng-container>
+
 </mat-dialog-actions>

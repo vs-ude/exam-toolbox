@@ -376,7 +376,7 @@ export class CreateExamComponent {
 
     this.dialog.open(MassExamDialogComponent, {
       width: '50%',
-      height: '80%',
+      height: '60%',
       data: { exam: this.exam }
     })
   }
