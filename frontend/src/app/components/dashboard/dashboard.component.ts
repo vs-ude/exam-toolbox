@@ -61,6 +61,10 @@ export class DashboardComponent {
     this.router.navigate(['/debug'])
   }
 
+  onDownload(){
+    this.router.navigate(['/download'])
+  }
+
   onExamClick(exam: Exam){
     if(exam._id == undefined){
       console.warn(`Exam ${exam.courseName} ${exam.semester} has no ExamID`);

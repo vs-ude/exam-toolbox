@@ -134,4 +134,9 @@ export class ApiService {
   getDownloadableJobs(): Observable<DownloadableJob[]> {
     return this.http.get<DownloadableJob[]>(`${this.apiUrl}/jobs/downloadable`);
   }
+
+  downloadExam(jobId: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/jobs/${jobId}/download`, { responseType: 'blob' });
+  }
+
 }

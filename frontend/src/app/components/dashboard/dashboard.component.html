@@ -31,14 +31,14 @@
         </div>
 
 
-        <div class="export thumbnail">
-            <button class="export_exam_button">
-                <div class="export_icon_container">
-                    <mat-icon aria-hidden="false" fontIcon="">build</mat-icon>
+        <div class="download thumbnail" (click)="onDownload()">
+            <button class="download_exam_button">
+                <div class="download_icon_container">
+                    <mat-icon aria-hidden="false" fontIcon="">file_download</mat-icon>
                 </div>
                 <div class="description_shelf">
-                    <span class="export_name">Export</span>
-                    <span class="export_description">Build and export an exam</span>
+                    <span class="download_name">Download</span>
+                    <span class="download_description">See all downloadable exams</span>
                 </div>
             </button>
         </div>
@@ -47,7 +47,7 @@
         <div class="import thumbnail">
             <button class="import_exam_button">
                 <div class="import_icon_container">
-                    <mat-icon aria-hidden="false" fontIcon="">file_download</mat-icon>
+                    <mat-icon aria-hidden="false" fontIcon="">build</mat-icon>
                 </div>
                 <div class="description_shelf">
                     <span class="import_name">Import</span>

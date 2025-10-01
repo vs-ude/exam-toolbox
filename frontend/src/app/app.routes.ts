@@ -5,6 +5,7 @@ import { GettingStartedComponent } from './components/getting-started/getting-st
 import { CreateExamComponent } from './components/create-exam/create-exam.component';
 import { DebugComponent } from './components/debug/debug.component';
 import { TaskPoolComponent } from './components/task-pool/task-pool.component';
+import { DownloadableExamsComponent } from './components/downloadable-exams/downloadable-exams.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -15,4 +16,5 @@ export const routes: Routes = [
   { path: 'create-exam', component: CreateExamComponent},
   { path: 'debug', component: DebugComponent},
   { path: 'task-pool', component: TaskPoolComponent},
+  { path: 'download', component: DownloadableExamsComponent},
 ];

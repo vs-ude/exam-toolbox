@@ -202,8 +202,8 @@
 
 
 /*------------------------------------------------------------------
-  [ Export Section ]*/
-.export_exam_button {
+  [ Download Section ]*/
+.download_exam_button {
     padding: 24px 0 24px 0;
     display: flex;
     align-items: center;
@@ -221,22 +221,22 @@
     transition: .1s ease-in;
 }
 
-.export_exam_button:hover {
+.download_exam_button:hover {
     transition: .1s ease-in;
 
-    .export_icon_container {
+    .download_icon_container {
         background-color: #0000001a
     }
 
     ;
 
-    .export_name {
+    .download_name {
         color: #ffff
     }
 
     ;
 
-    .export_description {
+    .download_description {
         color: #ffffffcc
     }
 
@@ -245,12 +245,12 @@
     cursor: pointer;
 }
 
-.export_exam_button:active {
+.download_exam_button:active {
     filter: brightness(85%);
     transition: .05 ease-in;
 }
 
-.export_icon_container {
+.download_icon_container {
     width: 32px;
     height: 32px;
     margin: 0 0 12 0;
@@ -267,13 +267,13 @@
     transition: .1s ease-in;
 }
 
-.export_name {
+.download_name {
     color: var(--color-text);
     font-weight: 550;
     transition: .1s ease-in;
 }
 
-.export_description {
+.download_description {
     color: var(--color-text-secondary);
     font-weight: 450;
     transition: .1s ease-in;

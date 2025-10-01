@@ -1,0 +1,17 @@
+<div class="taskPool_container">
+    <div class="header">
+        <span>Downloadable Exams</span>
+    </div>
+
+
+
+    <div class="examBrowser_view">
+        @for (exam of exams; track exam._id){
+            <div class="examBrowser_item" (click)="onDownload(exam._id)">
+                <app-exam-card [name]="exam.courseName" />
+            </div>
+        }
+    </div>
+
+
+</div>
