@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, timeout } from 'rxjs';
 import { Exam, Task } from '../exam';
 import { User } from '../user';
+import { Tag } from '../tag';
 
 export interface JobStatus {
   jobId: string;
@@ -137,6 +138,14 @@ export class ApiService {
 
   downloadExam(jobId: string): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/jobs/${jobId}/download`, { responseType: 'blob' });
+  }
+
+  addTag(tag: Tag) {
+    return this.http.post(`${this.apiUrl}/tags`, tag);
+  }
+
+  getTag(tagName: string) {
+    return this.http.get<Tag>(`${this.apiUrl}/tags/${tagName}`);
   }
 
 }

@@ -17,6 +17,7 @@ import { Resend } from "npm:resend@2.0.0";
 import { copy } from "https://deno.land/std@0.224.0/fs/copy.ts";
 import { updateMetaStudent, generateExam } from "./helpers.ts";
 import { generateTasksLatex } from "./generateTasksLatex.ts";
+import { Tag } from "./tag.ts";
 
 
 
@@ -138,6 +139,7 @@ const db = client.database("examToolboxDB");
 const exams = db.collection("exams");
 const pool = db.collection("taskPool");
 const fileTracker = db.collection("fileTracker");
+const tags = db.collection("tags");
 
 // Create Oak Application and Router
 const app = new Application();
@@ -637,6 +639,38 @@ router
       ctx.response.body = { message: "Error fetching downloadable jobs list" };
     }
   })
+  .post("/api/tags", async (ctx) => {
+    const tag: Tag = await ctx.request.body().value;
+    try {
+      const result = await tags.insertOne({tag});
+      ctx.response.status = 200,
+        ctx.response.body = {
+          message: "Tag saved successfully!",
+          insertedId: result,
+        }
+    } catch (error) {
+      ctx.response.status = 500
+      ctx.response.body = { message: 'Error saving tag', error: error }
+    }
+  })
+  .get("/api/tags/:id", async (ctx) => {
+    const tagName = ctx.params.id
+    try {
+      const tag = await tags.findOne({ name: tagName })
+      if (!tag) {
+        ctx.response.status = 404
+        ctx.response.body = { message: "Tag not found" }
+        return
+      }
+      ctx.response.status = 200
+      ctx.response.body = tag
+    } catch (error) {
+      ctx.response.status = 500
+      ctx.response.body = { message: 'Error fetching tag', error }
+    }
+  })
+
+
 
 
 
@@ -871,6 +905,6 @@ async function getDownloadableJobs(): Promise<{ examId: string, jobId: string }[
       }
     }
   }
-  
+
   return downloadableJobs
 }

@@ -7,6 +7,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort'
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { ApiService } from '../../services/api.service';
+import { Tag } from '../../tag';
 
 
 @Component({
@@ -121,6 +122,35 @@ export class TaskPoolComponent implements AfterViewInit {
         console.error('Error fetching tasks from pool:', error);
       }
     )
+
+
+    const testTag = new Tag("Tag")
+      .addTask(this.tasks[0].taskId)
+      .setColors("#64b5f6", "#fff");
+
+    console.log(testTag);
+    console.log("used in ");
+    testTag.getUsedBy().forEach(ref => console.log(ref));
+
+    this.apiService.addTag(testTag).subscribe(
+      res => {
+        console.log("added tag to backend:");
+        console.log(res);
+      },
+      error => {
+        console.error('Error adding tag to backend:', error);
+      })
+
+    this.apiService.getTag("Tag").subscribe(
+      res => {
+        console.log("fetched tag from backend:");
+        console.log(res);
+      },
+      error => {
+        console.error('Error fetching tag from backend:', error);
+      }
+    )
+
   }
 
   ngAfterViewInit() {
