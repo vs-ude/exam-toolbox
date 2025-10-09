@@ -1,0 +1,21 @@
+<h2 mat-dialog-title class="title">Create a new Tag</h2>
+<mat-dialog-content class="dialog-content">
+
+    <div class="tag" [ngStyle]="{'backgroundColor': color, color: textColor}">{{name}}</div>
+
+
+    <div class="customization-container">
+        <input class="name-input" type="text" [(ngModel)]="name" placeholder="Tag Name" />
+        <div class="bgColorPicker">
+            <input type="color" class="color-picker" [(ngModel)]="color" />
+        </div>
+        <div class="textColorPicker">
+            <input type="color" class="color-picker" [(ngModel)]="textColor" />
+        </div>
+
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button class="cancel-button" [mat-dialog-close]="false">Cancel</button>
+    <button class="create-button" [mat-dialog-close]="{name: name, color: color, textColor: textColor}">Create</button>
+</mat-dialog-actions>

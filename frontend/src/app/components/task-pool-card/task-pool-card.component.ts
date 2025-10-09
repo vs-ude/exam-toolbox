@@ -3,11 +3,15 @@ import { Task } from '../../exam';
 import { MatIconModule } from '@angular/material/icon';
 import { ColorProviderService } from '../../services/color-provider.service';
 import { NgFor, NgStyle } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
+import { AddTagDialogComponent } from '../add-tag-dialog/add-tag-dialog.component';
+import { Tag } from '../../tag';
+
 
 @Component({
   selector: 'app-task-pool-card',
   standalone: true,
-  imports: [MatIconModule, NgStyle, NgFor],
+  imports: [MatIconModule, NgStyle,],
   templateUrl: './task-pool-card.component.html',
   styleUrl: './task-pool-card.component.scss'
 })
@@ -17,10 +21,38 @@ export class TaskPoolCardComponent {
   public mouseHovering: boolean = false;
 
   constructor(
-    private colorProvider: ColorProviderService
+    private colorProvider: ColorProviderService,
+    private dialog: MatDialog,
   ){}
   
   ngOnInit() {
     this.taskColor = this.colorProvider.getTaskColor(this.task.type)
+  }
+
+  public onAddTag() {
+    console.log("Add tag to task at index: ", this.task.taskId);
+
+    const dialogRef = this.dialog.open(AddTagDialogComponent, {
+              width: '50%',
+              height: '50%',
+              data: {}
+            });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const newTag = new Tag(result.name).setColors(result.color, result.textColor);
+
+        // link tag and task
+        newTag.addTask(this.task.taskId);
+        this.task.tags.push(newTag);
+
+        console.log("Created new tag: ", newTag);
+        
+        // TODO: 
+        // update tag and Task in db  
+        // add Feature to delete tags from tasks
+        // add Feature to add already existing tags to tasks
+      }
+    });
   }
 }

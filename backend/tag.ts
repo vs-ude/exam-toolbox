@@ -4,10 +4,10 @@ interface TagReference {
 }
 
 export class Tag {
-    name: string;
-    color: string;
-    textColor: string;
-    private usedIn: Array<TagReference>;
+    private name: string;
+    private color: string;
+    private textColor: string;
+    private usedBy: Array<TagReference>;
 
 
 
@@ -15,16 +15,16 @@ export class Tag {
         this.name = name;
         this.color = '#81c784';
         this.textColor = "#fff";
-        this.usedIn = [];
+        this.usedBy = [];
     }
 
     public addExam(examId: string) {
-        this.usedIn = [...new Set(this.usedIn).add({ type: "exam", id: examId })];
+        this.usedBy = [...new Set(this.usedBy).add({ type: "exam", id: examId })];
         return this;
     }
 
     public addTask(taskId: string) {
-        this.usedIn = [...new Set(this.usedIn).add({type: "task", id: taskId})];
+        this.usedBy = [...new Set(this.usedBy).add({type: "task", id: taskId})];
         return this;
     }
 
@@ -35,6 +35,22 @@ export class Tag {
     }
 
     public delete(id: string) {
-        this.usedIn = this.usedIn.filter(ref => ref.id !== id);
+        this.usedBy = this.usedBy.filter(ref => ref.id !== id);
+    }
+
+    public getUsedBy() {
+        return this.usedBy;
+    }
+
+    public getName() {
+        return this.name;
+    }
+
+    public getColor() {
+        return this.color;
+    }
+
+    public getTextColor() {
+        return this.textColor;
     }
 }

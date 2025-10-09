@@ -7,10 +7,13 @@
         <span class="name">{{task.question.DE}}</span>
         <span class="description"></span>
     </div>
-    <div class="tag_wrapper" *ngFor="let tag of task.tags">
-        <span class="task_tag" [ngStyle]="{'backgroundColor': tag.color, 'color': tag.textColor}">
-            {{tag.name}}
+    <div class="tag_wrapper">
+        @for (tag of task.tags; track tag.getName();) {
+        <span class="task_tag" [ngStyle]="{'backgroundColor': tag.getColor(), 'color': tag.getTextColor()}">
+            {{tag.getName()}}
         </span>
+        }
+        <button class="addTag_Button" (click)="onAddTag()"><mat-icon>add</mat-icon></button>
     </div>
 
     <div class="footer">

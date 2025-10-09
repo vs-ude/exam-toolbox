@@ -81,7 +81,7 @@ export class TaskPoolComponent implements AfterViewInit {
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: ["placeholder_id"],
-    tags: [{ name: "Easy", color: "#81c784", textColor: "#fff" }],
+    tags: [ new Tag("Easy").setColors("#81c784").addExam("multipleChoice-1748525128025")],
     children: [],
   },
   {
@@ -100,7 +100,7 @@ export class TaskPoolComponent implements AfterViewInit {
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: ["placeholder_id"],
-    tags: [{ name: "Hard", color: "#e57373", textColor: "#fff" }],
+    tags: [ new Tag("Hard").setColors("#e57373", "#fff").addTask("shortAnswer-1749196671991")],
     children: [],
   }];
 

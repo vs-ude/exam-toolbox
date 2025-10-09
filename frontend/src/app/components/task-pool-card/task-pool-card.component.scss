@@ -63,21 +63,44 @@
     max-width: 100%;
     flex-wrap: wrap;
     justify-content: center;
+    cursor: default;
 }
 
 .task_tag {
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 11px;
     font-style: normal;
     background: #ffe600;
     color: var(--color-text);
     border-radius: 16px;
     padding: 2px 10px;
-    width: auto;
     min-width: 0;
     box-sizing: border-box;
     text-align: center;
     line-height: 1.4;
+}
+
+.addTag_Button {
+    border: none;
+    background: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px; // smaller icon
+    width: 24px;
+    height: 24px;
+    transition: .1s ease-in;
+}
+
+.addTag_Button:hover {
+    color: var(--color-text);
+    background: var(--color-bg-lifted);
+    border-radius: 12px;
 }
 
 //------ Descriptions -----------------

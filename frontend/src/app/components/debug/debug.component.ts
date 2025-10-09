@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Exam, Task } from '../../exam';
 import { saveAs } from 'file-saver';
 import { ApiService } from '../../services/api.service';
+import { Tag } from '../../tag';
 
 
 const courseName = 'DEBUG EXAM';
@@ -23,7 +24,7 @@ const tasks: Task[] = [
       EN: ''
     },
     points: 4,
-    tags: [{ name: 'Cloud', color: '#4caf50', textColor: '#fff' }],
+    tags: [new Tag("Cloud").setColors("#4caf50").addTask("task1")],
     createdBy: "Hans Wurst",
     createdAt: new Date(),
     lastUsed: new Date(),

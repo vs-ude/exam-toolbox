@@ -1,3 +1,5 @@
+import { Tag } from "./tag";
+
 export class Exam {
     _id?: string = undefined;
     courseName: string;
@@ -117,10 +119,4 @@ export interface NewPage extends BaseTask {
 export interface Translation {
     DE: string;
     EN: string;
-}
-
-export interface Tag {
-    name: string;
-    color: string;
-    textColor: string;
 }
