@@ -1,4 +1,4 @@
-import { Tag } from "./tag";
+import { Tag } from "./tag.ts";
 
 export class Exam {
     _id?: string = undefined;

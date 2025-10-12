@@ -50,6 +50,12 @@ interface ExamGenerationJob {
 const basePath = "/app/ExamTemplate"
 const JOBS_DIR = "/app/jobs"
 
+// for scheduled removing of old jobs from joblist
+const now = new Date()
+const nextRun = new Date()
+const JOB_EXPIRATION_AGE_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
+// const JOB_EXPIRATION_AGE_MS = 30 * 1000 // 30 seconds for testing
+
 // a union type for all possible tasks that a worker can handle
 type GenerationTask = { type: 'student', [key: string]: any } | { type: 'solution', [key: string]: any } | { type: 'log', [key: string]: any }
 
@@ -677,6 +683,8 @@ router
 app.use(router.routes())
 app.use(router.allowedMethods())
 
+scheduleDailyCleanup()
+
 const port = 3000
 await app.listen({ port })
 
@@ -808,8 +816,8 @@ async function updateMetaTemplate(exam: Exam, workingDir: string) {
 
   // these can also be updated, see meta-exam.tex
   // \newcommand{\klausurtyp}{A}
-  // \newcommand{\schmierblaetteranzahl}{2} % (CB) set to 0 for no empty pages at the end. Will be filled to a even number of pages
-  // \newcommand{\interactive}{N} % Y=Yes, N=No; use PDF forms and generate info for digital exams
+  // \newcommand{\schmierblaetteranzahl}{2} // (CB) set to 0 for no empty pages at the end. Will be filled to a even number of pages
+  // \newcommand{\interactive}{N} // Y=Yes, N=No; use PDF forms and generate info for digital exams
   // \newcommand{\englishandgerman}{yes}
 
   // Update meta-exam.tex
@@ -905,6 +913,58 @@ async function getDownloadableJobs(): Promise<{ examId: string, jobId: string }[
       }
     }
   }
-
+  
   return downloadableJobs
+}
+
+function cleanupOldJobs() {
+  const now = Date.now()
+  let cleanedCount = 0
+
+  console.log("--- Before Cleanup: Current Jobs in Memory ---")
+  // print every joblist entry for testing
+  console.log(jobs)
+
+  for (const [jobId, job] of jobs.entries()) {
+    // only check jobs that are finished
+    if (job.status === 'completed' || job.status === 'failed') {
+      const jobAge = now - job.createdAt.getTime()
+      
+      // if the job is older than our 7-day expiration age, delete it from memory
+      if (jobAge > JOB_EXPIRATION_AGE_MS) {
+        jobs.delete(jobId)
+        cleanedCount++
+      }
+    }
+  }
+  if (cleanedCount > 0) {
+    console.log(`Memory cleanup: Removed ${cleanedCount} old job(s) from the in-memory list.`)
+    
+    console.log("--- After Cleanup: Remaining Jobs in Memory ---")
+    // this will print the list again after deletion
+    console.log(jobs)
+  } else {
+    console.log("Memory cleanup: No old jobs to remove.")
+  }
+}
+
+function scheduleDailyCleanup() {
+  // set the time for the next run to 4:00 AM for low server load
+  nextRun.setHours(2, 0, 0, 0) // the docker-container uses UTC time, offset accordingly
+
+  // if it's already past 4 AM today, schedule it for 4 AM tomorrow
+  if (now > nextRun) {
+    nextRun.setDate(nextRun.getDate() + 1)
+  }
+
+  const delay = nextRun.getTime() - now.getTime()
+  
+  console.log(`Next in-memory cleanup scheduled for ${nextRun.toLocaleString()} UTC-Time`)
+
+  setTimeout(() => {
+    console.log("Running daily in-memory job cleanup...")
+    cleanupOldJobs()
+    // after it runs, schedule the next one for the following day
+    scheduleDailyCleanup()
+  }, delay)
 }
