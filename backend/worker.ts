@@ -1,6 +1,6 @@
 // @ts-ignore
 import { copy } from "https://deno.land/std@0.224.0/fs/copy.ts"
-import { updateMetaStudent, generateExam } from "./helpers.ts"
+import { updateMetaStudent, generateExam } from "./generation.ts"
 
 // this worker receives a task, generates a single artifact (like a student pdf or a solution), and sends back the result
 self.onmessage = async (e: MessageEvent) => {
