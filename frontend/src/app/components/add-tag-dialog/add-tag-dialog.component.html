@@ -14,8 +14,27 @@
         </div>
 
     </div>
+
+    <h3 class="existing-header"> or choose an existing one</h3>
+    <div class="existingTag-container">
+        @for (tag of tags; track tag.getName())
+        {
+        <span 
+            [ngStyle]="{'backgroundColor': tag.getColor(), 'color': tag.getTextColor()}"
+            [mat-dialog-close]="{
+                exists: true, 
+                name: tag.getName(), 
+                color: tag.getColor(), 
+                textColor: tag.getTextColor()}"
+            class="existingTag" >
+            {{tag.getName()}}
+        </span>
+        }
+
+    </div>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
     <button class="cancel-button" [mat-dialog-close]="false">Cancel</button>
-    <button class="create-button" [mat-dialog-close]="{name: name, color: color, textColor: textColor}">Create</button>
+    <button class="create-button"
+        [mat-dialog-close]="{exists: false, name: name, color: color, textColor: textColor}">Create</button>
 </mat-dialog-actions>

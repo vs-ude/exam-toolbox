@@ -19,10 +19,11 @@ export class Tag {
     }
 
     public static fromPlain(obj: any): Tag {
-        const tag = new Tag(obj.name);
-        tag.color = obj.color;
-        tag.textColor = obj.textColor;
-        tag.usedBy = obj.usedBy || [];
+        const data = obj.tag || obj; // might be nested
+        const tag = new Tag(data.name);
+        tag.color = data.color;
+        tag.textColor = data.textColor;
+        tag.usedBy = data.usedBy || [];
         return tag;
     }
 

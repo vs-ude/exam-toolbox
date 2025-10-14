@@ -25,51 +25,67 @@ export class TaskPoolCardComponent {
     private colorProvider: ColorProviderService,
     private dialog: MatDialog,
     private api: ApiService,
-  ){}
-  
+  ) { }
+
   ngOnInit() {
     this.taskColor = this.colorProvider.getTaskColor(this.task.type)
     this.task.tags = this.task.tags.map(tag => Tag.fromPlain(tag));
   }
 
   public onAddTag() {
-    console.log("Add tag to task at index: ", this.task.taskId);
-
     const dialogRef = this.dialog.open(AddTagDialogComponent, {
-              width: '50%',
-              height: '50%',
-              data: {}
-            });
+      width: '50%',
+      height: '50%',
+      data: {}
+    });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const newTag = new Tag(result.name).setColors(result.color, result.textColor);
+      if (!result) {
+        return;
+      }
 
-        // link tag and task
+
+      if (!result.exists) {
+        // create New Tag and link to Task
+        const newTag = new Tag(result.name).setColors(result.color, result.textColor);
         newTag.addTask(this.task.taskId);
         this.task.tags.push(newTag);
 
-        console.log("Created new tag: ", newTag);
-
         this.api.addTag(newTag).subscribe(
-          res => {console.log("Tag added successfully", res);},
-          err => {console.error("Error adding tag: ", err);}
-        )
+          res => { console.log("Tag added successfully", res); },
+          err => { console.error("Error adding tag: ", err); }
+        );
 
         this.api.updateTaskInPool(this.task.taskId, this.task).subscribe(
-          res => {
-            console.log("Task updated with new tag: ", res);
-          },
-          err => {
-            console.error("Error updating task with new tag: ", err);
-          }
+          res => { console.log("Task updated with new tag: ", res); },
+          err => { console.error("Error updating task with new tag: ", err); }
         );
-        
-        // TODO: 
-        // update tag and Task in db  
-        // add Feature to delete tags from tasks
-        // add Feature to add already existing tags to tasks
+      } else {
+        // update existing Tag and associated Task
+        if(this.task.tags.find(tag => tag.getName() === result.name)){return;}
+        this.api.getTag(result.name).subscribe(
+          res => { 
+            const tag = Tag.fromPlain(res);
+            tag.addTask(this.task.taskId);
+            this.task.tags.push(tag);
+
+            this.api.updateTaskInPool(this.task.taskId, this.task).subscribe(
+              res => {console.log("task updated successfully", res)},
+              err => {console.error("Error updating task", err)}
+            );
+            this.api.updateTag(tag).subscribe(
+              res => {console.log("task updated successfully", res)},
+              err => {console.error("Error updating Tag", err)},
+            );
+
+          },
+          err => { console.error("Error fetching Tag", err)}
+        )
+
       }
+
+
+
     });
   }
 }

@@ -224,23 +224,6 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
         ctx.response.body = { message: "Error fetching downloadable jobs list" };
       }
     })
-    .get("/api/tags/:id", async (ctx) => {
-      const tagName = ctx.params.id
-      try {
-        const tag = await tags.findOne({ name: tagName })
-        if (!tag) {
-          ctx.response.status = 404
-          ctx.response.body = { message: "Tag not found" }
-          return
-        }
-        ctx.response.status = 200
-        ctx.response.body = tag
-      } catch (error) {
-        ctx.response.status = 500
-        ctx.response.body = { message: 'Error fetching tag', error }
-      }
-    })
-
     .post("/api/exams", async (ctx) => {
       const exam: Exam = await ctx.request.body().value
       try {
@@ -471,8 +454,6 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
         const result = await pool.updateOne(
           { taskId: id }, { $set: updateData }
         )
-        console.log(result);
-
 
         if (result.matchedCount === 0) {
           ctx.response.status = 404
@@ -558,18 +539,50 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
         ctx.response.body = { message: "Error deleting task-pool", error }
       }
     })
-    .put("/api/tags/:id", async (ctx) => {
-      const tagName = ctx.params.id;
+    .get("/api/tags/:id", async (ctx) => {
+      const tagName = ctx.params.id
       try {
+        const tag = await tags.findOne({ "tag.name": tagName })
+        if (!tag) {
+          ctx.response.status = 404
+          ctx.response.body = { message: "Tag not found" }
+          return
+        }
+        ctx.response.status = 200
+        ctx.response.body = tag
+      } catch (error) {
+        ctx.response.status = 500
+        ctx.response.body = { message: 'Error fetching tag', error }
+      }
+    })
+    .get("/api/tags", async (ctx) => {
+      try {
+        const tagList = await tags.find().toArray()
+        ctx.response.status = 200;
+        ctx.response.body = tagList;
+      } catch (error) {
+        ctx.response.status = 500;
+        ctx.response.body = { message: 'Error fetching tags', error }
+      }
+    })
+    .put("/api/tags/:id", async (ctx) => {
+      try {
+        const tagName = ctx.params.id;
+        const { _id, ...tag } = await ctx.request.body().value;
+        
         const result = await tags.updateOne(
-          { name: tagName },
-          { $set: await ctx.request.body().value }
+          { "tag.name": tagName },
+          { $set: {tag: tag} }
         );
+
         if (result.matchedCount === 0) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Tag not found" };
           return;
         }
+        ctx.response.status = 200;
+        ctx.response.body = {message: "Tag updated successfully"};
+        
       } catch (error) {
         ctx.response.status = 500;
         ctx.response.body = { message: "Error updating tag", error };
