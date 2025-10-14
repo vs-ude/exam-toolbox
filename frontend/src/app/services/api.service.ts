@@ -129,6 +129,8 @@ export class ApiService {
   }
 
   updateTaskInPool(taskId: string, updatedTask: Task) {
+    console.log(updatedTask);
+    
     return this.http.put(`${this.apiUrl}/taskPool/${taskId}`, updatedTask);
   }
 
@@ -146,6 +148,18 @@ export class ApiService {
 
   getTag(tagName: string) {
     return this.http.get<Tag>(`${this.apiUrl}/tags/${tagName}`);
+  }
+
+  deleteAllTags() {
+    return this.http.delete(`${this.apiUrl}/tags`);
+  }
+
+  getAllTags() {
+    return this.http.get<Tag[]>(`${this.apiUrl}/tags`);
+  }
+
+  updateTag(tag: Tag){
+    return this.http.put(`${this.apiUrl}/tags/${tag.getName()}`, tag);
   }
 
 }

@@ -19,44 +19,44 @@ import { updateMetaStudent, generateExam, updateMetaTemplate, generateTasksLatex
 import { Tag } from "./tag.ts";
 
 interface ExamGenerationJob {
-    jobId: string
-    examId: string
-    userEmail: string
-    status: 'queued' | 'processing' | 'finalizing' | 'completed' | 'failed'
-    progress: {
-      total: number
-      completed: number
-      failed: number
-    }
-    jobDir: string
-    zipPath?: string
-    createdAt: Date
-    studentData: any[]
-    randomNumbers: { de: string; en: string }[]
-    studentResults: any[]
+  jobId: string
+  examId: string
+  userEmail: string
+  status: 'queued' | 'processing' | 'finalizing' | 'completed' | 'failed'
+  progress: {
+    total: number
+    completed: number
+    failed: number
+  }
+  jobDir: string
+  zipPath?: string
+  createdAt: Date
+  studentData: any[]
+  randomNumbers: { de: string; en: string }[]
+  studentResults: any[]
 }
 
 interface AppState {
-    db: Database;
-    jobs: Map<string, ExamGenerationJob>;
-    taskQueue: any[];
-    workers: any[];
-    basePath: string;
-    JOBS_DIR: string;
-    processQueue: () => void;
-    genRandomNumber: (lang: 'de' | 'en', counter: number) => string;
-    getDownloadableJobs: () => Promise<{ examId: string, jobId: string }[]>;
+  db: Database;
+  jobs: Map<string, ExamGenerationJob>;
+  taskQueue: any[];
+  workers: any[];
+  basePath: string;
+  JOBS_DIR: string;
+  processQueue: () => void;
+  genRandomNumber: (lang: 'de' | 'en', counter: number) => string;
+  getDownloadableJobs: () => Promise<{ examId: string, jobId: string }[]>;
 }
 
 export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_DIR, processQueue, genRandomNumber, getDownloadableJobs }: AppState): Router {
-    const router = new Router();
+  const router = new Router();
 
-    const exams = db.collection("exams");
-    const pool = db.collection("taskPool");
-    const fileTracker = db.collection("fileTracker");
-    const tags = db.collection("tags");
-    
-    router
+  const exams = db.collection("exams");
+  const pool = db.collection("taskPool");
+  const fileTracker = db.collection("fileTracker");
+  const tags = db.collection("tags");
+
+  router
     .get("/", (ctx) => {
       ctx.response.body = "API is running..."
     })
@@ -277,7 +277,7 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
     .post("/api/upload", async (ctx) => {
       const body = ctx.request.body({ type: "form-data" })
       const formData = await body.value.read({ maxSize: 10 * 1024 * 1024 })
-  
+
       if (!formData.files || formData.files.length === 0) {
         ctx.response.status = 400
         ctx.response.body = { message: "No file uploaded" }
@@ -325,9 +325,9 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
           ctx.response.body = { message: "Missing file, file content, exam data or exam id" }
           return
         }
-  
+
         const examId = examJson._id;
-  
+
         for (const [jobId, existingJob] of jobs.entries()) {
           if (existingJob.examId === examId) {
             if (['processing', 'queued', 'finalizing'].includes(existingJob.status)) {
@@ -344,28 +344,28 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
             break;
           }
         }
-  
+
         const jobId = crypto.randomUUID()
         const jobDir = `${JOBS_DIR}/${jobId}`
         const jobTemplatePath = `${jobDir}/template`
         const tempOutputDir = `${jobDir}/temp_output`
         const studentPdfDir = `${tempOutputDir}/student_pdfs`
         await Deno.mkdir(studentPdfDir, { recursive: true })
-  
+
         await copy(basePath, jobTemplatePath, { overwrite: true })
         await updateMetaTemplate(examJson, jobTemplatePath)
         const tasksContentLatex = await generateTasksLatex(examJson, jobTemplatePath)
         await Deno.writeTextFile(`${jobTemplatePath}/aufgaben.tex`, tasksContentLatex)
-  
+
         const workbook = read(file.content, { type: "buffer" })
         const worksheet = workbook.Sheets[workbook.SheetNames[0]]
         const studentData = utils.sheet_to_json(worksheet, {
           header: ["examPlanId", "examNumber", "examTitle", "lastName", "firstName", "studentId"],
           range: 5,
         }).filter((student: any) => student.firstName && student.lastName)
-  
+
         const totalTasks = studentData.length + 3
-  
+
         const newJob: ExamGenerationJob = {
           jobId,
           examId,
@@ -378,7 +378,7 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
           randomNumbers: [],
           studentResults: [],
         }
-  
+
         studentData.forEach((student: any, index: number) => {
           const seatNumber = index + 1
           const deRandomNumber = genRandomNumber('de', index + 1)
@@ -395,18 +395,18 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
             seatNumber
           })
         })
-  
+
         taskQueue.push({ type: 'solution', jobId, jobTemplatePath, outputDir: tempOutputDir })
         taskQueue.push({ type: 'log', jobId, jobTemplatePath, outputDir: tempOutputDir, lang: 'de' })
         taskQueue.push({ type: 'log', jobId, jobTemplatePath, outputDir: tempOutputDir, lang: 'en' })
-  
+
         jobs.set(jobId, newJob)
-  
+
         workers.forEach(() => processQueue())
-  
+
         ctx.response.status = 202
         ctx.response.body = { jobId, message: "Exam generation job has been started." }
-  
+
       } catch (error) {
         console.error('Error starting mass-exam generation job:', error)
         ctx.response.status = 500
@@ -439,21 +439,6 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
         }
       }
     })
-    .post("/api/tags", async (ctx) => {
-      const tag: Tag = await ctx.request.body().value;
-      try {
-        const result = await tags.insertOne({tag});
-        ctx.response.status = 200,
-          ctx.response.body = {
-            message: "Tag saved successfully!",
-            insertedId: result,
-          }
-      } catch (error) {
-        ctx.response.status = 500
-        ctx.response.body = { message: 'Error saving tag', error: error }
-      }
-    })
-    
     .put("/api/exams/update", async (ctx) => {
       try {
         const { examId, updatedExam } = await ctx.request.body().value
@@ -480,10 +465,15 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
     })
     .put("/api/taskPool/:taskId", async (ctx) => {
       try {
+        const id = ctx.params.taskId;
+        const { _id, ...updateData } = await ctx.request.body().value;
+
         const result = await pool.updateOne(
-          { taskId: ctx.params.taskId }, { $set: await ctx.request.body().value }
+          { taskId: id }, { $set: updateData }
         )
-  
+        console.log(result);
+
+
         if (result.matchedCount === 0) {
           ctx.response.status = 404
           ctx.response.body = { message: "Task not found" }
@@ -513,24 +503,24 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
     .delete("/api/jobs/:jobId", async (ctx) => {
       const jobId = ctx.params.jobId
       const job = jobs.get(jobId)
-  
+
       if (!job) {
         ctx.response.status = 404
         ctx.response.body = { message: "Job not found" }
         return
       }
-  
+
       if (job.status === 'processing' || job.status === 'queued') {
         console.log(`Cancellation requested for job: ${jobId}`)
-  
+
         job.status = 'failed'
-  
+
         taskQueue = taskQueue.filter(task => task.jobId !== jobId)
-  
+
         await Deno.remove(job.jobDir, { recursive: true }).catch(err => {
           console.error(`Error during immediate cleanup for cancelled job ${jobId}:`, err)
         })
-  
+
         ctx.response.status = 200
         ctx.response.body = { message: `Job ${jobId} has been cancelled.` }
       } else {
@@ -568,6 +558,68 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
         ctx.response.body = { message: "Error deleting task-pool", error }
       }
     })
+    .put("/api/tags/:id", async (ctx) => {
+      const tagName = ctx.params.id;
+      try {
+        const result = await tags.updateOne(
+          { name: tagName },
+          { $set: await ctx.request.body().value }
+        );
+        if (result.matchedCount === 0) {
+          ctx.response.status = 404;
+          ctx.response.body = { message: "Tag not found" };
+          return;
+        }
+      } catch (error) {
+        ctx.response.status = 500;
+        ctx.response.body = { message: "Error updating tag", error };
+      }
+    })
+    .post("/api/tags", async (ctx) => {
+      const tag: Tag = await ctx.request.body().value;
+      try {
+        const result = await tags.insertOne({ tag });
+        ctx.response.status = 200,
+          ctx.response.body = {
+            message: "Tag saved successfully!",
+            insertedId: result,
+          }
+      } catch (error) {
+        ctx.response.status = 500
+        ctx.response.body = { message: 'Error saving tag', error: error }
+      }
+    })
+    .delete("/api/tags", async (ctx) => {
+      try {
+        const result = await tags.deleteMany({});
+        ctx.response.status = 200;
+        ctx.response.body = {
+          message: `${result} tags deleted successfully!`,
+          deletedCount: result,
+        }
+      } catch (error) {
+        ctx.response.status = 500;
+        ctx.response.body = { message: "Error deleting tags", error };
+      }
+    })
+    .delete("/api/tags/:id", async (ctx) => {
+      const tagName = ctx.params.id;
+      try {
+        const result = await tags.deleteOne({ name: tagName });
+        if (result.deletedCount === 0) {
+          ctx.response.status = 404;
+          ctx.response.body = { message: "Tag not found" };
+          return;
+        }
+        ctx.response.status = 200;
+        ctx.response.body = { message: "Tag deleted successfully" };
+      } catch (error) {
+        ctx.response.status = 500;
+        ctx.response.body = { message: "Error deleting tag", error };
+      }
+    });
 
-  return router
+
+
+  return router;
 }

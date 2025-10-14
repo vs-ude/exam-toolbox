@@ -18,6 +18,14 @@ export class Tag {
         this.usedBy = [];
     }
 
+    public static fromPlain(obj: any): Tag {
+        const tag = new Tag(obj.name);
+        tag.color = obj.color;
+        tag.textColor = obj.textColor;
+        tag.usedBy = obj.usedBy || [];
+        return tag;
+    }
+
     public addExam(examId: string) {
         this.usedBy = [...new Set(this.usedBy).add({ type: "exam", id: examId })];
         return this;

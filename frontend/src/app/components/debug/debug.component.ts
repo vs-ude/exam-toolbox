@@ -49,7 +49,7 @@ const tasks: Task[] = [
     lastUsed: new Date(),
     usedIn: [],
     children: [],
-    
+
   }
 ];
 
@@ -189,10 +189,27 @@ export class DebugComponent {
     );
   }
 
-  onGetDownloadableList(){
+  onGetDownloadableList() {
     this.api.getDownloadableJobs().subscribe(downloadableJobs => {
       console.log("Downloadable Jobs: ")
       console.table(downloadableJobs)
     })
+  }
+
+  onDeleteAllTags() {
+    this.api.deleteAllTags().subscribe(
+      res => {console.log('All tags deleted successfully: ', res)},
+      err => {console.error('Error deleting all tags: ', err)}
+    )
+  }
+
+  onGetAllTags() {
+    this.api.getAllTags().subscribe(
+      tags => {
+        console.log("All Tags: ")
+        console.table(tags)
+      },
+      err => {console.error('Error getting all tags: ', err)}
+    )
   }
 }

@@ -6,6 +6,7 @@ import { NgFor, NgStyle } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { AddTagDialogComponent } from '../add-tag-dialog/add-tag-dialog.component';
 import { Tag } from '../../tag';
+import { ApiService } from '../../services/api.service';
 
 
 @Component({
@@ -23,10 +24,12 @@ export class TaskPoolCardComponent {
   constructor(
     private colorProvider: ColorProviderService,
     private dialog: MatDialog,
+    private api: ApiService,
   ){}
   
   ngOnInit() {
     this.taskColor = this.colorProvider.getTaskColor(this.task.type)
+    this.task.tags = this.task.tags.map(tag => Tag.fromPlain(tag));
   }
 
   public onAddTag() {
@@ -47,6 +50,20 @@ export class TaskPoolCardComponent {
         this.task.tags.push(newTag);
 
         console.log("Created new tag: ", newTag);
+
+        this.api.addTag(newTag).subscribe(
+          res => {console.log("Tag added successfully", res);},
+          err => {console.error("Error adding tag: ", err);}
+        )
+
+        this.api.updateTaskInPool(this.task.taskId, this.task).subscribe(
+          res => {
+            console.log("Task updated with new tag: ", res);
+          },
+          err => {
+            console.error("Error updating task with new tag: ", err);
+          }
+        );
         
         // TODO: 
         // update tag and Task in db  
