@@ -1,6 +1,7 @@
-<button class="task" (mouseover)="mouseHovering=true" (mouseleave)="mouseHovering=false"
-    [ngStyle]="{'backgroundColor': mouseHovering ? taskColor : 'var(--color-bg-accent)' }">
-    <div class="icon_container" [ngStyle]="{'backgroundColor': mouseHovering ? '#0000002a' : taskColor }">
+
+<button class="task" (mouseover)="mouseHoveringCard=true" (mouseleave)="mouseHoveringCard=false"
+    [ngStyle]="{'backgroundColor': mouseHoveringCard ? taskColor : 'var(--color-bg-accent)' }">
+    <div class="icon_container" [ngStyle]="{'backgroundColor': mouseHoveringCard ? '#0000002a' : taskColor }">
         <img src="{{ task.type + '.svg' }}" alt="Task Type Icon" class="task_icon">
     </div>
     <div class="description_shelf">
@@ -8,9 +9,13 @@
         <span class="description"></span>
     </div>
     <div class="tag_wrapper">
-        @for (tag of task.tags; track tag.getName();) {
-        <span class="task_tag" [ngStyle]="{'backgroundColor': tag.getColor(), 'color': tag.getTextColor()}">
+        @for (tag of task.tags; track $index;) {
+        <span class="task_tag" [ngStyle]="{'backgroundColor': tag.getColor(), 'color': tag.getTextColor()}"
+            (mouseover)="mouseHoveringTagIndex = $index" (mouseleave)="mouseHoveringTagIndex = -1">
             {{tag.getName()}}
+            @if (mouseHoveringTagIndex === $index){
+                <span class="delete_icon" (click)="onDeleteTag($index)"><mat-icon>delete</mat-icon></span>
+            }
         </span>
         }
         <button class="addTag_Button" (click)="onAddTag()"><mat-icon>add</mat-icon></button>

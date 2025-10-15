@@ -1,6 +1,5 @@
-
 .task {
-    padding: 24px 4px 12px ;
+    padding: 24px 4px 12px;
     display: flex;
     align-items: center;
     flex: 1;
@@ -18,18 +17,23 @@
 
 .task:hover {
     transition: .1s ease-in;
+
     .name {
         color: #ffff
     }
+
     ;
+
     .description {
         color: #ffffffcc
     }
+
     ;
 
     .footer {
         color: #ffffffcc
     }
+
     cursor: pointer;
 }
 
@@ -56,7 +60,7 @@
 }
 
 //------ Tags -----------------
-.tag_wrapper{
+.tag_wrapper {
     display: flex;
     flex-direction: row;
     gap: 4px;
@@ -80,6 +84,11 @@
     box-sizing: border-box;
     text-align: center;
     line-height: 1.4;
+    position: relative;
+}
+
+.task_tag:hover {
+    filter: brightness(0.9);
 }
 
 .addTag_Button {
@@ -102,6 +111,20 @@
     background: var(--color-bg-lifted);
     border-radius: 12px;
 }
+
+.delete_icon {
+    position: absolute;
+    color: var(--color-text);
+    top: -10px;
+    right: -8px;
+    scale: 0.8;
+}
+
+.delete_icon:hover {
+    cursor: pointer;
+    color: red;
+}
+
 
 //------ Descriptions -----------------
 .description_shelf {
@@ -128,7 +151,7 @@
 }
 
 //------ Footer -----------------
-.footer{
+.footer {
     display: flex;
     flex-direction: row;
     justify-content: space-between;

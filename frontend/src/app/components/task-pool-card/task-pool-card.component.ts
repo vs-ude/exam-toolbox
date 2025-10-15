@@ -9,6 +9,7 @@ import { Tag } from '../../tag';
 import { ApiService } from '../../services/api.service';
 
 
+
 @Component({
   selector: 'app-task-pool-card',
   standalone: true,
@@ -19,7 +20,8 @@ import { ApiService } from '../../services/api.service';
 export class TaskPoolCardComponent {
   @Input() task!: Task;
   public taskColor: string = "";
-  public mouseHovering: boolean = false;
+  public mouseHoveringCard: boolean = false;
+  public mouseHoveringTagIndex = -1;
 
   constructor(
     private colorProvider: ColorProviderService,
@@ -31,6 +33,16 @@ export class TaskPoolCardComponent {
     this.taskColor = this.colorProvider.getTaskColor(this.task.type)
     this.task.tags = this.task.tags.map(tag => Tag.fromPlain(tag));
   }
+
+
+  public onDeleteTag(index: number) {
+    this.task.tags.splice(index, 1);
+    this.api.updateTaskInPool(this.task.taskId, this.task).subscribe(
+      res => { console.log("Tag removed successfully!", res) },
+      err => { console.error("Error removing Tag"), err });
+    this.mouseHoveringTagIndex = -1
+  }
+
 
   public onAddTag() {
     const dialogRef = this.dialog.open(AddTagDialogComponent, {
@@ -62,24 +74,24 @@ export class TaskPoolCardComponent {
         );
       } else {
         // update existing Tag and associated Task
-        if(this.task.tags.find(tag => tag.getName() === result.name)){return;}
+        if (this.task.tags.find(tag => tag.getName() === result.name)) { return; }
         this.api.getTag(result.name).subscribe(
-          res => { 
+          res => {
             const tag = Tag.fromPlain(res);
             tag.addTask(this.task.taskId);
             this.task.tags.push(tag);
 
             this.api.updateTaskInPool(this.task.taskId, this.task).subscribe(
-              res => {console.log("task updated successfully", res)},
-              err => {console.error("Error updating task", err)}
+              res => { console.log("task updated successfully", res) },
+              err => { console.error("Error updating task", err) }
             );
             this.api.updateTag(tag).subscribe(
-              res => {console.log("task updated successfully", res)},
-              err => {console.error("Error updating Tag", err)},
+              res => { console.log("task updated successfully", res) },
+              err => { console.error("Error updating Tag", err) },
             );
 
           },
-          err => { console.error("Error fetching Tag", err)}
+          err => { console.error("Error fetching Tag", err) }
         )
 
       }
