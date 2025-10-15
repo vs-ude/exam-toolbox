@@ -3,6 +3,7 @@ import { Exam, Task } from '../../exam';
 import { saveAs } from 'file-saver';
 import { ApiService } from '../../services/api.service';
 import { Tag } from '../../tag';
+import { HttpResponse } from '@angular/common/http';
 
 
 const courseName = 'DEBUG EXAM';
@@ -89,11 +90,23 @@ export class DebugComponent {
 
   onGenerateExam() {
     this.api.generateExam(exam).subscribe({
-      next: (examPDF: Blob) => {
-        saveAs(examPDF, `${exam.courseName}.pdf`)
+      next: (response: HttpResponse<Blob>) => {
+        const pdfBlob = response.body
+        if(pdfBlob){
+          saveAs(pdfBlob, `${exam.courseName}.pdf`)
+        }
+
+        const subtaskHeader = response.headers.get('X-Subtask-Info')
+        const subtaskInfo = subtaskHeader ? JSON.parse(subtaskHeader) : []
+        console.log("Subtask Info from header:", subtaskInfo)
+        
+        const hasErrors = subtaskInfo.some((info: any) => info.logFileBoundaryError === true)
+        if (hasErrors) {
+          alert("Warning: A layout error was detected! Check the console for details.")
+        }
       },
       error: (err) => {
-        console.error('Error downloading PDF: ', err)
+        console.error('Error generating exam preview: ', err)
       }
     })
   }
