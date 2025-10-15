@@ -27,6 +27,7 @@ import { LoadingService } from '../../services/loading.service';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { NewPageComponent } from "./tasks/new-page/new-page.component";
 import { UpdateTaskDialogComponent } from '../update-task-dialog/update-task-dialog.component';
+import { HttpResponse } from '@angular/common/http';
 
 
 
@@ -221,17 +222,30 @@ export class CreateExamComponent {
 
   onPreview() {
     this.checkIfValid()
-    console.log(this.exam)
+    // console.log(this.exam)
 
     this.loadingService.loadingOn();
     this.api.generateExam(this.exam).subscribe({
-      next: (examPDF: Blob) => {
-        saveAs(examPDF, `${this.exam.courseName}.pdf`)
-        this.loadingService.loadingOff();
+      next: (response: HttpResponse<Blob>) => {
+        const pdfBlob = response.body
+        if(pdfBlob){
+          saveAs(pdfBlob, `${this.exam.courseName}.pdf`)
+        }
+
+        const subtaskHeader = response.headers.get('X-Subtask-Info')
+        const subtaskInfo = subtaskHeader ? JSON.parse(subtaskHeader) : []
+        console.log("Subtask Info from header:", subtaskInfo)
+        
+        const hasErrors = subtaskInfo.some((info: any) => info.logFileBoundaryError === true)
+        if (hasErrors) {
+          alert("Warning: A layout error was detected in the Logfile! Check the browser-console for details.")
+        }
+
+        this.loadingService.loadingOff()
       },
       error: (err) => {
-        console.error('Error downloading PDF: ', err)
-        this.loadingService.loadingOff();
+        console.error('Error generating exam preview: ', err)
+        this.loadingService.loadingOff()
       }
     })
   }

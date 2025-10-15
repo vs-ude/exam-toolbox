@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, timeout } from 'rxjs';
 import { Exam, Task } from '../exam';
 import { User } from '../user';
@@ -50,8 +50,8 @@ export class ApiService {
     return this.http.delete(`${this.apiUrl}/jobs/${jobId}`)
   }
 
-  generateExam(exam?: Exam): Observable<Blob> {
-    return this.http.post(`${this.apiUrl}/generate-exam`, exam, { responseType: 'blob' })
+  generateExam(exam?: Exam): Observable<HttpResponse<Blob>> {
+    return this.http.post(`${this.apiUrl}/generate-exam`, exam, { responseType: 'blob', observe: 'response' })
   }
 
   addExam(exam: Exam): Observable<any> {

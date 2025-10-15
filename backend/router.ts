@@ -46,9 +46,10 @@ interface AppState {
   processQueue: () => void;
   genRandomNumber: (lang: 'de' | 'en', counter: number) => string;
   getDownloadableJobs: () => Promise<{ examId: string, jobId: string }[]>;
+  parseLogFileForSubtaskInfo: (logContent: string) => any[];
 }
 
-export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_DIR, processQueue, genRandomNumber, getDownloadableJobs }: AppState): Router {
+export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_DIR, processQueue, genRandomNumber, getDownloadableJobs, parseLogFileForSubtaskInfo }: AppState): Router {
   const router = new Router();
 
   const exams = db.collection("exams");
@@ -238,6 +239,7 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
         ctx.response.body = { message: 'Error saving exam', error: err }
       }
     })
+    // functions as a preview and also sends information about the finished pdf to frontend (like which subtask is at which page)
     .post("/api/generate-exam", async (ctx) => {
       try {
         const exam: Exam = await ctx.request.body().value
@@ -249,6 +251,13 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
         const tasksContentLatex = await generateTasksLatex(exam, tempDir)
         await Deno.writeTextFile(tasksPath, tasksContentLatex)
         const { pdfBytes: examPDF, logContent } = await generateExam(tempDir)
+        
+        const subtaskInfo = parseLogFileForSubtaskInfo(logContent)
+        const subtaskInfoJson = JSON.stringify(subtaskInfo)
+
+        ctx.response.headers.set("X-Subtask-Info", subtaskInfoJson)
+        ctx.response.headers.set("Access-Control-Expose-Headers", "X-Subtask-Info")
+        
         ctx.response.headers.set("Content-Type", "application/pdf")
         ctx.response.headers.set("Content-Disposition", `attachment; filename="${exam.courseName}.pdf"`)
         ctx.response.body = examPDF

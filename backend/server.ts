@@ -149,7 +149,7 @@ const tags = db.collection("tags");
 
 // Create Oak Application and Router
 const app = new Application();
-const router = configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_DIR, processQueue, genRandomNumber, getDownloadableJobs });
+const router = configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_DIR, processQueue, genRandomNumber, getDownloadableJobs, parseLogFileForSubtaskInfo });
 
 
 app.use(async (ctx, next) => {
@@ -269,6 +269,46 @@ async function finalizeJob(jobId: string) {
     console.error(`Failed to finalize job ${jobId}:`, error)
     job.status = 'failed'
   }
+}
+
+function parseLogFileForSubtaskInfo(logContent: string) {
+    const lines = logContent.split('\n')
+    const subtaskInfo: {
+        aufgabe: number
+        subtask: string
+        page: number
+        logFileBoundaryError: boolean
+    }[] = []
+    
+    let aufgabeCounter = 0
+    let subtaskInAufgabeCounter = 0
+
+    for (const line of lines) {
+        if (line.includes("VSEXAM: {'Typ':'AufgabeStart'")) {
+            aufgabeCounter++
+            subtaskInAufgabeCounter = 0
+        }
+
+        if (line.includes("VSEXAM: {'Typ':'AufgabenTeil'")) {
+            subtaskInAufgabeCounter++
+            const pageMatch = line.match(/'Seite':'(\d+)'/)
+            const page = pageMatch ? parseInt(pageMatch[1], 10) : 0
+
+            subtaskInfo.push({
+                aufgabe: aufgabeCounter,
+                subtask: String.fromCharCode(96 + subtaskInAufgabeCounter),
+                page: page,
+                logFileBoundaryError: false,
+            })
+        }
+
+        if (line.includes("VSEXAM: {'Typ':'edgeStart'") && line.includes("'X': '0'")) {
+            if (subtaskInfo.length > 0) {
+                subtaskInfo[subtaskInfo.length - 1].logFileBoundaryError = true
+            }
+        }
+    }
+    return subtaskInfo
 }
 
 async function createZipArchiveFromDirectory(outDir: string, zipFilePath: string): Promise<void> {
