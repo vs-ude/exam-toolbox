@@ -1,0 +1,18 @@
+<h1>All Tags</h1>
+@for (tag of tags; track $index){
+    <div>{{tag.getName()}}</div>
+}
+
+<br>
+<h1>matched</h1>
+@for (res of result; track $index){
+    <div>
+        <p><b>{{$index}}. &#123; {{res.name}}, {{res.type}}, {{res.link}} &#125;</b></p> 
+        @if (res.type === "tag"){
+            @for(ass of res.link.getUsedBy(); track $index){
+                <div style="margin-left: 15%;"> &#123; {{ass.id}}, {{ass.type}}  &#125;</div>
+            }
+        }
+        
+    </div>
+}

@@ -20,7 +20,8 @@
                         clip-rule="evenodd"></path>
                 </svg>
                 <input type="text" placeholder="Search..." class="search-input" aria-label="Search"
-                    aria-autocomplete="list" aria-controls="mat-autocomplete-0" aria-activedescendant="mat-option-0">
+                    aria-autocomplete="list" aria-controls="mat-autocomplete-0" aria-activedescendant="mat-option-0"
+                    #search (keydown.enter)="onSearch(search.value)">
             </div>
         </button>
 

@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild, viewChild } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav'
 import { MatListModule } from '@angular/material/list'
-import { RouterOutlet, RouterModule } from '@angular/router';
+import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button'
 import { ThemeToggleService } from '../../services/theme-toggle.service';
 import { MatIcon } from '@angular/material/icon';
@@ -25,7 +25,8 @@ export class MainViewComponent {
 
   constructor(
     private themeToggleService: ThemeToggleService,
-    private api: ApiService
+    private api: ApiService,
+    private router: Router,
   ) { }
 
   ngOnInit() {
@@ -55,6 +56,10 @@ export class MainViewComponent {
     this.isNavCollapsed = !this.isNavCollapsed
     this.sidenav.nativeElement.style.width = this.isNavCollapsed ? '0' : '12%';
     this.content.nativeElement.style.width = this.isNavCollapsed ? '100%' : '88%';
+  }
+
+  onSearch(search: string){
+    this.router.navigate([`/search/${search}`])
   }
 
 
