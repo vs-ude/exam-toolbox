@@ -1,6 +1,6 @@
-<h2 mat-dialog-title>Generate Mass Exam</h2>
+<h2 class="title" mat-dialog-title>Generate Mass Exam</h2>
 
-<mat-dialog-content>
+<mat-dialog-content class="content">
   
   <div *ngIf="!isLoading && jobStatus?.status !== 'completed'">
     <p class="dialog-description">Please select the student list file (.xlsx) to begin the generation.</p>
@@ -19,8 +19,8 @@
         <span>{{ selectedFile.name }}</span>
       </div>
 
-      <mat-slide-toggle class="auto-download-toggle" [(ngModel)]="autoDownload">
-        Auto-download when complete
+      <mat-slide-toggle [(ngModel)]="autoDownload">
+        <div style="color: var(--color-text);">Auto-download when complete</div>
       </mat-slide-toggle>
     </div>
   </div>
@@ -80,7 +80,7 @@
   
   <ng-container *ngIf="!isLoading && jobStatus?.status === 'completed'">
     <button mat-stroked-button (click)="navigateToExamsPool()">View in Exams Pool</button>
-    <button mat-flat-button color="primary" (click)="downloadResult()" [disabled]="downloadSuccessful">
+    <button mat-flat-button color="primary" style="color: var(--color-text);" (click)="downloadResult()" [disabled]="downloadSuccessful">
       <mat-icon>download</mat-icon>
       <span>Download Now</span>
     </button>

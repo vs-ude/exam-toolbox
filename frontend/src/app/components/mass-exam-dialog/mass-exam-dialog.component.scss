@@ -1,3 +1,10 @@
+.title {
+  color: var(--color-text);
+}
+
+.content {
+  color: var(--color-text);
+}
 .generation-controls {
   margin-top: 16px;
   padding: 16px;
@@ -8,4 +15,13 @@
 .auto-download-toggle {
   display: block;
   margin-top: 20px;
+  color: var(--color-text);
+}
+
+:host ::ng-deep  .mat-slide-toggle.mat-checked:not(.mat-disabled) .mat-slide-toggle-thumb {
+   color: var(--color-text);
+}
+
+::ng-deep .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: var(--color-background);
 }
