@@ -228,17 +228,19 @@ export class CreateExamComponent {
     this.api.generateExam(this.exam).subscribe({
       next: (response: HttpResponse<Blob>) => {
         const pdfBlob = response.body
-        if(pdfBlob){
+        if (pdfBlob) {
           saveAs(pdfBlob, `${this.exam.courseName}.pdf`)
         }
 
         const subtaskHeader = response.headers.get('X-Subtask-Info')
-        const subtaskInfo = subtaskHeader ? JSON.parse(subtaskHeader) : []
+        const subtaskInfo: { aufgabe: number, subtask: string, page: number, logFileBoundaryError: boolean }[] = subtaskHeader ? JSON.parse(subtaskHeader) : []
         console.log("Subtask Info from header:", subtaskInfo)
-        
-        const hasErrors = subtaskInfo.some((info: any) => info.logFileBoundaryError === true)
+
+        const hasErrors = subtaskInfo.some((info) => info.logFileBoundaryError)
         if (hasErrors) {
-          alert("Warning: A layout error was detected in the Logfile! Check the browser-console for details.")
+          console.warn("Log file boundary errors detected, inserting new pages accordingly.")
+          // put dialog for asking for auto insert here
+          this.insertNewPage(subtaskInfo.filter(info => info.logFileBoundaryError)[0]);
         }
 
         this.loadingService.loadingOff()
@@ -248,6 +250,20 @@ export class CreateExamComponent {
         this.loadingService.loadingOff()
       }
     })
+  }
+
+  private insertNewPage(subtaskInfo: { aufgabe: number, subtask: string, page: number, logFileBoundaryError: boolean }) {
+    const assignmentIndex = subtaskInfo.aufgabe - 1;
+    let taskIndex = -1;
+    for (let i = 0; i < this.exam.tasks[assignmentIndex].tasks.length; i++) {
+      const taskChar = this.calcTaskChar(i, assignmentIndex);
+      if (this.calcTaskChar(i, assignmentIndex) === subtaskInfo.subtask) {
+        taskIndex = i;
+        break;
+      }
+    }
+    const newPageElement = this.taskBuilder.createTask("new_newPage")
+    this.exam.tasks[assignmentIndex].tasks.splice(taskIndex, 0, newPageElement);
   }
 
 
@@ -346,7 +362,7 @@ export class CreateExamComponent {
             task.children.push(newTask.taskId);
 
             // update old task in pool
-            this.api.updateTaskInPool(task.taskId, task).subscribe( 
+            this.api.updateTaskInPool(task.taskId, task).subscribe(
               response => {
                 console.log(`Task ${task.taskId} updated successfully`, response)
               },
@@ -431,10 +447,10 @@ export class CreateExamComponent {
     this.currentGroupView = index;
   }
 
-  public calcTaskChar(index: number): string {
+  public calcTaskChar(index: number, groupIndex = this.currentGroupView): string {
     // ignore manual text and new page tasks when calculating the task number
     let ignoredCount = 0;
-    const tasks = this.exam.tasks[this.currentGroupView].tasks;
+    const tasks = this.exam.tasks[groupIndex].tasks;
     for (let i = 0; i < index; i++) {
       if (tasks[i].type === 'manualText' || tasks[i].type === 'newPage') ignoredCount++;
     }

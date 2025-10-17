@@ -37,6 +37,15 @@ export class NewPageComponent extends BaseTaskComponent {
     children: [],
   }
 
+  override ngAfterViewInit(): void {
+    return;
+  }
+
+  // element has no language-specific content
+  override ngAfterViewChecked(): void {
+    return;
+  }
+
   ngOnInit(): void {
     if (this.preTask) {
       this.task = this.preTask as NewPage;
