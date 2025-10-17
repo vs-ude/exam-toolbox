@@ -28,6 +28,7 @@ import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, CdkDragHandle } fro
 import { NewPageComponent } from "./tasks/new-page/new-page.component";
 import { UpdateTaskDialogComponent } from '../update-task-dialog/update-task-dialog.component';
 import { HttpResponse } from '@angular/common/http';
+import { NewPageDialogComponent } from './new-page-dialog/new-page-dialog.component';
 
 
 
@@ -96,7 +97,6 @@ export class CreateExamComponent {
     this.themeService.themeChanged$.subscribe((theme: Theme) => {
       this.lightTheme = theme === Theme.LIGHT ? true : false;
     })
-
   }
 
   @ViewChild("nameInput") nameInput?: ElementRef;
@@ -262,8 +262,23 @@ export class CreateExamComponent {
         break;
       }
     }
-    const newPageElement = this.taskBuilder.createTask("new_newPage")
-    this.exam.tasks[assignmentIndex].tasks.splice(taskIndex, 0, newPageElement);
+    const result = this.askForAutoInsert(this.exam.tasks[assignmentIndex].tasks[taskIndex], `${subtaskInfo.aufgabe}.${subtaskInfo.subtask}`);
+    result.subscribe(auto => {
+      if (!auto) { return; }
+      const newPageElement = this.taskBuilder.createTask("new_newPage")
+      this.exam.tasks[assignmentIndex].tasks.splice(taskIndex, 0, newPageElement);
+    })
+
+  }
+
+
+  private askForAutoInsert(task: Task, taskNumber: string) {
+    const dialogRef = this.dialog.open(NewPageDialogComponent, {
+      width: '30%',
+      height: '30%',
+      data: { taskNumber: taskNumber, task: task }
+    })
+    return dialogRef.afterClosed();
   }
 
 
@@ -320,12 +335,8 @@ export class CreateExamComponent {
     this.addNewTasksToPool();
     this.updatePoolTasks();
     this.api.updateExam(this.exam._id, this.exam).subscribe(
-      response => {
-        console.log('Exam updated successfully: ', response);
-      },
-      error => {
-        console.error('Error updating exam: ', error);
-      }
+      response => { console.log('Exam updated successfully: ', response); },
+      error => { console.error('Error updating exam: ', error); }
     )
   }
 
