@@ -104,6 +104,10 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/taskPool`, task)
   }
 
+  getTaskWithIdFromPool(taskId: string): Observable<Task> {
+    return this.http.get<Task>(`${this.apiUrl}/taskPool/${taskId}`);
+  }
+
   getTasksFromPool() {
     return this.http.get<Task[]>(`${this.apiUrl}/taskPool`)
   }

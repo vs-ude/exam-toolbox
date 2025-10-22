@@ -1,18 +1,25 @@
-<h1>All Tags</h1>
-@for (tag of tags; track $index){
-    <div>{{tag.getName()}}</div>
-}
-
-<br>
-<h1>matched</h1>
-@for (res of result; track $index){
-    <div>
-        <p><b>{{$index}}. &#123; {{res.name}}, {{res.type}}, {{res.link}} &#125;</b></p> 
-        @if (res.type === "tag"){
-            @for(ass of res.link.getUsedBy(); track $index){
-                <div style="margin-left: 15%;"> &#123; {{ass.id}}, {{ass.type}}  &#125;</div>
-            }
-        }
-        
+<div class="view_container">
+    <div class="header">
+        <span>Search Results</span>
     </div>
-}
+
+    <div class="tag-list-container">
+        @for (tagRef of tagRefs; track $index){
+
+        <div class="tag-container">
+            <span class="tag"
+                [ngStyle]="{'backgroundColor': tagRef.tag.getColor(), 'color': tagRef.tag.getTextColor()}">{{tagRef.tag.getName()}}</span>
+            <div class="tag-usedByList">
+                @for (exam$ of tagRef.exams; track $index) {
+                <app-exam-card *ngIf="(exam$ |async) as exam" [name]=" exam.courseName"
+                    (click)="onExamClick(exam)"></app-exam-card>
+                }
+                @for (task$ of tagRef.tasks; track $index) {
+                <app-task-pool-card *ngIf="(task$ | async) as task" [task]="task"></app-task-pool-card>
+                }
+            </div>
+        </div>
+        }
+
+    </div>
+</div>

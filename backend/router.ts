@@ -181,6 +181,22 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
         ctx.response.body = { message: 'Error fetching tasks', error }
       }
     })
+    .get("/api/taskPool/:taskId", async (ctx) => {
+      try {
+        const taskId = ctx.params.taskId;
+        const task = await pool.findOne({ taskId: taskId });
+        if (!task) {
+          ctx.response.status = 404;
+          ctx.response.body = { message: "Task not found" };
+          return;
+        }
+        ctx.response.status = 200;
+        ctx.response.body = task;
+      } catch (error) {
+        ctx.response.status = 500;
+        ctx.response.body = { message: "Error fetching task", error };
+      }
+    })
     .get("/api/taskPool/type/:type", async (ctx) => {
       const taskType = ctx.params.type
       try {

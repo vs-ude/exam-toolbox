@@ -2,64 +2,92 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { Tag } from '../../tag';
+import { RouterModule } from '@angular/router';
+import { ExamCardComponent } from "../exam-card/exam-card.component";
+import { TaskPoolCardComponent } from "../task-pool-card/task-pool-card.component"; // Import RouterModule
+import { Observable } from 'rxjs';
+import { AsyncPipe, JsonPipe, NgIf, NgStyle } from '@angular/common';
 import { Exam, Task } from '../../exam';
-
-type Result =
-  | { type: "task", name: string, link: Task }
-  | { type: "exam", name: string, link: Exam }
-  | { type: "tag", name: string, link: Tag }
 
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [],
+  imports: [RouterModule, ExamCardComponent, TaskPoolCardComponent, AsyncPipe, NgIf, JsonPipe, NgStyle],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
 })
 export class SearchComponent {
 
-  public search: string = "";
-  public tags: Tag[] = [];
-  public result: Result[] = [];
+  private filteredTags: Tag[] = [];
+  public tagRefs: { tag: Tag, exams: Observable<Exam>[], tasks: Observable<Task>[] }[] = [];
 
   constructor(
     private router: Router,
     private api: ApiService,
     private route: ActivatedRoute,
-  ) { 
+  ) {
+
     this.route.params.subscribe(params => {
-      this.result = [];
-      this.search = "";
-      this.tags = [];
-      this.filter()
+      this.filterTags()
     })
-      
+  }
+
+  private getRefsOfTag() {
+    this.tagRefs = [];
+    for (const tag of this.filteredTags) {
+      const exams: Observable<Exam>[] = [];
+      const tasks: Observable<Task>[] = [];
+      tag.getUsedBy().forEach(ref => {
+        if (ref.type === "exam") {
+          const examObservable: Observable<Exam> = this.api.getExam(ref.id)
+          exams.push(examObservable);
+        } else {
+          const taskObservable: Observable<Task> = this.api.getTaskWithIdFromPool(ref.id);
+          tasks.push(taskObservable);
+        }
+      })
+      this.tagRefs.push({ tag: tag, exams: exams, tasks: tasks });
+    }
   }
 
 
-  private filter() {
-    const lastURLPart = this.router.url.split("/").pop();
-    if (lastURLPart === undefined || lastURLPart === "search") {
-      console.warn("no search text detected");
-      return;
-    }
-    this.search = lastURLPart
 
+  private filterTags() {
+    const searchString = this.getSearchString();
+    if (searchString === "") { return; }
 
     this.api.getAllTags().subscribe(
       res => {
-        this.tags = res.map(tag => Tag.fromPlain(tag));
-        const filtered = this.tags.filter(tag => tag.getName().toLowerCase().includes(this.search.toLowerCase()))
-        const result: Result[] = filtered.map(res => ({ name: res.getName(), type: "tag", link: res }))
-        for (let res of result) {
-          this.result.push(res);
-        }
+        const tags = res.map(tag => Tag.fromPlain(tag));
+        this.filteredTags = tags.filter(tag => tag.getName().toLowerCase().includes(searchString.toLowerCase()))
+        this.getRefsOfTag();
       },
       err => { console.error("Error fetching Tag list"), err }
     )
   }
 
+
+  private getSearchString(): string {
+    const lastURLPart = this.router.url.split("/").pop();
+    if (lastURLPart === undefined || lastURLPart === "search") {
+      console.warn("no search text detected");
+      return "";
+    }
+    return lastURLPart
+  }
+
+  public onExamClick(exam: Exam) {
+    if (exam._id == undefined) {
+      console.warn(`Exam ${exam.courseName} ${exam.semester} has no ExamID`);
+      return;
+    };
+    this.router.navigate([`/create-exam/${exam._id}`])
+  }
+
+  public onTaskClick(task: Task) {
+    console.log("Task clicked:", task);
+  }
 
 
 
