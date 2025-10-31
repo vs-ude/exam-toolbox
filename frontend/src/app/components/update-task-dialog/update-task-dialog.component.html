@@ -1,14 +1,25 @@
-<h2 mat-dialog-title>Update pool task or create a new one?</h2>
+<h2 mat-dialog-title class="title">Update tasks or create a new one?</h2>
 <mat-dialog-content class="dialog_content">
-    <p>
-        You are about to update task
-        <span style="font-weight: bold; font-size: 1.2em;">
-            {{data.assignmentNumber}}
-        </span>
-        in the task pool. Do you want to update the existing task in the pool or create a new one?
-    </p>
+    <div>
+        Some of the tasks that came out of the task pool were modified. You can either update the task in the task pool
+        or create a new one. Check the tasks that should be created as new tasks.
+    </div>
+    <div class="updateTask-container">
+        @for(task of data; track task.assignmentNumber) {
+        <div class="assignment-wrapper">
+            <div class="input">
+                <input type="checkbox" [checked]="true"  [(ngModel)]="this.checked[$index]" />
+                <span class="tooltip">Create a new Task</span>
+            </div>
+            <div class="assignmentName">{{task.assignmentNumber}}</div>
+            <div class="assignmentQuestion">{{task.task.question.DE}}</div>
+        </div>
+        }
+    </div>
+
+
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-    <button class="update_button" [mat-dialog-close]="'update'">Update</button>
-    <button class="newTask_button" [mat-dialog-close]="'newTask'">Create a new One</button>
+    <button class="cancel_button" [mat-dialog-close]="false">Cancel</button>
+    <button class="newTask_button" [mat-dialog-close]="checked">OK</button>
 </mat-dialog-actions>

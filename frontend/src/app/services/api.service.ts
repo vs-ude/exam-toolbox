@@ -133,9 +133,11 @@ export class ApiService {
   }
 
   updateTaskInPool(taskId: string, updatedTask: Task) {
-    console.log(updatedTask);
-    
     return this.http.put(`${this.apiUrl}/taskPool/${taskId}`, updatedTask);
+  }
+
+  addChildToTaskPoolTask(taskId: string, childId: string) {
+    return this.http.put(`${this.apiUrl}/taskPool/addChild/${taskId}`, childId);
   }
 
   getDownloadableJobs(): Observable<DownloadableJob[]> {

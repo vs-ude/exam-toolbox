@@ -97,6 +97,59 @@ export class CreateExamComponent {
     this.themeService.themeChanged$.subscribe((theme: Theme) => {
       this.lightTheme = theme === Theme.LIGHT ? true : false;
     })
+
+
+
+    // // for testing - remove later
+    // this.exam = {
+
+    //   _id: "68eeb1bbcf170febc7e50d40",
+    //   courseName: "New Exam",
+    //   examinerName: "asdf",
+    //   semester: "WS 26/27",
+    //   date: "2025-10-31",
+    //   examLengthMinutes: 90,
+    //   tasks: [
+    //     {
+    //       groupNumber: 1,
+    //       groupTitle: { DE: "", EN: "" },
+    //       tasks: [
+    //         {
+    //           taskId: "multipleChoice-1760473502100",
+    //           type: "multipleChoice",
+    //           question: { DE: "Frage 1 ist wirklich super lang. Wenn es noch länger wäre, würde es einer langen Schlange Konkurenz machen aber so lang ist die Frage dann doch nicht", EN: "Question 1" },
+    //           answerOptions: [],
+    //           points: 1,
+    //           createdBy: "test",
+    //           createdAt: new Date(),
+    //           lastUsed: new Date(),
+    //           usedIn: [],
+    //           tags: [],
+    //           children: []
+    //         },]
+    //     },
+    //     {
+    //       groupNumber: 1,
+    //       groupTitle: { DE: "", EN: "" },
+    //       tasks: [
+    //         {
+    //           taskId: "multipleChoice-1760473502100",
+    //           type: "multipleChoice",
+    //           question: { DE: "Frage 1", EN: "Question 1" },
+    //           answerOptions: [],
+    //           points: 1,
+    //           createdBy: "test",
+    //           createdAt: new Date(),
+    //           lastUsed: new Date(),
+    //           usedIn: [],
+    //           tags: [],
+    //           children: []
+    //         },]
+    //     }
+    //   ]
+    // };
+    // this.askUserForTaskUpdate([[0, 0], [1, 0]])
+
   }
 
   @ViewChild("nameInput") nameInput?: ElementRef;
@@ -341,6 +394,9 @@ export class CreateExamComponent {
   }
 
   private updatePoolTasks() {
+    if (this.modifiedPoolTasks.size === 0) { return; }
+
+    const modifiedIndices: [number, number][] = [];
     for (let i = 0; i < this.exam.tasks.length; i++) {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const task = this.exam.tasks[i].tasks[j];
@@ -349,67 +405,151 @@ export class CreateExamComponent {
 
         if (!isPoolTask || !isModified) continue;
 
-        const dialogRef = this.dialog.open(UpdateTaskDialogComponent, {
-          width: '50%',
-          height: '50%',
-          data: { assignmentNumber: `${i + 1}.${this.mapTaskIndexToChar(j)}`, task: task }
-        });
-
-        dialogRef.afterClosed().subscribe(status => {
-          if (status === "update") {
-            this.api.updateTaskInPool(task.taskId, task).subscribe(
-              response => {
-                console.log(`Task ${task.taskId} updated in pool`, response);
-              },
-              error => {
-                console.error(`Error updating task ${task.taskId}: `, error);
-              }
-            );
-          } else {
-            const newTask = JSON.parse(JSON.stringify(task));
-            newTask.parent = task.taskId;
-            newTask.children = [];
-            newTask.taskId = task.type + "-" + Date.now();
-            task.children.push(newTask.taskId);
-
-            // update old task in pool
-            this.api.updateTaskInPool(task.taskId, task).subscribe(
-              response => {
-                console.log(`Task ${task.taskId} updated successfully`, response)
-              },
-              error => {
-                console.log(`Error updating Task ${task.taskId}`, error)
-              }
-            )
-
-            this.exam.tasks[i].tasks[j] = newTask;
-
-            // add new task to pool
-            this.api.addTaskToPool(newTask).subscribe(
-              response => {
-                console.log(`New Task ${newTask.taskId} added to pool`, response);
-              },
-              error => {
-                console.error(`Error adding new task ${newTask.taskId}: `, error);
-              }
-            );
-
-            // update Exam that now includes the new Task
-            this.api.updateExam(this.exam._id, this.exam).subscribe(
-              response => {
-                console.log('Exam with new Task updated successfully: ', response);
-              },
-              error => {
-                console.error('Error updating exam: ', error);
-              }
-            );
-          }
-        });
-
-        this.modifiedPoolTasks.delete(task.taskId);
+        modifiedIndices.push([i, j]);
       }
     }
+
+    this.askUserForTaskUpdate(modifiedIndices);
   }
+
+  private askUserForTaskUpdate(modifiedIndices: [number, number][]) {
+
+    const tasks = []
+    for (const [i, j] of modifiedIndices) {
+      const task = this.exam.tasks[i].tasks[j];
+      tasks.push({ assignmentNumber: `${i + 1}.${this.mapTaskIndexToChar(j)}`, task: task, newTask: false });
+    }
+
+    const dialogRef = this.dialog.open(UpdateTaskDialogComponent, {
+      width: '50%',
+      height: '50%',
+      data: tasks
+    });
+
+    dialogRef.afterClosed().subscribe((results: string) => {
+      if (!results) { return; }
+      for (let index = 0; index < results.length; index++) {
+        results[index] ? this.createNewTask(modifiedIndices[index]) : this.updateTask(modifiedIndices[index]);
+      }
+      this.modifiedPoolTasks.clear();
+    })
+
+  }
+
+  updateTask(index: [number, number]) {
+    const [i, j] = index;
+    const task = this.exam.tasks[i].tasks[j];
+    this.api.updateTaskInPool(task.taskId, task).subscribe(
+      response => { 
+        console.log(`Task ${task.taskId} updated in pool`, response);
+        this.importPoolTasks(); // refresh pool tasks after updating task
+       },
+      error => { console.error(`Error updating task ${task.taskId}: `, error); }
+    );
+  }
+
+
+  createNewTask(index: [number, number]) { 
+    const [i, j] = index;
+    const oldTask = this.exam.tasks[i].tasks[j];
+    const newTask: Task = JSON.parse(JSON.stringify(oldTask));
+    newTask.parent = oldTask.taskId;
+    newTask.children = [];
+    newTask.taskId = oldTask.type + "-" + Date.now();
+    oldTask.children.push(newTask.taskId);
+
+    console.log("OldTask:");
+    console.log(oldTask);
+    console.log("newTask:");
+    console.log(newTask);
+    
+ 
+    // add new child to the old Task
+    this.api.addChildToTaskPoolTask(oldTask.taskId, newTask.taskId).subscribe(
+      response => {console.log("new child was added to the old Task")},
+      error => {console.error("Error adding the child to the old Task", error)}
+    )
+
+
+    this.exam.tasks[i].tasks[j] = newTask;
+
+    // add new task to pool
+    this.api.addTaskToPool(newTask).subscribe(
+      response => { 
+        console.log(`New Task ${newTask.taskId} added to pool`, response);
+        this.importPoolTasks(); // refresh pool tasks after adding new task
+      },
+      error => { console.error(`Error adding new task ${newTask.taskId}: `, error); }
+    );
+
+    // update Exam that now includes the new Task
+    this.api.updateExam(this.exam._id, this.exam).subscribe(
+      response => { console.log('Exam with new Task updated successfully: ', response); },
+      error => { console.error('Error updating exam: ', error); }
+    );
+  }
+
+
+  // private oldStuff() {
+  //   const dialogRef = this.dialog.open(UpdateTaskDialogComponent, {
+  //     width: '50%',
+  //     height: '50%',
+  //     data: { assignmentNumber: `${i + 1}.${this.mapTaskIndexToChar(j)}`, task: task }
+  //   });
+
+  //   dialogRef.afterClosed().subscribe(status => {
+  //     if (status === "update") {
+  //       this.api.updateTaskInPool(task.taskId, task).subscribe(
+  //         response => {
+  //           console.log(`Task ${task.taskId} updated in pool`, response);
+  //         },
+  //         error => {
+  //           console.error(`Error updating task ${task.taskId}: `, error);
+  //         }
+  //       );
+  //     } else {
+  //       const newTask = JSON.parse(JSON.stringify(task));
+  //       newTask.parent = task.taskId;
+  //       newTask.children = [];
+  //       newTask.taskId = task.type + "-" + Date.now();
+  //       task.children.push(newTask.taskId);
+
+  //       // update old task in pool
+  //       this.api.updateTaskInPool(task.taskId, task).subscribe(
+  //         response => {
+  //           console.log(`Task ${task.taskId} updated successfully`, response)
+  //         },
+  //         error => {
+  //           console.log(`Error updating Task ${task.taskId}`, error)
+  //         }
+  //       )
+
+  //       this.exam.tasks[i].tasks[j] = newTask;
+
+  //       // add new task to pool
+  //       this.api.addTaskToPool(newTask).subscribe(
+  //         response => {
+  //           console.log(`New Task ${newTask.taskId} added to pool`, response);
+  //         },
+  //         error => {
+  //           console.error(`Error adding new task ${newTask.taskId}: `, error);
+  //         }
+  //       );
+
+  //       // update Exam that now includes the new Task
+  //       this.api.updateExam(this.exam._id, this.exam).subscribe(
+  //         response => {
+  //           console.log('Exam with new Task updated successfully: ', response);
+  //         },
+  //         error => {
+  //           console.error('Error updating exam: ', error);
+  //         }
+  //       );
+  //     }
+  //   });
+
+  //   this.modifiedPoolTasks.delete(task.taskId);
+  // }
 
   private importExam() {
     const lastURLPart = this.router.url.split("/").pop();

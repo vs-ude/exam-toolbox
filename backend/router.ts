@@ -219,6 +219,27 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
         ctx.response.body = { message: 'Error fetching tasks by tag', error }
       }
     })
+    .put("/api/taskPool/addChild/:taskId", async (ctx) => {
+      try {
+        const id = ctx.params.taskId;
+        const { childTaskId } = await ctx.request.body().value;
+
+        const result = await pool.updateOne(
+          { taskId: id }, { $addToSet: { children: childTaskId } }
+        )
+
+        if (result.matchedCount === 0) {
+          ctx.response.status = 404
+          ctx.response.body = { message: "Task not found" }
+          return
+        }
+        ctx.response.status = 200;
+        
+      } catch (error) {
+        ctx.response.status = 500;
+        ctx.response.body = { message: `Error updating child tasks for ${ctx.params.taskId}`, error };
+      }
+    })
     .get("/api/taskPool/user/:userId", async (ctx) => {
       const userId = ctx.params.userId
       try {
