@@ -416,3 +416,40 @@
 ::-webkit-scrollbar-thumb:hover {
     background: var(--color-icon);
 }
+
+.preview-tab {
+    position: relative;
+    color: var(--color-warn);
+}
+
+.notification-dot {
+    height: 8px;
+    width: 8px;
+    background-color: var(--color-primary);
+    border-radius: 50%;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+.preview_container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+iframe {
+    flex-grow: 1;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+.no-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: var(--color-text-secondary);
+    font-size: 1.2em;
+}

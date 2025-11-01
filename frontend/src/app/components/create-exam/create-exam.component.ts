@@ -1,41 +1,51 @@
-import { Component, ElementRef, HostListener, viewChild, ViewChild } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { NgFor, NgIf, NgStyle } from '@angular/common';
-import { Exam, Task } from '../../exam';
-import { AddTaskComponent } from './add-task/add-task.component';
-import { MatSelectModule } from '@angular/material/select';
-import { FormsModule, } from '@angular/forms';
-import { ApiService } from '../../services/api.service';
-import { saveAs } from 'file-saver';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MultiplechoiceTaskComponent } from './tasks/multipleChoiceTask/multiplechoice-task.component';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  viewChild,
+  ViewChild,
+} from "@angular/core";
+import { MatIconModule } from "@angular/material/icon";
+import { MatTooltipModule } from "@angular/material/tooltip";
+import { NgFor, NgIf, NgStyle } from "@angular/common";
+import { Exam, Task } from "../../exam";
+import { AddTaskComponent } from "./add-task/add-task.component";
+import { MatSelectModule } from "@angular/material/select";
+import { FormsModule } from "@angular/forms";
+import { ApiService } from "../../services/api.service";
+import { MatTabsModule } from "@angular/material/tabs";
+import { MultiplechoiceTaskComponent } from "./tasks/multipleChoiceTask/multiplechoice-task.component";
 import { ShortAnswerTaskComponent } from "./tasks/short-answer-task/short-answer-task.component";
-import { MatCardModule } from '@angular/material/card';
-import { Router } from '@angular/router';
+import { MatCardModule } from "@angular/material/card";
+import { Router } from "@angular/router";
 import { TaskGroupTitleComponent } from "./task-group-title/task-group-title.component";
 import { PictureTaskComponent } from "./tasks/picture-task/picture-task.component";
-import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
-import { ColorProviderService } from '../../services/color-provider.service';
-import { LatexTaskComponent } from './tasks/latex-task/latex-task.component';
-import { TableTaskComponent } from './tasks/table-task/table-task.component';
-import { TaskBuilderService } from '../../services/task-builder.service';
-import { ManualTextComponent } from './tasks/manual-text/manual-text.component';
-import { MatDialog } from '@angular/material/dialog';
-import { MassExamDialogComponent } from '../mass-exam-dialog/mass-exam-dialog.component';
-import { LoadingService } from '../../services/loading.service';
-import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, CdkDragHandle } from '@angular/cdk/drag-drop';
+import { Theme, ThemeToggleService } from "../../services/theme-toggle.service";
+import { ColorProviderService } from "../../services/color-provider.service";
+import { LatexTaskComponent } from "./tasks/latex-task/latex-task.component";
+import { TableTaskComponent } from "./tasks/table-task/table-task.component";
+import { TaskBuilderService } from "../../services/task-builder.service";
+import { ManualTextComponent } from "./tasks/manual-text/manual-text.component";
+import { MatDialog } from "@angular/material/dialog";
+import { MassExamDialogComponent } from "../mass-exam-dialog/mass-exam-dialog.component";
+import { LoadingService } from "../../services/loading.service";
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDropList,
+  moveItemInArray,
+  CdkDragHandle,
+} from "@angular/cdk/drag-drop";
 import { NewPageComponent } from "./tasks/new-page/new-page.component";
-import { UpdateTaskDialogComponent } from '../update-task-dialog/update-task-dialog.component';
-import { HttpResponse } from '@angular/common/http';
-import { NewPageDialogComponent } from './new-page-dialog/new-page-dialog.component';
-
-
-
-
+import { UpdateTaskDialogComponent } from "../update-task-dialog/update-task-dialog.component";
+import { HttpResponse } from "@angular/common/http";
+import { NewPageDialogComponent } from "./new-page-dialog/new-page-dialog.component";
+import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
+import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatButtonModule } from "@angular/material/button";
 
 @Component({
-  selector: 'app-create-exam',
+  selector: "app-create-exam",
   standalone: true,
   imports: [
     MatIconModule,
@@ -57,16 +67,16 @@ import { NewPageDialogComponent } from './new-page-dialog/new-page-dialog.compon
     CdkDrag,
     CdkDropList,
     CdkDragHandle,
-    NewPageComponent
+    NewPageComponent,
+    MatSnackBarModule,
   ],
-  templateUrl: './create-exam.component.html',
-  styleUrl: './create-exam.component.scss'
+  templateUrl: "./create-exam.component.html",
+  styleUrl: "./create-exam.component.scss",
 })
 export class CreateExamComponent {
-
   public inDropzone = false;
-  public isNameChange = false
-  public isUpdateMode = false
+  public isNameChange = false;
+  public isUpdateMode = false;
 
   private bodyElement: HTMLElement = document.body;
   public semesters = ["WS 23/24", "SS 24", "WS 24/25", "SS 25"];
@@ -75,11 +85,17 @@ export class CreateExamComponent {
   public taskPool: Task[] = [];
   public totalPoints = 0;
   public bilingual = false;
-  public exam = new Exam("New Exam", "", "", "", 90, [{ groupNumber: 1, groupTitle: { DE: "", EN: "" }, tasks: [] }]);
+  public exam = new Exam("New Exam", "", "", "", 90, [
+    { groupNumber: 1, groupTitle: { DE: "", EN: "" }, tasks: [] },
+  ]);
 
   public currentGroupView = 0;
   public lightTheme: boolean = true;
 
+  public previewPdfUrl: SafeResourceUrl | null = null;
+
+  public isPreviewTabActive = false;
+  public previewTabNotification = false;
 
   constructor(
     private api: ApiService,
@@ -89,6 +105,8 @@ export class CreateExamComponent {
     private taskBuilder: TaskBuilderService,
     private dialog: MatDialog,
     private loadingService: LoadingService,
+    private sanitizer: DomSanitizer,
+    private snackBar: MatSnackBar,
   ) {
     this.importExam();
     this.importPoolTasks();
@@ -96,9 +114,7 @@ export class CreateExamComponent {
 
     this.themeService.themeChanged$.subscribe((theme: Theme) => {
       this.lightTheme = theme === Theme.LIGHT ? true : false;
-    })
-
-
+    });
 
     // // for testing - remove later
     // this.exam = {
@@ -149,7 +165,6 @@ export class CreateExamComponent {
     //   ]
     // };
     // this.askUserForTaskUpdate([[0, 0], [1, 0]])
-
   }
 
   @ViewChild("nameInput") nameInput?: ElementRef;
@@ -162,18 +177,24 @@ export class CreateExamComponent {
       return;
     }
     this.isNameChange = false;
-    if (!this.nameInput) { return; }
+    if (!this.nameInput) {
+      return;
+    }
     const newName = this.nameInput.nativeElement.value;
-    if (newName === "") { return }
+    if (newName === "") {
+      return;
+    }
     this.exam.courseName = newName;
   }
 
   onNameChange(event: any) {
-    if (event.key !== "Enter") { return }
+    if (event.key !== "Enter") {
+      return;
+    }
     const newName = event.target.value;
     if (newName !== "") {
       this.exam.courseName = event.target.value;
-    };
+    }
     this.isNameChange = false;
   }
 
@@ -184,7 +205,7 @@ export class CreateExamComponent {
 
   drop(event: DragEvent) {
     this.bodyElement.classList.remove("inheritCursors");
-    this.bodyElement.style.cursor = "unset"
+    this.bodyElement.style.cursor = "unset";
     const element = event.target as Element;
     console.log(element.id);
 
@@ -199,18 +220,22 @@ export class CreateExamComponent {
   }
 
   reorderDrop(event: CdkDragDrop<Task[]>) {
-    moveItemInArray(this.exam.tasks[this.currentGroupView].tasks, event.previousIndex, event.currentIndex);
+    moveItemInArray(
+      this.exam.tasks[this.currentGroupView].tasks,
+      event.previousIndex,
+      event.currentIndex,
+    );
   }
 
   private pushNewTask(taskType: string) {
-    let task = this.taskBuilder.createTask(taskType)
+    let task = this.taskBuilder.createTask(taskType);
     task.usedIn = [this.exam._id || "placeholder_id"];
-    this.exam.tasks[this.currentGroupView].tasks.push(task)
+    this.exam.tasks[this.currentGroupView].tasks.push(task);
     this.adjustTotalPoints();
   }
 
   private pushPoolTask(taskId: string) {
-    const task = this.taskPool.find(element => element.taskId === taskId);
+    const task = this.taskPool.find((element) => element.taskId === taskId);
     if (task == undefined) {
       console.warn("couldn't find task");
       return;
@@ -246,16 +271,21 @@ export class CreateExamComponent {
     for (let i = 0; i < this.exam.tasks.length; i++) {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const currentTaskId = this.exam.tasks[i].tasks[j].taskId;
-        if (this.taskPool.find(task => task.taskId === currentTaskId) == undefined) {
-          if (this.exam.tasks[i].tasks[j].type === "newPage") { continue; }
+        if (
+          this.taskPool.find((task) => task.taskId === currentTaskId) ==
+          undefined
+        ) {
+          if (this.exam.tasks[i].tasks[j].type === "newPage") {
+            continue;
+          }
           this.api.addTaskToPool(this.exam.tasks[i].tasks[j]).subscribe(
-            response => {
+            (response) => {
               console.log(`Task ${currentTaskId} added to pool`, response);
             },
-            error => {
-              console.error('Error adding task: ', error);
-            }
-          )
+            (error) => {
+              console.error("Error adding task: ", error);
+            },
+          );
         }
       }
     }
@@ -263,49 +293,74 @@ export class CreateExamComponent {
 
   private uploadExam() {
     this.api.addExam(this.exam).subscribe(
-      response => {
-        console.log('Exam added successfully: ', response);
-        this.router.navigate([`/create-exam/${response.insertedId}`]) // uses the id inserted by mongodb to navigate to a detailed view of this exam
+      (response) => {
+        console.log("Exam added successfully: ", response);
+        this.router.navigate([`/create-exam/${response.insertedId}`]); // uses the id inserted by mongodb to navigate to a detailed view of this exam
       },
-      error => {
-        console.error('Error adding exam: ', error);
-      }
+      (error) => {
+        console.error("Error adding exam: ", error);
+      },
     );
   }
 
   onPreview() {
-    this.checkIfValid()
-    // console.log(this.exam)
-
+    this.checkIfValid();
     this.loadingService.loadingOn();
     this.api.generateExam(this.exam).subscribe({
       next: (response: HttpResponse<Blob>) => {
-        const pdfBlob = response.body
+        const pdfBlob = response.body;
         if (pdfBlob) {
-          saveAs(pdfBlob, `${this.exam.courseName}.pdf`)
+          if (this.previewPdfUrl) {
+            const oldUrl = this.sanitizer.sanitize(
+              4,
+              this.previewPdfUrl,
+            ) as string; // 4 = ResourceUrl
+            if (oldUrl) URL.revokeObjectURL(oldUrl);
+          }
+
+          const objectUrl = URL.createObjectURL(pdfBlob);
+          this.previewPdfUrl =
+            this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+          this.previewTabNotification = true;
+          this.snackBar.open("Preview has been updated!", "Dismiss", {
+            duration: 3000,
+          });
         }
 
-        const subtaskHeader = response.headers.get('X-Subtask-Info')
-        const subtaskInfo: { aufgabe: number, subtask: string, page: number, logFileBoundaryError: boolean }[] = subtaskHeader ? JSON.parse(subtaskHeader) : []
-        console.log("Subtask Info from header:", subtaskInfo)
+        const subtaskHeader = response.headers.get("X-Subtask-Info");
+        const subtaskInfo: {
+          aufgabe: number;
+          subtask: string;
+          page: number;
+          logFileBoundaryError: boolean;
+        }[] = subtaskHeader ? JSON.parse(subtaskHeader) : [];
+        console.log("Subtask Info from header:", subtaskInfo);
 
-        const hasErrors = subtaskInfo.some((info) => info.logFileBoundaryError)
+        const hasErrors = subtaskInfo.some((info) => info.logFileBoundaryError);
         if (hasErrors) {
-          console.warn("Log file boundary errors detected, inserting new pages accordingly.")
-          // put dialog for asking for auto insert here
-          this.insertNewPage(subtaskInfo.filter(info => info.logFileBoundaryError)[0]);
+          console.warn(
+            "Log file boundary errors detected, inserting new pages accordingly.",
+          );
+          this.insertNewPage(
+            subtaskInfo.filter((info) => info.logFileBoundaryError)[0],
+          );
         }
 
-        this.loadingService.loadingOff()
+        this.loadingService.loadingOff();
       },
       error: (err) => {
-        console.error('Error generating exam preview: ', err)
-        this.loadingService.loadingOff()
-      }
-    })
+        console.error("Error generating exam preview: ", err);
+        this.loadingService.loadingOff();
+      },
+    });
   }
 
-  private insertNewPage(subtaskInfo: { aufgabe: number, subtask: string, page: number, logFileBoundaryError: boolean }) {
+  private insertNewPage(subtaskInfo: {
+    aufgabe: number;
+    subtask: string;
+    page: number;
+    logFileBoundaryError: boolean;
+  }) {
     const assignmentIndex = subtaskInfo.aufgabe - 1;
     let taskIndex = -1;
     for (let i = 0; i < this.exam.tasks[assignmentIndex].tasks.length; i++) {
@@ -315,25 +370,31 @@ export class CreateExamComponent {
         break;
       }
     }
-    const result = this.askForAutoInsert(this.exam.tasks[assignmentIndex].tasks[taskIndex], `${subtaskInfo.aufgabe}.${subtaskInfo.subtask}`);
-    result.subscribe(auto => {
-      if (!auto) { return; }
-      const newPageElement = this.taskBuilder.createTask("new_newPage")
-      this.exam.tasks[assignmentIndex].tasks.splice(taskIndex, 0, newPageElement);
-    })
-
+    const result = this.askForAutoInsert(
+      this.exam.tasks[assignmentIndex].tasks[taskIndex],
+      `${subtaskInfo.aufgabe}.${subtaskInfo.subtask}`,
+    );
+    result.subscribe((auto) => {
+      if (!auto) {
+        return;
+      }
+      const newPageElement = this.taskBuilder.createTask("new_newPage");
+      this.exam.tasks[assignmentIndex].tasks.splice(
+        taskIndex,
+        0,
+        newPageElement,
+      );
+    });
   }
-
 
   private askForAutoInsert(task: Task, taskNumber: string) {
     const dialogRef = this.dialog.open(NewPageDialogComponent, {
-      width: '30%',
-      height: '30%',
-      data: { taskNumber: taskNumber, task: task }
-    })
+      width: "30%",
+      height: "30%",
+      data: { taskNumber: taskNumber, task: task },
+    });
     return dialogRef.afterClosed();
   }
-
 
   private checkIfValid() {
     if (this.exam.courseName === "") {
@@ -353,54 +414,62 @@ export class CreateExamComponent {
 
     if (this.exam.date === "") {
       alert("Please enter the exam date");
-      throw new Error("no exam date set")
+      throw new Error("no exam date set");
     }
   }
 
   private adjustTotalPoints() {
     this.totalPoints = this.exam.tasks
-      .map(taskGroup => taskGroup.tasks.flat())
+      .map((taskGroup) => taskGroup.tasks.flat())
       .flat()
-      .reduce(
-        (accumulator: number, task) => accumulator += task.points, 0
-      );
+      .reduce((accumulator: number, task) => (accumulator += task.points), 0);
   }
 
   onTaskChange(task: Task, index: number) {
     this.exam.tasks[this.currentGroupView].tasks[index] = task;
     this.adjustTotalPoints();
     this.trackChangeInPoolTasks(task.taskId);
-    console.log(task)
+    console.log(task);
   }
 
   private trackChangeInPoolTasks(taskId: string) {
-    if (this.taskPool.find(poolTask => poolTask.taskId === taskId) != undefined) {
+    if (
+      this.taskPool.find((poolTask) => poolTask.taskId === taskId) != undefined
+    ) {
       this.modifiedPoolTasks.add(taskId);
     }
   }
 
-  onTitleChange(taskGroupTitle: { DE: string, EN: string }) {
+  onTitleChange(taskGroupTitle: { DE: string; EN: string }) {
     this.exam.tasks[this.currentGroupView].groupTitle = taskGroupTitle;
   }
 
   onUpdate() {
-    this.checkIfValid()
+    this.checkIfValid();
     this.addNewTasksToPool();
     this.updatePoolTasks();
     this.api.updateExam(this.exam._id, this.exam).subscribe(
-      response => { console.log('Exam updated successfully: ', response); },
-      error => { console.error('Error updating exam: ', error); }
-    )
+      (response) => {
+        console.log("Exam updated successfully: ", response);
+      },
+      (error) => {
+        console.error("Error updating exam: ", error);
+      },
+    );
   }
 
   private updatePoolTasks() {
-    if (this.modifiedPoolTasks.size === 0) { return; }
+    if (this.modifiedPoolTasks.size === 0) {
+      return;
+    }
 
     const modifiedIndices: [number, number][] = [];
     for (let i = 0; i < this.exam.tasks.length; i++) {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const task = this.exam.tasks[i].tasks[j];
-        const isPoolTask = this.taskPool.find(poolTask => poolTask.taskId === task.taskId) != undefined;
+        const isPoolTask =
+          this.taskPool.find((poolTask) => poolTask.taskId === task.taskId) !=
+          undefined;
         const isModified = this.modifiedPoolTasks.has(task.taskId);
 
         if (!isPoolTask || !isModified) continue;
@@ -413,43 +482,50 @@ export class CreateExamComponent {
   }
 
   private askUserForTaskUpdate(modifiedIndices: [number, number][]) {
-
-    const tasks = []
+    const tasks = [];
     for (const [i, j] of modifiedIndices) {
       const task = this.exam.tasks[i].tasks[j];
-      tasks.push({ assignmentNumber: `${i + 1}.${this.mapTaskIndexToChar(j)}`, task: task, newTask: false });
+      tasks.push({
+        assignmentNumber: `${i + 1}.${this.mapTaskIndexToChar(j)}`,
+        task: task,
+        newTask: false,
+      });
     }
 
     const dialogRef = this.dialog.open(UpdateTaskDialogComponent, {
-      width: '50%',
-      height: '50%',
-      data: tasks
+      width: "50%",
+      height: "50%",
+      data: tasks,
     });
 
     dialogRef.afterClosed().subscribe((results: string) => {
-      if (!results) { return; }
+      if (!results) {
+        return;
+      }
       for (let index = 0; index < results.length; index++) {
-        results[index] ? this.createNewTask(modifiedIndices[index]) : this.updateTask(modifiedIndices[index]);
+        results[index]
+          ? this.createNewTask(modifiedIndices[index])
+          : this.updateTask(modifiedIndices[index]);
       }
       this.modifiedPoolTasks.clear();
-    })
-
+    });
   }
 
   updateTask(index: [number, number]) {
     const [i, j] = index;
     const task = this.exam.tasks[i].tasks[j];
     this.api.updateTaskInPool(task.taskId, task).subscribe(
-      response => { 
+      (response) => {
         console.log(`Task ${task.taskId} updated in pool`, response);
         this.importPoolTasks(); // refresh pool tasks after updating task
-       },
-      error => { console.error(`Error updating task ${task.taskId}: `, error); }
+      },
+      (error) => {
+        console.error(`Error updating task ${task.taskId}: `, error);
+      },
     );
   }
 
-
-  createNewTask(index: [number, number]) { 
+  createNewTask(index: [number, number]) {
     const [i, j] = index;
     const oldTask = this.exam.tasks[i].tasks[j];
     const newTask: Task = JSON.parse(JSON.stringify(oldTask));
@@ -462,33 +538,40 @@ export class CreateExamComponent {
     console.log(oldTask);
     console.log("newTask:");
     console.log(newTask);
-    
- 
+
     // add new child to the old Task
     this.api.addChildToTaskPoolTask(oldTask.taskId, newTask.taskId).subscribe(
-      response => {console.log("new child was added to the old Task")},
-      error => {console.error("Error adding the child to the old Task", error)}
-    )
-
+      (response) => {
+        console.log("new child was added to the old Task");
+      },
+      (error) => {
+        console.error("Error adding the child to the old Task", error);
+      },
+    );
 
     this.exam.tasks[i].tasks[j] = newTask;
 
     // add new task to pool
     this.api.addTaskToPool(newTask).subscribe(
-      response => { 
+      (response) => {
         console.log(`New Task ${newTask.taskId} added to pool`, response);
         this.importPoolTasks(); // refresh pool tasks after adding new task
       },
-      error => { console.error(`Error adding new task ${newTask.taskId}: `, error); }
+      (error) => {
+        console.error(`Error adding new task ${newTask.taskId}: `, error);
+      },
     );
 
     // update Exam that now includes the new Task
     this.api.updateExam(this.exam._id, this.exam).subscribe(
-      response => { console.log('Exam with new Task updated successfully: ', response); },
-      error => { console.error('Error updating exam: ', error); }
+      (response) => {
+        console.log("Exam with new Task updated successfully: ", response);
+      },
+      (error) => {
+        console.error("Error updating exam: ", error);
+      },
     );
   }
-
 
   // private oldStuff() {
   //   const dialogRef = this.dialog.open(UpdateTaskDialogComponent, {
@@ -554,34 +637,39 @@ export class CreateExamComponent {
   private importExam() {
     const lastURLPart = this.router.url.split("/").pop();
     if (lastURLPart === "create-exam" || lastURLPart == undefined) {
-      this.isUpdateMode = false
+      this.isUpdateMode = false;
       return;
     }
-    this.exam._id = lastURLPart
-    this.isUpdateMode = true
+    this.exam._id = lastURLPart;
+    this.isUpdateMode = true;
     this.api.getExam(lastURLPart).subscribe(
-      response => {
+      (response) => {
         this.exam = response;
         this.adjustTotalPoints();
       },
-      error => {
+      (error) => {
         console.error(error);
-      }
+      },
     );
   }
 
   private importPoolTasks() {
     this.api.getTasksFromPool().subscribe(
-      response => {
+      (response) => {
         this.taskPool = response;
       },
-      error => {
+      (error) => {
         console.error(error);
-      })
+      },
+    );
   }
 
   public addTab() {
-    this.exam.tasks.push({ groupNumber: this.exam.tasks.length + 1, groupTitle: { DE: "", EN: "" }, tasks: [] });
+    this.exam.tasks.push({
+      groupNumber: this.exam.tasks.length + 1,
+      groupTitle: { DE: "", EN: "" },
+      tasks: [],
+    });
     this.currentGroupView = this.exam.tasks.length - 1;
   }
 
@@ -593,34 +681,43 @@ export class CreateExamComponent {
     this.currentGroupView--;
   }
 
-
   public changeTab(index: number) {
     this.currentGroupView = index;
+    if (index < this.exam.tasks.length) {
+      this.isPreviewTabActive = false;
+    } else {
+      this.isPreviewTabActive = true;
+      this.previewTabNotification = false;
+    }
   }
 
-  public calcTaskChar(index: number, groupIndex = this.currentGroupView): string {
+  public calcTaskChar(
+    index: number,
+    groupIndex = this.currentGroupView,
+  ): string {
     // ignore manual text and new page tasks when calculating the task number
     let ignoredCount = 0;
     const tasks = this.exam.tasks[groupIndex].tasks;
     for (let i = 0; i < index; i++) {
-      if (tasks[i].type === 'manualText' || tasks[i].type === 'newPage') ignoredCount++;
+      if (tasks[i].type === "manualText" || tasks[i].type === "newPage")
+        ignoredCount++;
     }
 
     return this.mapTaskIndexToChar(index - ignoredCount);
   }
 
   private mapTaskIndexToChar(index: number) {
-    return String.fromCharCode(97 + index % 26);
+    return String.fromCharCode(97 + (index % 26));
   }
 
   onMassExam() {
-    this.checkIfValid()
+    this.checkIfValid();
 
     this.dialog.open(MassExamDialogComponent, {
-      width: '50%',
-      height: '60%',
-      data: { exam: this.exam }
-    })
+      width: "50%",
+      height: "60%",
+      data: { exam: this.exam },
+    });
   }
 
   private getSemesters() {
@@ -630,25 +727,20 @@ export class CreateExamComponent {
 
     let formatYear = (year: number): string => {
       return year.toString().slice(-2);
-    }
+    };
 
     if (month >= 10 || month <= 3) {
       return [
         `WS ${formatYear(year)}/${formatYear(year + 1)}`,
         `SS ${formatYear(year + 1)}`,
-        `WS ${formatYear(year + 1)}/${formatYear(year + 2)}`
+        `WS ${formatYear(year + 1)}/${formatYear(year + 2)}`,
       ];
     } else {
       return [
         `SS ${formatYear(year)}`,
         `WS ${formatYear(year)}/${formatYear(year + 1)}`,
-        `SS ${formatYear(year + 1)}`
+        `SS ${formatYear(year + 1)}`,
       ];
     }
   }
-
-
-
 }
-
-
