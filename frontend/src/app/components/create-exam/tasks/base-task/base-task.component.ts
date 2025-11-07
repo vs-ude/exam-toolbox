@@ -12,7 +12,9 @@ export abstract class BaseTaskComponent {
   @Input() public taskId!: string;
   @Input() public preTask?: Task;
   @Input() public bilingual?: boolean;
+  @Input() public isModifiedPoolTask?: boolean;
   @Output() deleteEvent = new EventEmitter<string>();
+  @Output() createNewTaskEvent = new EventEmitter<boolean>()
   @ViewChild("questionFieldDE") questionFieldDE!: ElementRef;
   @ViewChild("questionFieldEN") questionFieldEN?: ElementRef;
 
@@ -23,6 +25,7 @@ export abstract class BaseTaskComponent {
   isUnderline: boolean = false;
   isQuestionActive: boolean = false;
   languageChanged: boolean = false;
+  createNewTask: boolean = false;
 
   public abstract task: Task;
 
@@ -94,6 +97,10 @@ export abstract class BaseTaskComponent {
 
   public updateTask() {
     this.taskChangeEvent.emit(this.task);
+  }
+
+  public onCreateNewTaskChange() {
+    this.createNewTaskEvent.emit(this.createNewTask);
   }
 
 }

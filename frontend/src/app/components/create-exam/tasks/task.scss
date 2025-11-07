@@ -109,6 +109,21 @@ mat-icon-button.active {
     background-color: #ff00001a;
 }
 
+.newTaskCheckbox_container {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.newTaskCheckbox {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
 .points {
     display: flex;
     align-items: center;

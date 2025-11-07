@@ -42,7 +42,6 @@ import { HttpResponse } from "@angular/common/http";
 import { NewPageDialogComponent } from "./new-page-dialog/new-page-dialog.component";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
-import { MatButtonModule } from "@angular/material/button";
 
 @Component({
   selector: "app-create-exam",
@@ -81,6 +80,7 @@ export class CreateExamComponent {
   private bodyElement: HTMLElement = document.body;
   public semesters = ["WS 23/24", "SS 24", "WS 24/25", "SS 25"];
   private modifiedPoolTasks: Set<string> = new Set<string>();
+  private newTasksToCreate: Set<string> = new Set<string>();
 
   public taskPool: Task[] = [];
   public totalPoints = 0;
@@ -115,56 +115,6 @@ export class CreateExamComponent {
     this.themeService.themeChanged$.subscribe((theme: Theme) => {
       this.lightTheme = theme === Theme.LIGHT ? true : false;
     });
-
-    // // for testing - remove later
-    // this.exam = {
-
-    //   _id: "68eeb1bbcf170febc7e50d40",
-    //   courseName: "New Exam",
-    //   examinerName: "asdf",
-    //   semester: "WS 26/27",
-    //   date: "2025-10-31",
-    //   examLengthMinutes: 90,
-    //   tasks: [
-    //     {
-    //       groupNumber: 1,
-    //       groupTitle: { DE: "", EN: "" },
-    //       tasks: [
-    //         {
-    //           taskId: "multipleChoice-1760473502100",
-    //           type: "multipleChoice",
-    //           question: { DE: "Frage 1 ist wirklich super lang. Wenn es noch länger wäre, würde es einer langen Schlange Konkurenz machen aber so lang ist die Frage dann doch nicht", EN: "Question 1" },
-    //           answerOptions: [],
-    //           points: 1,
-    //           createdBy: "test",
-    //           createdAt: new Date(),
-    //           lastUsed: new Date(),
-    //           usedIn: [],
-    //           tags: [],
-    //           children: []
-    //         },]
-    //     },
-    //     {
-    //       groupNumber: 1,
-    //       groupTitle: { DE: "", EN: "" },
-    //       tasks: [
-    //         {
-    //           taskId: "multipleChoice-1760473502100",
-    //           type: "multipleChoice",
-    //           question: { DE: "Frage 1", EN: "Question 1" },
-    //           answerOptions: [],
-    //           points: 1,
-    //           createdBy: "test",
-    //           createdAt: new Date(),
-    //           lastUsed: new Date(),
-    //           usedIn: [],
-    //           tags: [],
-    //           children: []
-    //         },]
-    //     }
-    //   ]
-    // };
-    // this.askUserForTaskUpdate([[0, 0], [1, 0]])
   }
 
   @ViewChild("nameInput") nameInput?: ElementRef;
@@ -433,11 +383,28 @@ export class CreateExamComponent {
   }
 
   private trackChangeInPoolTasks(taskId: string) {
-    if (
-      this.taskPool.find((poolTask) => poolTask.taskId === taskId) != undefined
-    ) {
+    if (this.isPoolTask(taskId)) {
       this.modifiedPoolTasks.add(taskId);
     }
+  }
+
+  public isPoolTask(taskId: string): boolean {
+    return this.taskPool.find((poolTask) => poolTask.taskId === taskId) != undefined;
+  }
+
+  public isModifiedPoolTask(taskId: string): boolean {
+    if (!this.isPoolTask(taskId)){ return false;}
+    return this.modifiedPoolTasks.has(taskId);
+  }
+
+  public onCreateNewTaskChange(newTask: boolean, index: number) {
+    console.log("onCreateNewTaskChange", newTask, index);
+    const taskId = this.exam.tasks[this.currentGroupView].tasks[index].taskId;
+    if (newTask) {
+      this.newTasksToCreate.add(taskId);
+      return;
+    }
+    this.newTasksToCreate.delete(taskId);
   }
 
   onTitleChange(taskGroupTitle: { DE: string; EN: string }) {
@@ -488,9 +455,11 @@ export class CreateExamComponent {
       tasks.push({
         assignmentNumber: `${i + 1}.${this.mapTaskIndexToChar(j)}`,
         task: task,
-        newTask: false,
+        newTask: this.newTasksToCreate.has(task.taskId),
       });
     }
+
+    console.log(tasks)
 
     const dialogRef = this.dialog.open(UpdateTaskDialogComponent, {
       width: "50%",
@@ -508,6 +477,7 @@ export class CreateExamComponent {
           : this.updateTask(modifiedIndices[index]);
       }
       this.modifiedPoolTasks.clear();
+      this.newTasksToCreate.clear()
     });
   }
 
@@ -534,20 +504,11 @@ export class CreateExamComponent {
     newTask.taskId = oldTask.type + "-" + Date.now();
     oldTask.children.push(newTask.taskId);
 
-    console.log("OldTask:");
-    console.log(oldTask);
-    console.log("newTask:");
-    console.log(newTask);
-
-    // add new child to the old Task
+    // add new Task as child for the old Task
     this.api.addChildToTaskPoolTask(oldTask.taskId, newTask.taskId).subscribe(
-      (response) => {
-        console.log("new child was added to the old Task");
-      },
-      (error) => {
-        console.error("Error adding the child to the old Task", error);
-      },
-    );
+      response => { console.log("new child was added to the old Task") },
+      error => { console.error("Error adding the child to the old Task", error) }
+    )
 
     this.exam.tasks[i].tasks[j] = newTask;
 
@@ -572,67 +533,6 @@ export class CreateExamComponent {
       },
     );
   }
-
-  // private oldStuff() {
-  //   const dialogRef = this.dialog.open(UpdateTaskDialogComponent, {
-  //     width: '50%',
-  //     height: '50%',
-  //     data: { assignmentNumber: `${i + 1}.${this.mapTaskIndexToChar(j)}`, task: task }
-  //   });
-
-  //   dialogRef.afterClosed().subscribe(status => {
-  //     if (status === "update") {
-  //       this.api.updateTaskInPool(task.taskId, task).subscribe(
-  //         response => {
-  //           console.log(`Task ${task.taskId} updated in pool`, response);
-  //         },
-  //         error => {
-  //           console.error(`Error updating task ${task.taskId}: `, error);
-  //         }
-  //       );
-  //     } else {
-  //       const newTask = JSON.parse(JSON.stringify(task));
-  //       newTask.parent = task.taskId;
-  //       newTask.children = [];
-  //       newTask.taskId = task.type + "-" + Date.now();
-  //       task.children.push(newTask.taskId);
-
-  //       // update old task in pool
-  //       this.api.updateTaskInPool(task.taskId, task).subscribe(
-  //         response => {
-  //           console.log(`Task ${task.taskId} updated successfully`, response)
-  //         },
-  //         error => {
-  //           console.log(`Error updating Task ${task.taskId}`, error)
-  //         }
-  //       )
-
-  //       this.exam.tasks[i].tasks[j] = newTask;
-
-  //       // add new task to pool
-  //       this.api.addTaskToPool(newTask).subscribe(
-  //         response => {
-  //           console.log(`New Task ${newTask.taskId} added to pool`, response);
-  //         },
-  //         error => {
-  //           console.error(`Error adding new task ${newTask.taskId}: `, error);
-  //         }
-  //       );
-
-  //       // update Exam that now includes the new Task
-  //       this.api.updateExam(this.exam._id, this.exam).subscribe(
-  //         response => {
-  //           console.log('Exam with new Task updated successfully: ', response);
-  //         },
-  //         error => {
-  //           console.error('Error updating exam: ', error);
-  //         }
-  //       );
-  //     }
-  //   });
-
-  //   this.modifiedPoolTasks.delete(task.taskId);
-  // }
 
   private importExam() {
     const lastURLPart = this.router.url.split("/").pop();
