@@ -27,4 +27,4 @@ EXPOSE 3000
 ENV MONGODB_URI=mongodb://mongo:27017/examToolboxDB
 
 # Run the server.ts script using Deno and start CRON
-CMD sh -c "service cron start && deno run --allow-net --allow-env --allow-write --allow-read --allow-run --allow-import server.ts"
+CMD sh -c "service cron start && deno run --allow-net --allow-env --allow-write --allow-read --allow-run --allow-import --allow-sys server.ts"
