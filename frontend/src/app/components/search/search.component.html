@@ -3,7 +3,15 @@
         <span>Search Results</span>
     </div>
 
-    <div class="tag-list-container">
+    <div class="questionMatches-container" *ngIf="questionMatches.length > 0">
+        <div class="questionMatches-list">
+            @for (question of questionMatches; track $index) {
+            <app-task-pool-card [task]="question"></app-task-pool-card>
+            }
+        </div>
+    </div>
+
+    <div class="tag-list-container" *ngIf="tagRefs.length > 0">
         @for (tagRef of tagRefs; track $index){
 
         <div class="tag-container">

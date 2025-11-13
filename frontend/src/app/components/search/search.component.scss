@@ -15,6 +15,16 @@
     color: var(--color-text);
 }
 
+.questionMatches-list {
+    margin-top: 16px;
+    padding: 0 32px 32px 32px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
 .tag-list-container {
     padding: 0 32px 0 32px;
     margin-top: 16px;

@@ -21,6 +21,7 @@ export class SearchComponent {
 
   private filteredTags: Tag[] = [];
   public tagRefs: { tag: Tag, exams: Observable<Exam>[], tasks: Observable<Task>[] }[] = [];
+  public questionMatches: Task[] = [];
 
   constructor(
     private router: Router,
@@ -30,6 +31,7 @@ export class SearchComponent {
 
     this.route.params.subscribe(params => {
       this.filterTags()
+      this.filterTasks();
     })
   }
 
@@ -51,8 +53,6 @@ export class SearchComponent {
     }
   }
 
-
-
   private filterTags() {
     const searchString = this.getSearchString();
     if (searchString === "") { return; }
@@ -67,7 +67,6 @@ export class SearchComponent {
     )
   }
 
-
   private getSearchString(): string {
     const lastURLPart = this.router.url.split("/").pop();
     if (lastURLPart === undefined || lastURLPart === "search") {
@@ -76,6 +75,21 @@ export class SearchComponent {
     }
     return lastURLPart
   }
+
+  private filterTasks() {
+    const searchString = this.getSearchString();
+    if (searchString === "") { return; }
+    this.questionMatches = [];
+    this.api.getTasksWithQuestionTextFromPool(searchString).subscribe(
+      res => {
+        this.questionMatches = res;
+        console.log("Question text matches:", this.questionMatches);
+      },
+      err => { console.error("Error fetching Tasks by question text"), err }
+    )
+
+  }
+
 
   public onExamClick(exam: Exam) {
     if (exam._id == undefined) {
@@ -88,7 +102,5 @@ export class SearchComponent {
   public onTaskClick(task: Task) {
     console.log("Task clicked:", task);
   }
-
-
 
 }

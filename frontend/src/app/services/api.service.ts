@@ -66,7 +66,7 @@ export class ApiService {
     return this.http.get<Exam>(`${this.apiUrl}/exam/${examId}`)
   }
 
-  getUser(){
+  getUser() {
     return this.http.get<User>(`/api/user`)
   }
 
@@ -132,6 +132,10 @@ export class ApiService {
     return this.http.get<Task[]>(`${this.apiUrl}/taskPool/user/${userId}`);
   }
 
+  getTasksWithQuestionTextFromPool(text: string): Observable<Task[]> {
+    return this.http.get<Task[]>(`${this.apiUrl}/taskPool/search/${text}`);
+  }
+
   updateTaskInPool(taskId: string, updatedTask: Task) {
     return this.http.put(`${this.apiUrl}/taskPool/${taskId}`, updatedTask);
   }
@@ -164,7 +168,7 @@ export class ApiService {
     return this.http.get<Tag[]>(`${this.apiUrl}/tags`);
   }
 
-  updateTag(tag: Tag){
+  updateTag(tag: Tag) {
     return this.http.put(`${this.apiUrl}/tags/${tag.getName()}`, tag);
   }
 

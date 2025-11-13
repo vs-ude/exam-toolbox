@@ -219,6 +219,23 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
         ctx.response.body = { message: 'Error fetching tasks by tag', error }
       }
     })
+    .get("/api/taskPool/search/:questionText", async (ctx) => {
+      try {
+        const questionText = ctx.params.questionText;
+        console.log("Searching tasks with question text:", questionText);
+        const taskList = await pool.find({
+          $or: [
+            { "question.DE": { $regex: questionText, $options: 'i' } },
+            { "question.EN": { $regex: questionText, $options: 'i' } }
+          ]
+        }).toArray();
+        ctx.response.status = 200;
+        ctx.response.body = taskList;
+      } catch (error) {
+        ctx.response.status = 500;
+        ctx.response.body = { message: 'Error fetching tasks by question text', error };
+      }
+    })
     .put("/api/taskPool/addChild/:taskId", async (ctx) => {
       try {
         const id = ctx.params.taskId;
@@ -234,7 +251,7 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
           return
         }
         ctx.response.status = 200;
-        
+
       } catch (error) {
         ctx.response.status = 500;
         ctx.response.body = { message: `Error updating child tasks for ${ctx.params.taskId}`, error };
@@ -288,13 +305,13 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
         const tasksContentLatex = await generateTasksLatex(exam, tempDir)
         await Deno.writeTextFile(tasksPath, tasksContentLatex)
         const { pdfBytes: examPDF, logContent } = await generateExam(tempDir)
-        
+
         const subtaskInfo = parseLogFileForSubtaskInfo(logContent)
         const subtaskInfoJson = JSON.stringify(subtaskInfo)
 
         ctx.response.headers.set("X-Subtask-Info", subtaskInfoJson)
         ctx.response.headers.set("Access-Control-Expose-Headers", "X-Subtask-Info")
-        
+
         ctx.response.headers.set("Content-Type", "application/pdf")
         ctx.response.headers.set("Content-Disposition", `attachment; filename="${exam.courseName}.pdf"`)
         ctx.response.body = examPDF
@@ -615,10 +632,10 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
       try {
         const tagName = ctx.params.id;
         const { _id, ...tag } = await ctx.request.body().value;
-        
+
         const result = await tags.updateOne(
           { "tag.name": tagName },
-          { $set: {tag: tag} }
+          { $set: { tag: tag } }
         );
 
         if (result.matchedCount === 0) {
@@ -627,8 +644,8 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
           return;
         }
         ctx.response.status = 200;
-        ctx.response.body = {message: "Tag updated successfully"};
-        
+        ctx.response.body = { message: "Tag updated successfully" };
+
       } catch (error) {
         ctx.response.status = 500;
         ctx.response.body = { message: "Error updating tag", error };
