@@ -156,6 +156,71 @@ for (let i = 0; i < POOL_SIZE; i++) {
 console.log(`Worker pool initialized with ${POOL_SIZE} workers.`);
 await Deno.mkdir(JOBS_DIR, { recursive: true });
 
+// Memory monitoring when workers are active
+let lowMemoryWarningLogged = false;
+const MEMORY_WARNING_THRESHOLD_PERCENT = 0.05; // 5%
+
+function monitorMemoryUsage() {
+  const hasActiveWorkers = workers.some((w) => w.isBusy);
+  if (!hasActiveWorkers) {
+    if (lowMemoryWarningLogged) {
+      const memInfo = Deno.systemMemoryInfo();
+      const availableMemoryMB = (memInfo.available / (1024 * 1024)).toFixed(2);
+      const totalMemoryMB = (memInfo.total / (1024 * 1024)).toFixed(2);
+      console.log(
+        "\n\x1b[32m==================== ✅ MEMORY RECOVERED ✅ ====================\x1b[0m",
+      );
+      console.log(
+        `\x1b[32mWork finished. Available memory is now ${availableMemoryMB} MB / ${totalMemoryMB} MB.\x1b[0m`,
+      );
+      console.log(
+        "\x1b[32m================================================================\x1b[0m\n",
+      );
+      lowMemoryWarningLogged = false;
+    }
+    return;
+  }
+
+  const memInfo = Deno.systemMemoryInfo();
+  const memoryThreshold = memInfo.total * MEMORY_WARNING_THRESHOLD_PERCENT;
+
+  if (memInfo.available < memoryThreshold) {
+    if (!lowMemoryWarningLogged) {
+      const availableMemoryMB = (memInfo.available / (1024 * 1024)).toFixed(2);
+      const totalMemoryMB = (memInfo.total / (1024 * 1024)).toFixed(2);
+      console.warn(
+        "\n\x1b[31m==================== 🚨 MEMORY WARNING 🚨 ====================\x1b[0m",
+      );
+      console.warn(
+        `\x1b[93mAvailable memory is low: ${availableMemoryMB} MB of ${totalMemoryMB} MB remaining.\x1b[0m`,
+      );
+      console.warn(
+        "\x1b[93mSystem is under memory pressure. Exam generation may fail or become slow.\x1b[0m",
+      );
+      console.warn(
+        "\x1b[31m================================================================\x1b[0m\n",
+      );
+      lowMemoryWarningLogged = true;
+    }
+  } else {
+    if (lowMemoryWarningLogged) {
+      const availableMemoryMB = (memInfo.available / (1024 * 1024)).toFixed(2);
+      const totalMemoryMB = (memInfo.total / (1024 * 1024)).toFixed(2);
+      console.log(
+        "\n\x1b[32m==================== ✅ MEMORY RECOVERED ✅ ====================\x1b[0m",
+      );
+      console.log(
+        `\x1b[32mAvailable memory has recovered to ${availableMemoryMB} MB / ${totalMemoryMB} MB.\x1b[0m`,
+      );
+      console.log(
+        "\x1b[32m================================================================\x1b[0m\n",
+      );
+      lowMemoryWarningLogged = false;
+    }
+  }
+}
+setInterval(monitorMemoryUsage, 5000); // Check memory every 5 seconds
+
 let isGenerating = false;
 
 // MongoDB setup
