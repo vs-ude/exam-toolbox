@@ -42,6 +42,7 @@ import { HttpResponse } from "@angular/common/http";
 import { NewPageDialogComponent } from "./new-page-dialog/new-page-dialog.component";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
+import { Tag } from "../../tag";
 
 @Component({
   selector: "app-create-exam",
@@ -320,7 +321,7 @@ export class CreateExamComponent {
         break;
       }
     }
-    const result = this.askForAutoInsert(
+    const result = this.askForNewPageAutoInsert(
       this.exam.tasks[assignmentIndex].tasks[taskIndex],
       `${subtaskInfo.aufgabe}.${subtaskInfo.subtask}`,
     );
@@ -337,7 +338,7 @@ export class CreateExamComponent {
     });
   }
 
-  private askForAutoInsert(task: Task, taskNumber: string) {
+  private askForNewPageAutoInsert(task: Task, taskNumber: string) {
     const dialogRef = this.dialog.open(NewPageDialogComponent, {
       width: "30%",
       height: "30%",
@@ -398,7 +399,6 @@ export class CreateExamComponent {
   }
 
   public onCreateNewTaskChange(newTask: boolean, index: number) {
-    console.log("onCreateNewTaskChange", newTask, index);
     const taskId = this.exam.tasks[this.currentGroupView].tasks[index].taskId;
     if (newTask) {
       this.newTasksToCreate.add(taskId);
@@ -458,8 +458,6 @@ export class CreateExamComponent {
         newTask: this.newTasksToCreate.has(task.taskId),
       });
     }
-
-    console.log(tasks)
 
     const dialogRef = this.dialog.open(UpdateTaskDialogComponent, {
       width: "50%",
@@ -532,6 +530,20 @@ export class CreateExamComponent {
         console.error("Error updating exam: ", error);
       },
     );
+
+    this.linkTagsToTask(newTask);
+  }
+
+  private linkTagsToTask(task: Task) {
+    if (task.tags.length === 0){ return;}
+    for (let tag of task.tags) {
+      tag = Tag.fromPlain(tag);
+      tag.addTask(task.taskId);
+      this.api.updateTag(tag).subscribe(
+        response => { console.log(`Tag ${tag.getName()} updated with new task link`, response); },
+        error => { console.error(`Error updating tag ${tag.getName()}: `, error); }
+      );
+    }
   }
 
   private importExam() {
