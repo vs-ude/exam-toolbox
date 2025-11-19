@@ -25,6 +25,16 @@
     align-items: flex-start;
 }
 
+.examMatches-list {
+    margin-top: 16px;
+    padding: 0 32px 0 32px;
+    display: grid;
+    grid-template-columns: 22% 22% 22% 22%;
+    gap: 4%;
+    grid-auto-rows: 25vh;
+}
+
+
 .tag-list-container {
     padding: 0 32px 0 32px;
     margin-top: 16px;

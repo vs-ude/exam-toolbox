@@ -22,6 +22,7 @@ export class SearchComponent {
   private filteredTags: Tag[] = [];
   public tagRefs: { tag: Tag, exams: Observable<Exam>[], tasks: Observable<Task>[] }[] = [];
   public questionMatches: Task[] = [];
+  public examMatches: Exam[] = [];
 
   constructor(
     private router: Router,
@@ -32,6 +33,7 @@ export class SearchComponent {
     this.route.params.subscribe(params => {
       this.filterTags()
       this.filterTasks();
+      this.filterExams();
     })
   }
 
@@ -87,7 +89,18 @@ export class SearchComponent {
       },
       err => { console.error("Error fetching Tasks by question text"), err }
     )
+  }
 
+  private filterExams() {
+    const searchString = this.getSearchString();
+    if (searchString === "") { return; }
+    this.api.getExamsWithSearchText(searchString).subscribe(
+      res => {
+        this.examMatches = res;
+        console.log("Exam matches:", this.examMatches);
+      },
+      err => { console.error("Error fetching Exams by search text"), err }
+    )
   }
 
 

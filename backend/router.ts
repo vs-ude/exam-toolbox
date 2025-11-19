@@ -98,6 +98,22 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
         ctx.response.body = { message: "Error fetching exam", error }
       }
     })
+    .get("/api/exams/search/:searchText", async (ctx) => {
+      try {
+        const searchText = ctx.params.searchText;
+        const examList = await exams.find({
+          $or: [
+            { "courseName": { $regex: searchText, $options: 'i' } }, 
+            { "semester": { $regex: searchText, $options: 'i' } }
+          ]
+        }).toArray();
+        ctx.response.status = 200;
+        ctx.response.body = examList;
+      } catch (error) {
+        ctx.response.status = 500;
+        ctx.response.body = { message: "Error searching exams", error };
+      }
+    })
     .get("/api/download", async (ctx) => {
       const fileUrl = ctx.request.url.searchParams.get("fileUrl")
       if (!fileUrl) {
@@ -222,7 +238,6 @@ export function configureRouter({ db, jobs, taskQueue, workers, basePath, JOBS_D
     .get("/api/taskPool/search/:questionText", async (ctx) => {
       try {
         const questionText = ctx.params.questionText;
-        console.log("Searching tasks with question text:", questionText);
         const taskList = await pool.find({
           $or: [
             { "question.DE": { $regex: questionText, $options: 'i' } },

@@ -66,6 +66,10 @@ export class ApiService {
     return this.http.get<Exam>(`${this.apiUrl}/exam/${examId}`)
   }
 
+  getExamsWithSearchText(searchText: string) {
+    return this.http.get<Exam[]>(`${this.apiUrl}/exams/search/${searchText}`)
+  }
+
   getUser() {
     return this.http.get<User>(`/api/user`)
   }

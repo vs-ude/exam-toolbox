@@ -11,6 +11,14 @@
         </div>
     </div>
 
+    <div class="examMatches-container" *ngIf="examMatches.length > 0">
+        <div class="examMatches-list">
+            @for (exam of examMatches; track $index) {
+            <app-exam-card [name]="exam.courseName" (click)="onExamClick(exam)"></app-exam-card>
+            }
+        </div>
+    </div>
+
     <div class="tag-list-container" *ngIf="tagRefs.length > 0">
         @for (tagRef of tagRefs; track $index){
 
