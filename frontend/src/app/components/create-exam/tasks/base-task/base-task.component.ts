@@ -1,5 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Task } from '../../../../exam';
+import { Tag } from '../../../../tag';
 
 @Component({
   selector: 'app-base-task',
@@ -15,6 +16,7 @@ export abstract class BaseTaskComponent {
   @Input() public isModifiedPoolTask?: boolean;
   @Output() deleteEvent = new EventEmitter<string>();
   @Output() createNewTaskEvent = new EventEmitter<boolean>()
+  @Output() newTagEvent = new EventEmitter<void>();
   @ViewChild("questionFieldDE") questionFieldDE!: ElementRef;
   @ViewChild("questionFieldEN") questionFieldEN?: ElementRef;
 
@@ -101,6 +103,10 @@ export abstract class BaseTaskComponent {
 
   public onCreateNewTaskChange() {
     this.createNewTaskEvent.emit(this.createNewTask);
+  }
+
+  public onAddTag() {
+    this.newTagEvent.emit();
   }
 
 }

@@ -43,6 +43,8 @@ import { NewPageDialogComponent } from "./new-page-dialog/new-page-dialog.compon
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { Tag } from "../../tag";
+import { AddTagDialogComponent } from "../add-tag-dialog/add-tag-dialog.component";
+import { TagHelperService } from "../../services/tag-helper.service";
 
 @Component({
   selector: "app-create-exam",
@@ -82,6 +84,7 @@ export class CreateExamComponent {
   public semesters = ["WS 23/24", "SS 24", "WS 24/25", "SS 25"];
   private modifiedPoolTasks: Set<string> = new Set<string>();
   private newTasksToCreate: Set<string> = new Set<string>();
+  private tasksWithModifiedTags: { taskId: string, tagData: { name: string, color: string, textColor: string } }[] = [];
 
   public taskPool: Task[] = [];
   public totalPoints = 0;
@@ -108,6 +111,7 @@ export class CreateExamComponent {
     private loadingService: LoadingService,
     private sanitizer: DomSanitizer,
     private snackBar: MatSnackBar,
+    private tagHelper: TagHelperService,
   ) {
     this.importExam();
     this.importPoolTasks();
@@ -197,6 +201,7 @@ export class CreateExamComponent {
       task.usedIn.push(this.exam._id || "placeholder_id");
     }
     task.lastUsed = new Date();
+    task.tags = task.tags.map(tag => Tag.fromPlain(tag));
 
     this.exam.tasks[this.currentGroupView].tasks.push(task);
     this.adjustTotalPoints();
@@ -215,8 +220,15 @@ export class CreateExamComponent {
   onSave() {
     this.checkIfValid();
     this.addNewTasksToPool();
+    this.addNewTags();
     this.uploadExam();
   }
+
+
+  private addNewTags() {
+    this.tagHelper.addTags(this.exam, this.tasksWithModifiedTags);
+  }
+
 
   private addNewTasksToPool() {
     for (let i = 0; i < this.exam.tasks.length; i++) {
@@ -394,7 +406,7 @@ export class CreateExamComponent {
   }
 
   public isModifiedPoolTask(taskId: string): boolean {
-    if (!this.isPoolTask(taskId)){ return false;}
+    if (!this.isPoolTask(taskId)) { return false; }
     return this.modifiedPoolTasks.has(taskId);
   }
 
@@ -414,7 +426,9 @@ export class CreateExamComponent {
   onUpdate() {
     this.checkIfValid();
     this.addNewTasksToPool();
+    this.addNewTags();
     this.updatePoolTasks();
+    this.importPoolTasks();
     this.api.updateExam(this.exam._id, this.exam).subscribe(
       (response) => {
         console.log("Exam updated successfully: ", response);
@@ -535,7 +549,7 @@ export class CreateExamComponent {
   }
 
   private linkTagsToTask(task: Task) {
-    if (task.tags.length === 0){ return;}
+    if (task.tags.length === 0) { return; }
     for (let tag of task.tags) {
       tag = Tag.fromPlain(tag);
       tag.addTask(task.taskId);
@@ -557,6 +571,13 @@ export class CreateExamComponent {
     this.api.getExam(lastURLPart).subscribe(
       (response) => {
         this.exam = response;
+
+        for (let taskGroup of this.exam.tasks) {
+          for (let task of taskGroup.tasks) {
+            task.tags = task.tags.map(tag => Tag.fromPlain(tag));
+          }
+        }
+
         this.adjustTotalPoints();
       },
       (error) => {
@@ -568,6 +589,9 @@ export class CreateExamComponent {
   private importPoolTasks() {
     this.api.getTasksFromPool().subscribe(
       (response) => {
+        for (let task of response) {
+          task.tags = task.tags.map(tag => Tag.fromPlain(tag));
+        }
         this.taskPool = response;
       },
       (error) => {
@@ -655,4 +679,30 @@ export class CreateExamComponent {
       ];
     }
   }
+
+  public onAddTag(index: number) {
+    console.log("add tag for task with index ", index);
+    const dialogRef = this.dialog.open(AddTagDialogComponent, {
+      width: '50%',
+      height: '50%',
+      data: {}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result) { return; }
+      const taskId = this.exam.tasks[this.currentGroupView].tasks[index].taskId;
+      const tagData = { name: result.name, color: result.color, textColor: result.textColor };
+      this.tasksWithModifiedTags.push({ taskId: taskId, tagData: tagData })
+      if (!result.exists) {
+        const newTag = new Tag(result.name).setColors(result.color, result.textColor);
+        this.api.addTag(newTag).subscribe(
+          res => { console.log("New Tag added", res) },
+          err => { console.error("Error adding new Tag", err) }
+        );
+      }
+      this.exam.tasks[this.currentGroupView].tasks[index].tags.push(new Tag(result.name).setColors(result.color, result.textColor));
+
+    })
+  }
+
 }
+

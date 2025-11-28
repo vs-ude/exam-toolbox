@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgStyle } from '@angular/common';
+import { NgFor, NgIf, NgStyle, NgClass } from '@angular/common';
 import { Component, Output, EventEmitter, AfterViewInit, OnInit, OnChanges, AfterViewChecked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -25,8 +25,8 @@ import { TaskAnimations } from '../task-animations';
     NgStyle,
     NgIf,
     MatTooltipModule,
-
-  ],
+    NgClass
+],
   templateUrl: './multiplechoice-task.component.html',
   styleUrls: ['./multiplechoice-task.component.scss', '../task.scss'],
   animations: [TaskAnimations.inOutAnimation, TaskAnimations.leftRightAnimation,]
