@@ -15,7 +15,6 @@ Thumbs.db
 # ===================================================================
 # Visual Studio Code
 .vscode/*
-!.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
@@ -23,7 +22,6 @@ Thumbs.db
 
 # Zed
 .zed/*
-!.zed/settings.json
 
 # Other IDEs
 .idea/
