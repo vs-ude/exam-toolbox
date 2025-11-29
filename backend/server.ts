@@ -12,7 +12,6 @@ import {
   read,
   utils,
 } from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
-import { PDFDocument } from "https://cdn.skypack.dev/pdf-lib@1.17.1?dts";
 import { crypto } from "jsr:@std/crypto";
 import { encodeHex } from "jsr:@std/encoding/hex";
 import * as fs from "https://deno.land/std/fs/mod.ts";
@@ -162,7 +161,11 @@ const MEMORY_WARNING_THRESHOLD_PERCENT = 0.05; // 5%
 
 function monitorMemoryUsage() {
   const hasActiveWorkers = workers.some((w) => w.isBusy);
-  if (!hasActiveWorkers) {
+  const isFinalizing = [...jobs.values()].some(
+    (job) => job.status === "finalizing",
+  );
+
+  if (!hasActiveWorkers && !isFinalizing) {
     if (lowMemoryWarningLogged) {
       const memInfo = Deno.systemMemoryInfo();
       const availableMemoryMB = (memInfo.available / (1024 * 1024)).toFixed(2);
@@ -308,6 +311,17 @@ async function finalizeJob(jobId: string) {
   const job = jobs.get(jobId);
   if (!job) return;
 
+  // If even ONE task failed, we must abort.
+  // Otherwise we create a ZIP that is missing exams, which is dangerous.
+  if (job.progress.failed > 0) {
+    job.status = "failed";
+    console.error(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+    console.error(`Job ${jobId} FAILED during generation phase.`);
+    console.error(`${job.progress.failed} tasks failed. Aborting merge.`);
+    console.error(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+    return;
+  }
+
   job.status = "finalizing";
   console.log(`Finalizing job ${jobId}...`);
 
@@ -322,33 +336,11 @@ async function finalizeJob(jobId: string) {
 
     // merges all individual german exam PDFs into a single file
     console.log(`Merging ${sortedGermanPaths.length} German PDFs...`);
-    const mergedPdfDE = await PDFDocument.create();
-    for (const pdfPath of sortedGermanPaths) {
-      const pdfBytes = await Deno.readFile(pdfPath);
-      const pdf = await PDFDocument.load(pdfBytes);
-      const copiedPages = await mergedPdfDE.copyPages(
-        pdf,
-        pdf.getPageIndices(),
-      );
-      copiedPages.forEach((page) => mergedPdfDE.addPage(page));
-    }
-    const mergedDEBytes = await mergedPdfDE.save();
-    await Deno.writeFile(`${finalOutputDir}/exam_merged_de.pdf`, mergedDEBytes);
+    await mergePdfs(sortedGermanPaths, `${finalOutputDir}/exam_merged_de.pdf`);
 
     // merges all individual english exam PDFs into a single file
     console.log(`Merging ${sortedEnglishPaths.length} English PDFs...`);
-    const mergedPdfEN = await PDFDocument.create();
-    for (const pdfPath of sortedEnglishPaths) {
-      const pdfBytes = await Deno.readFile(pdfPath);
-      const pdf = await PDFDocument.load(pdfBytes);
-      const copiedPages = await mergedPdfEN.copyPages(
-        pdf,
-        pdf.getPageIndices(),
-      );
-      copiedPages.forEach((page) => mergedPdfEN.addPage(page));
-    }
-    const mergedENBytes = await mergedPdfEN.save();
-    await Deno.writeFile(`${finalOutputDir}/exam_merged_en.pdf`, mergedENBytes);
+    await mergePdfs(sortedEnglishPaths, `${finalOutputDir}/exam_merged_en.pdf`);
 
     // creates the attendance list CSV file
     let csvContent = "Sitzplatz,Random,Matrikelnr,Name,Anwesend? (X)\n";
@@ -365,6 +357,7 @@ async function finalizeJob(jobId: string) {
 
     // moves the solution and log files into the final output directory
     const tempOutputDir = `${job.jobDir}/temp_output`;
+
     await Deno.rename(
       `${tempOutputDir}/exam_solution_de.pdf`,
       `${finalOutputDir}/exam_solution_de.pdf`,
@@ -384,9 +377,7 @@ async function finalizeJob(jobId: string) {
 
     job.status = "completed";
     job.zipPath = zipFilePath;
-    console.log(
-      `Job ${jobId} completed successfully. ZIP available at ${zipFilePath}`,
-    );
+    console.log(`Job ${jobId} completed. ZIP at ${zipFilePath}`);
   } catch (error) {
     console.error(`Failed to finalize job ${jobId}:`, error);
     job.status = "failed";
@@ -624,4 +615,30 @@ function scheduleDailyCleanup() {
     // after it runs, schedule the next one for the following day
     scheduleDailyCleanup();
   }, delay);
+}
+
+async function mergePdfs(files: string[], output: string) {
+  if (files.length === 0) return;
+
+  // Ghostscript Arguments:
+  // -q: Quiet
+  // -dNOPAUSE -dBATCH: Exit after finishing
+  // -sDEVICE=pdfwrite: Stream merge (does not accumulate exams in the RAM, that would cause the RAM to max out)
+  const args = [
+    "-q",
+    "-dNOPAUSE",
+    "-dBATCH",
+    "-sDEVICE=pdfwrite",
+    `-sOutputFile=${output}`,
+    ...files,
+  ];
+
+  const cmd = new Deno.Command("gs", { args });
+  const { success, stderr } = await cmd.output();
+
+  if (!success) {
+    throw new Error(
+      `Ghostscript merge failed: ${new TextDecoder().decode(stderr)}`,
+    );
+  }
 }
