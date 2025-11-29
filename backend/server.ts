@@ -250,6 +250,9 @@ const router = configureRouter({
   parseLogFileForSubtaskInfo,
 });
 
+// Define the group allowed to access the system
+const REQUIRED_GROUP = "researcher";
+
 app.use(async (ctx, next) => {
   ctx.response.headers.set("Access-Control-Allow-Origin", "*");
   ctx.response.headers.set(
@@ -273,14 +276,22 @@ app.use(async (ctx, next) => {
         .map((role) => role.trim())
         .filter((role) => role !== "")
     : [];
-  ctx.state.user = { id: userId, email: userEmail, roles: userRoles };
-  console.log("Authenticated User: ");
-  console.log(userId);
-  if (userId) {
-    console.log(
-      `Authenticated User: ID=${userId}, Email=${userEmail}, Roles=[${userRoles.join(", ")}]`,
+
+  // If the user does NOT have the required group, block them immediately.
+  // This prevents them from loading exams, deleting them, or doing anything else.
+  if (!userRoles.includes(REQUIRED_GROUP)) {
+    console.warn(
+      `⛔ Access Denied: User ${
+        userId || "Anonymous"
+      } lacks group '${REQUIRED_GROUP}'`,
     );
+    ctx.response.status = 403; // Forbidden
+    ctx.response.body = { error: "Access Denied: You do not have permission." };
+    return; // STOP. Do not process the request further.
   }
+
+  ctx.state.user = { id: userId, email: userEmail, roles: userRoles };
+
   await next();
 });
 

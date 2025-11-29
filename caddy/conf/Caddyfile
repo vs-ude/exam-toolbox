@@ -36,6 +36,7 @@
 
       groups {
         "cn=researcher,ou=groups,dc=exascan,dc=com" researcher
+        "cn=noGroup,ou=groups,dc=exascan,dc=com"    noGroup
       }
     }
 
@@ -69,7 +70,7 @@
       crypto key verify {$JWT_SHARED_KEY}
       crypto key token name JWT_TOKEN
       set auth url "/auth/"
-      allow roles researcher
+      allow roles authp/user
       validate bearer header
       validate source address
       inject headers with claims
