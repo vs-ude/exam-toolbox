@@ -20,6 +20,18 @@ uid: test
 # This is a hash of "test"
 userpassword: {SSHA}J8g8rF8DW6VNWvZJgCGES6n5CLpWI/Oz
 
+# 3. Create the "Student User" (The Unauthorized User)
+dn: cn=Student User,ou=users,{{ LDAP_BASE_DN }}
+cn: Student User
+mail: student@example.com
+objectclass: inetOrgPerson
+objectclass: top
+givenname: Student
+sn: User
+uid: student
+# This is a hash of "test"
+userpassword: {SSHA}J8g8rF8DW6VNWvZJgCGES6n5CLpWI/Oz
+
 dn: ou=groups,{{ LDAP_BASE_DN }}
 objectclass: organizationalUnit
 objectclass: top
@@ -30,3 +42,9 @@ cn: researcher
 objectclass: groupOfUniqueNames
 objectclass: top
 uniquemember: cn=Test Testersson,ou=users,{{ LDAP_BASE_DN }}
+
+dn: cn=noGroup,ou=groups,{{ LDAP_BASE_DN }}
+cn: noGroup
+objectclass: groupOfUniqueNames
+objectclass: top
+uniquemember: cn=Student User,ou=users,{{ LDAP_BASE_DN }}
