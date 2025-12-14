@@ -67,18 +67,6 @@
     box-sizing: border-box;
 }
 
-.task_wrapper {
-    margin-left: 1%;
-}
-
-.task_wrapper:hover {
-    cursor: grab;
-}
-
-.task_wrapper:active {
-    cursor: grabbing;
-}
-
 /*------------ [ total Points ] ------------*/
 .total_points {
     padding: 10px 32px 10px 32px;
@@ -378,20 +366,6 @@
     overflow-x: hidden;
     box-sizing: border-box;
 }
-
-
-
-.task_pool_container {
-    background-color: var(--color-bg-accent);
-    height: 80%;
-    border-radius: 15px;
-    padding: 10px 32px 10px 32px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    overflow-x: hidden;
-    width: 100%;
-}
-
 
 
 

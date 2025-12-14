@@ -45,6 +45,7 @@ import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { Tag } from "../../tag";
 import { AddTagDialogComponent } from "../add-tag-dialog/add-tag-dialog.component";
 import { TagHelperService } from "../../services/tag-helper.service";
+import { DraggablePoolComponent } from "./draggable-pool/draggable-pool.component";
 
 @Component({
   selector: "app-create-exam",
@@ -71,7 +72,8 @@ import { TagHelperService } from "../../services/tag-helper.service";
     CdkDragHandle,
     NewPageComponent,
     MatSnackBarModule,
-  ],
+    DraggablePoolComponent
+],
   templateUrl: "./create-exam.component.html",
   styleUrl: "./create-exam.component.scss",
 })

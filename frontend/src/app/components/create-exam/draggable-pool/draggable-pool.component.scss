@@ -1,0 +1,45 @@
+.task-pool-container {
+    background-color: var(--color-bg-accent);
+    height: 80%;
+    border-radius: 15px;
+    padding: 10px 32px 10px 32px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    border-radius: 5px;
+    background-color: var(--color-bg-lifted);
+}
+
+.search-input {
+    width: 80%;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: var(--color-text);
+    background-color: transparent;
+    outline: none;
+    border: 0;
+}
+
+::placeholder {
+    color: var(--color-text-secondary);
+}
+
+.task_wrapper {
+    margin-left: 1%;
+}
+
+.task_wrapper:hover {
+    cursor: grab;
+}
+
+.task_wrapper:active {
+    cursor: grabbing;
+}
