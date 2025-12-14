@@ -67,6 +67,19 @@
     box-sizing: border-box;
 }
 
+
+.task_wrapper {
+    margin-left: 1%;
+}
+
+.task_wrapper:hover {
+    cursor: grab;
+}
+
+.task_wrapper:active {
+    cursor: grabbing;
+}
+
 /*------------ [ total Points ] ------------*/
 .total_points {
     padding: 10px 32px 10px 32px;

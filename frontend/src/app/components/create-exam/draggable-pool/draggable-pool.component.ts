@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Task } from '../../../exam';
 import { AddTaskComponent } from "../add-task/add-task.component";
 import { ColorProviderService } from '../../../services/color-provider.service';
@@ -11,7 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   templateUrl: './draggable-pool.component.html',
   styleUrl: './draggable-pool.component.scss'
 })
-export class DraggablePoolComponent implements AfterViewInit {
+export class DraggablePoolComponent {
 
   @Input() public taskPool!: Task[];
 
@@ -20,18 +20,6 @@ export class DraggablePoolComponent implements AfterViewInit {
 
   constructor(public colorProvider: ColorProviderService) {
   }
-
-  async ngAfterViewInit() {
-    function delay(ms: number) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    
-    for (let i = 0; i<20; i++){
-      console.log(this.taskPool);
-      await delay(10000);
-    }
-  }
-
 
 
   public onSearch(search: string): void {
