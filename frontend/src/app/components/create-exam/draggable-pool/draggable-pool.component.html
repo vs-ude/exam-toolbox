@@ -1,0 +1,34 @@
+<div class="task-pool-container">
+    <div class="filter-container">
+        <div class="search-container">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <path fill="var(--color-icon)" fill-rule="evenodd"
+                    d="M16 11.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0m-.956 4.206a5.5 5.5 0 1 1 .662-.662.5.5 0 0 1 .148.102l3 3a.5.5 0 1 1-.707.707l-3-3a.5.5 0 0 1-.103-.147"
+                    clip-rule="evenodd"></path>
+            </svg>
+            <input type="text" placeholder="Search..." class="search-input" aria-label="Search" aria-autocomplete="list"
+                aria-controls="mat-autocomplete-0" aria-activedescendant="mat-option-0" #search
+                (keydown.enter)="onSearch(search.value)">
+        </div>
+
+
+
+        <div class="sort-container">
+            <div class="type"></div>
+            <div class="points"></div>
+        </div>
+    </div>
+
+
+    @for (task of taskPool; track $index){
+    <app-AddTask class="task_wrapper" [name]="task.question.DE"
+        [color]="colorProvider.getTaskColor(task.type)" [iconName]="task.type + '.svg'" id="{{ task.taskId }}"
+        draggable="true" (dragstart)="dragStart.emit($event)" (dragend)="drop.emit($event)"
+        matTooltip="{{ task.question.DE }}" [matTooltipShowDelay]="800">
+    </app-AddTask>
+    }
+
+
+
+
+</div>
