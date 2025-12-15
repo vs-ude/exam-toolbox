@@ -1,35 +1,95 @@
 <div class="createExam_container">
   <div class="left_container">
     <div class="exam_name_wrapper" id="examName">
-      <span class="exam_name" (click)="isNameChange = true" *ngIf="!isNameChange" id="examName">
+      <span
+        class="exam_name"
+        (click)="isNameChange = true"
+        *ngIf="!isNameChange"
+        id="examName"
+      >
         {{ exam.courseName }}
       </span>
-      <input class="name_input" *ngIf="isNameChange" [value]="exam.courseName" (keydown)="onNameChange($event)"
-        id="examName" #nameInput />
+      <input
+        class="name_input"
+        *ngIf="isNameChange"
+        [value]="exam.courseName"
+        (keydown)="onNameChange($event)"
+        id="examName"
+        #nameInput
+      />
     </div>
     <div class="add_tasks_container">
-      <app-AddTask class="task_wrapper" [name]="'Multiple Choice'"
-        [color]="colorProvider.getTaskColor('multipleChoice')" [iconName]="'multipleChoice.svg'" id="new_multipleChoice"
-        draggable="true" (dragstart)="dragStart($event)" (dragend)="drop($event)">
+      <app-AddTask
+        class="task_wrapper"
+        [name]="'Multiple Choice'"
+        [color]="colorProvider.getTaskColor('multipleChoice')"
+        [iconName]="'multipleChoice.svg'"
+        id="new_multipleChoice"
+        draggable="true"
+        (dragstart)="dragStart($event)"
+        (dragend)="drop($event)"
+      >
       </app-AddTask>
-      <app-AddTask class="task_wrapper" [name]="'Short Answer'" [color]="colorProvider.getTaskColor('shortAnswer')"
-        [iconName]="'shortAnswer.svg'" id="new_shortAnswer" draggable="true" (dragstart)="dragStart($event)"
-        (dragend)="drop($event)"></app-AddTask>
-      <app-AddTask class="task_wrapper" [name]="'New Page'" [color]="colorProvider.getTaskColor('newPage')"
-        [iconName]="'newPage.svg'" id="new_newPage" draggable="true" (dragstart)="dragStart($event)"
-        (dragend)="drop($event)"></app-AddTask>
-      <app-AddTask class="task_wrapper" [name]="'Picture Task'" [color]="colorProvider.getTaskColor('pictureTask')"
-        [iconName]="'pictureTask.svg'" id="new_picture" draggable="true" (dragstart)="dragStart($event)"
-        (dragend)="drop($event)"></app-AddTask>
-      <app-AddTask class="task_wrapper" [name]="'Latex Task'" [color]="colorProvider.getTaskColor('latex')"
-        [iconName]="'latex.svg'" id="new_latex" draggable="true" (dragstart)="dragStart($event)"
-        (dragend)="drop($event)"></app-AddTask>
-      <app-AddTask class="task_wrapper" [name]="'Table Task'" [color]="colorProvider.getTaskColor('table')"
-        [iconName]="'table.svg'" id="new_table" draggable="true" (dragstart)="dragStart($event)"
-        (dragend)="drop($event)"></app-AddTask>
-      <app-AddTask class="task_wrapper" [name]="'Manual Text'" [color]="colorProvider.getTaskColor('manualText')"
-        [iconName]="'manualText.svg'" id="new_manualText" draggable="true" (dragstart)="dragStart($event)"
-        (dragend)="drop($event)"></app-AddTask>
+      <app-AddTask
+        class="task_wrapper"
+        [name]="'Short Answer'"
+        [color]="colorProvider.getTaskColor('shortAnswer')"
+        [iconName]="'shortAnswer.svg'"
+        id="new_shortAnswer"
+        draggable="true"
+        (dragstart)="dragStart($event)"
+        (dragend)="drop($event)"
+      ></app-AddTask>
+      <app-AddTask
+        class="task_wrapper"
+        [name]="'New Page'"
+        [color]="colorProvider.getTaskColor('newPage')"
+        [iconName]="'newPage.svg'"
+        id="new_newPage"
+        draggable="true"
+        (dragstart)="dragStart($event)"
+        (dragend)="drop($event)"
+      ></app-AddTask>
+      <app-AddTask
+        class="task_wrapper"
+        [name]="'Picture Task'"
+        [color]="colorProvider.getTaskColor('pictureTask')"
+        [iconName]="'pictureTask.svg'"
+        id="new_picture"
+        draggable="true"
+        (dragstart)="dragStart($event)"
+        (dragend)="drop($event)"
+      ></app-AddTask>
+      <app-AddTask
+        class="task_wrapper"
+        [name]="'Latex Task'"
+        [color]="colorProvider.getTaskColor('latex')"
+        [iconName]="'latex.svg'"
+        id="new_latex"
+        draggable="true"
+        (dragstart)="dragStart($event)"
+        (dragend)="drop($event)"
+      ></app-AddTask>
+      <app-AddTask
+        class="task_wrapper"
+        [name]="'Table Task'"
+        [color]="colorProvider.getTaskColor('table')"
+        [iconName]="'table.svg'"
+        id="new_table"
+        draggable="true"
+        (dragstart)="dragStart($event)"
+        (dragend)="drop($event)"
+      ></app-AddTask>
+      <app-AddTask
+        class="task_wrapper"
+        [name]="'Manual Text'"
+        [color]="colorProvider.getTaskColor('manualText')"
+        [iconName]="'manualText.svg'"
+        id="new_manualText"
+        draggable="true"
+        (dragstart)="dragStart($event)"
+        (dragend)="drop($event)"
+      ></app-AddTask>
     </div>
 
     <div class="total_points">
@@ -41,52 +101,86 @@
     <div class="viewBar_spacer"></div>
     <div class="viewBar_wrapper">
       <div class="icon_wrapper bar_icon">
-        <mat-icon aria-hidden="false" fontIcon="remove_red_eye" matTooltip="Preview" (click)="onPreview()"></mat-icon>
+        <mat-icon
+          aria-hidden="false"
+          fontIcon="remove_red_eye"
+          matTooltip="Preview"
+          (click)="onPreview()"
+        ></mat-icon>
       </div>
       <div class="icon_wrapper bar_icon">
-        <mat-icon *ngIf="!isUpdateMode" aria-hidden="false" fontIcon="save" matTooltip="Save"
-          (click)="onSave()"></mat-icon>
-        <mat-icon *ngIf="isUpdateMode" aria-hidden="false" fontIcon="update" matTooltip="Update"
-          (click)="onUpdate()"></mat-icon>
+        <mat-icon
+          *ngIf="!isUpdateMode"
+          aria-hidden="false"
+          fontIcon="save"
+          matTooltip="Save"
+          (click)="onSave()"
+        ></mat-icon>
+        <mat-icon
+          *ngIf="isUpdateMode"
+          aria-hidden="false"
+          fontIcon="update"
+          matTooltip="Update"
+          (click)="onUpdate()"
+        ></mat-icon>
       </div>
 
       <div class="icon_wrapper bar_icon">
-        <mat-icon aria-hidden="false" fontIcon="download" matTooltip="Generate all Exams"
-          (click)="onMassExam()"></mat-icon>
+        <mat-icon
+          aria-hidden="false"
+          fontIcon="download"
+          matTooltip="Generate all Exams"
+          (click)="onMassExam()"
+        ></mat-icon>
       </div>
 
-      <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"><img
-          src="{{ bilingual ? 'english.svg' : 'german.svg' }}" /></span>
+      <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"
+        ><img src="{{ bilingual ? 'english.svg' : 'german.svg' }}"
+      /></span>
 
-      <!-- Duration -->
       <div class="duration_wrapper">
         <div class="icon_wrapper">
           <mat-icon aria-hidden="false" fontIcon="access_time"></mat-icon>
         </div>
-        <input class="duration_picker" type="number" min="0" step="10" [(ngModel)]="exam.examLengthMinutes" />
+        <input
+          class="duration_picker"
+          type="number"
+          min="0"
+          step="10"
+          [(ngModel)]="exam.examLengthMinutes"
+        />
       </div>
 
-      <!-- Exam Date -->
       <div class="date_wrapper">
-        <input type="date" class="datePicker" [style.color-scheme]="lightTheme ? 'light' : 'dark'"
-          [(ngModel)]="exam.date" />
+        <input
+          type="date"
+          class="datePicker"
+          [style.color-scheme]="lightTheme ? 'light' : 'dark'"
+          [(ngModel)]="exam.date"
+        />
       </div>
 
-      <!-- Examiner -->
       <div class="examiner_wrapper">
         <div class="icon_wrapper">
           <mat-icon aria-hidden="false" fontIcon="person"></mat-icon>
         </div>
-        <input class="examiner_input" placeholder="Enter Examiner's Name" [(ngModel)]="exam.examinerName" />
+        <input
+          class="examiner_input"
+          placeholder="Enter Examiner's Name"
+          [(ngModel)]="exam.examinerName"
+        />
       </div>
 
-      <!-- Semester -->
       <div class="semester_wrapper">
         <div class="icon_wrapper">
           <mat-icon aria-hidden="false" fontIcon="school"></mat-icon>
         </div>
-        <mat-select class="selectSemester" placeholder="Select Semester" [(ngModel)]="exam.semester"
-          panelClass="semesterSelect">
+        <mat-select
+          class="selectSemester"
+          placeholder="Select Semester"
+          [(ngModel)]="exam.semester"
+          panelClass="semesterSelect"
+        >
           <mat-option *ngFor="let semester of semesters" [value]="semester">
             {{ semester }}
           </mat-option>
@@ -94,11 +188,19 @@
       </div>
     </div>
 
-    <div class="view_wrapper" id="drop-list" (dragover)="dragOverDropzone($event)" (dragleave)="inDropzone = false">
+    <div
+      class="view_wrapper"
+      id="drop-list"
+      (dragover)="dragOverDropzone($event)"
+      (dragleave)="inDropzone = false"
+    >
       <div class="tab_holder">
-        <button class="tab" (click)="changeTab(i)" *ngFor="let tab of [].constructor(exam.tasks.length); let i = index">
+        <button
+          class="tab"
+          (click)="changeTab(i)"
+          *ngFor="let tab of [].constructor(exam.tasks.length); let i = index"
+        >
           {{
-<<<<<<< HEAD
             exam.tasks.length < 5
               ? "Assignment " + (i + 1)
               : i < 9
@@ -136,7 +238,7 @@
         >
           No tasks in this group yet. Drag and drop tasks from the sides to add
           tasks
-          <br />or<
+          <br />or
           <span (click)="deleteTab()" class="delete_group">
             <u>delete this group</u>
           </span>
@@ -152,7 +254,6 @@
             track task.taskId;
             let i = $index
           ) {
-            <!-- Assignment Description -->
             <mat-card
               class="task_group_title form-card"
               *ngIf="i === 0"
@@ -167,7 +268,6 @@
               />
             </mat-card>
 
-            <!-- Task Number/Header -->
             <span
               *ngIf="task.type !== 'manualText' && task.type !== 'newPage'"
               class="task_number"
@@ -181,7 +281,6 @@
               New Page
             </span>
 
-            <!-- Multiple Choice-->
             <mat-card
               class="form-card"
               *ngIf="task.type === 'multipleChoice'"
@@ -207,7 +306,6 @@
               </div>
             </mat-card>
 
-            <!-- short Answer -->
             <mat-card
               class="form-card"
               *ngIf="task.type === 'shortAnswer'"
@@ -233,7 +331,6 @@
               </div>
             </mat-card>
 
-            <!-- Picture Task -->
             <mat-card
               class="form-card"
               *ngIf="task.type === 'pictureTask'"
@@ -259,7 +356,6 @@
               </div>
             </mat-card>
 
-            <!-- Latex Task -->
             <mat-card class="form-card" *ngIf="task.type === 'latex'" cdkDrag>
               <app-latex-task
                 class="task_container"
@@ -281,7 +377,6 @@
               </div>
             </mat-card>
 
-            <!-- Table Task -->
             <mat-card class="form-card" *ngIf="task.type === 'table'" cdkDrag>
               <app-table-task
                 class="task_container"
@@ -303,7 +398,6 @@
               </div>
             </mat-card>
 
-            <!-- Manual Text  -->
             <mat-card
               class="form-card"
               *ngIf="task.type === 'manualText'"
@@ -329,7 +423,6 @@
               </div>
             </mat-card>
 
-            <!-- New Page  -->
             <mat-card class="form-card" *ngIf="task.type === 'newPage'" cdkDrag>
               <app-new-page
                 class="task_container"
@@ -359,152 +452,18 @@
         <div *ngIf="!previewPdfUrl" class="no-preview">
           Click the preview button to generate a preview.
         </div>
-=======
-          exam.tasks.length < 5 ? "Assignment " + (i + 1) : i < 9 ? "A 0" + (i + 1) : "A " + (i + 1) }} <div
-            *ngIf="i === 0" class="tab_slider" [style.transform]="'translateX(' + currentGroupView * 100 + '%)'">
->>>>>>> temp-work
-      </div>
-      </button>
-      <button class="tab" (click)="addTab()" matTooltip="add Group" [matTooltipShowDelay]="800">
-        <mat-icon aria-hidden="false" fontIcon="add"></mat-icon>
-      </button>
-      <button class="tab preview-tab" *ngIf="previewPdfUrl" (click)="changeTab(exam.tasks.length)">
-        Preview
-        <span *ngIf="previewTabNotification" class="notification-dot"></span>
-      </button>
-    </div>
-
-    <ng-container *ngIf="!isPreviewTabActive">
-      <div *ngIf="exam.tasks[currentGroupView].tasks.length === 0" class="empty_group_holder">
-        No tasks in this group yet. Drag and drop tasks from the sides to add
-        tasks
-        <br />or< <span (click)="deleteTab()" class="delete_group">
-          <u>delete this group</u>
-          </span>
-      </div>
-
-      <div cdkDropList (cdkDropListDropped)="reorderDrop($event)" class="task_group_container">
-        @for (
-        task of exam.tasks[currentGroupView].tasks;
-        track task.taskId;
-        let i = $index
-        ) {
-        <!-- Assignment Description -->
-        <mat-card class="task_group_title form-card" *ngIf="i === 0" style="border-color: var(--color-text)">
-          <app-task-group-title class="task_container" [assignmentNumber]="currentGroupView + 1" [bilingual]="bilingual"
-            [preTitle]="exam.tasks[currentGroupView].groupTitle" (titleChangedEvent)="onTitleChange($event)" />
-        </mat-card>
-
-        <!-- Task Number/Header -->
-        <span *ngIf="task.type !== 'manualText' && task.type !== 'newPage'" class="task_number">
-          Assignment {{ currentGroupView + 1 }}.{{ calcTaskChar(i) }}
-        </span>
-        <span *ngIf="task.type === 'manualText'" class="task_number">
-          Manual Text
-        </span>
-        <span *ngIf="task.type === 'newPage'" class="task_number">
-          New Page
-        </span>
-
-        <!-- Multiple Choice-->
-        <mat-card class="form-card" *ngIf="task.type === 'multipleChoice'" cdkDrag>
-          <app-multiplechoiceTask class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
-            [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
-            [isModifiedPoolTask]="isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i].taskId)"
-            (createNewTaskEvent)="onCreateNewTaskChange($event, i)" (taskChangeEvent)="onTaskChange($event, i)"
-            (deleteEvent)="deleteTask(i)" (newTagEvent)="onAddTag(i)" />
-          <div class="drag_handle" cdkDragHandle>
-            <mat-icon>drag_indicator</mat-icon>
-          </div>
-        </mat-card>
-
-        <!-- short Answer -->
-        <mat-card class="form-card" *ngIf="task.type === 'shortAnswer'" cdkDrag>
-          <app-short-answer-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
-            [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
-            [isModifiedPoolTask]="isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i].taskId)"
-            (createNewTaskEvent)="onCreateNewTaskChange($event, i)" (deleteEvent)="deleteTask(i)"
-            (taskChangeEvent)="onTaskChange($event, i)" (newTagEvent)="onAddTag(i)" />
-          <div class="drag_handle" cdkDragHandle>
-            <mat-icon>drag_indicator</mat-icon>
-          </div>
-        </mat-card>
-
-        <!-- Picture Task -->
-        <mat-card class="form-card" *ngIf="task.type === 'pictureTask'" cdkDrag>
-          <app-picture-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
-            [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
-            [isModifiedPoolTask]="isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i].taskId)"
-            (createNewTaskEvent)="onCreateNewTaskChange($event, i)" (deleteEvent)="deleteTask(i)"
-            (taskChangeEvent)="onTaskChange($event, i)" (newTagEvent)="onAddTag(i)" />
-          <div class="drag_handle" cdkDragHandle>
-            <mat-icon>drag_indicator</mat-icon>
-          </div>
-        </mat-card>
-
-        <!-- Latex Task -->
-        <mat-card class="form-card" *ngIf="task.type === 'latex'" cdkDrag>
-          <app-latex-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
-            [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
-            [isModifiedPoolTask]="isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i].taskId)"
-            (createNewTaskEvent)="onCreateNewTaskChange($event, i)" (deleteEvent)="deleteTask(i)"
-            (taskChangeEvent)="onTaskChange($event, i)" (newTagEvent)="onAddTag(i)" />
-          <div class="drag_handle" cdkDragHandle>
-            <mat-icon>drag_indicator</mat-icon>
-          </div>
-        </mat-card>
-
-        <!-- Table Task -->
-        <mat-card class="form-card" *ngIf="task.type === 'table'" cdkDrag>
-          <app-table-task class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
-            [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
-            [isModifiedPoolTask]="isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i].taskId)"
-            (createNewTaskEvent)="onCreateNewTaskChange($event, i)" (deleteEvent)="deleteTask(i)"
-            (taskChangeEvent)="onTaskChange($event, i)" (newTagEvent)="onAddTag(i)" />
-          <div class="drag_handle" cdkDragHandle>
-            <mat-icon>drag_indicator</mat-icon>
-          </div>
-        </mat-card>
-
-        <!-- Manual Text  -->
-        <mat-card class="form-card" *ngIf="task.type === 'manualText'" cdkDrag>
-          <app-manual-text class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
-            [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual"
-            [isModifiedPoolTask]="isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i].taskId)"
-            (createNewTaskEvent)="onCreateNewTaskChange($event, i)" (deleteEvent)="deleteTask(i)"
-            (taskChangeEvent)="onTaskChange($event, i)" (newTagEvent)="onAddTag(i)" />
-          <div class="drag_handle" cdkDragHandle>
-            <mat-icon>drag_indicator</mat-icon>
-          </div>
-        </mat-card>
-
-        <!-- New Page  -->
-        <mat-card class="form-card" *ngIf="task.type === 'newPage'" cdkDrag>
-          <app-new-page class="task_container" [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
-            [preTask]="exam.tasks[currentGroupView].tasks[i]" [bilingual]="bilingual" (deleteEvent)="deleteTask(i)"
-            (taskChangeEvent)="onTaskChange($event, i)" (newTagEvent)="onAddTag(i)" />
-          <div class="drag_handle" cdkDragHandle>
-            <mat-icon>drag_indicator</mat-icon>
-          </div>
-        </mat-card>
-        }
-      </div>
-    </ng-container>
-
-    <div *ngIf="isPreviewTabActive" class="preview_container">
-      <iframe *ngIf="previewPdfUrl" [src]="previewPdfUrl" width="100%" height="100%"></iframe>
-
-      <div *ngIf="!previewPdfUrl" class="no-preview">
-        Click the preview button to generate a preview.
       </div>
     </div>
   </div>
-</div>
 
-<div class="right_container">
-  pool
+  <div class="right_container">
+    pool
 
-  <app-draggable-pool [taskPool]="taskPool" (dragStart)="dragStart($event)" (drop)="drop($event)">
-  </app-draggable-pool>
-</div>
+    <app-draggable-pool
+      [taskPool]="taskPool"
+      (dragStart)="dragStart($event)"
+      (drop)="drop($event)"
+    >
+    </app-draggable-pool>
+  </div>
 </div>
