@@ -118,6 +118,9 @@ export class CreateExamComponent {
     this.importExam();
     this.importPoolTasks();
     this.semesters = this.getSemesters();
+    if (!this.exam.semester) {
+      this.exam.semester = this.semesters[0];
+    }
 
     this.themeService.themeChanged$.subscribe((theme: Theme) => {
       this.lightTheme = theme === Theme.LIGHT ? true : false;
