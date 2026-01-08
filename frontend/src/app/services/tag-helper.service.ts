@@ -13,7 +13,7 @@ export class TagHelperService {
     private api: ApiService,
   ) { }
 
-  public addTags(exam: Exam, tasksWithModifiedTags: { taskId: string, tagData: { name: string, color: string, textColor: string }}[]) {
+  public addTags(exam: Exam, tasksWithModifiedTags: { taskId: string, tagData: { name: string, color: string, textColor: string } }[]) {
     let tasks = this.getAllTasks(exam);
     for (let element of tasksWithModifiedTags) {
 
@@ -55,5 +55,15 @@ export class TagHelperService {
     }
     return tasks;
   }
+
+  public calcFontColor(backgroundColor: string): string {
+    const color = backgroundColor.charAt(0) === '#' ? backgroundColor.substring(1, 7) : backgroundColor;
+    const r = parseInt(color.substring(0, 2), 16);
+    const g = parseInt(color.substring(2, 4), 16);
+    const b = parseInt(color.substring(4, 6), 16);
+
+    return (r * 0.299 + g * 0.587 + b * 0.114) > 186 ? '#000000' : '#FFFFFF';
+  }
+
 
 }

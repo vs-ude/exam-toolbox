@@ -7,10 +7,8 @@
     <div class="customization-container">
         <input class="name-input" type="text" [(ngModel)]="name" placeholder="Tag Name" />
         <div class="bgColorPicker">
-            <input type="color" class="color-picker" [(ngModel)]="color" />
-        </div>
-        <div class="textColorPicker">
-            <input type="color" class="color-picker" [(ngModel)]="textColor" />
+            <input type="color" class="color-picker" [(ngModel)]="color" [value]="color"
+                (input)="onColorChange(color)" />
         </div>
 
     </div>
@@ -19,14 +17,11 @@
     <div class="existingTag-container">
         @for (tag of tags; track tag.getName())
         {
-        <span 
-            [ngStyle]="{'backgroundColor': tag.getColor(), 'color': tag.getTextColor()}"
-            [mat-dialog-close]="{
+        <span [ngStyle]="{'backgroundColor': tag.getColor(), 'color': tag.getTextColor()}" [mat-dialog-close]="{
                 exists: true, 
                 name: tag.getName(), 
                 color: tag.getColor(), 
-                textColor: tag.getTextColor()}"
-            class="existingTag" >
+                textColor: tag.getTextColor()}" class="existingTag">
             {{tag.getName()}}
         </span>
         }

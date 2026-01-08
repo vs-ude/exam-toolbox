@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../../services/api.service';
 import { Tag } from '../../tag';
+import { TagHelperService } from '../../services/tag-helper.service';
 
 @Component({
   selector: 'app-add-tag-dialog',
@@ -23,17 +24,24 @@ export class AddTagDialogComponent {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: {},
-    private api: ApiService) {
+    private api: ApiService,
+    private tagHelper: TagHelperService
+  ) { }
 
-  }
 
   ngOnInit() {
     this.api.getAllTags().subscribe(
-      tags => { this.tags = tags.map(tag => Tag.fromPlain(tag));
-       },
+      tags => {
+        this.tags = tags.map(tag => Tag.fromPlain(tag));
+      },
       err => {
         console.error("error fetching tags", err);
       }
     )
+  }
+
+  public onColorChange(bgColor: string){
+    this.textColor = this.tagHelper.calcFontColor(bgColor);
+    console.log("Changed text color to ", this.textColor);
   }
 }
