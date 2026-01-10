@@ -736,6 +736,35 @@ export function configureRouter({
         ctx.response.body = { message: "Error deleting exams", error };
       }
     })
+    .delete("/api/exams/:examId", async (ctx) => {
+      const id = ctx.params.examId;
+
+      if (!id) {
+        ctx.response.status = 400;
+        ctx.response.body = { message: "Exam ID is required" };
+        return;
+      }
+
+      try {
+        // Attempt to delete the exam from the 'exams' collection
+        const result = await exams.deleteOne({ _id: new ObjectId(id) });
+
+        if (result === 0) {
+          ctx.response.status = 404;
+          ctx.response.body = { message: "Exam not found" };
+        } else {
+          ctx.response.status = 200;
+          ctx.response.body = { message: "Exam deleted successfully" };
+          console.log(`Exam ${id} deleted.`);
+        }
+      } catch (error) {
+        console.error("Error deleting exam:", error);
+        ctx.response.status = 500; // Or 400 if the ObjectId format is wrong
+        ctx.response.body = {
+          message: "Internal server error during deletion",
+        };
+      }
+    })
     .delete("/api/jobs/:jobId", async (ctx) => {
       const jobId = ctx.params.jobId;
       const job = jobs.get(jobId);

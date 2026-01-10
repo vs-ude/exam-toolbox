@@ -98,6 +98,10 @@ export class ApiService {
     return this.http.delete(`${this.apiUrl}/exams`);
   }
 
+  deleteExam(examId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/exams/${examId}`);
+  }
+
   generateAllExams(exam: Exam, list: File) {
     const formData = new FormData();
 
