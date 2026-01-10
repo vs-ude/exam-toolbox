@@ -40,10 +40,23 @@ services:
       - ./backend/uploads:/app/uploads
     environment:
       - MONGODB_URI=mongodb://mongo:27017/examToolboxDB
-      - RESEND_API_KEY=re_AsubX85v_5tF3NwdzWs5nsrcXnd8nUqY1
-      - RESEND_FROM_EMAIL=your-verified-domain@your-domain.com
+      - SMTP_HOST=mailcrab
+      - SMTP_PORT=1025
+      - SMTP_FROM=noreply@example.com
+      - CADDY_DOMAIN=${CADDY_DOMAIN}
     depends_on:
       - mongo
+      - mailcrab
+    networks:
+      - web
+
+  mailcrab:
+    image: marlonb/mailcrab:latest
+    container_name: mailcrab
+    restart: unless-stopped
+    ports:
+      - "1080:1080"
+      - "1025:1025"
     networks:
       - web
 

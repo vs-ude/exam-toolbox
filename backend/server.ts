@@ -15,7 +15,7 @@ import {
 import { crypto } from "jsr:@std/crypto";
 import { encodeHex } from "jsr:@std/encoding/hex";
 import * as fs from "https://deno.land/std/fs/mod.ts";
-import { Resend } from "npm:resend@2.0.0";
+import nodemailer from "npm:nodemailer@6.9.9";
 import { copy } from "https://deno.land/std@0.224.0/fs/copy.ts";
 import {
   updateMetaStudent,
@@ -368,7 +368,6 @@ async function finalizeJob(jobId: string) {
 
     // moves the solution and log files into the final output directory
     const tempOutputDir = `${job.jobDir}/temp_output`;
-
     await Deno.rename(
       `${tempOutputDir}/exam_solution_de.pdf`,
       `${finalOutputDir}/exam_solution_de.pdf`,
@@ -388,6 +387,50 @@ async function finalizeJob(jobId: string) {
 
     job.status = "completed";
     job.zipPath = zipFilePath;
+
+    // --- EMAIL LOGIC ---
+    let examName = "Exam";
+    let exam = null; // Defined OUTSIDE the try block to prevent ReferenceError
+
+    try {
+      const queryId = new ObjectId(job.examId.trim());
+      exam = await exams.findOne({ _id: queryId });
+
+      if (exam && exam.courseName) {
+        examName = exam.courseName;
+        if (exam.semester) {
+          examName += ` (${exam.semester})`;
+        }
+      }
+    } catch (e) {
+      console.error("Error querying exam name:", e);
+    }
+
+    const domain = Deno.env.get("CADDY_DOMAIN") || "localhost";
+    const downloadUrl = `http://${domain}/api/jobs/${jobId}/download`;
+
+    console.log(`Sending completion email to ${job.userEmail}...`);
+
+    await sendEmail(
+      job.userEmail,
+      `Exam Ready: ${examName}`,
+      `
+      <div style="font-family: sans-serif; padding: 20px;">
+        <h2>Exam Generation Complete</h2>
+        <p>The exam <strong>"${examName}"</strong> (${exam.semester}) is ready.</p>
+        <br/>
+        <a href="${downloadUrl}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+          Download ZIP
+        </a>
+        <br/><br/>
+        <p style="font-size: 0.9em; color: #666;">
+          <em>Link not working? Go to Dashboard -> Exams Pool</em>
+        </p>
+      </div>
+      `,
+    );
+    // --- END EMAIL LOGIC ---
+
     console.log(`Job ${jobId} completed. ZIP at ${zipFilePath}`);
   } catch (error) {
     console.error(`Failed to finalize job ${jobId}:`, error);
@@ -471,25 +514,30 @@ async function sendEmail(
   subject: string,
   html: string,
 ): Promise<void> {
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  const host = Deno.env.get("SMTP_HOST") || "mailcrab";
+  const port = parseInt(Deno.env.get("SMTP_PORT") || "1025");
+  const from = Deno.env.get("SMTP_FROM") || "noreply@examtoolbox.local";
 
-  if (!RESEND_API_KEY) {
-    console.error("RESEND_API_KEY is not set");
-    return;
-  }
-
-  const resend = new Resend(RESEND_API_KEY);
+  const transporter = nodemailer.createTransport({
+    host: host,
+    port: port,
+    secure: false, // true for 465, false for other ports
+    auth: null, // MailCrab needs no auth
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
 
   try {
-    await resend.emails.send({
-      from: "ExamToolbox <onboarding@resend.dev>",
+    const info = await transporter.sendMail({
+      from: `"ExamToolbox" <${from}>`,
       to,
       subject,
       html,
     });
-    console.log("Email sent via Resend");
+    console.log("Email sent via MailCrab:", info.messageId);
   } catch (error) {
-    console.error("Resend error:", error);
+    console.error("SMTP Error:", error);
   }
 }
 
