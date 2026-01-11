@@ -8,6 +8,8 @@ import { MatLabel } from '@angular/material/form-field';
 import { TaskAnimations } from '../task-animations';
 import { MathJaxParagraphComponent } from '../../../math-jax-paragraph/math-jax-paragraph.component';
 import { MatTooltip } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
+import { PreviewDialogComponent } from './preview-dialog/preview-dialog.component';
 
 @Component({
   selector: 'app-latex-task',
@@ -35,6 +37,7 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
 
   @Output() taskChangeEvent = new EventEmitter<Task>();
 
+
   public task: LatexTask = {
     taskId: "",
     type: "latex",
@@ -52,6 +55,10 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
     children: [],
   };
 
+  constructor(private dialog: MatDialog,) {
+    super();
+  }
+
   ngOnInit(): void {
     if (this.preTask) {
       this.task = this.preTask as LatexTask;
@@ -59,6 +66,21 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
     }
     this.task.taskId = this.taskId;
     this.taskChangeEvent.emit(this.task);
+  }
+
+  public onOpenPreview() {
+    const dialogRef = this.dialog.open(PreviewDialogComponent, {
+      width: "30%",
+      height: "60%",
+    }).afterClosed();
+
+    dialogRef.subscribe(result => {
+      if (!result) { return; }
+      this.task.questionLatex.DE = result;
+      this.taskChangeEvent.emit(this.task);
+    })
+
+
   }
 
   public isValidMathString(mathString: string): boolean {

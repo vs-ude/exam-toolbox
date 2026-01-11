@@ -49,7 +49,7 @@
 
 <!-- Latex Question Input -->
 <div class="form-body">
-  <span class="latex_input_label">LaTeX content in this format -> \\( content \\):</span>
+  <span class="latex_input_label">LaTeX content in this format -> \( &lt;content&gt; \)</span>
   <textarea class="latex_input" [(ngModel)]="this.task.questionLatex.DE" (blur)="updateTask()"></textarea>
   <!-- <div  class="latex_preview_container">
     <span class="latex_input_label">Preview:</span>
@@ -58,7 +58,10 @@
 
 </div>
 
-
+<div class="icon_wrapper presets" (click)="onOpenPreview()">
+  <mat-icon aria-hidden="false" fontIcon="style"></mat-icon>
+  Select LaTeX Template
+</div>
 
 <!-- Footer -->
 <div class="form-footer">

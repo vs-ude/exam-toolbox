@@ -1,14 +1,14 @@
 .form-body {
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-    margin-top: 16px;
-    margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  margin-top: 16px;
+  margin-bottom: 16px;
 }
 
 .latex_input_label {
-    font-size: smaller;
-    color: var(--color-dark-gray);
+  font-size: smaller;
+  color: var(--color-dark-gray);
 }
 
 textarea {
@@ -51,4 +51,15 @@ textarea:focus {
   padding: 12px;
   border-radius: 8px;
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+.presets {
+  margin-top: 10px;
+  background-color: var(--color-secondary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 0 5% 0 5%;
 }
