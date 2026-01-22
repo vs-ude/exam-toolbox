@@ -15,7 +15,7 @@
 
         <div class="sort-container">
             <div class="type-filter-container">
-                <select>
+                <select #selectedType (change)="onFilterType(selectedType.value)">
                     @for( type of types; track type.value ){
                     <option value="{{ type.value }}">{{ type.viewValue }}</option>
                     }

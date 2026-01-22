@@ -460,7 +460,7 @@
     pool
 
     <app-draggable-pool
-      [taskPool]="taskPool"
+      [refreshPool$]="refreshPool$"
       (dragStart)="dragStart($event)"
       (drop)="drop($event)"
     >

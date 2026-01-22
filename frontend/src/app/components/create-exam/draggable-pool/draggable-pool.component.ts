@@ -4,6 +4,8 @@ import { AddTaskComponent } from "../add-task/add-task.component";
 import { ColorProviderService } from '../../../services/color-provider.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIcon } from "@angular/material/icon";
+import { ApiService } from '../../../services/api.service';
+import { Observable, Subscription } from 'rxjs';
 
 enum SortPoints {
   Ascending,
@@ -24,14 +26,17 @@ interface TypeOption {
   styleUrl: './draggable-pool.component.scss'
 })
 export class DraggablePoolComponent {
-
-  @Input() public taskPool!: Task[];
+  @Input() refreshPool$!: Observable<void> ;
 
   @Output() dragStart = new EventEmitter<DragEvent>();
   @Output() drop = new EventEmitter<DragEvent>();
 
+  public taskPool: Task[] = [];
+  private refreshSubscription: Subscription = new Subscription();
+
   public SortPoints = SortPoints;
   public sortPoints: SortPoints = SortPoints.None;
+  private currentTypeFilter: string = '';
 
   public types: TypeOption[] = [
     { value: '', viewValue: 'All Types' },
@@ -43,8 +48,49 @@ export class DraggablePoolComponent {
     { value: 'table', viewValue: 'Table' },
   ]
 
+  ngOnInit(): void {
+    this.refreshSubscription = this.refreshPool$.subscribe(() => {
+      this.refreshTaskPool();
+    });
+  }
 
-  constructor(public colorProvider: ColorProviderService) {
+  ngOnDestroy(): void {
+    this.refreshSubscription.unsubscribe();
+  }
+
+
+  constructor(public colorProvider: ColorProviderService, private api: ApiService) {
+    this.refreshTaskPool();
+  }
+
+  private refreshTaskPool(): void {
+    this.api.getTasksFromPool().subscribe(
+      (tasks) => { 
+        this.taskPool = tasks;
+
+        if (this.currentTypeFilter !== ''){
+          this.onFilterType(this.currentTypeFilter);
+        }
+        this.sortTasksByPoints();
+       },
+      (error) => { console.error('Error fetching tasks from pool:', error); }
+    );
+  }
+
+  public onFilterType(type: string): void {
+    this.currentTypeFilter = type;
+    if (type === '') {
+      this.refreshTaskPool();
+      return;
+    }
+
+    this.api.getTaskWithTypeFromPool(type).subscribe(
+      (tasks) => {
+        this.taskPool = tasks;
+        this.sortTasksByPoints();
+      },
+      (error) => { console.error('Error fetching tasks from pool by type:', error); }
+    );
   }
 
 
@@ -58,6 +104,15 @@ export class DraggablePoolComponent {
       return;
     }
     this.sortPoints = sort;
+    this.sortTasksByPoints();
+  }
+
+  private sortTasksByPoints(): void {
+    if (this.sortPoints === SortPoints.Ascending) {
+      this.taskPool.sort((a, b) => a.points - b.points);
+    } else if (this.sortPoints === SortPoints.Descending) {
+      this.taskPool.sort((a, b) => b.points - a.points);
+    }
   }
 
 }

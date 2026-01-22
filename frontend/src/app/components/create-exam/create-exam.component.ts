@@ -46,6 +46,7 @@ import { Tag } from "../../tag";
 import { AddTagDialogComponent } from "../add-tag-dialog/add-tag-dialog.component";
 import { TagHelperService } from "../../services/tag-helper.service";
 import { DraggablePoolComponent } from "./draggable-pool/draggable-pool.component";
+import { Subject } from "rxjs";
 
 @Component({
   selector: "app-create-exam",
@@ -89,6 +90,7 @@ export class CreateExamComponent {
   private tasksWithModifiedTags: { taskId: string, tagData: { name: string, color: string, textColor: string } }[] = [];
 
   public taskPool: Task[] = [];
+  public refreshPool$: Subject<void> = new Subject<void>();
   public totalPoints = 0;
   public bilingual = false;
   public exam = new Exam("New Exam", "", "", "", 90, [
@@ -598,6 +600,7 @@ export class CreateExamComponent {
           task.tags = task.tags.map(tag => Tag.fromPlain(tag));
         }
         this.taskPool = response;
+        this.refreshPool$.next();
       },
       (error) => {
         console.error(error);

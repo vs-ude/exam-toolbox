@@ -11,9 +11,13 @@
 
 .filter-container {
     border: 2px solid var(--border-color);
-    padding: 1%;
+    padding: 2%;
     border-radius: 5px;
     margin: 0 -16px 0 -16px;
+    display: flex;
+    align-items: left;
+    justify-content: space-between;
+    flex-wrap: wrap
 }
 
 .search-container {
@@ -23,6 +27,7 @@
     flex-wrap: nowrap;
     border-radius: 5px;
     background-color: var(--color-bg-lifted);
+    width: 100%;
 }
 
 .search-input {
@@ -41,22 +46,20 @@
 
 .sort-container {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: nowrap;
-    margin-left: 8px;
-    padding: 8px 12px;
+    align-items: baseline;
+    justify-content: left;
+    flex-wrap: wrap;
     font-size: 14px;
     color: var(--color-text);
+    width: 100%;
 }
 
 .type-filter-container {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
     flex-wrap: nowrap;
-    margin-left: 8px;
-    padding: 8px 12px;
+    padding: 8px 0px 8px 0px;
     font-size: 14px;
     color: var(--color-text);
     margin-top: 4px;
@@ -70,6 +73,7 @@
     padding: 6px 10px;
     cursor: pointer;
     outline: none;
+    width: 100%;
 }
 
 .type-filter-container select:hover {
