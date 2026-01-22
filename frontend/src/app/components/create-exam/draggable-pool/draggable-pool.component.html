@@ -14,17 +14,29 @@
 
 
         <div class="sort-container">
-            <div class="type"></div>
-            <div class="points"></div>
+            <div class="type-filter-container">
+                <select>
+                    @for( type of types; track type.value ){
+                    <option value="{{ type.value }}">{{ type.viewValue }}</option>
+                    }
+                </select>
+            </div>
+            <div class="sort-points-container">
+                <span>Points:</span>
+                <mat-icon class="icon" (click)="onSortPoints(SortPoints.Descending)"
+                    [class.active]="sortPoints == SortPoints.Descending">arrow_downward</mat-icon>
+                <mat-icon class="icon" (click)="onSortPoints(SortPoints.Ascending)"
+                    [class.active]="sortPoints == SortPoints.Ascending">arrow_upward</mat-icon>
+            </div>
         </div>
+
     </div>
 
 
     @for (task of taskPool; track $index){
-    <app-AddTask class="task_wrapper" [name]="task.question.DE"
-        [color]="colorProvider.getTaskColor(task.type)" [iconName]="task.type + '.svg'" id="{{ task.taskId }}"
-        draggable="true" (dragstart)="dragStart.emit($event)" (dragend)="drop.emit($event)"
-        matTooltip="{{ task.question.DE }}" [matTooltipShowDelay]="800">
+    <app-AddTask class="task_wrapper" [name]="task.question.DE" [color]="colorProvider.getTaskColor(task.type)"
+        [iconName]="task.type + '.svg'" id="{{ task.taskId }}" draggable="true" (dragstart)="dragStart.emit($event)"
+        (dragend)="drop.emit($event)" matTooltip="{{ task.question.DE }}" [matTooltipShowDelay]="800">
     </app-AddTask>
     }
 
