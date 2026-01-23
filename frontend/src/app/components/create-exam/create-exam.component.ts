@@ -319,8 +319,9 @@ export class CreateExamComponent {
         this.loadingService.loadingOff();
       },
       error: (err) => {
-        console.error("Error generating exam preview: ", err);
+        console.error("Error generating exam preview: ", err)
         this.loadingService.loadingOff();
+        alert("An error occurred while generating the exam preview");
       },
     });
   }
