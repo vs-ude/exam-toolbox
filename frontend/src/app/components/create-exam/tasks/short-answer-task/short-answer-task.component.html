@@ -76,10 +76,11 @@
       <mat-icon aria-hidden="false" fontIcon="delete" matTooltip="Delete" (click)="onDelete()"></mat-icon>
     </div>
 
-    <div class="tag" *ngFor="let tag of task.tags"
-      [ngStyle]="{'background-color': tag.getColor(), 'color': tag.getTextColor()}">
+    @for(tag of task.tags; track tag){
+    <div class="tag" [ngStyle]="{'background-color': tag.getColor(), 'color': tag.getTextColor()}">
       {{ tag.getName() }}
     </div>
+    }
 
     <div class="icon_wrapper footer_icon">
       <mat-icon aria-hidden="false" fontIcon="add" matTooltip="add Tag" (click)="onAddTag()"></mat-icon>
