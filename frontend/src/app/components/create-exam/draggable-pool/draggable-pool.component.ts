@@ -26,7 +26,7 @@ interface TypeOption {
   styleUrl: './draggable-pool.component.scss'
 })
 export class DraggablePoolComponent {
-  @Input() refreshPool$!: Observable<void> ;
+  @Input() refreshPool$!: Observable<void>;
 
   @Output() dragStart = new EventEmitter<DragEvent>();
   @Output() drop = new EventEmitter<DragEvent>();
@@ -37,6 +37,7 @@ export class DraggablePoolComponent {
   public SortPoints = SortPoints;
   public sortPoints: SortPoints = SortPoints.None;
   private currentTypeFilter: string = '';
+  private currentSearchTerm: string = '';
 
   public types: TypeOption[] = [
     { value: '', viewValue: 'All Types' },
@@ -65,15 +66,17 @@ export class DraggablePoolComponent {
 
   private refreshTaskPool(): void {
     this.api.getTasksFromPool().subscribe(
-      (tasks) => { 
-        this.taskPool = tasks;
+      {
+        next: (tasks) => {
+          this.taskPool = tasks;
 
-        if (this.currentTypeFilter !== ''){
-          this.onFilterType(this.currentTypeFilter);
-        }
-        this.sortTasksByPoints();
-       },
-      (error) => { console.error('Error fetching tasks from pool:', error); }
+          if (this.currentTypeFilter !== '') {
+            this.onFilterType(this.currentTypeFilter);
+          }
+          this.applyCurrentFilters();
+        },
+        error: (error) => { console.error('Error fetching tasks from pool:', error); }
+      }
     );
   }
 
@@ -87,7 +90,7 @@ export class DraggablePoolComponent {
     this.api.getTaskWithTypeFromPool(type).subscribe(
       (tasks) => {
         this.taskPool = tasks;
-        this.sortTasksByPoints();
+        this.applyCurrentFilters();
       },
       (error) => { console.error('Error fetching tasks from pool by type:', error); }
     );
@@ -95,7 +98,19 @@ export class DraggablePoolComponent {
 
 
   public onSearch(search: string): void {
-    console.log("Searching for tasks with term: ", search);
+    this.currentSearchTerm = search;
+
+    if (search === '') {
+      this.refreshTaskPool();
+      return;
+    }
+
+    this.taskPool = this.taskPool.filter(task => {
+      const questionDE = task.question.DE.toLowerCase();
+      const questionEN = task.question.EN.toLowerCase();
+      const searchTerm = search.toLowerCase();
+      return questionDE.includes(searchTerm) || questionEN.includes(searchTerm);
+    })
   }
 
   public onSortPoints(sort: SortPoints): void {
@@ -112,6 +127,13 @@ export class DraggablePoolComponent {
       this.taskPool.sort((a, b) => a.points - b.points);
     } else if (this.sortPoints === SortPoints.Descending) {
       this.taskPool.sort((a, b) => b.points - a.points);
+    }
+  }
+
+  private applyCurrentFilters(): void {
+    this.sortTasksByPoints();
+    if (this.currentSearchTerm !== '') {
+      this.onSearch(this.currentSearchTerm);
     }
   }
 
