@@ -368,6 +368,34 @@ export function configureRouter({
         };
       }
     })
+    // Check for active job for a specific exam. This allows the frontend to "resume" the progress bar if the dialog was closed
+    .get("/api/exams/:examId/active-job", (ctx) => {
+      const examId = ctx.params.examId;
+      let activeJob = null;
+
+      // Scan the in-memory jobs map for a match that is currently running
+      for (const job of jobs.values()) {
+        if (
+          job.examId === examId &&
+          ["queued", "processing", "finalizing"].includes(job.status)
+        ) {
+          activeJob = job;
+          break;
+        }
+      }
+
+      if (activeJob) {
+        ctx.response.status = 200;
+        ctx.response.body = {
+          jobId: activeJob.jobId,
+          status: activeJob.status,
+          progress: activeJob.progress,
+        };
+      } else {
+        ctx.response.status = 200;
+        ctx.response.body = null;
+      }
+    })
     .post("/api/exams", async (ctx) => {
       const exam: Exam = await ctx.request.body().value;
       exam.lastEditedBy = ctx.state.user.id;

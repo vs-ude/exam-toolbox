@@ -247,6 +247,7 @@ const router = configureRouter({
   processQueue,
   genRandomNumber,
   getDownloadableJobs,
+  getActiveJobForExam,
   parseLogFileForSubtaskInfo,
 });
 
@@ -618,6 +619,18 @@ async function getDownloadableJobs(): Promise<
   }
 
   return downloadableJobs;
+}
+
+function getActiveJobForExam(examId: string): ExamGenerationJob | null {
+  for (const job of jobs.values()) {
+    if (
+      job.examId === examId &&
+      ["queued", "processing", "finalizing"].includes(job.status)
+    ) {
+      return job;
+    }
+  }
+  return null;
 }
 
 function cleanupOldJobs() {

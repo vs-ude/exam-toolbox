@@ -198,4 +198,10 @@ export class ApiService {
   updateTag(tag: Tag) {
     return this.http.put(`${this.apiUrl}/tags/${tag.getName()}`, tag);
   }
+
+  getActiveJob(examId: string): Observable<JobStatus | null> {
+    return this.http.get<JobStatus | null>(
+      `${this.apiUrl}/exams/${examId}/active-job`,
+    );
+  }
 }
