@@ -511,6 +511,10 @@ export function configureRouter({
         const body = ctx.request.body({ type: "form-data" });
         const formData = await body.value.read({ maxSize: 10 * 1024 * 1024 });
         const examJson: Exam = JSON.parse(formData.fields.exam);
+        const startSeatNumber = parseInt(
+          formData.fields.startSeatNumber || "1",
+          10,
+        );
         const file = formData.files?.find((f) => f.name === "list");
         if (!file || !examJson || !file.content || !examJson._id) {
           ctx.response.status = 400;
@@ -522,6 +526,7 @@ export function configureRouter({
 
         const examId = examJson._id;
 
+        // Check for Existing Jobs
         for (const [jobId, existingJob] of jobs.entries()) {
           if (existingJob.examId === examId) {
             if (
@@ -554,6 +559,7 @@ export function configureRouter({
           }
         }
 
+        // Setup Job Directory
         const jobId = crypto.randomUUID();
         const jobDir = `${JOBS_DIR}/${jobId}`;
         const jobTemplatePath = `${jobDir}/template`;
@@ -572,6 +578,7 @@ export function configureRouter({
           tasksContentLatex,
         );
 
+        // Parse Excel File
         const workbook = read(file.content, { type: "buffer" });
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         const studentData = utils
@@ -603,10 +610,12 @@ export function configureRouter({
           studentResults: [],
         };
 
+        // Generate Tasks Loop
         studentData.forEach((student: any, index: number) => {
-          const seatNumber = index + 1;
-          const deRandomNumber = genRandomNumber("de", index + 1);
-          const enRandomNumber = genRandomNumber("en", index + 1);
+          const seatNumber = index + startSeatNumber;
+          const deRandomNumber = genRandomNumber("de", seatNumber);
+          const enRandomNumber = genRandomNumber("en", seatNumber);
+
           newJob.randomNumbers.push({ de: deRandomNumber, en: enRandomNumber });
           taskQueue.push({
             type: "student",
@@ -620,6 +629,7 @@ export function configureRouter({
           });
         });
 
+        // Add System Tasks
         taskQueue.push({
           type: "solution",
           jobId,

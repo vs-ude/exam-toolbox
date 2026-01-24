@@ -26,11 +26,22 @@ import { FormsModule } from "@angular/forms";
   templateUrl: "./mass-exam-dialog.component.html",
   styleUrl: "./mass-exam-dialog.component.scss",
 })
-export class MassExamDialogComponent implements OnDestroy {
+export class MassExamDialogComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
+
+  // Needed for when generating an exam for a single student
+  isSingleMode = false;
+  startSeatNumber = 1;
+  singleStudent = {
+    firstName: "",
+    lastName: "",
+    studentId: "",
+  };
+
+  // Job State
   jobId: string | null = null;
   jobStatus: JobStatus | null = null;
-  isLoading = false;
+  isLoading = true;
   errorMessage: string | null = null;
   autoDownload = false;
   downloadSuccessful = false;
@@ -79,19 +90,63 @@ export class MassExamDialogComponent implements OnDestroy {
   }
 
   onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
-    this.errorMessage = null;
+    if (event.target.files && event.target.files.length > 0) {
+      this.selectedFile = event.target.files[0];
+      this.errorMessage = null;
+    }
+  }
+
+  createSingleStudentCsv(): File {
+    // Backend expects the padding rows to be present
+    // And SheetJS on the Backend is too smart, so the rows can't be empty
+    const dummyRow = "IGNORE,IGNORE,IGNORE,IGNORE,IGNORE,IGNORE";
+    const paddingRows = [dummyRow, dummyRow, dummyRow, dummyRow, dummyRow].join(
+      "\n",
+    );
+
+    // Columns match backend header: [0]PlanId, [1]ExamNr, [2]Title, [3]LastName, [4]FirstName, [5]StudentId
+    const studentRow = `123,DUMMY,SingleExam,${this.singleStudent.lastName},${this.singleStudent.firstName},${this.singleStudent.studentId}`;
+
+    const csvContent = paddingRows + "\n" + studentRow;
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    return new File([blob], "single_student_generated.csv", {
+      type: "text/csv",
+    });
   }
 
   generate() {
-    if (!this.selectedFile) return;
-
     this.isLoading = true;
     this.errorMessage = null;
     this.jobStatus = null;
 
+    let fileToUpload: File;
+
+    if (this.isSingleMode) {
+      // Generate exam for single student
+      if (
+        !this.singleStudent.firstName ||
+        !this.singleStudent.lastName ||
+        !this.singleStudent.studentId
+      ) {
+        this.handleError("Please fill out all student fields.");
+        return;
+      }
+      fileToUpload = this.createSingleStudentCsv();
+    } else {
+      // Mass Exam Generation
+      if (!this.selectedFile) {
+        this.handleError("Please select a file.");
+        return;
+      }
+      fileToUpload = this.selectedFile;
+    }
+
     this.api
-      .startMassExamGeneration(this.data.exam, this.selectedFile)
+      .startMassExamGeneration(
+        this.data.exam,
+        fileToUpload,
+        this.startSeatNumber,
+      )
       .subscribe({
         next: (response) => {
           this.jobId = response.jobId;

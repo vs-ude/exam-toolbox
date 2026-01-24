@@ -1,39 +1,109 @@
-<h2 class="title" mat-dialog-title>Generate Mass Exam</h2>
+<h2 class="title" mat-dialog-title>
+  Generate {{ isSingleMode ? "Single Exam" : "Mass Exam" }}
+</h2>
 
 <mat-dialog-content class="content">
-  
   <div *ngIf="!isLoading && jobStatus?.status !== 'completed'">
-    <p class="dialog-description">Please select the student list file (.xlsx) to begin the generation.</p>
+    <div *ngIf="!isSingleMode">
+      <p class="dialog-description">
+        Please select the student list file (.xlsx) to begin.
+      </p>
 
-    <div class="generation-controls">
-      <div class="file-input-container">
-        <label for="file-upload" class="file-upload-label">
-          <mat-icon>attach_file</mat-icon>
-          <span>{{ selectedFile ? 'Change file' : 'Choose a file...' }}</span>
-        </label>
-        <input id="file-upload" type="file" (change)="onFileSelected($event)" accept=".xlsx, .xls">
-      </div>
-      
-      <div *ngIf="selectedFile" class="file-name-display">
-        <mat-icon>description</mat-icon>
-        <span>{{ selectedFile.name }}</span>
-      </div>
+      <div class="generation-controls">
+        <div class="file-input-container">
+          <label for="file-upload" class="file-upload-label">
+            <mat-icon>attach_file</mat-icon>
+            <span>{{ selectedFile ? "Change file" : "Choose a file..." }}</span>
+          </label>
+          <input
+            id="file-upload"
+            type="file"
+            (change)="onFileSelected($event)"
+            accept=".xlsx, .xls"
+          />
+        </div>
 
-      <mat-slide-toggle [(ngModel)]="autoDownload">
-        <div style="color: var(--color-text);">Auto-download when complete</div>
+        <div *ngIf="selectedFile" class="file-name-display">
+          <mat-icon>description</mat-icon>
+          <span>{{ selectedFile.name }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="isSingleMode">
+      <p class="dialog-description">Enter the student details manually.</p>
+
+      <div class="generation-controls manual-form-container">
+        <div class="form-row">
+          <input
+            type="text"
+            placeholder="First Name"
+            [(ngModel)]="singleStudent.firstName"
+            class="custom-input"
+          />
+          <input
+            type="text"
+            placeholder="Last Name"
+            [(ngModel)]="singleStudent.lastName"
+            class="custom-input"
+          />
+        </div>
+        <div class="form-row">
+          <input
+            type="text"
+            placeholder="Matrikelnummer (ID)"
+            [(ngModel)]="singleStudent.studentId"
+            class="custom-input"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="generation-controls settings-block">
+      <div class="setting-row">
+        <div class="setting-label">
+          <span>Start Exam Number:</span>
+          <span class="sub-text">(Default: 1)</span>
+        </div>
+        <input
+          type="number"
+          [(ngModel)]="startSeatNumber"
+          min="1"
+          class="custom-input small-input"
+        />
+      </div>
+    </div>
+
+    <div class="toggles-wrapper">
+      <mat-slide-toggle
+        [(ngModel)]="isSingleMode"
+        color="primary"
+        class="small-toggle"
+      >
+        Enter Student Manually
+      </mat-slide-toggle>
+
+      <mat-slide-toggle [(ngModel)]="autoDownload" class="small-toggle">
+        Auto-download when complete
       </mat-slide-toggle>
     </div>
   </div>
 
   <div *ngIf="isLoading" class="loading-container">
     <p>Generating exams... Please do not close this window.</p>
-    
+
     <ng-container *ngIf="jobStatus && jobStatus.progress.total > 0">
-      <mat-progress-bar 
-        mode="determinate" 
-        [value]="(jobStatus.progress.completed / jobStatus.progress.total) * 100">
+      <mat-progress-bar
+        mode="determinate"
+        [value]="
+          (jobStatus.progress.completed / jobStatus.progress.total) * 100
+        "
+      >
       </mat-progress-bar>
-      <p class="progress-text">{{ jobStatus.progress.completed }} / {{ jobStatus.progress.total }} tasks completed.</p>
+      <p class="progress-text">
+        {{ jobStatus.progress.completed }} /
+        {{ jobStatus.progress.total }} tasks completed.
+      </p>
     </ng-container>
 
     <ng-container *ngIf="!jobStatus">
@@ -42,7 +112,10 @@
     </ng-container>
   </div>
 
-  <div *ngIf="!isLoading && jobStatus?.status === 'completed'" class="completed-container">
+  <div
+    *ngIf="!isLoading && jobStatus?.status === 'completed'"
+    class="completed-container"
+  >
     <mat-icon class="completed-icon">check_circle</mat-icon>
     <h3>Generation Complete</h3>
 
@@ -55,35 +128,56 @@
     </ng-template>
   </div>
 
-
   <div *ngIf="errorMessage" class="error-message">
     <mat-icon>error_outline</mat-icon>
     <span>{{ errorMessage }}</span>
   </div>
-
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  
   <ng-container *ngIf="!isLoading && jobStatus?.status !== 'completed'">
     <button mat-stroked-button mat-dialog-close>Cancel</button>
-    <button mat-flat-button color="primary" [disabled]="!selectedFile" (click)="generate()">
+
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="generate()"
+      [disabled]="
+        (!isSingleMode && !selectedFile) ||
+        (isSingleMode &&
+          (!singleStudent.firstName ||
+            !singleStudent.lastName ||
+            !singleStudent.studentId))
+      "
+    >
       <mat-icon>play_arrow</mat-icon>
       <span>Generate</span>
     </button>
   </ng-container>
-  
-  <button *ngIf="isLoading" mat-stroked-button color="warn" (click)="cancelGeneration()">
+
+  <button
+    *ngIf="isLoading"
+    mat-stroked-button
+    color="warn"
+    (click)="cancelGeneration()"
+  >
     <mat-icon>cancel</mat-icon>
     <span>Stop Generation</span>
   </button>
-  
+
   <ng-container *ngIf="!isLoading && jobStatus?.status === 'completed'">
-    <button mat-stroked-button (click)="navigateToExamsPool()">View in Exams Pool</button>
-    <button mat-flat-button color="primary" style="color: var(--color-text);" (click)="downloadResult()" [disabled]="downloadSuccessful">
+    <button mat-stroked-button (click)="navigateToExamsPool()">
+      View in Exams Pool
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      style="color: var(--color-text)"
+      (click)="downloadResult()"
+      [disabled]="downloadSuccessful"
+    >
       <mat-icon>download</mat-icon>
       <span>Download Now</span>
     </button>
   </ng-container>
-
 </mat-dialog-actions>

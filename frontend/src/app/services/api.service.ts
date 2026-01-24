@@ -32,10 +32,13 @@ export class ApiService {
   startMassExamGeneration(
     exam: Exam,
     list: File,
+    startSeatNumber: number = 1,
   ): Observable<{ jobId: string }> {
     const formData = new FormData();
     formData.append("exam", JSON.stringify(exam));
     formData.append("list", list, list.name);
+    formData.append("startSeatNumber", startSeatNumber.toString());
+
     return this.http.post<{ jobId: string }>(
       `${this.apiUrl}/generate-exams`,
       formData,
