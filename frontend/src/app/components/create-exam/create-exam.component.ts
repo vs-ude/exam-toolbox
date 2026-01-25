@@ -1,13 +1,7 @@
-import {
-  Component,
-  ElementRef,
-  HostListener,
-  viewChild,
-  ViewChild,
-} from "@angular/core";
+import { Component, ElementRef, HostListener, ViewChild } from "@angular/core";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTooltipModule } from "@angular/material/tooltip";
-import { NgFor, NgIf, NgStyle } from "@angular/common";
+import { NgFor, NgIf } from "@angular/common";
 import { Exam, Task } from "../../exam";
 import { AddTaskComponent } from "./add-task/add-task.component";
 import { MatSelectModule } from "@angular/material/select";
@@ -46,7 +40,9 @@ import { Tag } from "../../tag";
 import { AddTagDialogComponent } from "../add-tag-dialog/add-tag-dialog.component";
 import { TagHelperService } from "../../services/tag-helper.service";
 import { DraggablePoolComponent } from "./draggable-pool/draggable-pool.component";
-import { Subject } from "rxjs";
+import { Subject, debounceTime } from "rxjs";
+import { AutosaveService } from "../../services/autosave.service";
+import { ConflictDialogComponent } from "../conflict-dialog/conflict-dialog.component";
 
 @Component({
   selector: "app-create-exam",
@@ -73,8 +69,8 @@ import { Subject } from "rxjs";
     CdkDragHandle,
     NewPageComponent,
     MatSnackBarModule,
-    DraggablePoolComponent
-],
+    DraggablePoolComponent,
+  ],
   templateUrl: "./create-exam.component.html",
   styleUrl: "./create-exam.component.scss",
 })
@@ -87,7 +83,10 @@ export class CreateExamComponent {
   public semesters = ["WS 23/24", "SS 24", "WS 24/25", "SS 25"];
   private modifiedPoolTasks: Set<string> = new Set<string>();
   private newTasksToCreate: Set<string> = new Set<string>();
-  private tasksWithModifiedTags: { taskId: string, tagData: { name: string, color: string, textColor: string } }[] = [];
+  private tasksWithModifiedTags: {
+    taskId: string;
+    tagData: { name: string; color: string; textColor: string };
+  }[] = [];
 
   public taskPool: Task[] = [];
   public refreshPool$: Subject<void> = new Subject<void>();
@@ -105,6 +104,8 @@ export class CreateExamComponent {
   public isPreviewTabActive = false;
   public previewTabNotification = false;
 
+  private autosaveTrigger$ = new Subject<void>();
+
   constructor(
     private api: ApiService,
     private router: Router,
@@ -116,7 +117,15 @@ export class CreateExamComponent {
     private sanitizer: DomSanitizer,
     private snackBar: MatSnackBar,
     private tagHelper: TagHelperService,
+    private autosaveService: AutosaveService,
   ) {
+    this.autosaveTrigger$.pipe(debounceTime(2000)).subscribe(() => {
+      // If we are in "Create Mode" (no ID or 'new'), pass undefined to service (it handles 'new_draft')
+      const idToSave =
+        this.exam._id && this.exam._id !== "new" ? this.exam._id : undefined;
+      this.autosaveService.saveLocal(idToSave, this.exam);
+    });
+
     this.importExam();
     this.importPoolTasks();
     this.semesters = this.getSemesters();
@@ -130,6 +139,10 @@ export class CreateExamComponent {
   }
 
   @ViewChild("nameInput") nameInput?: ElementRef;
+
+  private triggerAutosave() {
+    this.autosaveTrigger$.next();
+  }
 
   @HostListener("document:click", ["$event"])
   unselectInputs(event: MouseEvent) {
@@ -147,6 +160,7 @@ export class CreateExamComponent {
       return;
     }
     this.exam.courseName = newName;
+    if (this.exam.courseName !== newName) this.triggerAutosave();
   }
 
   onNameChange(event: any) {
@@ -156,6 +170,7 @@ export class CreateExamComponent {
     const newName = event.target.value;
     if (newName !== "") {
       this.exam.courseName = event.target.value;
+      this.triggerAutosave();
     }
     this.isNameChange = false;
   }
@@ -177,6 +192,7 @@ export class CreateExamComponent {
       } else {
         this.pushPoolTask(element.id);
       }
+      this.triggerAutosave();
     }
     this.inDropzone = false;
   }
@@ -187,6 +203,7 @@ export class CreateExamComponent {
       event.previousIndex,
       event.currentIndex,
     );
+    this.triggerAutosave();
   }
 
   private pushNewTask(taskType: string) {
@@ -208,7 +225,7 @@ export class CreateExamComponent {
       task.usedIn.push(this.exam._id || "placeholder_id");
     }
     task.lastUsed = new Date();
-    task.tags = task.tags.map(tag => Tag.fromPlain(tag));
+    task.tags = task.tags.map((tag) => Tag.fromPlain(tag));
 
     this.exam.tasks[this.currentGroupView].tasks.push(task);
     this.adjustTotalPoints();
@@ -222,6 +239,7 @@ export class CreateExamComponent {
   deleteTask(index: number) {
     this.exam.tasks[this.currentGroupView].tasks.splice(index, 1);
     this.adjustTotalPoints();
+    this.triggerAutosave();
   }
 
   onSave() {
@@ -231,11 +249,9 @@ export class CreateExamComponent {
     this.uploadExam();
   }
 
-
   private addNewTags() {
     this.tagHelper.addTags(this.exam, this.tasksWithModifiedTags);
   }
-
 
   private addNewTasksToPool() {
     for (let i = 0; i < this.exam.tasks.length; i++) {
@@ -265,6 +281,7 @@ export class CreateExamComponent {
     this.api.addExam(this.exam).subscribe(
       (response) => {
         console.log("Exam added successfully: ", response);
+        this.autosaveService.clearLocal(undefined);
         this.router.navigate([`/create-exam/${response.insertedId}`]); // uses the id inserted by mongodb to navigate to a detailed view of this exam
       },
       (error) => {
@@ -319,7 +336,7 @@ export class CreateExamComponent {
         this.loadingService.loadingOff();
       },
       error: (err) => {
-        console.error("Error generating exam preview: ", err)
+        console.error("Error generating exam preview: ", err);
         this.loadingService.loadingOff();
         alert("An error occurred while generating the exam preview");
       },
@@ -355,6 +372,7 @@ export class CreateExamComponent {
         0,
         newPageElement,
       );
+      this.triggerAutosave();
     });
   }
 
@@ -401,6 +419,7 @@ export class CreateExamComponent {
     this.adjustTotalPoints();
     this.trackChangeInPoolTasks(task.taskId);
     console.log(task);
+    this.triggerAutosave();
   }
 
   private trackChangeInPoolTasks(taskId: string) {
@@ -410,11 +429,15 @@ export class CreateExamComponent {
   }
 
   public isPoolTask(taskId: string): boolean {
-    return this.taskPool.find((poolTask) => poolTask.taskId === taskId) != undefined;
+    return (
+      this.taskPool.find((poolTask) => poolTask.taskId === taskId) != undefined
+    );
   }
 
   public isModifiedPoolTask(taskId: string): boolean {
-    if (!this.isPoolTask(taskId)) { return false; }
+    if (!this.isPoolTask(taskId)) {
+      return false;
+    }
     return this.modifiedPoolTasks.has(taskId);
   }
 
@@ -429,6 +452,7 @@ export class CreateExamComponent {
 
   onTitleChange(taskGroupTitle: { DE: string; EN: string }) {
     this.exam.tasks[this.currentGroupView].groupTitle = taskGroupTitle;
+    this.triggerAutosave();
   }
 
   onUpdate() {
@@ -440,6 +464,7 @@ export class CreateExamComponent {
     this.api.updateExam(this.exam._id, this.exam).subscribe(
       (response) => {
         console.log("Exam updated successfully: ", response);
+        this.autosaveService.clearLocal(this.exam._id);
       },
       (error) => {
         console.error("Error updating exam: ", error);
@@ -497,7 +522,7 @@ export class CreateExamComponent {
           : this.updateTask(modifiedIndices[index]);
       }
       this.modifiedPoolTasks.clear();
-      this.newTasksToCreate.clear()
+      this.newTasksToCreate.clear();
     });
   }
 
@@ -526,9 +551,13 @@ export class CreateExamComponent {
 
     // add new Task as child for the old Task
     this.api.addChildToTaskPoolTask(oldTask.taskId, newTask.taskId).subscribe(
-      response => { console.log("new child was added to the old Task") },
-      error => { console.error("Error adding the child to the old Task", error) }
-    )
+      (response) => {
+        console.log("new child was added to the old Task");
+      },
+      (error) => {
+        console.error("Error adding the child to the old Task", error);
+      },
+    );
 
     this.exam.tasks[i].tasks[j] = newTask;
 
@@ -554,51 +583,126 @@ export class CreateExamComponent {
     );
 
     this.linkTagsToTask(newTask);
+    this.triggerAutosave();
   }
 
   private linkTagsToTask(task: Task) {
-    if (task.tags.length === 0) { return; }
+    if (task.tags.length === 0) {
+      return;
+    }
     for (let tag of task.tags) {
       tag = Tag.fromPlain(tag);
       tag.addTask(task.taskId);
       this.api.updateTag(tag).subscribe(
-        response => { console.log(`Tag ${tag.getName()} updated with new task link`, response); },
-        error => { console.error(`Error updating tag ${tag.getName()}: `, error); }
+        (response) => {
+          console.log(
+            `Tag ${tag.getName()} updated with new task link`,
+            response,
+          );
+        },
+        (error) => {
+          console.error(`Error updating tag ${tag.getName()}: `, error);
+        },
       );
     }
   }
 
   private importExam() {
     const lastURLPart = this.router.url.split("/").pop();
+
     if (lastURLPart === "create-exam" || lastURLPart == undefined) {
       this.isUpdateMode = false;
+
+      const draft = this.autosaveService.loadLocal(undefined);
+
+      if (draft) {
+        const dialogRef = this.dialog.open(ConflictDialogComponent, {
+          width: "600px",
+          disableClose: true,
+          data: {
+            dbExam: new Exam("New Exam", "", "", "", 90, []),
+            localWrapper: draft,
+            isNewExam: true,
+          },
+        });
+
+        dialogRef.afterClosed().subscribe((resume: boolean) => {
+          if (resume) {
+            this.exam = draft.data;
+            this.adjustTotalPoints();
+            this.snackBar.open("Resumed unsaved new exam.", "OK", {
+              duration: 3000,
+            });
+          } else {
+            this.autosaveService.clearLocal(undefined);
+          }
+        });
+      }
       return;
     }
+
     this.exam._id = lastURLPart;
     this.isUpdateMode = true;
-    this.api.getExam(lastURLPart).subscribe(
-      (response) => {
-        this.exam = response;
 
-        for (let taskGroup of this.exam.tasks) {
+    this.api.getExam(lastURLPart).subscribe(
+      (dbExam) => {
+        const localWrapper = this.autosaveService.loadLocal(dbExam._id);
+        const dbTime = (dbExam as any).updatedAt
+          ? new Date((dbExam as any).updatedAt).getTime()
+          : 0;
+
+        if (localWrapper && localWrapper.timestamp > dbTime) {
+          const dialogRef = this.dialog.open(ConflictDialogComponent, {
+            width: "600px",
+            disableClose: true,
+            data: { dbExam: dbExam, localWrapper: localWrapper },
+          });
+
+          dialogRef.afterClosed().subscribe((useLocal: boolean) => {
+            if (useLocal) {
+              this.exam = localWrapper.data;
+              this.exam._id = dbExam._id;
+              this.adjustTotalPoints();
+              this.snackBar.open("Unsaved changes restored.", "OK", {
+                duration: 3000,
+              });
+            } else {
+              this.initializeExamData(dbExam);
+              this.autosaveService.clearLocal(dbExam._id);
+              this.snackBar.open("Discarded local draft.", "OK", {
+                duration: 3000,
+              });
+            }
+          });
+        } else {
+          if (localWrapper) this.autosaveService.clearLocal(dbExam._id);
+          this.initializeExamData(dbExam);
+        }
+      },
+      (error) => console.error(error),
+    );
+  }
+
+  private initializeExamData(response: Exam) {
+    this.exam = response;
+    if (this.exam.tasks) {
+      for (let taskGroup of this.exam.tasks) {
+        if (taskGroup.tasks) {
           for (let task of taskGroup.tasks) {
-            task.tags = task.tags.map(tag => Tag.fromPlain(tag));
+            if (task.tags)
+              task.tags = task.tags.map((tag) => Tag.fromPlain(tag));
           }
         }
-
-        this.adjustTotalPoints();
-      },
-      (error) => {
-        console.error(error);
-      },
-    );
+      }
+    }
+    this.adjustTotalPoints();
   }
 
   private importPoolTasks() {
     this.api.getTasksFromPool().subscribe(
       (response) => {
         for (let task of response) {
-          task.tags = task.tags.map(tag => Tag.fromPlain(tag));
+          task.tags = task.tags.map((tag) => Tag.fromPlain(tag));
         }
         this.taskPool = response;
         this.refreshPool$.next();
@@ -692,26 +796,38 @@ export class CreateExamComponent {
   public onAddTag(index: number) {
     console.log("add tag for task with index ", index);
     const dialogRef = this.dialog.open(AddTagDialogComponent, {
-      width: '50%',
-      height: '50%',
-      data: {}
+      width: "50%",
+      height: "50%",
+      data: {},
     });
-    dialogRef.afterClosed().subscribe(result => {
-      if (!result) { return; }
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result) {
+        return;
+      }
       const taskId = this.exam.tasks[this.currentGroupView].tasks[index].taskId;
-      const tagData = { name: result.name, color: result.color, textColor: result.textColor };
-      this.tasksWithModifiedTags.push({ taskId: taskId, tagData: tagData })
+      const tagData = {
+        name: result.name,
+        color: result.color,
+        textColor: result.textColor,
+      };
+      this.tasksWithModifiedTags.push({ taskId: taskId, tagData: tagData });
       if (!result.exists) {
-        const newTag = new Tag(result.name).setColors(result.color, result.textColor);
+        const newTag = new Tag(result.name).setColors(
+          result.color,
+          result.textColor,
+        );
         this.api.addTag(newTag).subscribe(
-          res => { console.log("New Tag added", res) },
-          err => { console.error("Error adding new Tag", err) }
+          (res) => {
+            console.log("New Tag added", res);
+          },
+          (err) => {
+            console.error("Error adding new Tag", err);
+          },
         );
       }
-      this.exam.tasks[this.currentGroupView].tasks[index].tags.push(new Tag(result.name).setColors(result.color, result.textColor));
-
-    })
+      this.exam.tasks[this.currentGroupView].tasks[index].tags.push(
+        new Tag(result.name).setColors(result.color, result.textColor),
+      );
+    });
   }
-
 }
-

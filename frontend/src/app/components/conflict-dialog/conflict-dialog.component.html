@@ -1,0 +1,42 @@
+<h2 mat-dialog-title class="dialog-header" [class.dark-theme]="isDarkTheme">
+  <mat-icon color="warn">warning</mat-icon>
+  {{ data.isNewExam ? "Restorable Draft Found" : "Unsaved Changes Detected" }}
+</h2>
+
+<mat-dialog-content [class.dark-theme]="isDarkTheme">
+  <p *ngIf="!data.isNewExam">
+    We found a draft on this computer that is newer than the version on the
+    server. Which version would you like to continue working on?
+  </p>
+  <p *ngIf="data.isNewExam">
+    You have an unsaved exam draft from a previous session. Do you want to
+    resume it?
+  </p>
+
+  <div class="comparison-container">
+    <div class="version-card local">
+      <h3>Local Draft</h3>
+      <p><strong>Saved:</strong> {{ localDate | date: "medium" }}</p>
+      <p><strong>Tasks:</strong> {{ getTaskCount(data.localWrapper.data) }}</p>
+      <p class="note">Recover your unsaved work.</p>
+    </div>
+
+    <div class="version-card server">
+      <h3>{{ data.isNewExam ? "Start Fresh" : "Server Version" }}</h3>
+      <p *ngIf="!data.isNewExam">
+        <strong>Saved:</strong> {{ dbDate | date: "medium" }}
+      </p>
+      <p><strong>Tasks:</strong> {{ getTaskCount(data.dbExam) }}</p>
+      <p class="note">Discard the draft.</p>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" [class.dark-theme]="isDarkTheme">
+  <button mat-button color="warn" [mat-dialog-close]="false">
+    {{ data.isNewExam ? "Delete Draft" : "Discard Local Draft" }}
+  </button>
+  <button mat-flat-button color="primary" [mat-dialog-close]="true">
+    {{ data.isNewExam ? "Resume Draft" : "Resume Local Draft" }}
+  </button>
+</mat-dialog-actions>
