@@ -8,6 +8,7 @@ import { saveAs } from 'file-saver';
 import { LoadingService } from '../../services/loading.service';
 import { MatIconModule } from '@angular/material/icon';
 import { NgClass } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-exams-pool',
@@ -16,6 +17,7 @@ import { NgClass } from '@angular/common';
     ExamCardComponent,
     MatIconModule, // MatButtonModule is removed
     NgClass,
+    MatTooltip,
   ],
   templateUrl: './exams-pool.component.html',
   styleUrl: './exams-pool.component.scss'
@@ -40,12 +42,16 @@ export class ExamsPoolComponent implements OnInit {
   }
 
   constructor(
-    private api: ApiService, 
-    private loader: LoadingService, 
+    private api: ApiService,
+    private loader: LoadingService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
+    this.fetchExams();
+  }
+
+  private fetchExams() {
     this.loader.loadingOn();
     forkJoin({
       allExams: this.api.getExams(),
@@ -98,6 +104,22 @@ export class ExamsPoolComponent implements OnInit {
       },
       error: (err) => {
         console.error('Download error:', err);
+        this.loader.loadingOff();
+      }
+    });
+  }
+
+  public onDeleteExam(examId: string | undefined) {
+    if (!examId) return;
+    this.loader.loadingOn();
+
+    this.api.deleteExam(examId).subscribe({
+      next: () => {
+        this.loader.loadingOff();
+        this.router.navigate(["exams-pool"]);
+      },
+      error: (err) => {
+        console.error('Delete exam error:', err);
         this.loader.loadingOff();
       }
     });

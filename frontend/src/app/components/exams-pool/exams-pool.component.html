@@ -24,12 +24,14 @@
                     <div class="dropdown_header">Sort by</div>
 
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon="done"></mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false"
+                            fontIcon="done"></mat-icon>
                         <span>Alphabetical</span>
                     </div>
 
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon="done"></mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false"
+                            fontIcon="done"></mat-icon>
                         <span>Created</span>
                     </div>
 
@@ -47,7 +49,8 @@
                     </div>
 
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon="done"></mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false"
+                            fontIcon="done"></mat-icon>
                         <span>Z-A</span>
                     </div>
 
@@ -63,12 +66,14 @@
 
                 <div class="dropdown triangle" [ngClass]="{'hide_dropdown': !showDropdowns.filter}">
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon="done"></mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false"
+                            fontIcon="done"></mat-icon>
                         <span>Alphabetical</span>
                     </div>
 
                     <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon="done"></mat-icon>
+                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false"
+                            fontIcon="done"></mat-icon>
                         <span>Created</span>
                     </div>
 
@@ -84,8 +89,7 @@
             <div class="viewOptions_wrapper">
                 <div class="icon_wrapper" id="viewOption grid">
                     <div class="viewOptions_select">
-                        <mat-icon class="icon_wrapper" aria-hidden="false"
-                            fontIcon="apps"></mat-icon>
+                        <mat-icon class="icon_wrapper" aria-hidden="false" fontIcon="apps"></mat-icon>
                     </div>
                 </div>
                 <div class="icon_wrapper">
@@ -110,15 +114,21 @@
     <div class="examBrowser_view">
         @for (exam of exams; track exam._id){
         <div class="examBrowser_item" (click)="onEdit(exam._id)">
-            
+
             @if (isDownloadable(exam._id)) {
-                <div class="download-icon-wrapper" title="Download Generated Exam">
-                    <mat-icon fontIcon="download" (click)="onDownload($event, exam._id)"></mat-icon>
-                </div>
+            <div class="download-icon-wrapper" matTooltip="Download Generated Exam"
+                (click)="onDownload($event, exam._id)">
+                <mat-icon fontIcon="download"></mat-icon>
+            </div>
             }
-    
+
+            <div class="delete-icon-wrapper" matTooltip="Delete Exam" [matTooltipShowDelay]="500"
+                (click)="onDeleteExam(exam._id)">
+                <mat-icon fontIcon="delete"></mat-icon>
+            </div>
+
             <app-exam-card [name]="exam.courseName" />
-            
+
         </div>
         }
     </div>
