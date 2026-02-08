@@ -1,0 +1,45 @@
+.dialog-header {
+  margin: 0 !important;
+  padding: 24px 24px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.confirm-message {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.warning-text {
+  color: #f44336;
+  font-size: 0.9em;
+  margin-top: 0;
+  font-style: italic;
+}
+
+.dark-theme {
+  background-color: #303030 !important; // Force Dark BG
+  color: #e0e0e0 !important; // Force Light Text
+
+  // Force Header Colors
+  &.dialog-header {
+    background-color: #303030 !important;
+    color: #ffffff !important;
+  }
+
+  // Force Content Text Colors
+  p,
+  span,
+  strong {
+    color: #e0e0e0 !important;
+  }
+
+  strong {
+    color: #ffffff !important; // Highlight value in white
+  }
+
+  // Fix Buttons in Dark Mode
+  button[mat-button] {
+    color: #b0b0b0 !important; // Visible Cancel button
+  }
+}

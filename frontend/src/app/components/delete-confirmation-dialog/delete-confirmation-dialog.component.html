@@ -1,0 +1,16 @@
+<h2 mat-dialog-title class="dialog-header" [class.dark-theme]="isDarkTheme">
+  Delete Exam
+</h2>
+
+<mat-dialog-content [class.dark-theme]="isDarkTheme">
+  <p class="confirm-message">
+    Are you sure you want to delete <strong>{{ data.courseName }}</strong
+    >?
+  </p>
+  <p class="warning-text">This action cannot be undone.</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" [class.dark-theme]="isDarkTheme">
+  <button mat-button (click)="onDismiss()">Cancel</button>
+  <button mat-flat-button color="warn" (click)="onConfirm()">Delete</button>
+</mat-dialog-actions>

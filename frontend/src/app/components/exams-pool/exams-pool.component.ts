@@ -1,26 +1,23 @@
-import { Component, HostListener, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
-import { ExamCardComponent } from '../exam-card/exam-card.component';
-import { Exam } from '../../exam';
-import { ApiService, DownloadableJob } from '../../services/api.service';
-import { saveAs } from 'file-saver';
-import { LoadingService } from '../../services/loading.service';
-import { MatIconModule } from '@angular/material/icon';
-import { NgClass } from '@angular/common';
-import { MatTooltip } from '@angular/material/tooltip';
+import { Component, HostListener, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
+import { forkJoin } from "rxjs";
+import { ExamCardComponent } from "../exam-card/exam-card.component";
+import { Exam } from "../../exam";
+import { ApiService, DownloadableJob } from "../../services/api.service";
+import { saveAs } from "file-saver";
+import { LoadingService } from "../../services/loading.service";
+import { MatIconModule } from "@angular/material/icon";
+import { NgClass } from "@angular/common";
+import { MatTooltip } from "@angular/material/tooltip";
+import { MatDialog } from "@angular/material/dialog";
+import { DeleteConfirmationDialogComponent } from "../delete-confirmation-dialog/delete-confirmation-dialog.component";
 
 @Component({
-  selector: 'app-exams-pool',
+  selector: "app-exams-pool",
   standalone: true,
-  imports: [
-    ExamCardComponent,
-    MatIconModule, // MatButtonModule is removed
-    NgClass,
-    MatTooltip,
-  ],
-  templateUrl: './exams-pool.component.html',
-  styleUrl: './exams-pool.component.scss'
+  imports: [ExamCardComponent, MatIconModule, NgClass, MatTooltip],
+  templateUrl: "./exams-pool.component.html",
+  styleUrl: "./exams-pool.component.scss",
 })
 export class ExamsPoolComponent implements OnInit {
   public exams: Exam[] = [];
@@ -34,18 +31,23 @@ export class ExamsPoolComponent implements OnInit {
 
     if (elementId === "openSortingDropdown") {
       this.showDropdowns.sorting = !this.showDropdowns.sorting;
-    } else { this.showDropdowns.sorting = false; }
+    } else {
+      this.showDropdowns.sorting = false;
+    }
 
     if (elementId === "openFilterDropdown") {
       this.showDropdowns.filter = !this.showDropdowns.filter;
-    } else { this.showDropdowns.filter = false; }
+    } else {
+      this.showDropdowns.filter = false;
+    }
   }
 
   constructor(
     private api: ApiService,
     private loader: LoadingService,
-    private router: Router
-  ) { }
+    private router: Router,
+    private dialog: MatDialog,
+  ) {}
 
   ngOnInit() {
     this.fetchExams();
@@ -55,7 +57,7 @@ export class ExamsPoolComponent implements OnInit {
     this.loader.loadingOn();
     forkJoin({
       allExams: this.api.getExams(),
-      downloadableJobs: this.api.getDownloadableJobs()
+      downloadableJobs: this.api.getDownloadableJobs(),
     }).subscribe({
       next: ({ allExams, downloadableJobs }) => {
         this.exams = allExams;
@@ -65,18 +67,18 @@ export class ExamsPoolComponent implements OnInit {
       error: (err) => {
         console.error("Error fetching initial data for exams pool:", err);
         this.loader.loadingOff();
-      }
+      },
     });
   }
 
   isDownloadable(examId: string | undefined): boolean {
     if (!examId) return false;
-    return this.downloadableJobs.some(job => job.examId === examId);
+    return this.downloadableJobs.some((job) => job.examId === examId);
   }
 
   onEdit(examId: string | undefined) {
     if (!examId) return;
-    this.router.navigate(['/create-exam', examId]);
+    this.router.navigate(["/create-exam", examId]);
   }
 
   onDownload(event: MouseEvent, examId: string | undefined) {
@@ -86,7 +88,7 @@ export class ExamsPoolComponent implements OnInit {
       return;
     }
 
-    const job = this.downloadableJobs.find(j => j.examId === examId);
+    const job = this.downloadableJobs.find((j) => j.examId === examId);
     if (!job) {
       console.error("No downloadable job found for examId:", examId);
       return;
@@ -103,25 +105,45 @@ export class ExamsPoolComponent implements OnInit {
         this.loader.loadingOff();
       },
       error: (err) => {
-        console.error('Download error:', err);
+        console.error("Download error:", err);
         this.loader.loadingOff();
+      },
+    });
+  }
+
+  public onDeleteExam(event: MouseEvent, examId: string | undefined) {
+    event.stopPropagation(); // Stop click from triggering onEdit
+    if (!examId) return;
+
+    // Find the exam object to get the name for the dialog
+    const examToDelete = this.exams.find((e) => e._id === examId);
+    const examName = examToDelete ? examToDelete.courseName : "this exam";
+
+    const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
+      width: "400px",
+      data: { courseName: examName },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === true) {
+        this.performDeletion(examId);
       }
     });
   }
 
-  public onDeleteExam(examId: string | undefined) {
-    if (!examId) return;
+  private performDeletion(examId: string) {
     this.loader.loadingOn();
-
     this.api.deleteExam(examId).subscribe({
       next: () => {
         this.loader.loadingOff();
-        this.router.navigate(["exams-pool"]);
+        // Remove from local array so we don't need to refetch
+        this.exams = this.exams.filter((e) => e._id !== examId);
+        // this.router.navigate(["exams-pool"]); // No need to navigate if we are already here
       },
       error: (err) => {
-        console.error('Delete exam error:', err);
+        console.error("Delete exam error:", err);
         this.loader.loadingOff();
-      }
+      },
     });
   }
 }
