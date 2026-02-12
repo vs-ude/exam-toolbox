@@ -50,6 +50,11 @@ services:
       - mailcrab
     networks:
       - web
+    develop:
+      watch:
+        - path: backend/
+          target: /app/
+          action: sync+restart
 
   mailcrab:
     image: marlonb/mailcrab:latest
