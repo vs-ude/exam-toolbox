@@ -38,6 +38,7 @@ services:
     #   - "3000:3000"
     volumes:
       - ./backend/uploads:/app/uploads
+      - backend_jobs:/app/jobs
     environment:
       - MONGODB_URI=mongodb://mongo:27017/examToolboxDB
       - SMTP_HOST=mailcrab
@@ -109,12 +110,19 @@ services:
     depends_on:
       - ldap-host
 
+  job-cleanup:
+    build:
+      context: ./periodical
+    volumes:
+      - backend_jobs:/app/jobs
+
 volumes:
   mongodb_data:
   caddy_data:
   caddy_config:
   ldap_data:
   ldap_config:
+  backend_jobs:
 
 networks:
   web:
