@@ -254,9 +254,9 @@ app.use(async (ctx, next) => {
   const userRolesHeader = ctx.request.headers.get("X-Token-User-Roles");
   const userRoles = userRolesHeader
     ? userRolesHeader
-        .split(" ")
-        .map((role) => role.trim())
-        .filter((role) => role !== "")
+      .split(" ")
+      .map((role) => role.trim())
+      .filter((role) => role !== "")
     : [];
 
   // If the user does NOT have the required group, block them immediately.
@@ -341,7 +341,8 @@ async function finalizeJob(jobId: string) {
       const seatNumber = index + 1;
       const randoms = job.randomNumbers[index];
       const randomCode = `${randoms.de}/${randoms.en}`;
-      csvContent += `${seatNumber},${randomCode},${student.studentId},"${student.firstName} ${student.lastName}",\n`;
+      csvContent +=
+        `${seatNumber},${randomCode},${student.studentId},"${student.firstName} ${student.lastName}",\n`;
     });
     await Deno.writeTextFile(
       `${finalOutputDir}/anwesenheitsliste.csv`,

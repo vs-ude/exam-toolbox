@@ -173,7 +173,7 @@ export function configureRouter({
         );
         ctx.response.body = fileContent;
         console.log("sending file: ", fileUrl);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error reading file:", error);
         ctx.response.status = 500;
         ctx.response.body = {
@@ -195,8 +195,9 @@ export function configureRouter({
         jobId: job.jobId,
         status: job.status,
         progress: job.progress,
-        downloadUrl:
-          job.status === "completed" ? `/api/jobs/${jobId}/download` : null,
+        downloadUrl: job.status === "completed"
+          ? `/api/jobs/${jobId}/download`
+          : null,
       };
     })
     .get("/api/jobs/:jobId/download", async (ctx) => {
@@ -515,7 +516,8 @@ export function configureRouter({
               );
               ctx.response.status = 409;
               ctx.response.body = {
-                message: `A generation job for this exam is already in progress. Please wait for it to complete.`,
+                message:
+                  `A generation job for this exam is already in progress. Please wait for it to complete.`,
               };
               return;
             }
@@ -736,7 +738,6 @@ export function configureRouter({
         };
       }
     })
-
     .delete("/api/exams", async (ctx) => {
       try {
         const result = await exams.deleteMany({});
@@ -808,7 +809,8 @@ export function configureRouter({
       } else {
         ctx.response.status = 400;
         ctx.response.body = {
-          message: `Job ${jobId} cannot be cancelled as it is already ${job.status}.`,
+          message:
+            `Job ${jobId} cannot be cancelled as it is already ${job.status}.`,
         };
       }
     })
