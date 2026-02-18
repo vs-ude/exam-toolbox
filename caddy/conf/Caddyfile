@@ -1,9 +1,8 @@
 {
   # detailed logs for caddy (can be disabled for production)
-  debug
   log {
     output stdout
-    level DEBUG
+    level warn
     format json
   }
 
