@@ -1,32 +1,16 @@
-// @ts-ignore
-import { Application, Router } from "https://deno.land/x/oak@v10.5.0/mod.ts";
-// @ts-ignore
+import { Router } from "@oak/oak";
+import { Database, ObjectId } from "@db/mongo";
+import { read, utils } from "@mirror/xlsx";
+import { crypto } from "@std/crypto";
+import { encodeHex } from "@std/encoding";
+import * as fs from "@std/fs";
+
+import { Exam, Task } from "./exam.ts";
 import {
-  MongoClient,
-  Collection,
-  Database,
-} from "https://deno.land/x/mongo/mod.ts";
-import { Exam, Task, Translation } from "./exam.ts";
-import { FileTracker } from "./fileTracker.ts";
-import { ObjectId } from "https://deno.land/x/mongo@v0.33.0/deps.ts";
-import { ZipWriter } from "https://deno.land/x/zipjs/index.js";
-import { walk } from "https://deno.land/std/fs/walk.ts";
-// @ts-ignore
-import {
-  read,
-  utils,
-} from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
-import { PDFDocument } from "https://cdn.skypack.dev/pdf-lib@1.17.1?dts";
-import { crypto } from "jsr:@std/crypto";
-import { encodeHex } from "jsr:@std/encoding/hex";
-import * as fs from "https://deno.land/std/fs/mod.ts";
-import { Resend } from "npm:resend@2.0.0";
-import { copy } from "https://deno.land/std@0.224.0/fs/copy.ts";
-import {
-  updateMetaStudent,
   generateExam,
-  updateMetaTemplate,
   generateTasksLatex,
+  updateMetaStudent,
+  updateMetaTemplate,
 } from "./generation.ts";
 import { Tag } from "./tag.ts";
 
@@ -323,7 +307,7 @@ export function configureRouter({
     .put("/api/taskPool/addChild/:taskId", async (ctx) => {
       try {
         const id = ctx.params.taskId;
-        const { childTaskId } = await ctx.request.body().value;
+        const { childTaskId } = await ctx.request.body.json();
 
         const result = await pool.updateOne(
           { taskId: id },
@@ -397,7 +381,7 @@ export function configureRouter({
       }
     })
     .post("/api/exams", async (ctx) => {
-      const exam: Exam = await ctx.request.body().value;
+      const exam: Exam = await ctx.request.body.json();
       exam.lastEditedBy = ctx.state.user.id;
       exam.updatedAt = new Date();
       try {
@@ -415,9 +399,9 @@ export function configureRouter({
     // functions as a preview and also sends information about the finished pdf to frontend (like which subtask is at which page)
     .post("/api/generate-exam", async (ctx) => {
       try {
-        const exam: Exam = await ctx.request.body().value;
+        const exam: Exam = await ctx.request.body.json();
         const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
-        await copy(basePath, tempDir, { overwrite: true });
+        await fs.copy(basePath, tempDir, { overwrite: true });
         const tasksPath = `${tempDir}/aufgaben.tex`;
         await updateMetaTemplate(exam, tempDir);
         await updateMetaStudent(
@@ -454,37 +438,30 @@ export function configureRouter({
       }
     })
     .post("/api/upload", async (ctx) => {
-      const body = ctx.request.body({ type: "form-data" });
-      const formData = await body.value.read({ maxSize: 10 * 1024 * 1024 });
+      const formData = await ctx.request.body.formData();
+      console.log(formData);
+      const file: File = formData.get("image") as File;
 
-      if (!formData.files || formData.files.length === 0) {
+      if (!file || file.size === 0) {
         ctx.response.status = 400;
-        ctx.response.body = { message: "No file uploaded" };
+        ctx.response.body = { message: "No or empty file uploaded" };
         return;
       }
-      const file = formData.files[0];
-      if (!file.content) {
-        ctx.response.status = 400;
-        ctx.response.body = { message: "No file content" };
-        return;
-      }
+      const data = await file.bytes();
       const fileHashBuffer = await crypto.subtle.digest(
         "SHA-256",
-        file.content,
+        data,
       );
       const fileHash = encodeHex(fileHashBuffer);
-      const ext = file.originalName?.split(".").pop();
+      const ext = file.name?.split(".").pop();
       const hashedFileName = ext ? `${fileHash}.${ext}` : fileHash;
-      file.originalName = hashedFileName;
       const uploadDir = "./uploads";
-      const filePath = `${uploadDir}/${file.originalName}`;
-      if (file.content) {
-        await Deno.mkdir(uploadDir, { recursive: true });
-        await Deno.writeFile(filePath, file.content);
-        console.log("File saved to:", filePath);
-      }
+      const filePath = `${uploadDir}/${hashedFileName}`;
+      await Deno.mkdir(uploadDir, { recursive: true });
+      await Deno.writeFile(filePath, data);
+      console.log("File saved to:", filePath);
       const fileTrackerEntry: any = {
-        name: file.originalName,
+        name: file.name,
         refs: [],
         timeToLive: 7,
       };
@@ -502,21 +479,20 @@ export function configureRouter({
       }
       ctx.response.body = {
         message: "File uploaded successfully",
-        url: `./uploads/${file.originalName}`,
+        url: `./uploads/${hashedFileName}`,
       };
       ctx.response.status = 200;
     })
     .post("/api/generate-exams", async (ctx) => {
       try {
-        const body = ctx.request.body({ type: "form-data" });
-        const formData = await body.value.read({ maxSize: 10 * 1024 * 1024 });
-        const examJson: Exam = JSON.parse(formData.fields.exam);
+        const formData = await ctx.request.body.formData();
+        const examJson: Exam = JSON.parse(formData.get("exam")!.toString());
         const startSeatNumber = parseInt(
-          formData.fields.startSeatNumber || "1",
+          formData.get("startSeatNumber")?.toString() || "1",
           10,
         );
-        const file = formData.files?.find((f) => f.name === "list");
-        if (!file || !examJson || !file.content || !examJson._id) {
+        const file = formData.get("list") as File; // TODO: What kind of object do we get here?
+        if (!file || !examJson || file.size == 0 || !examJson._id) {
           ctx.response.status = 400;
           ctx.response.body = {
             message: "Missing file, file content, exam data or exam id",
@@ -567,7 +543,7 @@ export function configureRouter({
         const studentPdfDir = `${tempOutputDir}/student_pdfs`;
         await Deno.mkdir(studentPdfDir, { recursive: true });
 
-        await copy(basePath, jobTemplatePath, { overwrite: true });
+        await fs.copy(basePath, jobTemplatePath, { overwrite: true });
         await updateMetaTemplate(examJson, jobTemplatePath);
         const tasksContentLatex = await generateTasksLatex(
           examJson,
@@ -579,7 +555,7 @@ export function configureRouter({
         );
 
         // Parse Excel File
-        const workbook = read(file.content, { type: "buffer" });
+        const workbook = read(await file.arrayBuffer());
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         const studentData = utils
           .sheet_to_json(worksheet, {
@@ -670,7 +646,7 @@ export function configureRouter({
       }
     })
     .post("/api/taskPool", async (ctx) => {
-      const task: Task = await ctx.request.body().value;
+      const task: Task = await ctx.request.body.json();
       try {
         await pool.insertOne(task);
         ctx.response.status = 200;
@@ -702,7 +678,7 @@ export function configureRouter({
     })
     .put("/api/exams/update", async (ctx) => {
       try {
-        const { examId, updatedExam } = await ctx.request.body().value;
+        const { examId, updatedExam } = await ctx.request.body.json();
         if (!examId || !updatedExam) {
           ctx.response.status = 400;
           ctx.response.body = {
@@ -736,7 +712,7 @@ export function configureRouter({
     .put("/api/taskPool/:taskId", async (ctx) => {
       try {
         const id = ctx.params.taskId;
-        const { _id, ...updateData } = await ctx.request.body().value;
+        const { _id, ...updateData } = await ctx.request.body.json();
 
         const result = await pool.updateOne(
           { taskId: id },
@@ -839,7 +815,7 @@ export function configureRouter({
     .delete("/api/taskPool/:taskId", async (ctx) => {
       try {
         const result = await pool.deleteOne({ taskId: ctx.params.taskId });
-        if (result.deletedCount === 0) {
+        if (result === 0) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Task not found" };
           return;
@@ -895,7 +871,7 @@ export function configureRouter({
     .put("/api/tags/:id", async (ctx) => {
       try {
         const tagName = ctx.params.id;
-        const { _id, ...tag } = await ctx.request.body().value;
+        const { _id, ...tag } = await ctx.request.body.json();
 
         const result = await tags.updateOne(
           { "tag.name": tagName },
@@ -915,7 +891,7 @@ export function configureRouter({
       }
     })
     .post("/api/tags", async (ctx) => {
-      const tag: Tag = await ctx.request.body().value;
+      const tag: Tag = await ctx.request.body.json();
       try {
         const result = await tags.insertOne({ tag });
         ((ctx.response.status = 200),
@@ -945,7 +921,7 @@ export function configureRouter({
       const tagName = ctx.params.id;
       try {
         const result = await tags.deleteOne({ name: tagName });
-        if (result.deletedCount === 0) {
+        if (result === 0) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Tag not found" };
           return;

@@ -1,5 +1,4 @@
 import { Exam } from "./exam.ts";
-import { copy } from "https://deno.land/std@0.224.0/fs/copy.ts";
 
 // executes pdflatex to compile a .tex file and returns the resulting pdf and log file
 export async function generateExam(

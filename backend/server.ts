@@ -1,28 +1,9 @@
-// @ts-ignore
-import { Application, Router } from "https://deno.land/x/oak@v10.5.0/mod.ts";
-// @ts-ignore
-import { MongoClient } from "https://deno.land/x/mongo/mod.ts";
-import { Exam, Task, Translation } from "./exam.ts";
-import { FileTracker } from "./fileTracker.ts";
-import { ObjectId } from "https://deno.land/x/mongo@v0.33.0/deps.ts";
-import { ZipWriter } from "https://deno.land/x/zipjs/index.js";
-import { walk } from "https://deno.land/std/fs/walk.ts";
-// @ts-ignore
-import {
-  read,
-  utils,
-} from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
-import { crypto } from "jsr:@std/crypto";
-import { encodeHex } from "jsr:@std/encoding/hex";
-import * as fs from "https://deno.land/std/fs/mod.ts";
-import nodemailer from "npm:nodemailer@6.9.9";
-import { copy } from "https://deno.land/std@0.224.0/fs/copy.ts";
-import {
-  updateMetaStudent,
-  generateExam,
-  generateTasksLatex,
-} from "./generation.ts";
-import { Tag } from "./tag.ts";
+import { Application } from "@oak/oak";
+import { MongoClient, ObjectId } from "@db/mongo";
+import { ZipWriter } from "@zip-js/zip-js";
+import { walk } from "@std/fs";
+import nodemailer from "nodemailer";
+
 import { configureRouter } from "./router.ts";
 
 // output from a successful student PDF generation
