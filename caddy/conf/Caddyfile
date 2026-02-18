@@ -84,18 +84,24 @@
     file_server
   }
 
+  route /public/* {
+    root * /srv/app
+    file_server
+  }
+
+  @frontend {
+    not path /api/* /auth* /public/* /vsLogo.svg
+  }
+
   # frontend
-  route /* {
+  handle @frontend {
     # defined earlier
     authorize with default_policy
+    root * /srv/app
 
     # try_files ensures that an already authenticated user can use other routes on the website. In Angular every route is managed by index.html this is why it has to use index.html when the user uses routes (or even refreshes).
-    try_files {path} {path}/ /index.html
-
-    # file_server serves static files
-    file_server {
-      root /srv/app
-    }
+    try_files {path} /index.html
+    file_server
   }
 
   # reverse-proxy api requests to backend (backend defined in docker-compose.yml)
