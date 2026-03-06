@@ -93,7 +93,7 @@
   }
 
   # frontend
-  handle @frontend {
+  route @frontend {
     # defined earlier
     authorize with default_policy
     root * /srv/app
