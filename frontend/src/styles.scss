@@ -10,6 +10,14 @@
 @include mat.core();
 @import "variables";
 
+@font-face {
+  font-family: 'Roboto';
+  src: url('/fonts/roboto/Roboto-VariableFont_wdth,wght.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 // Define the theme object.
 $frontend-theme: mat.define-theme((
   color: (
