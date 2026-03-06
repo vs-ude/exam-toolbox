@@ -72,9 +72,9 @@
     </div>
 
     @for(tag of task.tags; track tag){
-      <div class="tag" [ngStyle]="{'background-color': tag.getColor(), 'color': tag.getTextColor()}">
-        {{ tag.getName() }}
-      </div>
+    <div class="tag" [ngStyle]="{'background-color': tag.getColor(), 'color': tag.getTextColor()}">
+      {{ tag.getName() }}
+    </div>
     }
 
     <div class="icon_wrapper footer_icon">
@@ -88,6 +88,11 @@
       New Task
     </div>
     }
+
+    <div class="icon_wrapper footer_icon">
+      <mat-icon aria-hidden="false" fontIcon="preview" matTooltip="Goto Preview" (click)="onPreview()"></mat-icon>
+    </div>
+
   </div>
 
   <div class="points">

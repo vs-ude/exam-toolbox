@@ -35,7 +35,11 @@ import { PreviewDialogComponent } from './preview-dialog/preview-dialog.componen
 })
 export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
 
-  @Output() taskChangeEvent = new EventEmitter<Task>();
+  @Output() 
+  taskChangeEvent = new EventEmitter<Task>();
+
+  @Output()
+  previewEvent = new EventEmitter();
 
 
   public task: LatexTask = {
@@ -79,14 +83,16 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
       this.task.questionLatex.DE = result;
       this.taskChangeEvent.emit(this.task);
     })
-
-
   }
 
   public isValidMathString(mathString: string): boolean {
     return mathString.length !== 0 &&
       mathString.startsWith('\\(') &&
       mathString.endsWith('\\)');
+  }
+
+  public onPreview() {
+    this.previewEvent.emit();
   }
 
 }

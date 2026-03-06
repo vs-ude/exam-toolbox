@@ -40,9 +40,16 @@ import { Tag } from "../../tag";
 import { AddTagDialogComponent } from "../add-tag-dialog/add-tag-dialog.component";
 import { TagHelperService } from "../../services/tag-helper.service";
 import { DraggablePoolComponent } from "./draggable-pool/draggable-pool.component";
-import { Subject, debounceTime } from "rxjs";
+import { Subject, debounceTime, Observable, take } from "rxjs";
 import { AutosaveService } from "../../services/autosave.service";
 import { ConflictDialogComponent } from "../conflict-dialog/conflict-dialog.component";
+
+interface PDFTaskInfo {
+  aufgabe: number;
+  subtask: string;
+  page: number;
+  logFileBoundaryError: boolean;
+}
 
 @Component({
   selector: "app-create-exam",
@@ -103,8 +110,10 @@ export class CreateExamComponent {
 
   public isPreviewTabActive = false;
   public previewTabNotification = false;
+  private PDFTasksInfo: PDFTaskInfo[] = [];
 
   private autosaveTrigger$ = new Subject<void>();
+  private previewReady$ = new Subject<void>();
 
   constructor(
     private api: ApiService,
@@ -293,7 +302,8 @@ export class CreateExamComponent {
   onPreview() {
     this.checkIfValid();
     this.loadingService.loadingOn();
-    this.api.generateExam(this.exam).subscribe({
+    const exam = this.api.generateExam(this.exam);
+    exam.subscribe({
       next: (response: HttpResponse<Blob>) => {
         const pdfBlob = response.body;
         if (pdfBlob) {
@@ -315,12 +325,8 @@ export class CreateExamComponent {
         }
 
         const subtaskHeader = response.headers.get("X-Subtask-Info");
-        const subtaskInfo: {
-          aufgabe: number;
-          subtask: string;
-          page: number;
-          logFileBoundaryError: boolean;
-        }[] = subtaskHeader ? JSON.parse(subtaskHeader) : [];
+        const subtaskInfo: PDFTaskInfo[] = subtaskHeader ? JSON.parse(subtaskHeader) : [];
+        this.PDFTasksInfo = subtaskInfo;
         console.log("Subtask Info from header:", subtaskInfo);
 
         const hasErrors = subtaskInfo.some((info) => info.logFileBoundaryError);
@@ -334,6 +340,7 @@ export class CreateExamComponent {
         }
 
         this.loadingService.loadingOff();
+        this.previewReady$.next();
       },
       error: (err) => {
         console.error("Error generating exam preview: ", err);
@@ -343,12 +350,7 @@ export class CreateExamComponent {
     });
   }
 
-  private insertNewPage(subtaskInfo: {
-    aufgabe: number;
-    subtask: string;
-    page: number;
-    logFileBoundaryError: boolean;
-  }) {
+  private insertNewPage(subtaskInfo: PDFTaskInfo) {
     const assignmentIndex = subtaskInfo.aufgabe - 1;
     let taskIndex = -1;
     for (let i = 0; i < this.exam.tasks[assignmentIndex].tasks.length; i++) {
@@ -829,5 +831,38 @@ export class CreateExamComponent {
         new Tag(result.name).setColors(result.color, result.textColor),
       );
     });
+  }
+
+  public onTaskPreview(index: number) {
+    this.onPreview();
+    this.previewReady$.pipe(take(1)).subscribe({
+      next: () => {
+        const pageNumber = this.getPDFPageNumber(index, this.currentGroupView);
+
+        // Update the PDF URL to jump to the specific page
+        const baseUrl = this.sanitizer.sanitize(4, this.previewPdfUrl) as string;
+        const pageUrl = baseUrl + '#page=' + pageNumber;
+        this.previewPdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(pageUrl);
+        
+        this.changeTab(this.exam.tasks.length); // switch to preview tab
+      },
+      error: () => {
+        console.error("Failed to generate preview");
+      },
+    });
+  }
+
+  private getPDFPageNumber(index: number, groupIndex = this.currentGroupView): number {
+    const subtask = this.calcTaskChar(index, groupIndex);
+    const previewTaskPDFInfo = this.PDFTasksInfo.find(
+      (taskInfo) =>
+        taskInfo.aufgabe === groupIndex && taskInfo.subtask === subtask
+    );
+
+    if (!previewTaskPDFInfo) {
+      throw new Error("Could not find PDF info for task " + groupIndex + "." + subtask);
+    }
+
+    return previewTaskPDFInfo.page;
   }
 }
