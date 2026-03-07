@@ -1,6 +1,7 @@
-describe('My First Test', () => {
-  it('Visits the initial project page', () => {
-    cy.visit('/')
-    cy.contains('app is running')
-  })
-})
+describe("Navigate to init page", () => {
+  it("Visits the initial project page and should redirect to login", () => {
+    cy.visit("/");
+    cy.url().should("include", "/auth");
+    cy.contains("Sign In").should("be.visible");
+  });
+});
