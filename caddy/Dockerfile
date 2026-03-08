@@ -15,7 +15,7 @@ RUN npm run build --configuration=production --output-path=./dist/frontend/brows
 
 
 # go is is required
-FROM caddy:2.10.0-builder-alpine AS caddy_builder
+FROM caddy:builder-alpine AS caddy_builder
 
 # build caddy with caddy-security (custom caddy)
 RUN xcaddy build --with github.com/greenpau/caddy-security@latest --output /opt/caddy
@@ -23,7 +23,7 @@ RUN xcaddy build --with github.com/greenpau/caddy-security@latest --output /opt/
 
 
 # final caddy image with frontend (copied static files) and custom caddy
-FROM caddy:2.10.0-alpine
+FROM caddy:alpine
 
 # copy and override caddy:2.8.4-alpine with custom caddy build from step before
 COPY --from=caddy_builder /opt/caddy /usr/bin/caddy

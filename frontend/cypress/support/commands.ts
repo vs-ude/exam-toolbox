@@ -10,6 +10,8 @@ Cypress.Commands.add("login", (role = "admin") => {
 
     cy.get('input[type="password"]').type(user.password);
     cy.contains("Authenticate").click();
+
+    cy.visit("/#/dashboard");
   });
 });
 
