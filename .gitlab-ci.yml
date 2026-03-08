@@ -17,11 +17,12 @@ cypress_e2e:
   before_script:
     - apk add --no-cache docker-compose nodejs npm
   script:
+    - sed -i '/develop:/,$d' docker-compose.yml
     - docker-compose up -d --build
     - cd frontend
     - npm install
     - npx wait-on https://localhost -t 300000
-    - npx cypress run --config baseUrl=https://localhost
+    - npx cypress run --config baseUrl=https://localhost,video=false
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: always
@@ -30,21 +31,17 @@ cypress_e2e:
     - when: manual
       allow_failure: true
 
-# Push images into Uni-Registry (Only in Main)
 push_images:
   stage: build_and_push
   needs: ["cypress_e2e"] # Only when tests are sucessfull
   rules:
-    - if: $CI_COMMIT_BRANCH == "main" # Only in Main-Branch
+    - if: $CI_COMMIT_BRANCH == "main"
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    # Backend Image build & push
     - docker build -t $CI_REGISTRY_IMAGE/backend:latest ./backend
     - docker push $CI_REGISTRY_IMAGE/backend:latest
-    # Caddy/Frontend build & push
     - docker build -t $CI_REGISTRY_IMAGE/caddy:latest -f ./caddy/Dockerfile .
     - docker push $CI_REGISTRY_IMAGE/caddy:latest
-    # Periodical/CRON build & push
     - docker build -t $CI_REGISTRY_IMAGE/periodic-tasks:latest ./periodical
     - docker push $CI_REGISTRY_IMAGE/periodic-tasks:latest
