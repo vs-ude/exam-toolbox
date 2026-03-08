@@ -10,7 +10,7 @@ variables:
 # Cypress Tests
 cypress_e2e:
   stage: test
-  image: cypress/base:20
+  image: cypress/base:20.9.0
   before_script:
     # default from documentation: https://docs.docker.com/engine/install/debian/
     - apt-get update
