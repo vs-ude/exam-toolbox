@@ -17,15 +17,19 @@ cypress_e2e:
     - docker compose up -d --build
     - cd frontend
     - npm install
+    - echo "--- CONTAINER STATUS ---"
+    - docker compose ps
+    - echo "--- CADDY LOGS ---"
+    - docker compose logs caddy
     - export NODE_TLS_REJECT_UNAUTHORIZED=0
-    - npx wait-on tcp:127.0.0.1:443 -t 300000
+    - npx wait-on tcp:127.0.0.1:443 -t 60000
     - npx cypress run --config baseUrl=https://localhost,video=false
   after_script:
     - docker compose down
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: always
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =="main"
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
       when: always
     - when: manual
       allow_failure: true
