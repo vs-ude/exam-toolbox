@@ -5,7 +5,7 @@ stages:
 image: docker:24.0.5
 
 variables:
-  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_TLS_CERTDIR: ""
 
 # Cypress Tests
 cypress_e2e:
@@ -13,7 +13,7 @@ cypress_e2e:
   before_script:
     - apk add --no-cache docker-compose nodejs npm
   script:
-    - sed -i '/develop:/,+4d' docker-compose.yml
+    - sed -i '/develop:/,/mailcrab:/ { /mailcrab:/ !d }' docker-compose.yml
     - docker-compose up -d --build
     - cd frontend
     - npm install
