@@ -6,6 +6,7 @@
         (click)="isNameChange = true"
         *ngIf="!isNameChange"
         id="examName"
+        data-cy="exam-name-display"
       >
         {{ exam.courseName }}
       </span>
@@ -16,6 +17,7 @@
         (keydown)="onNameChange($event)"
         id="examName"
         #nameInput
+        data-cy="exam-name-input"
       />
     </div>
     <div class="add_tasks_container">
@@ -39,6 +41,7 @@
         draggable="true"
         (dragstart)="dragStart($event)"
         (dragend)="drop($event)"
+        data-cy="short-answer"
       ></app-AddTask>
       <app-AddTask
         class="task_wrapper"
@@ -106,6 +109,7 @@
           fontIcon="remove_red_eye"
           matTooltip="Preview"
           (click)="onPreview()"
+          data-cy="preview-btn"
         ></mat-icon>
       </div>
       <div class="icon_wrapper bar_icon">
@@ -115,6 +119,7 @@
           fontIcon="save"
           matTooltip="Save"
           (click)="onSave()"
+          data-cy="save"
         ></mat-icon>
         <mat-icon
           *ngIf="isUpdateMode"
@@ -148,6 +153,7 @@
           min="0"
           step="10"
           [(ngModel)]="exam.examLengthMinutes"
+          data-cy="duration-input"
         />
       </div>
 
@@ -157,6 +163,7 @@
           class="datePicker"
           [style.color-scheme]="lightTheme ? 'light' : 'dark'"
           [(ngModel)]="exam.date"
+          data-cy="date-input"
         />
       </div>
 
@@ -168,6 +175,7 @@
           class="examiner_input"
           placeholder="Enter Examiner's Name"
           [(ngModel)]="exam.examinerName"
+          data-cy="examiner-input"
         />
       </div>
 
@@ -180,6 +188,7 @@
           placeholder="Select Semester"
           [(ngModel)]="exam.semester"
           panelClass="semesterSelect"
+          data-cy="semester-select"
         >
           <mat-option *ngFor="let semester of semesters" [value]="semester">
             {{ semester }}
@@ -193,6 +202,7 @@
       id="drop-list"
       (dragover)="dragOverDropzone($event)"
       (dragleave)="inDropzone = false"
+      data-cy="dropzone"
     >
       <div class="tab_holder">
         <button

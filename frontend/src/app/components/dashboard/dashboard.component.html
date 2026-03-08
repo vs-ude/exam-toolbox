@@ -4,7 +4,7 @@
   </div>
 
   <div class="file_creation_thumbnails">
-    <div class="create_exam thumbnail" (click)="onAddExam()">
+    <div class="create_exam thumbnail" (click)="onAddExam()" data-cy="add-exam">
       <button class="create_exam_button">
         <div class="create_icon_container">
           <mat-icon aria-hidden="false" fontIcon="playlist_add"></mat-icon>
@@ -28,7 +28,7 @@
       </button>
     </div>
 
-    <div class="download thumbnail" (click)="onExamsPool()">
+    <div class="download thumbnail" (click)="onExamsPool()" data-cy="exams-pool">
       <button class="download_exam_button">
         <div class="download_icon_container">
           <mat-icon aria-hidden="false" fontIcon="">folder_open</mat-icon>
