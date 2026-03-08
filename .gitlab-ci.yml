@@ -1,0 +1,50 @@
+stages:
+  - test
+  - build_and_push
+
+image: docker:24.0.5
+
+# "Docker-in-Docker" is needed, so that we can run docker-compose in CI
+services:
+  - docker:24.0.5-dind
+
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+
+# Cypress Tests
+cypress_e2e:
+  stage: test
+  before_script:
+    - apk add --no-cache docker-compose nodejs npm
+  script:
+    - docker-compose up -d --build
+    - cd frontend
+    - npm install
+    - npx wait-on https://localhost -t 300000
+    - npx cypress run --config baseUrl=https://localhost
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =="main"
+      when: always
+    - when: manual
+      allow_failure: true
+
+# Push images into Uni-Registry (Only in Main)
+push_images:
+  stage: build_and_push
+  needs: ["cypress_e2e"] # Only when tests are sucessfull
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" # Only in Main-Branch
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    # Backend Image build & push
+    - docker build -t $CI_REGISTRY_IMAGE/backend:latest ./backend
+    - docker push $CI_REGISTRY_IMAGE/backend:latest
+    # Caddy/Frontend build & push
+    - docker build -t $CI_REGISTRY_IMAGE/caddy:latest -f ./caddy/Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE/caddy:latest
+    # Periodical/CRON build & push
+    - docker build -t $CI_REGISTRY_IMAGE/periodic-tasks:latest ./periodical
+    - docker push $CI_REGISTRY_IMAGE/periodic-tasks:latest
