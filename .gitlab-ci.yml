@@ -18,7 +18,7 @@ cypress_e2e:
     - cd frontend
     - npm install
     - export NODE_TLS_REJECT_UNAUTHORIZED=0
-    - npx wait-on https://localhost -t 300000
+    - npx wait-on tcp:127.0.0.1:443 -t 300000
     - npx cypress run --config baseUrl=https://localhost,video=false
   after_script:
     - docker compose down
