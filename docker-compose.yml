@@ -6,20 +6,19 @@ services:
     build:
       context: .
       dockerfile: ./caddy/Dockerfile
-    command: [
+    command:
+      [
         "caddy",
         "run",
         "--config",
         "/etc/caddy/Caddyfile",
         "--adapter",
         "caddyfile",
-        "--watch",
-      ] # Watch only for debugging
+      ]
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./caddy/conf/:/etc/caddy/
       - caddy_data:/data # https://caddyserver.com/docs/conventions#data-directory
       - caddy_config:/config # https://caddyserver.com/docs/conventions#configuration-directory
     networks:
@@ -50,11 +49,6 @@ services:
       - mailcrab
     networks:
       - web
-    develop:
-      watch:
-        - path: backend/
-          target: /app/
-          action: sync+restart
 
   mailcrab:
     image: marlonb/mailcrab:latest

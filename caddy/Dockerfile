@@ -30,3 +30,6 @@ COPY --from=caddy_builder /opt/caddy /usr/bin/caddy
 
 # copy static frontend files to custom caddy build
 COPY --from=angular_build /usr/src/app/dist/frontend/browser/ /srv/app
+
+# conf file also in the image
+COPY caddy/conf/ /etc/caddy/
