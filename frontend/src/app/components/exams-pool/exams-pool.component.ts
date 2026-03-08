@@ -12,6 +12,12 @@ import { MatTooltip } from "@angular/material/tooltip";
 import { MatDialog } from "@angular/material/dialog";
 import { DeleteConfirmationDialogComponent } from "../delete-confirmation-dialog/delete-confirmation-dialog.component";
 
+type FilterFn = (exams: Exam[]) => Exam[];
+type ExamFilter = {
+  active: boolean;
+  filter: FilterFn;
+}
+
 @Component({
   selector: "app-exams-pool",
   standalone: true,
@@ -21,7 +27,10 @@ import { DeleteConfirmationDialogComponent } from "../delete-confirmation-dialog
 })
 export class ExamsPoolComponent implements OnInit {
   public exams: Exam[] = [];
+  public filteredExams: Exam[] = [];
   private downloadableJobs: DownloadableJob[] = [];
+
+  private username: string = "";
 
   public showDropdowns = { sorting: false, filter: false };
 
@@ -47,10 +56,11 @@ export class ExamsPoolComponent implements OnInit {
     private loader: LoadingService,
     private router: Router,
     private dialog: MatDialog,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.fetchExams();
+    this.fetchCurrentUser();
   }
 
   private fetchExams() {
@@ -61,6 +71,7 @@ export class ExamsPoolComponent implements OnInit {
     }).subscribe({
       next: ({ allExams, downloadableJobs }) => {
         this.exams = allExams;
+        this.filteredExams = allExams;
         this.downloadableJobs = downloadableJobs;
         this.loader.loadingOff();
       },
@@ -69,6 +80,14 @@ export class ExamsPoolComponent implements OnInit {
         this.loader.loadingOff();
       },
     });
+  }
+
+  private fetchCurrentUser() {
+    this.api.getUser().subscribe(
+      user => {
+        this.username = user.id
+      }
+    )
   }
 
   isDownloadable(examId: string | undefined): boolean {
@@ -145,5 +164,99 @@ export class ExamsPoolComponent implements OnInit {
         this.loader.loadingOff();
       },
     });
+  }
+
+  public onRecentlyViewed() {
+    this.filters.filterRecentlyViewed.active = true;
+    this.filters.filterMyExams.active = false;
+    this.filters.filterRelevantExams.active = false;
+    this.applyFilters();
+  }
+
+  public onMyExams() {
+    this.filters.filterMyExams.active = true;
+    this.filters.filterRecentlyViewed.active = false;
+    this.filters.filterRelevantExams.active = false;
+    this.applyFilters();
+  }
+
+  public onRelevantExams() {
+    this.filters.filterRelevantExams.active = true;
+    this.filters.filterRecentlyViewed.active = false;
+    this.filters.filterMyExams.active = false;
+    this.applyFilters();
+  }
+
+  public onSortAlphabetically() {
+    this.filters.sortAlphabetically.active = true;
+    this.filters.sortSemester.active = false;
+    this.filters.sortLastViewed.active = false;
+    this.applyFilters();
+  }
+
+  public onSortSemester() {
+    this.filters.sortAlphabetically.active = false;
+    this.filters.sortSemester.active = true;
+    this.filters.sortLastViewed.active = false;
+    this.applyFilters();
+  }
+
+  public onSortLastViewed() {
+    this.filters.sortAlphabetically.active = false;
+    this.filters.sortSemester.active = false;
+    this.filters.sortLastViewed.active = true;
+    this.applyFilters();
+  }
+
+  public onSortAscending() {
+    this.filters.sortAscending.active = true;
+    this.applyFilters();
+  }
+
+  public onSortDescending() {
+    this.filters.sortAscending.active = false;
+    this.applyFilters();
+  }
+
+  private applyFilters() {
+    const activeFilters = Object.values(this.filters).filter(f => f.active).map(f => f.filter);
+    this.filteredExams = activeFilters.reduce((result, filter) => filter(result), [...this.exams]);
+  }
+
+  public filters = {
+    filterRecentlyViewed: {
+      active: true,
+      filter: (exams: Exam[]) => { console.log("recentlyViewed not implemented"); return exams; }
+    },
+    filterMyExams: {
+      active: false,
+      filter: (exams: Exam[]) => exams.filter(exam => exam.examinerName === this.username)
+    },
+    filterRelevantExams: {
+      active: false,
+      filter: (exams: Exam[]) => exams.filter(exam => exam.date >= new Date().toISOString())
+    },
+    sortAlphabetically: {
+      active: false,
+      filter: (exams: Exam[]) => [...exams].sort((a, b) => a.courseName.localeCompare(b.courseName))
+    },
+    sortSemester: {
+      active: false,
+      filter: (exams: Exam[]) => [...exams].sort((a, b) => a.semester.localeCompare(b.semester))
+    },
+    sortLastViewed: {
+      active: true,
+      filter: (exams: Exam[]) => { console.log("lastViewed not implemented"); return exams; }
+    },
+    sortAscending: {
+      active: false,
+      filter: (exams: Exam[]) => exams.reverse()
+    }
+  }
+
+  public currentSortString(): string {
+    if (this.filters.sortAlphabetically.active) return "Alphabetically";
+    if (this.filters.sortSemester.active) return "By Semester";
+    return "Last Viewed";
   }
 }
