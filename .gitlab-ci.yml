@@ -2,7 +2,7 @@ stages:
   - test
   - build_and_push
 
-image: docker:24.0.5
+image: docker:25.0.5
 
 variables:
   DOCKER_TLS_CERTDIR: ""
@@ -11,14 +11,17 @@ variables:
 cypress_e2e:
   stage: test
   before_script:
-    - apk add --no-cache docker-compose nodejs npm
+    - apk add --no-cache nodejs npm
   script:
     - sed -i '/develop:/,/mailcrab:/ { /mailcrab:/ !d }' docker-compose.yml
-    - docker-compose up -d --build
+    - docker compose up -d --build
     - cd frontend
     - npm install
+    - export NODE_TLS_REJECT_UNAUTHORIZED=0
     - npx wait-on https://localhost -t 300000
     - npx cypress run --config baseUrl=https://localhost,video=false
+  after_script:
+    - docker compose down
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: always
