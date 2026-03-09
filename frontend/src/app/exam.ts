@@ -8,6 +8,8 @@ export class Exam {
     date: string;
     examLengthMinutes: number;
     tasks: TaskGroup[];
+    public lastEditedBy?: string;
+    public updatedAt?: Date;
 
     constructor(
         courseName: string,
@@ -33,7 +35,6 @@ export interface TaskGroup {
     tasks: Task[];
 }
 
-
 export type Task =
     | MultipleChoiceTask
     | ShortAnswerTask
@@ -41,9 +42,7 @@ export type Task =
     | LatexTask
     | TableTask
     | ManualText
-    | NewPage
-    ;
-
+    | NewPage;
 
 export interface BaseTask {
     taskId: string;
@@ -99,7 +98,7 @@ export interface LatexTask extends BaseTask {
 }
 
 export interface TableTask extends BaseTask {
-    type: "table"
+    type: "table";
     tableHeadersQuestion: Translation[];
     tableDataQuestion: Translation[][];
     tableHeadersSolution: Translation[];
@@ -107,12 +106,12 @@ export interface TableTask extends BaseTask {
 }
 
 export interface ManualText extends BaseTask {
-    type: "manualText"
+    type: "manualText";
     points: 0; // Manual texts do not have points
 }
 
 export interface NewPage extends BaseTask {
-    type: "newPage"
+    type: "newPage";
     points: 0; // New pages do not have points
 }
 
