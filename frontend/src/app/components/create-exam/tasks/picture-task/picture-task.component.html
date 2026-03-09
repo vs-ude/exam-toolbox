@@ -243,37 +243,12 @@
 
 
 
-<!-- Footer -->
-<div class="form-footer">
-    <div class="footer-actions">
-
-        <div class="icon_wrapper footer_icon_delete">
-            <mat-icon aria-hidden="false" fontIcon="delete" matTooltip="delete" (click)="onDelete()"></mat-icon>
-        </div>
-
-        @for(tag of task.tags; track tag){
-        <div class="tag" [ngStyle]="{'background-color': tag.getColor(), 'color': tag.getTextColor()}">
-            {{ tag.getName() }}
-        </div>
-        }
-
-        <div class="icon_wrapper footer_icon">
-            <mat-icon aria-hidden="false" fontIcon="add" matTooltip="add Tag" (click)="onAddTag()"></mat-icon>
-        </div>
-
-
-        @if(isModifiedPoolTask){
-        <div class="newTaskCheckbox_container">
-            <input class="newTaskCheckbox" type="checkbox" name="newTaskCheckbox" [(ngModel)]="createNewTask"
-                (change)="onCreateNewTaskChange()" />
-            New Task
-        </div>
-        }
-    </div>
-
-    <div class="points">
-        <mat-label>Points</mat-label>
-        <input type="number" step="0.5" min="0.5" class="points_input" value="1" [(ngModel)]="this.task.points"
-            (change)="updateTask()" />
-    </div>
-</div>
+<app-task-footer 
+  [task]="task"
+  [isModifiedPoolTask]="isModifiedPoolTask"
+  (deleteEvent)="onDelete()"
+  (createNewTaskEvent)="onCreateNewTaskChange($event)"
+  (newTagEvent)="onAddTag()" 
+  (previewEvent)="onPreview()"
+  (taskChangeEvent)="updateTask()">
+</app-task-footer>

@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BaseTaskComponent } from '../base-task/base-task.component';
 import { TaskAnimations } from '../task-animations';
+import { TaskFooterComponent } from "../base-task/task-footer/task-footer.component";
 
 
 @Component({
@@ -23,7 +24,8 @@ import { TaskAnimations } from '../task-animations';
     NgStyle,
     NgIf,
     MatTooltipModule,
-  ],
+    TaskFooterComponent
+],
   animations: [
     TaskAnimations.inOutAnimation, 
     TaskAnimations.leftRightAnimation

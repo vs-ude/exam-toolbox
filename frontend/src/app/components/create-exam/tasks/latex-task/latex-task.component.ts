@@ -10,6 +10,7 @@ import { MathJaxParagraphComponent } from '../../../math-jax-paragraph/math-jax-
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { PreviewDialogComponent } from './preview-dialog/preview-dialog.component';
+import { TaskFooterComponent } from "../base-task/task-footer/task-footer.component";
 
 @Component({
   selector: 'app-latex-task',
@@ -22,7 +23,8 @@ import { PreviewDialogComponent } from './preview-dialog/preview-dialog.componen
     MatLabel,
     MathJaxParagraphComponent,
     MatTooltip,
-  ],
+    TaskFooterComponent
+],
   templateUrl: './latex-task.component.html',
   styleUrls: [
     './latex-task.component.scss',

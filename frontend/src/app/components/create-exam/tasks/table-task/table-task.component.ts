@@ -7,6 +7,7 @@ import { MatLabel } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { TaskAnimations } from '../task-animations';
 import { MatTooltip } from '@angular/material/tooltip';
+import { TaskFooterComponent } from "../base-task/task-footer/task-footer.component";
 
 @Component({
   selector: 'app-table-task',
@@ -19,7 +20,8 @@ import { MatTooltip } from '@angular/material/tooltip';
     FormsModule,
     NgFor,
     MatTooltip,
-  ],
+    TaskFooterComponent
+],
   templateUrl: './table-task.component.html',
   styleUrls: [
     './table-task.component.scss',

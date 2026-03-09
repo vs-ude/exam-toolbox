@@ -11,11 +11,12 @@ import { PictureTask, Task } from '../../../../exam';
 import { TaskAnimations } from '../task-animations';
 import { DragAndDropDirective } from '../drag-and-drop.directive';
 import { ApiService } from '../../../../services/api.service';
+import { TaskFooterComponent } from "../base-task/task-footer/task-footer.component";
 
 @Component({
   selector: 'app-picture-task',
   standalone: true,
-  imports: [NgStyle, NgIf, FormsModule, MatCardModule, MatButtonToggleModule, MatIconModule, MatInputModule, MatTooltipModule, DragAndDropDirective],
+  imports: [NgStyle, NgIf, FormsModule, MatCardModule, MatButtonToggleModule, MatIconModule, MatInputModule, MatTooltipModule, DragAndDropDirective, TaskFooterComponent],
   templateUrl: './picture-task.component.html',
   styleUrls: ['./picture-task.component.scss', '../task.scss'],
   animations: [

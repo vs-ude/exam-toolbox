@@ -106,7 +106,7 @@
     @if(isModifiedPoolTask){
     <div class="newTaskCheckbox_container">
       <input class="newTaskCheckbox" type="checkbox" name="newTaskCheckbox" [(ngModel)]="createNewTask"
-        (change)="onCreateNewTaskChange()" />
+        (change)="onCreateNewTaskChange(createNewTask)" />
       New Task
     </div>
     }

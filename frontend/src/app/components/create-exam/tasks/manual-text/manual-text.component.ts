@@ -8,6 +8,7 @@ import { MatLabel } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MathJaxParagraphComponent } from '../../../math-jax-paragraph/math-jax-paragraph.component';
+import { TaskFooterComponent } from "../base-task/task-footer/task-footer.component";
 
 @Component({
   selector: 'app-manual-text',
@@ -20,7 +21,8 @@ import { MathJaxParagraphComponent } from '../../../math-jax-paragraph/math-jax-
     MatLabel,
     MathJaxParagraphComponent,
     MatTooltip,
-  ],
+    TaskFooterComponent
+],
   templateUrl: './manual-text.component.html',
   styleUrls: [
     './manual-text.component.scss',

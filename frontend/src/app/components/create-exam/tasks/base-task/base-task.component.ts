@@ -102,8 +102,11 @@ export abstract class BaseTaskComponent {
     this.taskChangeEvent.emit(this.task);
   }
 
-  public onCreateNewTaskChange() {
+  public onCreateNewTaskChange(state: boolean) {
+    console.log("Create New Task state changed to:", state);
+    this.createNewTask = state;
     this.createNewTaskEvent.emit(this.createNewTask);
+    console.log("Emitted createNewTaskEvent with value:", this.createNewTask);
   }
 
   public onAddTag() {
