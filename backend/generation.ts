@@ -173,7 +173,7 @@ export async function generateTasksLatex(
     // iterate over the sub-tasks within this group
     for (let subTask of group.tasks) {
       // handle newPage differently since its not really a task
-      // case for a creaPage inbetween subtasks
+      // case for a createPage in between subtasks
       if (subTask.type === "newPage") {
         latexContent += `\\clearpage\n`;
         continue;

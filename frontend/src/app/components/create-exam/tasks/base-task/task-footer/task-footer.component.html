@@ -24,9 +24,11 @@
         </div>
         }
 
+        @if(!hasNoPreview){
         <div class="icon_wrapper footer_icon">
             <mat-icon aria-hidden="false" fontIcon="preview" matTooltip="Goto Preview" (click)="onPreview()"></mat-icon>
         </div>
+        }
 
     </div>
 
