@@ -17,6 +17,7 @@ export abstract class BaseTaskComponent {
   @Output() deleteEvent = new EventEmitter<string>();
   @Output() createNewTaskEvent = new EventEmitter<boolean>()
   @Output() newTagEvent = new EventEmitter<void>();
+  @Output() previewEvent = new EventEmitter();
   @ViewChild("questionFieldDE") questionFieldDE!: ElementRef;
   @ViewChild("questionFieldEN") questionFieldEN?: ElementRef;
 
@@ -107,6 +108,10 @@ export abstract class BaseTaskComponent {
 
   public onAddTag() {
     this.newTagEvent.emit();
+  }
+
+  public onPreview() {
+    this.previewEvent.emit();
   }
 
 }

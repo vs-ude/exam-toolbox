@@ -38,10 +38,6 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
   @Output() 
   taskChangeEvent = new EventEmitter<Task>();
 
-  @Output()
-  previewEvent = new EventEmitter();
-
-
   public task: LatexTask = {
     taskId: "",
     type: "latex",
@@ -89,10 +85,6 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
     return mathString.length !== 0 &&
       mathString.startsWith('\\(') &&
       mathString.endsWith('\\)');
-  }
-
-  public onPreview() {
-    this.previewEvent.emit();
   }
 
 }
