@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, HostListener, OnInit, ViewChild } from "@angular/core";
+import { Component, HostListener, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { forkJoin } from "rxjs";
 import { ExamCardComponent } from "../exam-card/exam-card.component";
@@ -11,9 +11,8 @@ import { NgClass, NgIf } from "@angular/common";
 import { MatTooltip } from "@angular/material/tooltip";
 import { MatDialog } from "@angular/material/dialog";
 import { DeleteConfirmationDialogComponent } from "../delete-confirmation-dialog/delete-confirmation-dialog.component";
-import { MatTableDataSource, MatTableModule } from "@angular/material/table";
-import { MatSort, MatSortModule } from "@angular/material/sort";
 import { trigger, transition, style, animate } from "@angular/animations";
+import { ExamsTableComponent } from "../exams-table/exams-table.component";
 
 type FilterFn = (exams: Exam[]) => Exam[];
 type ExamFilter = {
@@ -25,7 +24,7 @@ type ExamFilter = {
 @Component({
   selector: "app-exams-pool",
   standalone: true,
-  imports: [ExamCardComponent, MatIconModule, NgClass, MatTooltip, MatTableModule, MatSortModule, NgIf],
+  imports: [ExamCardComponent, MatIconModule, NgClass, MatTooltip, NgIf, ExamsTableComponent],
   templateUrl: "./exams-pool.component.html",
   styleUrl: "./exams-pool.component.scss",
   animations: [
@@ -56,19 +55,15 @@ type ExamFilter = {
 
   ]
 })
-export class ExamsPoolComponent implements OnInit, AfterViewInit {
+export class ExamsPoolComponent implements OnInit {
   public exams: Exam[] = [];
   public filteredExams: Exam[] = [];
-  private downloadableJobs: DownloadableJob[] = [];
+  public downloadableJobs: DownloadableJob[] = [];
 
   private username: string = "";
 
   public showDropdowns = { sorting: false, filter: false };
   public viewMode: "grid" | "list" = "grid";
-
-  displayedColumns: string[] = ["courseName", "semester", "date", "updatedAt", "lastEditedBy", "download"];
-  dataSource = new MatTableDataSource<Exam>(this.filteredExams);
-  @ViewChild(MatSort) sort?: MatSort;
 
   @HostListener("document:click", ["$event"])
   handleDropdownStates(event: MouseEvent) {
@@ -100,12 +95,6 @@ export class ExamsPoolComponent implements OnInit, AfterViewInit {
     this.fetchCurrentUser();
   }
 
-  ngAfterViewInit() {
-    if (this.sort) {
-      this.dataSource.sort = this.sort;
-    }
-  }
-
   private fetchExams() {
     this.loader.loadingOn();
     forkJoin({
@@ -115,7 +104,6 @@ export class ExamsPoolComponent implements OnInit, AfterViewInit {
       next: ({ allExams, downloadableJobs }) => {
         this.exams = allExams;
         this.filteredExams = allExams;
-        this.dataSource = new MatTableDataSource<Exam>(this.filteredExams);
         this.downloadableJobs = downloadableJobs;
         this.loader.loadingOff();
       },
@@ -308,30 +296,5 @@ export class ExamsPoolComponent implements OnInit, AfterViewInit {
   public toggleViewMode(mode: "grid" | "list") {
     this.viewMode = mode;
     localStorage.setItem("examsPoolViewMode", mode);
-    if (mode === "list") {
-      // Allow time for the view to render, then assign sort
-      setTimeout(() => {
-        if (this.sort) {
-          this.dataSource.sort = this.sort;
-        }
-      });
-    }
-  }
-
-  public normalizeDate(dateString: string): string {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return dateString; // Return original string if it's not a valid date
-    }
-    return date.toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-  }
-
-  public stringifyDate(date: any): string {
-    const d = date instanceof Date ? date : new Date(date);
-    return d.toLocaleDateString('de-DE');
   }
 }

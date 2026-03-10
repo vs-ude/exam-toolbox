@@ -1,0 +1,50 @@
+table,
+th,
+td {
+    color: var(--color-text);
+}
+
+td {
+    border-bottom: var(--border-color) solid 1px;
+    border-collapse: collapse;
+}
+
+th {
+    border-bottom: var(--color-icon) solid 1px;
+    border-collapse: collapse;
+}
+
+tr.mat-mdc-row:hover {
+    background-color: var(--color-bg-lifted);
+    transition: .1s ease-in;
+    cursor: pointer;
+}
+
+.download_cell:hover {
+    cursor: default;
+}
+
+.delete_cell:hover {
+    cursor: default;
+}
+
+
+.list_download_icon {
+    color: var(--color-icon);
+}
+
+.list_download_icon:hover {
+    cursor: pointer;
+    color: var(--color-text);
+    transition: .1s ease-in;
+}
+
+.list_delete_icon {
+    color: red;
+}
+
+.list_delete_icon:hover {
+    cursor: pointer;
+    color: darkred;
+    transition: .1s ease-in;
+}

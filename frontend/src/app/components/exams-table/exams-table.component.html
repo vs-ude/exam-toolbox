@@ -1,0 +1,55 @@
+<table mat-table [dataSource]="dataSource" matSort class="exam_table">
+    <!-- Course Name Column -->
+    <ng-container matColumnDef="courseName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Course Name</th>
+        <td mat-cell *matCellDef="let exam" (click)="onEdit(exam._id)">{{ exam.courseName }}</td>
+    </ng-container>
+
+    <!-- Semester Column -->
+    <ng-container matColumnDef="semester">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Semester</th>
+        <td mat-cell *matCellDef="let exam" (click)="onEdit(exam._id)">{{ exam.semester }}</td>
+    </ng-container>
+
+    <!-- Date Column -->
+    <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Exam Date</th>
+        <td mat-cell *matCellDef="let exam" (click)="onEdit(exam._id)">{{ normalizeDate(exam.date) }}</td>
+    </ng-container>
+
+    <!-- Updated At Column -->
+    <ng-container matColumnDef="updatedAt">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Updated At</th>
+        <td mat-cell *matCellDef="let exam" (click)="onEdit(exam._id)">{{ stringifyDate(exam.updatedAt) }}</td>
+    </ng-container>
+
+    <!-- Last Edited By Column -->
+    <ng-container matColumnDef="lastEditedBy">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Edited By</th>
+        <td mat-cell *matCellDef="let exam" (click)="onEdit(exam._id)">{{ exam.lastEditedBy }}</td>
+    </ng-container>
+
+    <!-- Download Icon Column -->
+    <ng-container matColumnDef="download">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let exam" class="download_cell">
+            @if (isDownloadable(exam._id)) {
+            <mat-icon matTooltip="Download Generated Exam" [matTooltipShowDelay]="500" class="list_download_icon"
+                fontIcon="download" (click)="onDownload($event, exam._id)"></mat-icon>
+            }
+        </td>
+    </ng-container>
+
+    <!-- Delete Icon Column -->
+    <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let exam" class="delete_cell"> 
+            <mat-icon matTooltip="Delete Exam" [matTooltipShowDelay]="500" class="list_delete_icon"
+                fontIcon="delete" (click)="onDeleteExam($event, exam._id)"></mat-icon>
+        </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+</table>
