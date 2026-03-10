@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from "@angular/core";
+import { AfterViewInit, Component, HostListener, OnInit, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { forkJoin } from "rxjs";
 import { ExamCardComponent } from "../exam-card/exam-card.component";
@@ -7,10 +7,13 @@ import { ApiService, DownloadableJob } from "../../services/api.service";
 import { saveAs } from "file-saver";
 import { LoadingService } from "../../services/loading.service";
 import { MatIconModule } from "@angular/material/icon";
-import { NgClass } from "@angular/common";
+import { NgClass, NgIf } from "@angular/common";
 import { MatTooltip } from "@angular/material/tooltip";
 import { MatDialog } from "@angular/material/dialog";
 import { DeleteConfirmationDialogComponent } from "../delete-confirmation-dialog/delete-confirmation-dialog.component";
+import { MatTableDataSource, MatTableModule } from "@angular/material/table";
+import { MatSort, MatSortModule } from "@angular/material/sort";
+import { trigger, transition, style, animate } from "@angular/animations";
 
 type FilterFn = (exams: Exam[]) => Exam[];
 type ExamFilter = {
@@ -18,21 +21,78 @@ type ExamFilter = {
   filter: FilterFn;
 }
 
+const testExam1: Exam = {
+  _id: "123",
+  courseName: "Test Course",
+  semester: "WS 2023/2024",
+  date: "2024-12-31T00:00:00.000Z",
+  examinerName: "max.brockmann",
+  lastEditedBy: "max.brockmann",
+  examLengthMinutes: 89,
+  tasks: [],
+  updatedAt: new Date(),
+}
+
+const testExam2: Exam = {
+  _id: "456",
+  courseName: "Test Course 2",
+  semester: "WS 2022/2023",
+  date: "2024-12-31T00:20:00.000Z",
+  examinerName: "max.brockmann",
+  lastEditedBy: "test",
+  examLengthMinutes: 89,
+  tasks: [],
+  updatedAt: new Date(),
+}
+
+
 @Component({
   selector: "app-exams-pool",
   standalone: true,
-  imports: [ExamCardComponent, MatIconModule, NgClass, MatTooltip],
+  imports: [ExamCardComponent, MatIconModule, NgClass, MatTooltip, MatTableModule, MatSortModule, NgIf],
   templateUrl: "./exams-pool.component.html",
   styleUrl: "./exams-pool.component.scss",
+  animations: [
+    trigger(
+      'leftRightAnimation',
+      [
+        transition(
+          ':enter',
+          [
+            style({ height: 0, opacity: 0, transform: 'translateX(100%)' }),
+            animate('0.25s ease-out',
+              style({ height: '*', opacity: 1, transform: 'translateX(0%)' })
+            )
+          ]
+        ),
+        transition(
+          ':leave',
+          [
+            style({ height: '*', opacity: 1, transform: 'translateX(0%)' }),
+            animate('0.25s ease-in',
+              style({ height: 0, opacity: 0, transform: 'translateX(-100%)' })
+            )
+          ]
+        )
+      ],
+
+    ),
+
+  ]
 })
-export class ExamsPoolComponent implements OnInit {
+export class ExamsPoolComponent implements OnInit, AfterViewInit {
   public exams: Exam[] = [];
-  public filteredExams: Exam[] = [];
+  public filteredExams: Exam[] = [testExam1, testExam2];
   private downloadableJobs: DownloadableJob[] = [];
 
   private username: string = "";
 
   public showDropdowns = { sorting: false, filter: false };
+  public viewMode: "grid" | "list" = "grid";
+
+  displayedColumns: string[] = ["courseName", "semester", "date", "updatedAt", "lastEditedBy", "download"];
+  dataSource = new MatTableDataSource<Exam>(this.filteredExams);
+  @ViewChild(MatSort) sort?: MatSort;
 
   @HostListener("document:click", ["$event"])
   handleDropdownStates(event: MouseEvent) {
@@ -61,6 +121,13 @@ export class ExamsPoolComponent implements OnInit {
   ngOnInit() {
     this.fetchExams();
     this.fetchCurrentUser();
+    this.viewMode = localStorage.getItem("examsPoolViewMode") === "list" ? "list" : "grid";
+  }
+
+  ngAfterViewInit() {
+    if (this.sort) {
+      this.dataSource.sort = this.sort;
+    }
   }
 
   private fetchExams() {
@@ -72,6 +139,7 @@ export class ExamsPoolComponent implements OnInit {
       next: ({ allExams, downloadableJobs }) => {
         this.exams = allExams;
         this.filteredExams = allExams;
+        this.dataSource = new MatTableDataSource<Exam>(this.filteredExams);
         this.downloadableJobs = downloadableJobs;
         this.loader.loadingOff();
       },
@@ -146,6 +214,7 @@ export class ExamsPoolComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result === true) {
         this.performDeletion(examId);
+        this.fetchExams();
       }
     });
   }
@@ -258,5 +327,35 @@ export class ExamsPoolComponent implements OnInit {
     if (this.filters.sortAlphabetically.active) return "Alphabetically";
     if (this.filters.sortSemester.active) return "By Semester";
     return "Last Viewed";
+  }
+
+  public toggleViewMode(mode: "grid" | "list") {
+    this.viewMode = mode;
+    localStorage.setItem("examsPoolViewMode", mode);
+    if (mode === "list") {
+      // Allow time for the view to render, then assign sort
+      setTimeout(() => {
+        if (this.sort) {
+          this.dataSource.sort = this.sort;
+        }
+      });
+    }
+  }
+
+  public normalizeDate(dateString: string): string {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return dateString; // Return original string if it's not a valid date
+    }
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  }
+
+  public stringifyDate(date: any): string {
+    const d = date instanceof Date ? date : new Date(date);
+    return d.toLocaleDateString('de-DE');
   }
 }

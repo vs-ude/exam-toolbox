@@ -63,46 +63,7 @@ export class TaskPoolComponent implements AfterViewInit {
   public viewMode: 'list' | 'grid' = 'grid';
   public filterState: "all" | "createdByMe" | "recentlyUsed" = "all"
 
-  public tasks: Task[] = [{
-    taskId: "multipleChoice-1748525128025",
-    type: "multipleChoice",
-    question: {
-      DE: "Was ist die Hauptstadt von Deutschland?",
-      EN: "What is the capital of Germany?"
-    },
-    points: 5,
-    answerOptions: [
-      { DE: "Berlin", EN: "Berlin", correct: true },
-      { DE: "München", EN: "Munich", correct: false },
-      { DE: "Hamburg", EN: "Hamburg", correct: false },
-      { DE: "Köln", EN: "Cologne", correct: false },
-    ],
-    createdBy: "placeholder",
-    createdAt: new Date(),
-    lastUsed: new Date(),
-    usedIn: ["placeholder_id"],
-    tags: [ new Tag("Easy").setColors("#81c784").addExam("multipleChoice-1748525128025")],
-    children: [],
-  },
-  {
-    taskId: "shortAnswer-1749196671991",
-    type: "shortAnswer",
-    question: {
-      DE: "Was ist die Hauptstadt von Deutschland?",
-      EN: "What is the capital of Germany?"
-    },
-    points: 5,
-    solution: {
-      DE: "Berlin",
-      EN: "Berlin"
-    },
-    createdBy: "placeholder",
-    createdAt: new Date(),
-    lastUsed: new Date(),
-    usedIn: ["placeholder_id"],
-    tags: [ new Tag("Hard").setColors("#e57373", "#fff").addTask("shortAnswer-1749196671991")],
-    children: [],
-  }];
+  public tasks: Task[] = [];
 
   displayedColumns: string[] = ['taskId', 'type', 'question', 'points', "tags", "createdBy", "lastUsed",];
   dataSource = new MatTableDataSource<Task>(this.tasks);

@@ -22,7 +22,7 @@
 /*------------------------------------------------------------------
   [ Exam Browser ]*/
 
-.examBrowser_view {
+.examBrowser_grid_view {
     padding: 0 32px 0 32px;
     display: grid;
     grid-template-columns: 22% 22% 22% 22%;
@@ -32,8 +32,50 @@
 
 .examBrowser_item {
     margin-bottom: 4%;
-    position: relative; /* THIS IS CRUCIAL: Makes this the positioning context */
+    position: relative;
+    /* THIS IS CRUCIAL: Makes this the positioning context */
     cursor: pointer;
+}
+
+.examBrowser_table_view {
+    padding: 0 32px 0 32px;
+}
+
+table,
+th,
+td {
+    color: var(--color-text);
+}
+
+td {
+    border-bottom: var(--border-color) solid 1px;
+    border-collapse: collapse;
+}
+
+th {
+    border-bottom: var(--color-icon) solid 1px;
+    border-collapse: collapse;
+}
+
+tr.mat-mdc-row:hover {
+    background-color: var(--color-bg-lifted);
+    transition: .1s ease-in;
+    cursor: pointer;
+}
+
+.download_cell:hover {
+    cursor: default;
+}
+
+
+.list_download_icon {
+    color: var(--color-icon);
+}
+
+.list_download_icon:hover {
+    cursor: pointer;
+    color: var(--color-text);
+    transition: .1s ease-in;
 }
 
 /* This targets the div that wraps the MatIcon */
@@ -41,26 +83,33 @@
     position: absolute;
     top: 8px;
     left: 8px;
-    z-index: 10; /* Ensures the icon is on top of the card content */
-    
+    z-index: 10;
+    /* Ensures the icon is on top of the card content */
+
     /* Styling for the background circle */
-    background-color: rgba(255, 255, 255, 0.1); /* Brighter circle */
-    border-radius: 50%; /* Makes it a circle */
-    width: 36px; /* Adjust size as needed */
-    height: 36px; /* Adjust size as needed */
+    background-color: rgba(255, 255, 255, 0.1);
+    /* Brighter circle */
+    border-radius: 50%;
+    /* Makes it a circle */
+    width: 36px;
+    /* Adjust size as needed */
+    height: 36px;
+    /* Adjust size as needed */
     display: flex;
     align-items: center;
     justify-content: center;
     transition: background-color 0.2s;
-    
+
     &:hover {
         background-color: rgba(255, 255, 255, 0.2);
     }
 
     /* Styling for the icon itself (if you want it black inside the circle) */
     mat-icon {
-        color: black; /* Makes the icon black */
-        font-size: 20px; /* Adjust icon size as needed */
+        color: black;
+        /* Makes the icon black */
+        font-size: 20px;
+        /* Adjust icon size as needed */
         width: 20px;
         height: 20px;
     }
@@ -70,23 +119,23 @@
     position: absolute;
     top: 8px;
     right: 8px;
-    z-index: 10; 
-    
-    border-radius: 50%; 
-    width: 36px; 
-    height: 36px; 
+    z-index: 10;
+
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: background-color 0.2s;
-    
+
     &:hover {
         background-color: var(--color-bg-lifted);
     }
 
     mat-icon {
-        color: red; 
-        font-size: 20px; 
+        color: red;
+        font-size: 20px;
         width: 20px;
         height: 20px;
     }
@@ -268,17 +317,17 @@
     justify-content: left;
     flex-direction: row;
     padding: 2%;
-    align-items:center ;
+    align-items: center;
 }
 
-.option_container:hover{
+.option_container:hover {
     background-color: #0768c4;
     margin-left: -10%;
     margin-right: -10%;
     transition: .1s ease-in;
 }
 
-.dropdown_icon_wrapper{
+.dropdown_icon_wrapper {
     display: flex;
     justify-content: left;
     align-items: center;

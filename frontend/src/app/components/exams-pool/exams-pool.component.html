@@ -89,13 +89,13 @@
 
       <!-- View Options -->
       <div class="viewOptions_wrapper">
-        <div class="icon_wrapper" id="viewOption grid">
-          <div class="viewOptions_select">
+        <div class="icon_wrapper" id="viewOption grid" (click)="toggleViewMode('grid')">
+          <div class="" [ngClass]="viewMode === 'grid' ? 'viewOptions_select' : ''">
             <mat-icon class="icon_wrapper" aria-hidden="false" fontIcon="apps"></mat-icon>
           </div>
         </div>
-        <div class="icon_wrapper">
-          <div class="" id="viewOption row">
+        <div class="icon_wrapper" id="viewOption row" (click)="toggleViewMode('list')">
+          <div class="" id="viewOption row" [ngClass]="viewMode === 'list' ? 'viewOptions_select' : ''">
             <mat-icon class="icon_wrapper" aria-hidden="false" fontIcon="view_headline"></mat-icon>
           </div>
         </div>
@@ -110,8 +110,8 @@
       Create and save exams in the 'Add Exam' View to access them here.
     </div>
   </div>
-  } @else {
-  <div class="examBrowser_view">
+  }
+  <div class="examBrowser_grid_view" *ngIf="viewMode === 'grid'" @leftRightAnimation>
     @for (exam of filteredExams; track exam._id) {
     <div class="examBrowser_item" (click)="onEdit(exam._id)">
       @if (isDownloadable(exam._id)) {
@@ -129,5 +129,55 @@
     </div>
     }
   </div>
-  }
+
+  <div class="examBrowser_table_view" *ngIf="viewMode === 'list'">
+    <table mat-table [dataSource]="dataSource" matSort class="exam_table">
+      <!-- Course Name Column -->
+      <ng-container matColumnDef="courseName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Course Name</th>
+        <td mat-cell *matCellDef="let exam" (click)="onEdit(exam._id)">{{ exam.courseName }}</td>
+      </ng-container>
+
+      <!-- Semester Column -->
+      <ng-container matColumnDef="semester">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Semester</th>
+        <td mat-cell *matCellDef="let exam" (click)="onEdit(exam._id)">{{ exam.semester }}</td>
+      </ng-container>
+
+      <!-- Date Column -->
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Exam Date</th>
+        <td mat-cell *matCellDef="let exam" (click)="onEdit(exam._id)">{{ normalizeDate(exam.date) }}</td>
+      </ng-container>
+
+      <!-- Updated At Column -->
+      <ng-container matColumnDef="updatedAt">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Updated At</th>
+        <td mat-cell *matCellDef="let exam" (click)="onEdit(exam._id)">{{ stringifyDate(exam.updatedAt) }}</td>
+      </ng-container>
+
+      <!-- Last Edited By Column -->
+      <ng-container matColumnDef="lastEditedBy">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Edited By</th>
+        <td mat-cell *matCellDef="let exam" (click)="onEdit(exam._id)">{{ exam.lastEditedBy }}</td>
+      </ng-container>
+
+      <!-- Download Icon Column -->
+      <ng-container matColumnDef="download">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let exam" class="download_cell">
+          @if (isDownloadable(exam._id)) {
+          <mat-icon matTooltip="Download Generated Exam" [matTooltipShowDelay]="500"  class="list_download_icon" fontIcon="download"
+            (click)="onDownload($event, exam._id)"></mat-icon>
+          }
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    </table>
+  </div>
+
+
 </div>
