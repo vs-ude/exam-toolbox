@@ -43,9 +43,9 @@
     <!-- Delete Icon Column -->
     <ng-container matColumnDef="delete">
         <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let exam" class="delete_cell"> 
-            <mat-icon matTooltip="Delete Exam" [matTooltipShowDelay]="500" class="list_delete_icon"
-                fontIcon="delete" (click)="onDeleteExam($event, exam._id)"></mat-icon>
+        <td mat-cell *matCellDef="let exam" class="delete_cell">
+            <mat-icon matTooltip="Delete Exam" [matTooltipShowDelay]="500" class="list_delete_icon" fontIcon="delete"
+                (click)="onDeleteExam($event, exam._id)"></mat-icon>
         </td>
     </ng-container>
 

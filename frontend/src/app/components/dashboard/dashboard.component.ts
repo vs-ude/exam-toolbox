@@ -6,11 +6,12 @@ import { NgClass, NgFor } from "@angular/common";
 import { Router } from "@angular/router";
 import { ApiService } from "../../services/api.service";
 import { Exam } from "../../exam";
+import { ExamsTableComponent } from "../exams-table/exams-table.component";
 
 @Component({
   selector: "app-dashboard",
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, ExamCardComponent, NgFor, NgClass],
+  imports: [MatButtonModule, MatIconModule, ExamCardComponent, NgFor, NgClass, ExamsTableComponent],
   templateUrl: "./dashboard.component.html",
   styleUrl: "./dashboard.component.scss",
 })
@@ -46,24 +47,29 @@ export class DashboardComponent {
   }
 
   public showDropdowns = { sorting: false, filter: false };
+  public viewOption: "grid" | "list" = "grid";
 
-  onAddExam() {
+  public toggleViewOption(mode: "grid" | "list") {
+    this.viewOption = mode;
+  }
+
+  public onAddExam() {
     this.router.navigate(["/create-exam"]);
   }
 
-  onTaskPool() {
+  public onTaskPool() {
     this.router.navigate(["/task-pool"]);
   }
 
-  onDebug() {
+  public onDebug() {
     this.router.navigate(["/debug"]);
   }
 
-  onExamsPool() {
+  public onExamsPool() {
     this.router.navigate(["/exams-pool"]);
   }
 
-  onExamClick(exam: Exam) {
+  public onExamClick(exam: Exam) {
     if (exam._id == undefined) {
       console.warn(`Exam ${exam.courseName} ${exam.semester} has no ExamID`);
       return;

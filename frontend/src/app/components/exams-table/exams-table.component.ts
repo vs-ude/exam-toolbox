@@ -16,13 +16,16 @@ import { MatIconModule } from '@angular/material/icon';
 export class ExamsTableComponent implements AfterViewInit, OnChanges {
   @Input() exams: Exam[] = [];
   @Input() downloadableJobs: DownloadableJob[] = [];
+  @Input() readOnly: boolean = false; //  don´t show download and delete buttons when true
   @Output() examSelectedEvent = new EventEmitter<string>();
   @Output() downloadExamEvent = new EventEmitter<{ event: MouseEvent; examId: string | undefined }>();
   @Output() deleteExamEvent = new EventEmitter<{ event: MouseEvent; examId: string | undefined }>();
 
 
-  displayedColumns: string[] = ["courseName", "semester", "date", "updatedAt", "lastEditedBy", "download", "delete"];
-  dataSource = new MatTableDataSource<Exam>(this.exams);
+  private allColumns: string[] = ["courseName", "semester", "date", "updatedAt", "lastEditedBy", "download", "delete"];
+  private readOnlyColumns: string[] = ["courseName", "semester", "date", "updatedAt", "lastEditedBy"];
+  public dataSource = new MatTableDataSource<Exam>(this.exams);
+  get displayedColumns(): string[] {return this.readOnly ? this.readOnlyColumns : this.allColumns;}
   @ViewChild(MatSort) sort?: MatSort;
 
 
