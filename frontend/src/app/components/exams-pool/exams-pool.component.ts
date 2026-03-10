@@ -21,30 +21,6 @@ type ExamFilter = {
   filter: FilterFn;
 }
 
-const testExam1: Exam = {
-  _id: "123",
-  courseName: "Test Course",
-  semester: "WS 2023/2024",
-  date: "2024-12-31T00:00:00.000Z",
-  examinerName: "max.brockmann",
-  lastEditedBy: "max.brockmann",
-  examLengthMinutes: 89,
-  tasks: [],
-  updatedAt: new Date(),
-}
-
-const testExam2: Exam = {
-  _id: "456",
-  courseName: "Test Course 2",
-  semester: "WS 2022/2023",
-  date: "2024-12-31T00:20:00.000Z",
-  examinerName: "max.brockmann",
-  lastEditedBy: "test",
-  examLengthMinutes: 89,
-  tasks: [],
-  updatedAt: new Date(),
-}
-
 
 @Component({
   selector: "app-exams-pool",
@@ -82,7 +58,7 @@ const testExam2: Exam = {
 })
 export class ExamsPoolComponent implements OnInit, AfterViewInit {
   public exams: Exam[] = [];
-  public filteredExams: Exam[] = [testExam1, testExam2];
+  public filteredExams: Exam[] = [];
   private downloadableJobs: DownloadableJob[] = [];
 
   private username: string = "";
@@ -119,9 +95,9 @@ export class ExamsPoolComponent implements OnInit, AfterViewInit {
   ) { }
 
   ngOnInit() {
+    this.viewMode = localStorage.getItem("examsPoolViewMode") === "list" ? "list" : "grid";
     this.fetchExams();
     this.fetchCurrentUser();
-    this.viewMode = localStorage.getItem("examsPoolViewMode") === "list" ? "list" : "grid";
   }
 
   ngAfterViewInit() {
@@ -306,7 +282,7 @@ export class ExamsPoolComponent implements OnInit, AfterViewInit {
       filter: (exams: Exam[]) => exams.filter(exam => exam.date >= new Date().toISOString())
     },
     sortAlphabetically: {
-      active: false,
+      active: true,
       filter: (exams: Exam[]) => [...exams].sort((a, b) => a.courseName.localeCompare(b.courseName))
     },
     sortSemester: {
@@ -314,7 +290,7 @@ export class ExamsPoolComponent implements OnInit, AfterViewInit {
       filter: (exams: Exam[]) => [...exams].sort((a, b) => a.semester.localeCompare(b.semester))
     },
     sortLastViewed: {
-      active: true,
+      active: false,
       filter: (exams: Exam[]) => { console.log("lastViewed not implemented"); return exams; }
     },
     sortAscending: {
