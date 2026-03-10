@@ -27,6 +27,7 @@ export class DashboardComponent {
     this.api.getRecentExams().subscribe((exams) => {
       this.recentExams = exams;
     });
+    this.viewOption = localStorage.getItem("viewMode") === "list" ? "list" : "grid";
   }
 
   @HostListener("document:click", ["$event"])
@@ -51,6 +52,7 @@ export class DashboardComponent {
 
   public toggleViewOption(mode: "grid" | "list") {
     this.viewOption = mode;
+    localStorage.setItem("viewMode", mode);
   }
 
   public onAddExam() {
@@ -69,11 +71,11 @@ export class DashboardComponent {
     this.router.navigate(["/exams-pool"]);
   }
 
-  public onExamClick(exam: Exam) {
-    if (exam._id == undefined) {
-      console.warn(`Exam ${exam.courseName} ${exam.semester} has no ExamID`);
+  public onExamClick(examId: string|undefined) {
+    if (!examId) {
+      console.warn("Selected exam has no ID");
       return;
     }
-    this.router.navigate([`/create-exam/${exam._id}`]);
+    this.router.navigate([`/create-exam/${examId}`]);
   }
 }

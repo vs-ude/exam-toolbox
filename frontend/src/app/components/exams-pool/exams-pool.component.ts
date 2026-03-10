@@ -90,7 +90,7 @@ export class ExamsPoolComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.viewMode = localStorage.getItem("examsPoolViewMode") === "list" ? "list" : "grid";
+    this.viewMode = localStorage.getItem("viewMode") === "list" ? "list" : "grid";
     this.fetchExams();
     this.fetchCurrentUser();
   }
@@ -295,6 +295,6 @@ export class ExamsPoolComponent implements OnInit {
 
   public toggleViewMode(mode: "grid" | "list") {
     this.viewMode = mode;
-    localStorage.setItem("examsPoolViewMode", mode);
+    localStorage.setItem("viewMode", mode);
   }
 }
