@@ -421,33 +421,17 @@ async function finalizeJob(jobId: string) {
   }
 }
 
-function parseLogFileForSubtaskInfo(logContent: string) {
+function parseLogFileForSubtaskInfo(
+  logContent: string,
+): { page: number; logFileBoundaryError: boolean }[] {
   const lines = logContent.split("\n");
-  const subtaskInfo: {
-    aufgabe: number;
-    subtask: string;
-    page: number;
-    logFileBoundaryError: boolean;
-  }[] = [];
-
-  let aufgabeCounter = 0;
-  let subtaskInAufgabeCounter = 0;
+  const pages: { page: number; logFileBoundaryError: boolean }[] = [];
 
   for (const line of lines) {
-    if (line.includes("VSEXAM: {'Typ':'AufgabeStart'")) {
-      aufgabeCounter++;
-      subtaskInAufgabeCounter = 0;
-    }
-
     if (line.includes("VSEXAM: {'Typ':'AufgabenTeil'")) {
-      subtaskInAufgabeCounter++;
       const pageMatch = line.match(/'Seite':'(\d+)'/);
-      const page = pageMatch ? parseInt(pageMatch[1], 10) : 0;
-
-      subtaskInfo.push({
-        aufgabe: aufgabeCounter,
-        subtask: String.fromCharCode(96 + subtaskInAufgabeCounter),
-        page: page,
+      pages.push({
+        page: pageMatch ? parseInt(pageMatch[1], 10) : 0,
         logFileBoundaryError: false,
       });
     }
@@ -456,12 +440,12 @@ function parseLogFileForSubtaskInfo(logContent: string) {
       line.includes("VSEXAM: {'Typ':'edgeStart'") &&
       line.includes("'X': '0'")
     ) {
-      if (subtaskInfo.length > 0) {
-        subtaskInfo[subtaskInfo.length - 1].logFileBoundaryError = true;
+      if (pages.length > 0) {
+        pages[pages.length - 1].logFileBoundaryError = true;
       }
     }
   }
-  return subtaskInfo;
+  return pages;
 }
 
 async function createZipArchiveFromDirectory(

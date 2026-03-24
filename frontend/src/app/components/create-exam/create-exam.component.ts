@@ -45,8 +45,6 @@ import { AutosaveService } from "../../services/autosave.service";
 import { ConflictDialogComponent } from "../conflict-dialog/conflict-dialog.component";
 
 interface PDFTaskInfo {
-  aufgabe: number;
-  subtask: string;
   page: number;
   logFileBoundaryError: boolean;
 }
@@ -329,14 +327,12 @@ export class CreateExamComponent {
         this.PDFTasksInfo = subtaskInfo;
         console.log("Subtask Info from header:", subtaskInfo);
 
-        const hasErrors = subtaskInfo.some((info) => info.logFileBoundaryError);
-        if (hasErrors) {
+        const errorIndex = subtaskInfo.findIndex((info) => info.logFileBoundaryError);
+        if (errorIndex !== -1) {
           console.warn(
             "Log file boundary errors detected, inserting new pages accordingly.",
           );
-          this.insertNewPage(
-            subtaskInfo.filter((info) => info.logFileBoundaryError)[0],
-          );
+          this.insertNewPage(errorIndex);
         }
 
         this.loadingService.loadingOff();
@@ -350,30 +346,40 @@ export class CreateExamComponent {
     });
   }
 
-  private insertNewPage(subtaskInfo: PDFTaskInfo) {
-    const assignmentIndex = subtaskInfo.aufgabe - 1;
+  private insertNewPage(absoluteIndex: number) {
+    // Reverse-map the flat subtask index back to (groupIndex, taskIndex) using the
+    // same skip rules as generation.ts: single-newPage groups are skipped entirely;
+    // newPage and manualText tasks within a group are skipped.
+    let count = 0;
+    let assignmentIndex = -1;
     let taskIndex = -1;
-    for (let i = 0; i < this.exam.tasks[assignmentIndex].tasks.length; i++) {
-      const taskChar = this.calcTaskChar(i, assignmentIndex);
-      if (this.calcTaskChar(i, assignmentIndex) === subtaskInfo.subtask) {
-        taskIndex = i;
-        break;
+    outer: for (let g = 0; g < this.exam.tasks.length; g++) {
+      const group = this.exam.tasks[g];
+      if (group.tasks.length === 1 && group.tasks[0].type === "newPage") continue;
+      for (let i = 0; i < group.tasks.length; i++) {
+        const task = group.tasks[i];
+        if (task.type === "newPage" || task.type === "manualText") continue;
+        if (count === absoluteIndex) {
+          assignmentIndex = g;
+          taskIndex = i;
+          break outer;
+        }
+        count++;
       }
     }
+    if (assignmentIndex === -1 || taskIndex === -1) return;
+
+    const subtaskChar = this.calcTaskChar(taskIndex, assignmentIndex);
     const result = this.askForNewPageAutoInsert(
       this.exam.tasks[assignmentIndex].tasks[taskIndex],
-      `${subtaskInfo.aufgabe}.${subtaskInfo.subtask}`,
+      `${assignmentIndex + 1}.${subtaskChar}`,
     );
     result.subscribe((auto) => {
       if (!auto) {
         return;
       }
       const newPageElement = this.taskBuilder.createTask("new_newPage");
-      this.exam.tasks[assignmentIndex].tasks.splice(
-        taskIndex,
-        0,
-        newPageElement,
-      );
+      this.exam.tasks[assignmentIndex].tasks.splice(taskIndex, 0, newPageElement);
       this.triggerAutosave();
     });
   }
@@ -852,17 +858,38 @@ export class CreateExamComponent {
     });
   }
 
-  private getPDFPageNumber(index: number, groupIndex = this.currentGroupView): number {
-    const subtask = this.calcTaskChar(index, groupIndex);
-    const previewTaskPDFInfo = this.PDFTasksInfo.find(
-      (taskInfo) =>
-        taskInfo.aufgabe === groupIndex && taskInfo.subtask === subtask
-    );
-
-    if (!previewTaskPDFInfo) {
-      throw new Error("Could not find PDF info for task " + groupIndex + "." + subtask);
+  private getAbsoluteSubtaskIndex(groupIndex: number, taskIndex: number): number {
+    // Returns the 0-based position of the task at (groupIndex, taskIndex) in the
+    // backend's flat AufgabenTeil array, by counting all real subtasks that appear
+    // before it in LaTeX compilation order — mirroring generation.ts skip rules:
+    //   • Single-newPage groups are skipped entirely (no \aufgabe emitted).
+    //   • newPage and manualText tasks within a group are skipped (no \aufgabenteil).
+    let count = 0;
+    for (let g = 0; g < groupIndex; g++) {
+      const group = this.exam.tasks[g];
+      if (group.tasks.length === 1 && group.tasks[0].type === "newPage") continue;
+      for (const task of group.tasks) {
+        if (task.type !== "newPage" && task.type !== "manualText") count++;
+      }
     }
+    // Count real subtasks at positions [0, taskIndex) within the target group.
+    // taskIndex = 0 → loop never runs → count unchanged → returns 0 for the first task.
+    for (let i = 0; i < taskIndex; i++) {
+      const task = this.exam.tasks[groupIndex].tasks[i];
+      if (task.type !== "newPage" && task.type !== "manualText") count++;
+    }
+    return count;
+  }
 
-    return previewTaskPDFInfo.page;
+  private getPDFPageNumber(index: number, groupIndex = this.currentGroupView): number {
+    const absoluteIndex = this.getAbsoluteSubtaskIndex(groupIndex, index);
+    const info = this.PDFTasksInfo[absoluteIndex];
+    if (!info) {
+      const subtaskChar = this.calcTaskChar(index, groupIndex);
+      throw new Error(
+        "Could not find PDF info for task " + (groupIndex + 1) + "." + subtaskChar,
+      );
+    }
+    return info.page;
   }
 }
