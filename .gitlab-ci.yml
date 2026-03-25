@@ -10,6 +10,10 @@ variables:
 cypress_e2e:
   stage: test
   image: cypress/base:20.9.0
+  services:
+    - docker:25.0.5-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
   before_script:
     # default from documentation: https://docs.docker.com/engine/install/debian/
     - apt-get update
@@ -21,6 +25,8 @@ cypress_e2e:
     - apt-get update
     - apt-get install -y docker-ce-cli docker-compose-plugin
   script:
+    - DOCKER_IP=$(getent hosts docker | awk '{print $1}')
+    - sed -i "s/127\.0\.0\.1.*localhost/$DOCKER_IP\tlocalhost/" /etc/hosts
     - docker compose up -d --build
     - cd frontend
     - npm install
@@ -29,7 +35,7 @@ cypress_e2e:
     - echo "--- CADDY LOGS ---"
     - docker compose logs caddy
     - export NODE_TLS_REJECT_UNAUTHORIZED=0
-    - npx wait-on tcp:127.0.0.1:443 -t 60000
+    - npx wait-on tcp:localhost:443 -t 60000
     - npx cypress run --config baseUrl=https://localhost,video=false
   after_script:
     - docker compose down

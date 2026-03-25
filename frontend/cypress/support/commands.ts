@@ -1,4 +1,6 @@
 Cypress.Commands.add("login", (role = "admin") => {
+  cy.clearCookies();
+  cy.clearLocalStorage();
   cy.visit("/");
 
   cy.fixture("credentials").then((creds) => {
