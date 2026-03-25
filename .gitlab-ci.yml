@@ -1,6 +1,5 @@
 stages:
   - test
-  - build_and_push
 
 image: docker:25.0.5
 
@@ -39,20 +38,7 @@ cypress_e2e:
       when: always
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
       when: always
-    - when: manual
+    - if: $CI_COMMIT_BRANCH == "dev"
+      when: manual
       allow_failure: true
-
-push_images:
-  stage: build_and_push
-  needs: ["cypress_e2e"] # Only when tests are sucessfull
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - docker build -t $CI_REGISTRY_IMAGE/backend:latest ./backend
-    - docker push $CI_REGISTRY_IMAGE/backend:latest
-    - docker build -t $CI_REGISTRY_IMAGE/caddy:latest -f ./caddy/Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE/caddy:latest
-    - docker build -t $CI_REGISTRY_IMAGE/periodic-tasks:latest ./periodical
-    - docker push $CI_REGISTRY_IMAGE/periodic-tasks:latest
+    - when: never
