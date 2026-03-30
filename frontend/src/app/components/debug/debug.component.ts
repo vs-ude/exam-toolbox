@@ -25,7 +25,8 @@ const tasks: Task[] = [
       EN: ''
     },
     points: 4,
-    tags: [new Tag("Cloud").setColors("#4caf50").addTask("task1")],
+    tagIds: ["tag1"],
+    tags: [{_id: "tag1", name: "Cloud", color: "#0000FF", textColor: "#FFFFFF"}],
     createdBy: "Hans Wurst",
     createdAt: new Date(),
     lastUsed: new Date(),
@@ -44,6 +45,7 @@ const tasks: Task[] = [
       EN: ''
     },
     points: 6,
+    tagIds: [],
     tags: [],
     createdBy: "placeholder",
     createdAt: new Date(),

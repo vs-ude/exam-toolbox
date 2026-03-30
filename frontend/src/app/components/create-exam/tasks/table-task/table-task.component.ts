@@ -47,6 +47,7 @@ export class TableTaskComponent extends BaseTaskComponent {
     tableDataSolution: [],
     tableHeadersSolution: [],
     points: 0,
+    tagIds: [],
     tags: [],
     createdBy: "placeholder",
     createdAt: new Date(),

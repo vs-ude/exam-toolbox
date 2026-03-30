@@ -8,6 +8,14 @@ import { ApiService } from '../../services/api.service';
 import { Tag } from '../../tag';
 import { TagHelperService } from '../../services/tag-helper.service';
 
+export interface AddTagDialogData {
+  _id: string;
+  name: string;
+  color: string;
+  textColor: string;
+  exists: boolean;
+}
+
 @Component({
   selector: 'app-add-tag-dialog',
   standalone: true,
@@ -32,7 +40,7 @@ export class AddTagDialogComponent {
   ngOnInit() {
     this.api.getAllTags().subscribe(
       tags => {
-        this.tags = tags.map(tag => Tag.fromPlain(tag));
+        this.tags = tags;
       },
       err => {
         console.error("error fetching tags", err);
@@ -42,6 +50,5 @@ export class AddTagDialogComponent {
 
   public onColorChange(bgColor: string){
     this.textColor = this.tagHelper.calcFontColor(bgColor);
-    console.log("Changed text color to ", this.textColor);
   }
 }

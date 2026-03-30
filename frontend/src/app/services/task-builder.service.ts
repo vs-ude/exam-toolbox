@@ -39,6 +39,7 @@ export class TaskBuilderService {
           lastUsed: new Date(),
           usedIn: ["placeholder_id"],
           tags: [],
+          tagIds: [],
           children: [],
 
         };
@@ -54,6 +55,7 @@ export class TaskBuilderService {
           lastUsed: new Date(),
           usedIn: ["placeholder_id"],
           tags: [],
+          tagIds: [],
           children: [],
         };
       case "new_picture":
@@ -68,6 +70,7 @@ export class TaskBuilderService {
           createdAt: new Date(),
           lastUsed: new Date(),
           usedIn: ["placeholder_id"],
+          tagIds: [],
           tags: [],
           children: [],
         };
@@ -82,6 +85,7 @@ export class TaskBuilderService {
           questionLatex: { DE: "\\(\n\n\\)", EN: "" },
           points: 0,
           tags: [],
+          tagIds: [],
           createdBy: this.user.id,
           createdAt: new Date(),
           lastUsed: new Date(),
@@ -105,6 +109,7 @@ export class TaskBuilderService {
           ],
           points: 0,
           tags: [],
+          tagIds: [],
           createdBy: this.user.id,
           createdAt: new Date(),
           lastUsed: new Date(),
@@ -117,6 +122,7 @@ export class TaskBuilderService {
           type: "manualText",
           question: { DE: "", EN: "" },
           points: 0,
+          tagIds: [],
           tags: [],
           createdBy: this.user.id,
           createdAt: new Date(),
@@ -130,6 +136,7 @@ export class TaskBuilderService {
           type: "newPage",
           question: { DE: "", EN: "" },
           points: 0,
+          tagIds: [],
           tags: [],
           createdBy: this.user.id,
           createdAt: new Date(),

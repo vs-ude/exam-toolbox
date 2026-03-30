@@ -20,7 +20,7 @@ import { LatexTaskComponent } from "./tasks/latex-task/latex-task.component";
 import { TableTaskComponent } from "./tasks/table-task/table-task.component";
 import { TaskBuilderService } from "../../services/task-builder.service";
 import { ManualTextComponent } from "./tasks/manual-text/manual-text.component";
-import { MatDialog } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { MassExamDialogComponent } from "../mass-exam-dialog/mass-exam-dialog.component";
 import { LoadingService } from "../../services/loading.service";
 import {
@@ -37,10 +37,10 @@ import { NewPageDialogComponent } from "./new-page-dialog/new-page-dialog.compon
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { Tag } from "../../tag";
-import { AddTagDialogComponent } from "../add-tag-dialog/add-tag-dialog.component";
+import { AddTagDialogComponent, AddTagDialogData } from "../add-tag-dialog/add-tag-dialog.component";
 import { TagHelperService } from "../../services/tag-helper.service";
 import { DraggablePoolComponent } from "./draggable-pool/draggable-pool.component";
-import { Subject, debounceTime, Observable, take } from "rxjs";
+import { Subject, debounceTime, Observable, take, forkJoin, retry } from "rxjs";
 import { AutosaveService } from "../../services/autosave.service";
 import { ConflictDialogComponent } from "../conflict-dialog/conflict-dialog.component";
 
@@ -90,7 +90,7 @@ export class CreateExamComponent {
   private newTasksToCreate: Set<string> = new Set<string>();
   private tasksWithModifiedTags: {
     taskId: string;
-    tagData: { name: string; color: string; textColor: string };
+    tagData: Tag;
   }[] = [];
 
   public taskPool: Task[] = [];
@@ -232,7 +232,6 @@ export class CreateExamComponent {
       task.usedIn.push(this.exam._id || "placeholder_id");
     }
     task.lastUsed = new Date();
-    task.tags = task.tags.map((tag) => Tag.fromPlain(tag));
 
     this.exam.tasks[this.currentGroupView].tasks.push(task);
     this.adjustTotalPoints();
@@ -252,13 +251,9 @@ export class CreateExamComponent {
   onSave() {
     this.checkIfValid();
     this.addNewTasksToPool();
-    this.addNewTags();
     this.uploadExam();
   }
 
-  private addNewTags() {
-    this.tagHelper.addTags(this.exam, this.tasksWithModifiedTags);
-  }
 
   private addNewTasksToPool() {
     for (let i = 0; i < this.exam.tasks.length; i++) {
@@ -466,7 +461,6 @@ export class CreateExamComponent {
   onUpdate() {
     this.checkIfValid();
     this.addNewTasksToPool();
-    this.addNewTags();
     this.updatePoolTasks();
     this.importPoolTasks();
     this.api.updateExam(this.exam._id, this.exam).subscribe(
@@ -589,31 +583,9 @@ export class CreateExamComponent {
         console.error("Error updating exam: ", error);
       },
     );
-
-    this.linkTagsToTask(newTask);
     this.triggerAutosave();
   }
 
-  private linkTagsToTask(task: Task) {
-    if (task.tags.length === 0) {
-      return;
-    }
-    for (let tag of task.tags) {
-      tag = Tag.fromPlain(tag);
-      tag.addTask(task.taskId);
-      this.api.updateTag(tag).subscribe(
-        (response) => {
-          console.log(
-            `Tag ${tag.getName()} updated with new task link`,
-            response,
-          );
-        },
-        (error) => {
-          console.error(`Error updating tag ${tag.getName()}: `, error);
-        },
-      );
-    }
-  }
 
   private importExam() {
     const lastURLPart = this.router.url.split("/").pop();
@@ -693,32 +665,31 @@ export class CreateExamComponent {
 
   private initializeExamData(response: Exam) {
     this.exam = response;
-    if (this.exam.tasks) {
-      for (let taskGroup of this.exam.tasks) {
-        if (taskGroup.tasks) {
-          for (let task of taskGroup.tasks) {
-            if (task.tags)
-              task.tags = task.tags.map((tag) => Tag.fromPlain(tag));
-          }
-        }
+    for (let taskGroup  of this.exam.tasks) {
+      for (let task of taskGroup.tasks) {
+        this.tagHelper.importTagsToTask(task)
+        console.log("importing tags for task", task)
       }
     }
     this.adjustTotalPoints();
   }
 
   private importPoolTasks() {
-    this.api.getTasksFromPool().subscribe(
-      (response) => {
-        for (let task of response) {
-          task.tags = task.tags.map((tag) => Tag.fromPlain(tag));
-        }
-        this.taskPool = response;
+    forkJoin({
+      tasks: this.api.getTasksFromPool(),
+      tags: this.api.getAllTags()
+    }).subscribe({
+      next: ({ tasks, tags }) => {
+        this.taskPool = tasks.map(task => ({
+          ...task,
+          tags: tags.filter(tag => task.tagIds.includes(tag._id!))
+        }));
         this.refreshPool$.next();
       },
-      (error) => {
+      error: (error) => {
         console.error(error);
-      },
-    );
+      }
+    });
   }
 
   public addTab() {
@@ -803,7 +774,7 @@ export class CreateExamComponent {
 
   public onAddTag(index: number) {
     console.log("add tag for task with index ", index);
-    const dialogRef = this.dialog.open(AddTagDialogComponent, {
+    const dialogRef: MatDialogRef<AddTagDialogComponent, AddTagDialogData>  = this.dialog.open(AddTagDialogComponent, {
       width: "50%",
       height: "50%",
       data: {},
@@ -812,30 +783,23 @@ export class CreateExamComponent {
       if (!result) {
         return;
       }
-      const taskId = this.exam.tasks[this.currentGroupView].tasks[index].taskId;
-      const tagData = {
+
+      const task = this.exam.tasks[this.currentGroupView].tasks[index];
+      const tag: Tag = {
+        _id: result._id,
         name: result.name,
         color: result.color,
         textColor: result.textColor,
-      };
-      this.tasksWithModifiedTags.push({ taskId: taskId, tagData: tagData });
-      if (!result.exists) {
-        const newTag = new Tag(result.name).setColors(
-          result.color,
-          result.textColor,
-        );
-        this.api.addTag(newTag).subscribe(
-          (res) => {
-            console.log("New Tag added", res);
-          },
-          (err) => {
-            console.error("Error adding new Tag", err);
-          },
-        );
       }
-      this.exam.tasks[this.currentGroupView].tasks[index].tags.push(
-        new Tag(result.name).setColors(result.color, result.textColor),
-      );
+      this.tasksWithModifiedTags.push({taskId: task.taskId, tagData: tag});
+      
+      if (result.exists) {
+        console.log("addTagToTask()")
+        this.tagHelper.addTagToTask(tag, task);
+        return;
+      }
+
+      this.tagHelper.createTagAndAddToTask(tag, task);
     });
   }
 
@@ -849,7 +813,7 @@ export class CreateExamComponent {
         const baseUrl = this.sanitizer.sanitize(4, this.previewPdfUrl) as string;
         const pageUrl = baseUrl + '#page=' + pageNumber;
         this.previewPdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(pageUrl);
-        
+
         this.changeTab(this.exam.tasks.length); // switch to preview tab
       },
       error: () => {

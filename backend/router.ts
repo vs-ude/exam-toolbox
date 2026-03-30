@@ -271,19 +271,6 @@ export function configureRouter({
         ctx.response.body = { message: "Error fetching tasks by type", error };
       }
     })
-    .get("/api/taskPool/tags/:tag", async (ctx) => {
-      const tag = ctx.params.tag;
-      try {
-        const taskList = await pool
-          .find({ tags: { $elemMatch: { name: tag } } })
-          .toArray();
-        ctx.response.status = 200;
-        ctx.response.body = taskList;
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error fetching tasks by tag", error };
-      }
-    })
     .get("/api/taskPool/search/:questionText", async (ctx) => {
       try {
         const questionText = ctx.params.questionText;
@@ -743,8 +730,8 @@ export function configureRouter({
         const result = await exams.deleteMany({});
         ctx.response.status = 200;
         ctx.response.body = {
-          message: `${result} exams deleted successfully!`,
-          deletedCount: result,
+          message: `${result.deletedCount} exams deleted successfully!`,
+          deletedCount: result.deletedCount,
         };
       } catch (error) {
         ctx.response.status = 500;
@@ -764,7 +751,7 @@ export function configureRouter({
         // Attempt to delete the exam from the 'exams' collection
         const result = await exams.deleteOne({ _id: new ObjectId(id) });
 
-        if (result === 0) {
+        if (result.deletedCount === 0) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Exam not found" };
         } else {
@@ -844,10 +831,22 @@ export function configureRouter({
         ctx.response.body = { message: "Error deleting task-pool", error };
       }
     })
-    .get("/api/tags/:id", async (ctx) => {
-      const tagName = ctx.params.id;
+    .get("/api/taskPool/tags/:tagId", async (ctx) => {
+      const tagId = ctx.params.tagId;
       try {
-        const tag = await tags.findOne({ "tag.name": tagName });
+        const taskList =  await pool.find({ tagIds: tagId }).toArray();
+        ctx.response.status = 200;
+        ctx.response.body = taskList;
+      } catch (error) {
+        ctx.response.status = 500;
+        ctx.response.body = { message: "Error fetching tasks for tag", error };
+      }
+    })
+    .get("/api/tags/:id", async (ctx) => {
+      try {
+        const tagId = ctx.params.id;
+        const mongoId = new ObjectId(tagId);
+        const tag = await tags.findOne({ _id: mongoId });
         if (!tag) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Tag not found" };
@@ -862,7 +861,7 @@ export function configureRouter({
     })
     .get("/api/tags", async (ctx) => {
       try {
-        const tagList = await tags.find().toArray();
+        const tagList = await tags.find().sort({ name: 1 }).toArray();
         ctx.response.status = 200;
         ctx.response.body = tagList;
       } catch (error) {
@@ -872,19 +871,18 @@ export function configureRouter({
     })
     .put("/api/tags/:id", async (ctx) => {
       try {
-        const tagName = ctx.params.id;
-        const { _id, ...tag } = await ctx.request.body.json();
+        const tagId = ctx.params.id;
+        const mongoId = new ObjectId(tagId);
+        const { _id, ...updatedTag }: Tag = await ctx.request.body.json();
 
-        const result = await tags.updateOne(
-          { "tag.name": tagName },
-          { $set: { tag: tag } },
-        );
+        const result = await tags.updateOne({ _id: mongoId }, { $set: updatedTag });
 
         if (result.matchedCount === 0) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Tag not found" };
           return;
         }
+
         ctx.response.status = 200;
         ctx.response.body = { message: "Tag updated successfully" };
       } catch (error) {
@@ -893,14 +891,14 @@ export function configureRouter({
       }
     })
     .post("/api/tags", async (ctx) => {
-      const tag: Tag = await ctx.request.body.json();
+      const { _id, ...tag }: Tag = await ctx.request.body.json();
       try {
-        const result = await tags.insertOne({ tag });
-        ((ctx.response.status = 200),
-          (ctx.response.body = {
-            message: "Tag saved successfully!",
-            insertedId: result,
-          }));
+        const result = await tags.insertOne(tag);
+        ctx.response.status = 201;
+        ctx.response.body = {
+          message: "Tag saved successfully!",
+          insertedId: result, 
+        };
       } catch (error) {
         ctx.response.status = 500;
         ctx.response.body = { message: "Error saving tag", error: error };
@@ -920,14 +918,30 @@ export function configureRouter({
       }
     })
     .delete("/api/tags/:id", async (ctx) => {
-      const tagName = ctx.params.id;
+      const tagId = ctx.params.id;
+
+      if (!ObjectId.isValid(tagId)) {
+        ctx.response.status = 400;
+        ctx.response.body = { message: "Invalid tag ID" };
+        return;
+      }
+
       try {
-        const result = await tags.deleteOne({ name: tagName });
-        if (result === 0) {
+        const mongoId = new ObjectId(tagId);
+        const result = await tags.deleteOne({ _id: mongoId });
+
+        if (result.deletedCount === 0) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Tag not found" };
           return;
         }
+
+        // remove the deleted tag from all tasks that reference it
+        await pool.updateMany(
+          { tagIds: mongoId },
+          { $pull: { tagIds: mongoId } }
+        );
+
         ctx.response.status = 200;
         ctx.response.body = { message: "Tag deleted successfully" };
       } catch (error) {

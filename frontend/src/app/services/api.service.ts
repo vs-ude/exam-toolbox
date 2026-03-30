@@ -27,7 +27,7 @@ export interface DownloadableJob {
 export class ApiService {
   private apiUrl = "/api";
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   startMassExamGeneration(
     exam: Exam,
@@ -45,19 +45,13 @@ export class ApiService {
     );
   }
 
-  getJobStatus(jobId: string): Observable<JobStatus> {
-    return this.http.get<JobStatus>(`${this.apiUrl}/jobs/${jobId}/status`);
+  getUser() {
+    return this.http.get<User>(`/api/user`);
   }
 
-  downloadMassExamResult(jobId: string): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/jobs/${jobId}/download`, {
-      responseType: "blob",
-    });
-  }
-
-  cancelJob(jobId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/jobs/${jobId}`);
-  }
+  // -------
+  // Exam related API calls
+  // -------
 
   generateExam(exam?: Exam): Observable<HttpResponse<Blob>> {
     return this.http.post(`${this.apiUrl}/generate-exam`, exam, {
@@ -86,10 +80,6 @@ export class ApiService {
     return this.http.get<Exam[]>(`${this.apiUrl}/exams/recent`);
   }
 
-  getUser() {
-    return this.http.get<User>(`/api/user`);
-  }
-
   updateExam(examId: string | undefined, updatedExam: Exam) {
     return this.http.put(`${this.apiUrl}/exams/update`, {
       examId,
@@ -114,7 +104,6 @@ export class ApiService {
       .post(`${this.apiUrl}/generate-exams`, formData, { responseType: "blob" })
       .pipe();
   }
-
   uploadFile(file: File) {
     const formData = new FormData();
     formData.append("image", file);
@@ -127,6 +116,40 @@ export class ApiService {
       params: { fileUrl },
     });
   }
+
+  getJobStatus(jobId: string): Observable<JobStatus> {
+    return this.http.get<JobStatus>(`${this.apiUrl}/jobs/${jobId}/status`);
+  }
+
+  getActiveJob(examId: string): Observable<JobStatus | null> {
+    return this.http.get<JobStatus | null>(
+      `${this.apiUrl}/exams/${examId}/active-job`,
+    );
+  }
+
+  downloadMassExamResult(jobId: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/jobs/${jobId}/download`, {
+      responseType: "blob",
+    });
+  }
+
+  cancelJob(jobId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/jobs/${jobId}`);
+  }
+
+  getDownloadableJobs(): Observable<DownloadableJob[]> {
+    return this.http.get<DownloadableJob[]>(`${this.apiUrl}/jobs/downloadable`);
+  }
+
+  downloadExam(jobId: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/jobs/${jobId}/download`, {
+      responseType: "blob",
+    });
+  }
+
+  // -------
+  // Task Pool related API calls
+  // -------
 
   addTaskToPool(task: Task) {
     return this.http.post(`${this.apiUrl}/taskPool`, task);
@@ -152,10 +175,6 @@ export class ApiService {
     return this.http.get<Task[]>(`${this.apiUrl}/taskPool/type/${type}`);
   }
 
-  getTaskWithTagFromPool(tag: string): Observable<Task[]> {
-    return this.http.get<Task[]>(`${this.apiUrl}/taskPool/tag/${tag}`);
-  }
-
   getTaskWithUserIdFromPool(userId: string): Observable<Task[]> {
     return this.http.get<Task[]>(`${this.apiUrl}/taskPool/user/${userId}`);
   }
@@ -172,22 +191,20 @@ export class ApiService {
     return this.http.put(`${this.apiUrl}/taskPool/addChild/${taskId}`, childId);
   }
 
-  getDownloadableJobs(): Observable<DownloadableJob[]> {
-    return this.http.get<DownloadableJob[]>(`${this.apiUrl}/jobs/downloadable`);
+  getTasksByTagId(tagId: string): Observable<Task[]> {
+    return this.http.get<Task[]>(`${this.apiUrl}/taskPool/tags/${tagId}`);
   }
 
-  downloadExam(jobId: string): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/jobs/${jobId}/download`, {
-      responseType: "blob",
-    });
-  }
+  // -------
+  // Tag related API calls
+  // -------
 
-  addTag(tag: Tag) {
+  addTag(tag: Tag): Observable<any> {
     return this.http.post(`${this.apiUrl}/tags`, tag);
   }
 
-  getTag(tagName: string) {
-    return this.http.get<Tag>(`${this.apiUrl}/tags/${tagName}`);
+  getTag(tagId: string) {
+    return this.http.get<Tag>(`${this.apiUrl}/tags/${tagId}`);
   }
 
   deleteAllTags() {
@@ -199,12 +216,7 @@ export class ApiService {
   }
 
   updateTag(tag: Tag) {
-    return this.http.put(`${this.apiUrl}/tags/${tag.getName()}`, tag);
+    return this.http.put(`${this.apiUrl}/tags/${tag._id}`, tag);
   }
 
-  getActiveJob(examId: string): Observable<JobStatus | null> {
-    return this.http.get<JobStatus | null>(
-      `${this.apiUrl}/exams/${examId}/active-job`,
-    );
-  }
 }

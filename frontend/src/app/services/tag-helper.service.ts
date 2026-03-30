@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Tag } from '../tag';
 import { Exam, Task } from '../exam';
 import { ApiService } from './api.service';
-import { firstValueFrom, timeout } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,48 +12,51 @@ export class TagHelperService {
     private api: ApiService,
   ) { }
 
-  public addTags(exam: Exam, tasksWithModifiedTags: { taskId: string, tagData: { name: string, color: string, textColor: string } }[]) {
-    let tasks = this.getAllTasks(exam);
-    for (let element of tasksWithModifiedTags) {
-
-      const task = tasks.find(t => t.taskId === element.taskId)
-      if (!task) { continue; }
-
-      this.api.getTag(element.tagData.name).subscribe(
-        tag => {
-          tag = Tag.fromPlain(tag);
-          tag.addTask(task.taskId);
-
-          this.updateTag(tag)
-        },
-        err => { console.error("Error fetching Tag", err) }
+  public importTagsToTask(task: Task) {
+    task.tags = [];
+    for (const tagId of task.tagIds) {
+      this.api.getTag(tagId).subscribe(
+        res => { task.tags.push(res), console.log("added tag to task") },
+        err => console.error("Error fetching Tag", err)
       )
     }
-
   }
 
-  private updateTag(tag: Tag) {
-    this.api.updateTag(tag).subscribe(
-      res => { },
-      err => { console.error("error updating Tag", err) }
-    )
-  }
+  public removeTagIdFromTask(tag: Tag, task: Task) {
+    task.tagIds = task.tagIds.filter(id => id != tag._id)
 
-  private updateTaskInPool(task: Task) {
     this.api.updateTaskInPool(task.taskId, task).subscribe(
-      res => { },
-      err => { console.error("Error updating Task in Pool", err) }
+      res => { console.log("Tag removed successfully!", res) },
+      err => { console.error("Error removing Tag"), err });
+  }
+
+  public addTagToTask(tag: Tag, task: Task) {
+    if (task.tagIds.includes(tag._id!)) {
+      console.log(`Task already has this Tag: ${tag.name}`)
+      return;
+    }
+
+    task.tagIds.push(tag._id!);
+    task.tags.push(tag);
+
+    this.api.updateTaskInPool(task.taskId, task).subscribe(
+      res => console.log("updated Task in pool"),
+      err => console.error("Error updating Task", err)
+    );
+  }
+
+  public createTagAndAddToTask(tag: Tag, task: Task) {
+    this.api.addTag(tag).subscribe(
+      res => {
+        const newTag = { ...tag, _id: res.insertedId };
+        this.addTagToTask(newTag, task);
+      },
+      err => console.error("Error adding Tag", err)
     )
   }
 
-  private getAllTasks(exam: Exam) {
-    const tasks: Task[] = []
-    for (let group of exam.tasks) {
-      for (let task of group.tasks)
-        tasks.push(task);
-    }
-    return tasks;
-  }
+
+
 
   public calcFontColor(backgroundColor: string): string {
     const color = backgroundColor.charAt(0) === '#' ? backgroundColor.substring(1, 7) : backgroundColor;

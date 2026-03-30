@@ -30,6 +30,7 @@ export class NewPageComponent extends BaseTaskComponent {
     question: { DE: "", EN: "" },
     points: 0,
     tags: [],
+    tagIds: [],
     createdBy: "placeholder",
     createdAt: new Date(),
     lastUsed: new Date(),

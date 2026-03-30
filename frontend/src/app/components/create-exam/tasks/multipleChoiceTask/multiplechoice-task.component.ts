@@ -50,6 +50,7 @@ export class MultiplechoiceTaskComponent extends BaseTaskComponent implements On
     answerOptions: [{ DE: "Option1", EN: "", correct: false }],
     points: 0,
     tags: [],
+    tagIds: [],
     createdBy: "placeholder",
     createdAt: new Date(),
     lastUsed: new Date(),

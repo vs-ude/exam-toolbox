@@ -39,6 +39,7 @@ export class PictureTaskComponent extends BaseTaskComponent {
     solutionPicture: { urlDE: "", urlEN: "" },
     points: 2,
     tags: [],
+    tagIds: [],
     createdBy: "placeholder",
     createdAt: new Date(),
     lastUsed: new Date(),

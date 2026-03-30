@@ -94,8 +94,8 @@
 
 
     @for(tag of task.tags; track tag){
-    <div class="tag" [ngStyle]="{'background-color': tag.getColor(), 'color': tag.getTextColor()}">
-      {{ tag.getName() }}
+    <div class="tag" [ngStyle]="{'background-color': tag.color, 'color': tag.textColor}">
+      {{ tag.name }}
     </div>
     }
 

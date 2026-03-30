@@ -8,6 +8,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { ApiService } from '../../services/api.service';
 import { Tag } from '../../tag';
+import { forkJoin } from 'rxjs';
 
 
 @Component({
@@ -72,18 +73,24 @@ export class TaskPoolComponent implements AfterViewInit {
 
   constructor(private apiService: ApiService) { }
 
-  ngOnInit() {
-    this.apiService.getTasksFromPool().subscribe(
-      res => {
-        this.tasks = res as Task[];
-        this.dataSource = new MatTableDataSource<Task>(this.tasks);
-        console.log(this.tasks);
-      },
-      error => {
-        console.error('Error fetching tasks from pool:', error);
-      }
-    )
-  }
+ngOnInit() {
+  forkJoin({
+    tasks: this.apiService.getTasksFromPool(),
+    tags: this.apiService.getAllTags()
+  }).subscribe({
+    next: ({ tasks, tags }) => {
+      this.tasks = (tasks as Task[]).map(task => ({
+        ...task,
+        tags: (tags as Tag[]).filter(tag => task.tagIds.includes(tag._id!))
+      }));
+      this.dataSource = new MatTableDataSource<Task>(this.tasks);
+      console.log(this.tasks);
+    },
+    error: (error) => {
+      console.error('Error fetching data:', error);
+    }
+  });
+}
 
   ngAfterViewInit() {
     if (this.sort) {

@@ -48,6 +48,7 @@ export class ShortAnswerTaskComponent extends BaseTaskComponent implements OnIni
     solution: { DE: "", EN: "" },
     points: 2,
     tags: [],
+    tagIds: [],
     createdBy: "placeholder",
     createdAt: new Date(),
     lastUsed: new Date(),

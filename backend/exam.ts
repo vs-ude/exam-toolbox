@@ -49,6 +49,7 @@ export interface BaseTask {
   type: string;
   question: Question;
   points: number;
+  tagIds: string[];
   tags: Tag[];
   createdBy: string;
   createdAt: Date;

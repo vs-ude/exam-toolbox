@@ -15,14 +15,15 @@
 
     <h3 class="existing-header"> or choose an existing one</h3>
     <div class="existingTag-container">
-        @for (tag of tags; track tag.getName())
+        @for (tag of tags; track tag._id)
         {
-        <span [ngStyle]="{'backgroundColor': tag.getColor(), 'color': tag.getTextColor()}" [mat-dialog-close]="{
-                exists: true, 
-                name: tag.getName(), 
-                color: tag.getColor(), 
-                textColor: tag.getTextColor()}" class="existingTag">
-            {{tag.getName()}}
+        <span [ngStyle]="{'backgroundColor': tag.color, 'color': tag.textColor}" [mat-dialog-close]="{
+                exists: true,
+                name: tag.name, 
+                color: tag.color, 
+                textColor: tag.textColor,
+                _id: tag._id}" class="existingTag">
+            {{tag.name}}
         </span>
         }
 

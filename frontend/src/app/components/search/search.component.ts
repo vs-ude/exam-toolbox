@@ -5,7 +5,6 @@ import { Tag } from '../../tag';
 import { RouterModule } from '@angular/router';
 import { ExamCardComponent } from "../exam-card/exam-card.component";
 import { TaskPoolCardComponent } from "../task-pool-card/task-pool-card.component"; // Import RouterModule
-import { Observable } from 'rxjs';
 import { AsyncPipe, JsonPipe, NgIf, NgStyle } from '@angular/common';
 import { Exam, Task } from '../../exam';
 
@@ -19,8 +18,7 @@ import { Exam, Task } from '../../exam';
 })
 export class SearchComponent {
 
-  private filteredTags: Tag[] = [];
-  public tagRefs: { tag: Tag, exams: Observable<Exam>[], tasks: Observable<Task>[] }[] = [];
+  public filteredTagsWithTasks: { tag: Tag, tasks: Task[] }[] = [];
   public questionMatches: Task[] = [];
   public examMatches: Exam[] = [];
 
@@ -37,37 +35,33 @@ export class SearchComponent {
     })
   }
 
-  private getRefsOfTag() {
-    this.tagRefs = [];
-    for (const tag of this.filteredTags) {
-      const exams: Observable<Exam>[] = [];
-      const tasks: Observable<Task>[] = [];
-      tag.getUsedBy().forEach(ref => {
-        if (ref.type === "exam") {
-          const examObservable: Observable<Exam> = this.api.getExam(ref.id)
-          exams.push(examObservable);
-        } else {
-          const taskObservable: Observable<Task> = this.api.getTaskWithIdFromPool(ref.id);
-          tasks.push(taskObservable);
-        }
-      })
-      this.tagRefs.push({ tag: tag, exams: exams, tasks: tasks });
-    }
-  }
-
   private filterTags() {
     const searchString = this.getSearchString();
     if (searchString === "") { return; }
 
     this.api.getAllTags().subscribe(
-      res => {
-        const tags = res.map(tag => Tag.fromPlain(tag));
-        this.filteredTags = tags.filter(tag => tag.getName().toLowerCase().includes(searchString.toLowerCase()))
-        this.getRefsOfTag();
+      tags => {
+        let filteredTags = tags.filter(tag =>
+          tag.name.toLowerCase().includes(searchString.toLowerCase())
+        );
+
+        this.filteredTagsWithTasks = filteredTags.map(tag => ({ tag, tasks: [] }));
+
+        for (let i = 0; i < this.filteredTagsWithTasks.length; i++) {
+          const tagId = this.filteredTagsWithTasks[i].tag._id!;
+          this.api.getTasksByTagId(tagId).subscribe(
+            tasks => {
+              this.filteredTagsWithTasks[i].tasks = tasks;
+            },
+            err => console.error(`Error fetching tasks for tag ${tagId}`, err)
+          );
+        }
       },
-      err => { console.error("Error fetching Tag list"), err }
+      err => console.error("Error fetching tags", err)
     )
   }
+
+
 
   private getSearchString(): string {
     const lastURLPart = this.router.url.split("/").pop();

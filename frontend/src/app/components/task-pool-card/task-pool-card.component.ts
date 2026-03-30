@@ -3,10 +3,11 @@ import { Task } from '../../exam';
 import { MatIconModule } from '@angular/material/icon';
 import { ColorProviderService } from '../../services/color-provider.service';
 import { NgFor, NgStyle } from '@angular/common';
-import { MatDialog } from '@angular/material/dialog';
-import { AddTagDialogComponent } from '../add-tag-dialog/add-tag-dialog.component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { AddTagDialogComponent, AddTagDialogData } from '../add-tag-dialog/add-tag-dialog.component';
 import { Tag } from '../../tag';
 import { ApiService } from '../../services/api.service';
+import { TagHelperService } from '../../services/tag-helper.service';
 
 
 
@@ -27,25 +28,24 @@ export class TaskPoolCardComponent {
     private colorProvider: ColorProviderService,
     private dialog: MatDialog,
     private api: ApiService,
+    private tagHelper: TagHelperService,
   ) { }
 
   ngOnInit() {
-    this.taskColor = this.colorProvider.getTaskColor(this.task.type)
-    this.task.tags = this.task.tags.map(tag => Tag.fromPlain(tag));
+    this.taskColor = this.colorProvider.getTaskColor(this.task.type);
   }
 
 
   public onDeleteTag(index: number) {
-    this.task.tags.splice(index, 1);
-    this.api.updateTaskInPool(this.task.taskId, this.task).subscribe(
-      res => { console.log("Tag removed successfully!", res) },
-      err => { console.error("Error removing Tag"), err });
+    const tagToRemove = this.task.tags.splice(index, 1)[0];
+    this.tagHelper.removeTagIdFromTask(tagToRemove, this.task);
+
     this.mouseHoveringTagIndex = -1
   }
 
 
   public onAddTag() {
-    const dialogRef = this.dialog.open(AddTagDialogComponent, {
+    const dialogRef: MatDialogRef<AddTagDialogComponent, AddTagDialogData> = this.dialog.open(AddTagDialogComponent, {
       width: '50%',
       height: '50%',
       data: {}
@@ -56,48 +56,21 @@ export class TaskPoolCardComponent {
         return;
       }
 
+      const tag = {
+        _id: result._id,
+        name: result.name,
+        color: result.color,
+        textColor: result.textColor
+      };
 
-      if (!result.exists) {
-        // create New Tag and link to Task
-        const newTag = new Tag(result.name).setColors(result.color, result.textColor);
-        newTag.addTask(this.task.taskId);
-        this.task.tags.push(newTag);
-
-        this.api.addTag(newTag).subscribe(
-          res => { console.log("Tag added successfully", res); },
-          err => { console.error("Error adding tag: ", err); }
-        );
-
-        this.api.updateTaskInPool(this.task.taskId, this.task).subscribe(
-          res => { console.log("Task updated with new tag: ", res); },
-          err => { console.error("Error updating task with new tag: ", err); }
-        );
-      } else {
-        // update existing Tag and associated Task
-        if (this.task.tags.find(tag => tag.getName() === result.name)) { return; }
-        this.api.getTag(result.name).subscribe(
-          res => {
-            const tag = Tag.fromPlain(res);
-            tag.addTask(this.task.taskId);
-            this.task.tags.push(tag);
-
-            this.api.updateTaskInPool(this.task.taskId, this.task).subscribe(
-              res => { console.log("task updated successfully", res) },
-              err => { console.error("Error updating task", err) }
-            );
-            this.api.updateTag(tag).subscribe(
-              res => { console.log("task updated successfully", res) },
-              err => { console.error("Error updating Tag", err) },
-            );
-
-          },
-          err => { console.error("Error fetching Tag", err) }
-        )
-
+      if (result.exists) {
+        this.tagHelper.addTagToTask(tag, this.task);
+        return;
       }
 
-
-
+      this.tagHelper.createTagAndAddToTask(tag, this.task);
     });
   }
+
+
 }
