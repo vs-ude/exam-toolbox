@@ -233,7 +233,10 @@ export class CreateExamComponent {
     }
     task.lastUsed = new Date();
 
-    this.exam.tasks[this.currentGroupView].tasks.push(task);
+    //create new instance of the task to avoid modifying the pool task when editing the task in the exam
+    const newTaskInstance = JSON.parse(JSON.stringify(task)) as Task;
+
+    this.exam.tasks[this.currentGroupView].tasks.push(newTaskInstance);
     this.adjustTotalPoints();
   }
 
