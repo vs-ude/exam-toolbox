@@ -71,7 +71,7 @@ self.onmessage = async (e: MessageEvent) => {
     }
   } catch (error) {
     console.error(`Error in worker for task type ${type}:`, error);
-    self.postMessage({ status: "error", type, jobId, error: error.message });
+    self.postMessage({ status: "error", type, jobId, error: error instanceof Error ? error.message : String(error) });
   } finally {
     // ensures the temporary directory is always cleaned up to save space
     await Deno.remove(workerTempDir, { recursive: true });

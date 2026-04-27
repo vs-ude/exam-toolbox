@@ -1,10 +1,18 @@
 import { Application } from "@oak/oak";
 import { MongoClient, ObjectId } from "@db/mongo";
-import { ZipWriter } from "@zip-js/zip-js";
-import { walk } from "@std/fs";
-import nodemailer from "nodemailer";
+import {
+  createZipArchiveFromDirectory,
+  genRandomNumber,
+  mergePdfs,
+  parseLogFileForSubtaskInfo,
+  sendEmail,
+} from "./src/services/mod.ts";
 
-import { configureRouter } from "./router.ts";
+import {
+  configureExamManagerRouter,
+  configureTagRouter,
+  configureTaskPoolRouter,
+} from "./src/examManager/mod.ts";
 
 // output from a successful student PDF generation
 interface StudentResult {
@@ -56,9 +64,12 @@ const workers: { worker: Worker; isBusy: boolean }[] = [];
 
 // creates the worker pool at startup and defines how to handle messages from them
 for (let i = 0; i < POOL_SIZE; i++) {
-  const worker = new Worker(new URL("./worker.ts", import.meta.url).href, {
-    type: "module",
-  });
+  const worker = new Worker(
+    new URL("./src/examManager/worker.ts", import.meta.url).href,
+    {
+      type: "module",
+    },
+  );
 
   // handles messages coming back from a worker
   worker.onmessage = async (e) => {
@@ -218,7 +229,7 @@ const tags = db.collection("tags");
 
 // Create Oak Application and Router
 const app = new Application();
-const router = configureRouter({
+const examManagerRouter = configureExamManagerRouter({
   db,
   jobs,
   taskQueue,
@@ -228,8 +239,16 @@ const router = configureRouter({
   processQueue,
   genRandomNumber,
   getDownloadableJobs,
-  getActiveJobForExam,
   parseLogFileForSubtaskInfo,
+});
+
+const taskPoolRouter = configureTaskPoolRouter({
+  db,
+  basePath,
+});
+
+const tagRouter = configureTagRouter({
+  db,
 });
 
 // Define the group allowed to access the system
@@ -277,8 +296,12 @@ app.use(async (ctx, next) => {
   await next();
 });
 
-app.use(router.routes());
-app.use(router.allowedMethods());
+app.use(examManagerRouter.routes());
+app.use(examManagerRouter.allowedMethods());
+app.use(taskPoolRouter.routes());
+app.use(taskPoolRouter.allowedMethods());
+app.use(tagRouter.routes());
+app.use(tagRouter.allowedMethods());
 
 scheduleDailyCleanup();
 
@@ -394,13 +417,13 @@ async function finalizeJob(jobId: string) {
 
     console.log(`Sending completion email to ${job.userEmail}...`);
 
-    await sendEmail(
-      job.userEmail,
-      `Exam Ready: ${examName}`,
-      `
+    await sendEmail({
+      to: job.userEmail,
+      subject: `Exam Ready: ${examName}`,
+      html: `
       <div style="font-family: sans-serif; padding: 20px;">
         <h2>Exam Generation Complete</h2>
-        <p>The exam <strong>"${examName}"</strong> (${exam.semester}) is ready.</p>
+        <p>The exam <strong>"${examName}"</strong> (${exam?.semester}) is ready.</p>
         <br/>
         <a href="${downloadUrl}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
           Download ZIP
@@ -411,7 +434,7 @@ async function finalizeJob(jobId: string) {
         </p>
       </div>
       `,
-    );
+    });
     // --- END EMAIL LOGIC ---
 
     console.log(`Job ${jobId} completed. ZIP at ${zipFilePath}`);
@@ -419,131 +442,6 @@ async function finalizeJob(jobId: string) {
     console.error(`Failed to finalize job ${jobId}:`, error);
     job.status = "failed";
   }
-}
-
-function parseLogFileForSubtaskInfo(
-  logContent: string,
-): { page: number; logFileBoundaryError: boolean }[] {
-  const lines = logContent.split("\n");
-  const pages: { page: number; logFileBoundaryError: boolean }[] = [];
-
-  for (const line of lines) {
-    if (line.includes("VSEXAM: {'Typ':'AufgabenTeil'")) {
-      const pageMatch = line.match(/'Seite':'(\d+)'/);
-      pages.push({
-        page: pageMatch ? parseInt(pageMatch[1], 10) : 0,
-        logFileBoundaryError: false,
-      });
-    }
-
-    if (
-      line.includes("VSEXAM: {'Typ':'edgeStart'") &&
-      line.includes("'X': '0'")
-    ) {
-      if (pages.length > 0) {
-        pages[pages.length - 1].logFileBoundaryError = true;
-      }
-    }
-  }
-  return pages;
-}
-
-async function createZipArchiveFromDirectory(
-  outDir: string,
-  zipFilePath: string,
-): Promise<void> {
-  const zipFile = await Deno.open(zipFilePath, { write: true, create: true });
-  const zipWriter = new ZipWriter(zipFile);
-
-  try {
-    for await (const entry of walk(outDir)) {
-      if (entry.isFile) {
-        const relativePath = entry.path.substring(outDir.length + 1);
-        const content = await Deno.readFile(entry.path);
-        const contentStream = new ReadableStream({
-          start(controller) {
-            controller.enqueue(content);
-            controller.close();
-          },
-        });
-        await zipWriter.add(relativePath, contentStream);
-      }
-    }
-    await zipWriter.close();
-  } catch (zipError) {
-    zipFile.close();
-    throw zipError;
-  }
-}
-
-async function sendEmail(
-  to: string,
-  subject: string,
-  html: string,
-): Promise<void> {
-  const host = Deno.env.get("SMTP_HOST") || "mailcrab";
-  const port = parseInt(Deno.env.get("SMTP_PORT") || "1025");
-  const from = Deno.env.get("SMTP_FROM") || "noreply@examtoolbox.local";
-
-  const transporter = nodemailer.createTransport({
-    host: host,
-    port: port,
-    secure: false, // true for 465, false for other ports
-    auth: null, // MailCrab needs no auth
-    tls: {
-      rejectUnauthorized: false,
-    },
-  });
-
-  try {
-    const info = await transporter.sendMail({
-      from: `"ExamToolbox" <${from}>`,
-      to,
-      subject,
-      html,
-    });
-    console.log("Email sent via MailCrab:", info.messageId);
-  } catch (error) {
-    console.error("SMTP Error:", error);
-  }
-}
-
-// Calculate the checksum. A valid number should have a checksum of 1.
-function checksum(number: string): number {
-  const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const modulus = alphabet.length;
-  let check = Math.floor(modulus / 2);
-
-  for (const char of number) {
-    const charIndex = alphabet.indexOf(char);
-    if (charIndex === -1) continue; // ignores chars not in the alphabet
-    const val = check || modulus;
-    check = (((val * 2) % (modulus + 1)) + charIndex) % modulus;
-  }
-
-  return check;
-}
-
-// With the provided number, calculate the extra digit that should be appended to make it a valid number.
-function calc_check_digit(number: string): string {
-  const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const modulus = alphabet.length;
-  const cs = checksum(number) || modulus;
-  let index = 1 - ((cs * 2) % (modulus + 1));
-  index = ((index % modulus) + modulus) % modulus; // makes sure the index is not negative, because Typescript modulo is not really modulo (with negative numbers).
-
-  return alphabet[index];
-}
-
-// generates a random exam number
-function genRandomNumber(lang: "de" | "en", counter: number): string {
-  const paddedCount = counter.toString().padStart(4, "0");
-  const langPrefix = lang === "de" ? "1" : "2";
-  const num = parseInt(langPrefix + paddedCount, 10)
-    .toString(36)
-    .toUpperCase();
-  const parity = calc_check_digit(num);
-  return num + parity;
 }
 
 async function getDownloadableJobs(): Promise<
@@ -653,30 +551,4 @@ function scheduleDailyCleanup() {
     // after it runs, schedule the next one for the following day
     scheduleDailyCleanup();
   }, delay);
-}
-
-async function mergePdfs(files: string[], output: string) {
-  if (files.length === 0) return;
-
-  // Ghostscript Arguments:
-  // -q: Quiet
-  // -dNOPAUSE -dBATCH: Exit after finishing
-  // -sDEVICE=pdfwrite: Stream merge (does not accumulate exams in the RAM, that would cause the RAM to max out)
-  const args = [
-    "-q",
-    "-dNOPAUSE",
-    "-dBATCH",
-    "-sDEVICE=pdfwrite",
-    `-sOutputFile=${output}`,
-    ...files,
-  ];
-
-  const cmd = new Deno.Command("gs", { args });
-  const { success, stderr } = await cmd.output();
-
-  if (!success) {
-    throw new Error(
-      `Ghostscript merge failed: ${new TextDecoder().decode(stderr)}`,
-    );
-  }
 }

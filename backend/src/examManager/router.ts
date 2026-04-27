@@ -5,14 +5,13 @@ import { crypto } from "@std/crypto";
 import { encodeHex } from "@std/encoding";
 import * as fs from "@std/fs";
 
-import { Exam, Task } from "./exam.ts";
+import { Exam } from "./exam.ts";
 import {
   generateExam,
   generateTasksLatex,
   updateMetaStudent,
   updateMetaTemplate,
 } from "./generation.ts";
-import { Tag } from "./tag.ts";
 
 interface ExamGenerationJob {
   jobId: string;
@@ -45,7 +44,7 @@ interface AppState {
   parseLogFileForSubtaskInfo: (logContent: string) => any[];
 }
 
-export function configureRouter({
+export function configureExamManagerRouter({
   db,
   jobs,
   taskQueue,
@@ -57,18 +56,16 @@ export function configureRouter({
   getDownloadableJobs,
   parseLogFileForSubtaskInfo,
 }: AppState): Router {
-  const router = new Router();
+  const router = new Router({ prefix: "/api" });
 
   const exams = db.collection("exams");
-  const pool = db.collection("taskPool");
   const fileTracker = db.collection("fileTracker");
-  const tags = db.collection("tags");
 
   router
     .get("/", (ctx) => {
       ctx.response.body = "API is running...";
     })
-    .get("/api/user", (ctx) => {
+    .get("/user", (ctx) => {
       const user = ctx.state.user;
       if (!user || !user.id) {
         ctx.response.status = 401;
@@ -78,7 +75,7 @@ export function configureRouter({
       ctx.response.status = 200;
       ctx.response.body = { id: user.id, email: user.email, roles: user.roles };
     })
-    .get("/api/exams", async (ctx) => {
+    .get("/exams", async (ctx) => {
       try {
         const examList = await exams.find().toArray();
         ctx.response.status = 200;
@@ -88,10 +85,9 @@ export function configureRouter({
         ctx.response.body = { message: "Error fetching exams", error };
       }
     })
-    .get("/api/exams/recent", async (ctx) => {
+    .get("/exams/recent", async (ctx) => {
       try {
         const userId = ctx.state.user.id;
-        // Find exams edited by this user, sort by date desc, limit to 8
         const recentExams = await exams
           .find({ lastEditedBy: userId })
           .sort({ updatedAt: -1 })
@@ -105,7 +101,7 @@ export function configureRouter({
         ctx.response.body = { message: "Error fetching recent exams", error };
       }
     })
-    .get("/api/exam/:id", async (ctx) => {
+    .get("/exam/:id", async (ctx) => {
       try {
         const examId = ctx.params.id;
         const mongoId = new ObjectId(examId);
@@ -122,7 +118,7 @@ export function configureRouter({
         ctx.response.body = { message: "Error fetching exam", error };
       }
     })
-    .get("/api/exams/search/:searchText", async (ctx) => {
+    .get("/exams/search/:searchText", async (ctx) => {
       try {
         const searchText = ctx.params.searchText;
         const examList = await exams
@@ -140,7 +136,7 @@ export function configureRouter({
         ctx.response.body = { message: "Error searching exams", error };
       }
     })
-    .get("/api/download", async (ctx) => {
+    .get("/download", async (ctx) => {
       const fileUrl = ctx.request.url.searchParams.get("fileUrl");
       if (!fileUrl) {
         ctx.response.status = 400;
@@ -182,7 +178,7 @@ export function configureRouter({
         };
       }
     })
-    .get("/api/jobs/:jobId/status", (ctx) => {
+    .get("/jobs/:jobId/status", (ctx) => {
       const jobId = ctx.params.jobId;
       const job = jobs.get(jobId);
       if (!job) {
@@ -200,7 +196,7 @@ export function configureRouter({
           : null,
       };
     })
-    .get("/api/jobs/:jobId/download", async (ctx) => {
+    .get("/jobs/:jobId/download", async (ctx) => {
       const jobId = ctx.params.jobId;
       const job = jobs.get(jobId);
       if (!job) {
@@ -234,100 +230,7 @@ export function configureRouter({
         ctx.response.body = { message: "Error reading the generated file." };
       }
     })
-    .get("/api/taskPool", async (ctx) => {
-      try {
-        const taskList = await pool.find().toArray();
-        ctx.response.status = 200;
-        ctx.response.body = taskList;
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error fetching tasks", error };
-      }
-    })
-    .get("/api/taskPool/:taskId", async (ctx) => {
-      try {
-        const taskId = ctx.params.taskId;
-        const task = await pool.findOne({ taskId: taskId });
-        if (!task) {
-          ctx.response.status = 404;
-          ctx.response.body = { message: "Task not found" };
-          return;
-        }
-        ctx.response.status = 200;
-        ctx.response.body = task;
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error fetching task", error };
-      }
-    })
-    .get("/api/taskPool/type/:type", async (ctx) => {
-      const taskType = ctx.params.type;
-      try {
-        const taskList = await pool.find({ type: taskType }).toArray();
-        ctx.response.status = 200;
-        ctx.response.body = taskList;
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error fetching tasks by type", error };
-      }
-    })
-    .get("/api/taskPool/search/:questionText", async (ctx) => {
-      try {
-        const questionText = ctx.params.questionText;
-        const taskList = await pool
-          .find({
-            $or: [
-              { "question.DE": { $regex: questionText, $options: "i" } },
-              { "question.EN": { $regex: questionText, $options: "i" } },
-            ],
-          })
-          .toArray();
-        ctx.response.status = 200;
-        ctx.response.body = taskList;
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = {
-          message: "Error fetching tasks by question text",
-          error,
-        };
-      }
-    })
-    .put("/api/taskPool/addChild/:taskId", async (ctx) => {
-      try {
-        const id = ctx.params.taskId;
-        const { childTaskId } = await ctx.request.body.json();
-
-        const result = await pool.updateOne(
-          { taskId: id },
-          { $addToSet: { children: childTaskId } },
-        );
-
-        if (result.matchedCount === 0) {
-          ctx.response.status = 404;
-          ctx.response.body = { message: "Task not found" };
-          return;
-        }
-        ctx.response.status = 200;
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = {
-          message: `Error updating child tasks for ${ctx.params.taskId}`,
-          error,
-        };
-      }
-    })
-    .get("/api/taskPool/user/:userId", async (ctx) => {
-      const userId = ctx.params.userId;
-      try {
-        const taskList = await pool.find({ createdBy: userId }).toArray();
-        ctx.response.status = 200;
-        ctx.response.body = taskList;
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error fetching tasks by user", error };
-      }
-    })
-    .get("/api/jobs/downloadable", async (ctx) => {
+    .get("/jobs/downloadable", async (ctx) => {
       try {
         const downloadableJobs = await getDownloadableJobs();
         ctx.response.status = 200;
@@ -340,12 +243,10 @@ export function configureRouter({
         };
       }
     })
-    // Check for active job for a specific exam. This allows the frontend to "resume" the progress bar if the dialog was closed
-    .get("/api/exams/:examId/active-job", (ctx) => {
+    .get("/exams/:examId/active-job", (ctx) => {
       const examId = ctx.params.examId;
       let activeJob = null;
 
-      // Scan the in-memory jobs map for a match that is currently running
       for (const job of jobs.values()) {
         if (
           job.examId === examId &&
@@ -368,7 +269,7 @@ export function configureRouter({
         ctx.response.body = null;
       }
     })
-    .post("/api/exams", async (ctx) => {
+    .post("/exams", async (ctx) => {
       const exam: Exam = await ctx.request.body.json();
       exam.lastEditedBy = ctx.state.user.id;
       exam.updatedAt = new Date();
@@ -384,8 +285,7 @@ export function configureRouter({
         ctx.response.body = { message: "Error saving exam", error: err };
       }
     })
-    // functions as a preview and also sends information about the finished pdf to frontend (like which subtask is at which page)
-    .post("/api/generate-exam", async (ctx) => {
+    .post("/generate-exam", async (ctx) => {
       try {
         const exam: Exam = await ctx.request.body.json();
         const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
@@ -425,7 +325,7 @@ export function configureRouter({
         ctx.response.body = { message: "Error generating Exam PDF", error };
       }
     })
-    .post("/api/upload", async (ctx) => {
+    .post("/upload", async (ctx) => {
       const formData = await ctx.request.body.formData();
       console.log(formData);
       const file: File = formData.get("image") as File;
@@ -471,7 +371,7 @@ export function configureRouter({
       };
       ctx.response.status = 200;
     })
-    .post("/api/generate-exams", async (ctx) => {
+    .post("/generate-exams", async (ctx) => {
       try {
         const formData = await ctx.request.body.formData();
         const examJson: Exam = JSON.parse(formData.get("exam")!.toString());
@@ -479,7 +379,7 @@ export function configureRouter({
           formData.get("startSeatNumber")?.toString() || "1",
           10,
         );
-        const file = formData.get("list") as File; // TODO: What kind of object do we get here?
+        const file = formData.get("list") as File;
         if (!file || !examJson || file.size == 0 || !examJson._id) {
           ctx.response.status = 400;
           ctx.response.body = {
@@ -490,7 +390,6 @@ export function configureRouter({
 
         const examId = examJson._id;
 
-        // Check for Existing Jobs
         for (const [jobId, existingJob] of jobs.entries()) {
           if (existingJob.examId === examId) {
             if (
@@ -524,7 +423,6 @@ export function configureRouter({
           }
         }
 
-        // Setup Job Directory
         const jobId = crypto.randomUUID();
         const jobDir = `${JOBS_DIR}/${jobId}`;
         const jobTemplatePath = `${jobDir}/template`;
@@ -543,7 +441,6 @@ export function configureRouter({
           tasksContentLatex,
         );
 
-        // Parse Excel File
         const workbook = read(await file.arrayBuffer());
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         const studentData = utils
@@ -575,7 +472,6 @@ export function configureRouter({
           studentResults: [],
         };
 
-        // Generate Tasks Loop
         studentData.forEach((student: any, index: number) => {
           const seatNumber = index + startSeatNumber;
           const deRandomNumber = genRandomNumber("de", seatNumber);
@@ -594,7 +490,6 @@ export function configureRouter({
           });
         });
 
-        // Add System Tasks
         taskQueue.push({
           type: "solution",
           jobId,
@@ -634,38 +529,7 @@ export function configureRouter({
         };
       }
     })
-    .post("/api/taskPool", async (ctx) => {
-      const task: Task = await ctx.request.body.json();
-      try {
-        await pool.insertOne(task);
-        ctx.response.status = 200;
-        ctx.response.body = { message: "Task added to pool" };
-      } catch (err) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error adding to pool", error: err };
-      }
-      if (task.type === "pictureTask") {
-        const fileURLs = [
-          task.questionPicture.urlDE,
-          task.questionPicture.urlEN,
-          task.solutionPicture.urlDE,
-          task.solutionPicture.urlEN,
-        ];
-        console.log("File URLs: ", fileURLs);
-        for (const fileURL of fileURLs) {
-          const fileName = fileURL.split("/").pop();
-          try {
-            await fileTracker.updateOne(
-              { name: fileName },
-              { $addToSet: { refs: task.taskId } },
-            );
-          } catch (error) {
-            console.error("Error fetching file tracker enttry:", error);
-          }
-        }
-      }
-    })
-    .put("/api/exams/update", async (ctx) => {
+    .put("/exams/update", async (ctx) => {
       try {
         const { examId, updatedExam } = await ctx.request.body.json();
         if (!examId || !updatedExam) {
@@ -698,47 +562,20 @@ export function configureRouter({
         ctx.response.body = { message: "Error updating exam", error };
       }
     })
-    .put("/api/taskPool/:taskId", async (ctx) => {
-      try {
-        const id = ctx.params.taskId;
-        const { _id, ...updateData } = await ctx.request.body.json();
-
-        const result = await pool.updateOne(
-          { taskId: id },
-          { $set: updateData },
-        );
-
-        if (result.matchedCount === 0) {
-          ctx.response.status = 404;
-          ctx.response.body = { message: "Task not found" };
-          return;
-        }
-        ctx.response.status = 200;
-        ctx.response.body = {
-          message: `Task ${ctx.params.taskId} updated successfully`,
-        };
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = {
-          message: `Error updating task ${ctx.params.taskId}`,
-          error,
-        };
-      }
-    })
-    .delete("/api/exams", async (ctx) => {
+    .delete("/exams", async (ctx) => {
       try {
         const result = await exams.deleteMany({});
         ctx.response.status = 200;
         ctx.response.body = {
-          message: `${result.deletedCount} exams deleted successfully!`,
-          deletedCount: result.deletedCount,
+          message: `${result} exams deleted successfully!`,
+          deletedCount: result,
         };
       } catch (error) {
         ctx.response.status = 500;
         ctx.response.body = { message: "Error deleting exams", error };
       }
     })
-    .delete("/api/exams/:examId", async (ctx) => {
+    .delete("/exams/:examId", async (ctx) => {
       const id = ctx.params.examId;
 
       if (!id) {
@@ -748,10 +585,9 @@ export function configureRouter({
       }
 
       try {
-        // Attempt to delete the exam from the 'exams' collection
         const result = await exams.deleteOne({ _id: new ObjectId(id) });
 
-        if (result.deletedCount === 0) {
+        if (result === 0) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Exam not found" };
         } else {
@@ -761,13 +597,13 @@ export function configureRouter({
         }
       } catch (error) {
         console.error("Error deleting exam:", error);
-        ctx.response.status = 500; // Or 400 if the ObjectId format is wrong
+        ctx.response.status = 500;
         ctx.response.body = {
           message: "Internal server error during deletion",
         };
       }
     })
-    .delete("/api/jobs/:jobId", async (ctx) => {
+    .delete("/jobs/:jobId", async (ctx) => {
       const jobId = ctx.params.jobId;
       const job = jobs.get(jobId);
 
@@ -799,154 +635,6 @@ export function configureRouter({
           message:
             `Job ${jobId} cannot be cancelled as it is already ${job.status}.`,
         };
-      }
-    })
-    .delete("/api/taskPool/:taskId", async (ctx) => {
-      try {
-        const result = await pool.deleteOne({ taskId: ctx.params.taskId });
-        if (result === 0) {
-          ctx.response.status = 404;
-          ctx.response.body = { message: "Task not found" };
-          return;
-        }
-        ctx.response.status = 200;
-        ctx.response.body = { message: "Task deleted successfully" };
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error deleting task", error };
-      }
-    })
-    .delete("/api/taskPool", async (ctx) => {
-      try {
-        const result = await pool.deleteMany({});
-        await fileTracker.deleteMany({});
-        await fs.emptyDir("./uploads");
-        ctx.response.status = 200;
-        ctx.response.body = {
-          message: `${result} task-pool deleted successfully!`,
-          deletedCount: result,
-        };
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error deleting task-pool", error };
-      }
-    })
-    .get("/api/taskPool/tags/:tagId", async (ctx) => {
-      const tagId = ctx.params.tagId;
-      try {
-        const taskList =  await pool.find({ tagIds: tagId }).toArray();
-        ctx.response.status = 200;
-        ctx.response.body = taskList;
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error fetching tasks for tag", error };
-      }
-    })
-    .get("/api/tags/:id", async (ctx) => {
-      try {
-        const tagId = ctx.params.id;
-        const mongoId = new ObjectId(tagId);
-        const tag = await tags.findOne({ _id: mongoId });
-        if (!tag) {
-          ctx.response.status = 404;
-          ctx.response.body = { message: "Tag not found" };
-          return;
-        }
-        ctx.response.status = 200;
-        ctx.response.body = tag;
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error fetching tag", error };
-      }
-    })
-    .get("/api/tags", async (ctx) => {
-      try {
-        const tagList = await tags.find().sort({ name: 1 }).toArray();
-        ctx.response.status = 200;
-        ctx.response.body = tagList;
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error fetching tags", error };
-      }
-    })
-    .put("/api/tags/:id", async (ctx) => {
-      try {
-        const tagId = ctx.params.id;
-        const mongoId = new ObjectId(tagId);
-        const { _id, ...updatedTag }: Tag = await ctx.request.body.json();
-
-        const result = await tags.updateOne({ _id: mongoId }, { $set: updatedTag });
-
-        if (result.matchedCount === 0) {
-          ctx.response.status = 404;
-          ctx.response.body = { message: "Tag not found" };
-          return;
-        }
-
-        ctx.response.status = 200;
-        ctx.response.body = { message: "Tag updated successfully" };
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error updating tag", error };
-      }
-    })
-    .post("/api/tags", async (ctx) => {
-      const { _id, ...tag }: Tag = await ctx.request.body.json();
-      try {
-        const result = await tags.insertOne(tag);
-        ctx.response.status = 201;
-        ctx.response.body = {
-          message: "Tag saved successfully!",
-          insertedId: result, 
-        };
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error saving tag", error: error };
-      }
-    })
-    .delete("/api/tags", async (ctx) => {
-      try {
-        const result = await tags.deleteMany({});
-        ctx.response.status = 200;
-        ctx.response.body = {
-          message: `${result} tags deleted successfully!`,
-          deletedCount: result,
-        };
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error deleting tags", error };
-      }
-    })
-    .delete("/api/tags/:id", async (ctx) => {
-      const tagId = ctx.params.id;
-
-      if (!ObjectId.isValid(tagId)) {
-        ctx.response.status = 400;
-        ctx.response.body = { message: "Invalid tag ID" };
-        return;
-      }
-
-      try {
-        const mongoId = new ObjectId(tagId);
-        const result = await tags.deleteOne({ _id: mongoId });
-
-        if (result.deletedCount === 0) {
-          ctx.response.status = 404;
-          ctx.response.body = { message: "Tag not found" };
-          return;
-        }
-
-        // remove the deleted tag from all tasks that reference it
-        await pool.updateMany(
-          { tagIds: mongoId },
-          { $pull: { tagIds: mongoId } }
-        );
-
-        ctx.response.status = 200;
-        ctx.response.body = { message: "Tag deleted successfully" };
-      } catch (error) {
-        ctx.response.status = 500;
-        ctx.response.body = { message: "Error deleting tag", error };
       }
     });
 

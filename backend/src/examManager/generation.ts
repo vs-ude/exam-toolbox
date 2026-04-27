@@ -1,4 +1,4 @@
-import { Exam } from "./exam.ts";
+import type { Exam } from "./exam.ts";
 
 // executes pdflatex to compile a .tex file and returns the resulting pdf and log file
 export async function generateExam(
@@ -35,7 +35,7 @@ export async function generateExam(
 
     try {
       await Deno.stat(examPdfPath);
-    } catch (err) {
+    } catch (_) {
       throw new Error("PDF output file was not generated");
     }
 
@@ -44,7 +44,8 @@ export async function generateExam(
     return { pdfBytes, logContent };
   } catch (error) {
     console.error("Error during PDF generation:", error);
-    throw new Error("Failed to generate PDF: " + error.message);
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error("Failed to generate PDF: " + message);
   }
 }
 
