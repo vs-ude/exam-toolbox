@@ -49,6 +49,16 @@ services:
       - mailcrab
     networks:
       - web
+    develop:
+      watch:
+        - path: ./backend/
+          include:
+            - "**/*.ts"
+            - "server.ts"
+          action: sync
+          target: /app/
+        - path: backend/template/
+          action: rebuild
 
   mailcrab:
     image: marlonb/mailcrab:latest
