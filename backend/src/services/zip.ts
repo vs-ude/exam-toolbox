@@ -38,11 +38,17 @@ export async function createZipArchiveFromDirectory(
   } catch (error) {
     try {
       await zipWriter.close();
+      return;
     } catch {
       // ignore close errors during failure path
     }
+
+    try {
+      zipFile.close();
+    } catch {
+      // ignore file close errors during failure path
+    }
+
     throw error;
-  } finally {
-    zipFile.close();
   }
 }
