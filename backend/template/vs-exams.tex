@@ -4,7 +4,7 @@
 % - vs-exams.tex -
 %
 % LaTeX-Vorlage zur Verwendung als Vorlage für Klausuren
-% 
+%
 % Version 0.9 vom 5. Februar 2010, Matthäus Wander (Booktabs hinzugefügt, Komascript-Dings auskommentiert)
 % Version 0.8 vom 11.Februar 2009, Arno Wacker
 % basierend auf v1.4 von Jörg Schwerdtfeger
@@ -33,7 +33,7 @@
 %\aufgabe{Atmel ATMega 128 Assembler}{5}
 %blah blah
 %
-%	
+%
 %\aufgabenteil{2}
 %What is the purpose of this code segment?
 %
@@ -46,15 +46,26 @@
 % Diese Übungsdatei dann z. B. mit TeXnicCenter direkt in PDF übersetzen lassen.
 % (die hier vorliegende vs-exams.tex muss sich im selben Verzeichnis befinden)
 
-\documentclass[DIV0,a4paper,12pt,titlepage,pdftex,fleqn]{scrartcl}
-\usepackage[utf8]{inputenc}
+\documentclass[DIV=0,a4paper,12pt,titlepage,fleqn]{scrartcl}
+
+\ifdefined\XeTeXversion
+	% XeTeX // tectonic
+	\usepackage{fontspec}
+	\usepackage{polyglossia}
+	\setmainlanguage[spelling=new,babelshorthands=true]{german}
+	\setotherlanguage[variant=uk]{english}
+\else
+	% default: pdfLaTeX
+	\usepackage[english,german, provide=*]{babel}
+	\usepackage[T1]{fontenc}
+	\usepackage[utf8]{inputenc}
+\fi
+
 \input{meta-exam.tex}
 
 
-\usepackage{etex}
 %\reserveinsert{28}
-\usepackage[pdftex,
-            pdfauthor={\pruefer},
+\usepackage[pdfauthor={\pruefer},
             pdftitle={Klausur \veranstaltung\ im \semester},
             pdfsubject={Klausur zu \veranstaltung\ im \semester\ am \datum},
             pdffitwindow=true,
@@ -66,17 +77,16 @@
             pdfview=FitH,
             hidelinks]{hyperref}
 \hypersetup{colorlinks=false}
-\usepackage[pdftex]{color}
+\usepackage{color}
 \usepackage{pdfcolmk}
-\usepackage[pdftex]{graphicx}
+\usepackage{graphicx}
 \usepackage{pdfpages}
 \usepackage{qrcode}
-\usepackage{makebarcode} 
+\usepackage{makebarcode}
 \usepackage{csquotes}
 \usepackage{xstring}
 
 \newcounter{mycounter}
-
 
 {\catcode`\ =12\relax\gdef\viktorotherspace{ }}%
 \def\vcodes{%
@@ -109,14 +119,13 @@
 \escapedStringTypeout{VSEXAM: {'Typ':'pageGeo', 'hsize': '\strip@pt\DimX'}}%
 \makeatother
 
-\usepackage[english,ngerman]{babel}
-\usepackage{ae,amsmath,amssymb,amsfonts,bbm}
+\usepackage{amsmath,amssymb,amsfonts,bbm}
 \usepackage{amsthm}   % AMS-Theoremumgebung
 \usepackage{stmaryrd}	% Symbole, u. A. \lightning
 %\usepackage{fancybox}[2000/09/19]  % für hübsche Rahmen, usage: \shadowbox{}
 %\usepackage{secnum}  % Abbildungs- und Tabellennummern nach section
 %\usepackage[small,bf,hang]{caption}[2003/12/20] % Abbildungs- und Tabellenunterschriften anpassen
-\usepackage{lastpage}
+% \usepackage{lastpage}
 \usepackage{flafter}  % Abb. und Tabellen nie vor dem ersten Verweis im Text plazieren!
 \usepackage{footnpag} % Fußnotenzähler auf jeder Seite bei 1 beginnen
 \usepackage[normalem]{ulem} % Für div. Unterstreichungen, (\uline,\sout,\uwave)
@@ -145,7 +154,6 @@
 \usepackage{calc}       % Berechnungen Counter
 \usepackage{calculator} % Berechnungen Anzeige
 \usepackage{lastpage}   % Schmierblätter Seitenberechnung
-\usepackage{background}
 \usepackage{rotating}
 
 % theo
@@ -158,7 +166,7 @@
 \usepackage{boolexpr}
 
 % Fix for new PDF Versions (MK)
-\pdfminorversion=6
+% \pdfminorversion=6
 
 \ifthenelse{\equal{\interactive}{Y}}{
 	\usepackage{xstring}% (OC) for correctly sized text lines in \lineloesung
@@ -197,7 +205,11 @@
 \ifthenelse{\equal{\sprache}{en}}
 {
  % english
- \selectlanguage{english}
+ \ifdefined\XeTeXversion
+  \setmainlanguage{english}
+ \else
+  \selectlanguage{english}
+ \fi
  \newcommand{\seite}{Page}
  \newcommand{\udue}{University of Duisburg-Essen}
  \newcommand{\mtr}{Matriculation Nr.}
@@ -214,6 +226,11 @@
  %\newcommand{\printaufgaben}{\include{aufgaben-en}}
 }{
  % deutsch
+ \ifdefined\XeTeXversion
+  \setmainlanguage{german}
+ \else
+  \selectlanguage{german}
+ \fi
  \newcommand{\seite}{Seite}
  \newcommand{\udue}{Universität Duisburg-Essen}
  \newcommand{\mtr}{Matrikelnummer}
@@ -229,19 +246,6 @@
  \newcommand{\seqnr}{Klausurnummer}
  %\newcommand{\printaufgaben}{\include{aufgaben-de}}
 }
-
-
-%\newenvironment{de}{
-%\ifx\equal{\sprache}{de}
-%}{
-%\fi
-%}
-%
-%\newenvironment{en}{
-%\ifx\equal{\sprache}{en}
-%}{
-%\fi
-%}
 
 
 %----- (CB) Schmierblätter ---------------------------------------
@@ -326,7 +330,7 @@
 
 %----- Header + Footer ---------------------------------------
 \pagestyle{scrheadings}
-\clearscrheadfoot
+\clearpairofpagestyles
 \addtolength{\topmargin}{1.05cm}
 \addtolength{\headsep}{-2em}
 \setlength{\footskip}{32pt}
@@ -368,17 +372,17 @@
 \ifthenelse{\equal{\fusszeile}{yes}}{
 \cfoot{
  % \color{black}
- % \begin{tabular}{cc} 
+ % \begin{tabular}{cc}
  %  \#\randomexamnumber
  %  &
  %  \multirow{2}*{\qrcode[height=1.5cm,level=H]{\{'p':\thepage,'r':\randomexamnumber\}}} \printPos{pageQr}
  %  \\
- %  \barcode[code=Code39,X=.25mm,H=1cm]{\randomexamnumber} 
- %  &  
+ %  \barcode[code=Code39,X=.25mm,H=1cm]{\randomexamnumber}
+ %  &
  % \end{tabular}
  % \color{black}
-%  \begin{tabular}{c}   
-%   \barcode[code=Code39,X=.25mm,H=.5cm]{\randomexamnumber} 
+%  \begin{tabular}{c}
+%   \barcode[code=Code39,X=.25mm,H=.5cm]{\randomexamnumber}
 %    \\
 %   \#\randomexamnumber
 %  \end{tabular}
@@ -435,33 +439,6 @@
 \vskip 2ex
 }
 
-% (CB) Old Version
-% 2 Argumente: 1: Titel, 2: mögliche Punkte
-%\newcommand{\aufgabe}[2]{
-% \clearpage
-% \ifhmode\par\fi
-% \removelastskip
-% \vskip 3ex\goodbreak
- %\noindent
-% \refstepcounter{section} % manually increment the chapter number
-% manually add the chapter to the table of contents
-% \addcontentsline{toc}{section}{\protect\numberline{\thesection}#1}
-% and now format the header according to spec.
-%\arrayrulecolor{lightgray2}
-%\setlength{\arrayrulewidth}{1pt}
-%\vspace{10pt}
-%\begingroup
-%\begin{tabular}{|p{0.87\textwidth}p{0.13\textwidth}}
-%\hline
-%\vspace{0.1pt}
-%{\large\bfseries\textsf \afg\ \thesection\ - \it{\textsf{#1}}} & \vspace{0.1pt}\textsf{[#2 \pts]}\\
-%\end{tabular}
-%\quad
-%\par
-%\endgroup
-%\nobreak
-%\vskip 2ex
-%}
 
 %----- Definition für Teilaufgabe ---------------------------------------
 %\titleformat{hcommandi}[hshapei]{hformati}{hlabeli}{hsepi}{hbeforei}[hafteri]
@@ -504,7 +481,7 @@
 % 2 Argumente: Anzahl zeilen, Lösung
 \newcounter{ct}
 \newcommand{\loesung}[2]
-{  \escapedStringTypeout{VSEXAM: {'Typ':'Freitext', 'Zeilen': '#1', 'Loesung': '#2'}}
+{  \escapedStringTypeout{VSEXAM: {'Typ':'Freitext', 'Zeilen': '#1', 'Loesung': ''}}
  \ifthenelse{\equal{\zeigeloesung}{yes}}
  { % print solution
  {\color{red}\normalfont\itshape #2}
@@ -535,19 +512,16 @@
     \rule{\linewidth}{0.2mm}
     \newline
     }
-    \vspace{-1.2cm}
     }
-    %\vspace{-1.2cm}
-    %\vspace{-0.8cm}
+    \vspace{-0.8cm}
   }
   }
-  %\vspace{-0.8cm}
  }
 }
 
 % (CB) zus. Lösungs-Command für Einzeiler, z.B. in Tabellen
 \newcommand{\lineloesung}[2]
-{ \escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '#1', 'Loesung': '#2'}}%
+{ \escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
 \ifthenelse{\equal{\zeigeloesung}{yes}}%
 {%
 % yes
@@ -575,7 +549,7 @@
  { % print solution
     {\color{red}\normalfont\itshape #1}
  }{ % print as many lines as requested
-    \underline{\color{white} #1}    
+    \underline{\color{white} #1}
  }
 }
 
@@ -954,7 +928,7 @@
 \ifthenelse{\equal{\zeigeloesung}{yes}}
 {\ifthenelse{\equal{#3}{f}}{\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} &}{\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} &}
 \ifthenelse{\equal{#6}{f}}{\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\}{\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\}}
-{\emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} & \emptyb & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\ } 
+{\emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} & \emptyb & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\ }
 }
 
 \newcommand{\note}{\ifthenelse{\equal{\sprache}{de}}{Note}{Grade}}
@@ -991,7 +965,7 @@
   {You get \mcpoints{#2} for each correct row. You don't get negative points for wrong rows.}
 } \\
 \case{=4}
-\begin{longtable}{ccccp{7.5cm}}
+\begin{longtable}{ccccp{8.5cm}}
 \blacktoprule
 \multicolumn{5}{p{15.5cm}}{
   \ifthenelse{\equal{\sprache}{de}}
@@ -1055,7 +1029,7 @@
 \ifthenelse{\equal{\sprache}{de}}{#1}{#2}
 }
 
-\newcommand{\bildAufgabe}[4]{\escapedStringTypeout{VSEXAM: {'Typ':'BildAufgabe', 'Bildtext': '#1', 'Loesungsbild': '#4'}}\ifthenelse{\equal{\zeigeloesung}{no}}{
+\newcommand{\bildAufgabe}[4]{\escapedStringTypeout{VSEXAM: {'Typ':'BildAufgabe', 'Bildtext': '', 'Loesungsbild': ''}}\ifthenelse{\equal{\zeigeloesung}{no}}{
 %\begin{figure}[h]
 %\centering
 \includegraphics[width=#2]{#3}

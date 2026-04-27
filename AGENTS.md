@@ -25,7 +25,7 @@ The repository is positioned for a later workflow stage where scanned written ex
 
 - `frontend/`: Angular 18 application (UI for dashboard, exam builder, task pool, search, exam pool, mass-generation dialog)
 - `backend/`: Deno + Oak API, MongoDB integration, LaTeX generation pipeline, worker pool for mass generation
-- `backend/ExamTemplate/`: LaTeX template sources, style files, and helper assets/scripts used for exam rendering
+- `backend/template/`: LaTeX template sources, style files, and helper assets/scripts used for exam rendering
 - `caddy/`: Caddy reverse proxy + authentication portal integration (LDAP via caddy-security), static frontend serving
 - `ldap/`: LDAP bootstrap/test data for local/dev environments
 - `periodical/`: cron-based cleanup container for old mass-generation job directories
@@ -36,7 +36,7 @@ The repository is positioned for a later workflow stage where scanned written ex
 - Frontend talks to backend through `/api/*`
 - Caddy protects frontend and API routes, injects authenticated user claims
 - Backend enforces role-based access (`researcher` role) and serves exam/task/job APIs
-- Exam generation uses LaTeX (`pdflatex`) and post-processing (`gs`/Ghostscript)
+- Exam generation uses LaTeX (`tectonic`) and post-processing (`gs`/Ghostscript)
 - Bulk generation is queued and processed in parallel via Deno workers
 - Job state is kept in memory; generated artifacts are written to mounted job directories
 - MongoDB stores exams, task pool entries, tags, and file-tracking metadata
@@ -52,7 +52,7 @@ The repository is positioned for a later workflow stage where scanned written ex
   - enqueue student + solution + log tasks
   - track progress and expose job status/download endpoints
   - merge outputs and package ZIP deliverables
-  - notify requestor via SMTP (MailCrab in dev)
+  - notify requester via SMTP (MailCrab in dev)
 
 ## Operational notes
 
@@ -65,5 +65,5 @@ The repository is positioned for a later workflow stage where scanned written ex
 
 - Frontend: Angular, Angular Material, RxJS, Cypress/Karma
 - Backend: Deno, Oak, MongoDB driver, worker threads
-- Document pipeline: LaTeX (pdflatex), Ghostscript, ZIP archiving
+- Document pipeline: LaTeX (tectonic), Ghostscript, ZIP archiving
 - Infrastructure: Docker Compose, Caddy, OpenLDAP, MongoDB, MailCrab

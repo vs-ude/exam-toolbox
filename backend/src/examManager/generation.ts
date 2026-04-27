@@ -4,33 +4,33 @@ import type { Exam } from "./exam.ts";
 export async function generateExam(
   workingDir: string,
 ): Promise<{ pdfBytes: Uint8Array; logContent: string }> {
-  const examTexPath = `${workingDir}/exam.tex`;
   const examPdfPath = `${workingDir}/exam.pdf`;
   const examLogPath = `${workingDir}/exam.log`;
 
   try {
-    // runs pdflatex three times to ensure all cross-references (like page numbers) are resolved correctly
-    for (let i = 0; i < 3; i++) {
-      const cmd = new Deno.Command("pdflatex", {
-        args: [
-          "-interaction=nonstopmode",
-          "-halt-on-error",
-          "-output-directory",
-          workingDir,
-          examTexPath,
-        ],
-        stdout: "piped",
-        stderr: "piped",
-      });
+    const cmd = new Deno.Command("tectonic", {
+      args: [
+        "--chatter",
+        "minimal",
+        "-X",
+        "compile",
+        "--untrusted",
+        "--keep-logs",
+        "exam.tex",
+      ],
+      stdout: "piped",
+      stderr: "piped",
+      cwd: workingDir,
+    });
 
-      const { stdout, stderr } = await cmd.output();
-      const stderrStr = new TextDecoder().decode(stderr);
+    const child = cmd.spawn();
+    const stderrStr = await new Response(child.stderr).text();
 
-      if (stderrStr) {
-        console.error(
-          `pdflatex pass ${i + 1} errors in ${workingDir}:\n${stderrStr}`,
-        );
-      }
+    const status = await child.status;
+    if (!status.success) {
+      console.error(
+        `tectonic: code ${status.code}; errors:\n${stderrStr}`,
+      );
     }
 
     try {

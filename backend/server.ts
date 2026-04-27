@@ -8,7 +8,7 @@ import {
   createExamManagerRuntime,
 } from "./src/examManager/mod.ts";
 
-const basePath = "/app/ExamTemplate";
+const basePath = "/app/template";
 const JOBS_DIR = "/app/jobs";
 const REQUIRED_GROUP = "researcher";
 const port = 3000;
