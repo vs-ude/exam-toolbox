@@ -162,9 +162,6 @@ export async function generateTasksLatex(
   exam: Exam,
   workingDir: string,
 ): Promise<string> {
-  console.log(exam);
-  await clearLatexIMGFolder(workingDir); // remove old images from previous runs
-
   const taskGroups = exam.tasks; // get the array of task groups
   let latexContent = "";
 
@@ -329,29 +326,3 @@ export async function generateTasksLatex(
   }
   return latexContent;
 }
-
-export async function clearLatexIMGFolder(workingDir: string) {
-  try {
-    const imgPath = `${workingDir}/img`;
-    for await (const entry of Deno.readDir(imgPath)) {
-      if (
-        entry.isFile &&
-        ![
-          "kreuze.png",
-          "Unilogo.jpg",
-          "vslogo.png",
-          "background-svg.pdf",
-          "background-svg-muster.pdf",
-          "background-svg-muster-first.pdf",
-        ].includes(entry.name)
-      ) {
-        await Deno.remove(`${imgPath}/${entry.name}`);
-      }
-    }
-  } catch (error) {
-    console.error("Error clearing latex img folder:", error);
-  }
-}
-
-
-

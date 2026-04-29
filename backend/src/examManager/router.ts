@@ -301,7 +301,10 @@ export function configureExamManagerRouter({
           },
           tempDir,
         );
-        const tasksContentLatex = await generateTasksLatex(exam, tempDir);
+        const tasksContentLatex = await generateTasksLatex(
+          exam,
+          tempDir,
+        );
         await Deno.writeTextFile(tasksPath, tasksContentLatex);
         const { pdfBytes: examPDF, logContent } = await generateExam(tempDir);
 
