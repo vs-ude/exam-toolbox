@@ -100,10 +100,6 @@ export async function updateMetaStudent(
     .replace(
       /\\newcommand\{\\matrikelnummer\}\{.*?\}/,
       `\\newcommand{\\matrikelnummer}{${matrikelnummer || "3120434"}}`,
-    )
-    .replace(
-      /\\newcommand\{\\uploadurl\}\{.*?\}/,
-      `\\newcommand{\\uploadurl}{${uploadurl || "aklsjdhflkjashdflkjahsdf"}}`,
     );
 
   await Deno.writeTextFile(metaPath, updatedMeta);
@@ -146,12 +142,12 @@ function escapeLatex(text?: string): string {
 
   // Convert basic HTML formatting to LaTeX commands
   text = text
-    .replace(/<b>(.*?)<\/b>/g, '\\textbf{$1}')
-    .replace(/<i>(.*?)<\/i>/g, '\\textit{$1}')
-    .replace(/<br\s*\/?>/g, '\\\\')
-    .replace(/<u>(.*?)<\/u>/g, '\\underline{$1}')
-    .replace(/<div>([\s\S]*?)<\/div>/g, '\\\\ $1') 
-    .replace(/\n/g, '\\\\');
+    .replace(/<b>(.*?)<\/b>/g, "\\textbf{$1}")
+    .replace(/<i>(.*?)<\/i>/g, "\\textit{$1}")
+    .replace(/<br\s*\/?>/g, "\\\\")
+    .replace(/<u>(.*?)<\/u>/g, "\\underline{$1}")
+    .replace(/<div>([\s\S]*?)<\/div>/g, "\\\\ $1")
+    .replace(/\n/g, "\\\\");
 
   console.log("Escaped LaTeX text:", text);
 
@@ -178,8 +174,9 @@ export async function generateTasksLatex(
     const groupTitleEN = group.groupTitle.EN;
 
     // start a main task (\aufgabe) for the group
-    latexContent += `\\aufgabe{${escapeLatex(groupTitleDE)}}{${escapeLatex(groupTitleEN)
-      }}\n\n`;
+    latexContent += `\\aufgabe{${escapeLatex(groupTitleDE)}}{${
+      escapeLatex(groupTitleEN)
+    }}\n\n`;
 
     // iterate over the sub-tasks within this group
     for (let subTask of group.tasks) {
@@ -214,7 +211,6 @@ export async function generateTasksLatex(
         ).length; // calculate points per correct answer
         const totalMcPoints = subTask.points;
 
-        latexContent += `\\fortype{A}{\n`;
         latexContent += `\\mcstart[${totalMcPoints}]{${correctAnswersCount}}\n`; // use total points for the question
 
         answerOptions.forEach((option) => {
@@ -224,7 +220,7 @@ export async function generateTasksLatex(
           latexContent += `\\mcline{${de}}{${en}}{${correctness}}\n`;
         });
 
-        latexContent += `\\mcend\n}\n\n`; // end fortype and add newline
+        latexContent += `\\mcend\n\n`; // end and add newline
       } // --- handle short answer task ---
       else if (subTask.type === "shortAnswer" && subTask.solution) {
         const solutionDE = escapeLatex(subTask.solution.DE);
@@ -266,8 +262,9 @@ export async function generateTasksLatex(
         latexContent += `\\bildAufgabe{}`;
         latexContent +=
           `{1.0\\textwidth}{img/${questionImageName}}{img/${solutionImageName}}\n`;
-        latexContent += `\\manualText{${subTask.questionPicture.altTextDE || ""
-          }}{${subTask.questionPicture.altTextEN || ""}}\n\n`;
+        latexContent += `\\manualText{${
+          subTask.questionPicture.altTextDE || ""
+        }}{${subTask.questionPicture.altTextEN || ""}}\n\n`;
       } else if (subTask.type === "table") {
         if (!subTask.tableDataQuestion || !subTask.tableDataSolution) {
           console.warn("Table task missing data:", subTask.taskId);
@@ -306,13 +303,15 @@ export async function generateTasksLatex(
 
             latexContent += `\\lineloesung`;
             if (subTask.tableDataQuestion[i][j].DE) {
-              latexContent += `{${escapeLatex(subTask.tableDataQuestion[i][j].DE)
-                }}`;
+              latexContent += `{${
+                escapeLatex(subTask.tableDataQuestion[i][j].DE)
+              }}`;
             } else {
               latexContent += `{${"~".repeat(longestSolution)}}`;
             }
-            latexContent += `{ ${escapeLatex(subTask.tableDataSolution[i][j].DE)
-              } }`;
+            latexContent += `{ ${
+              escapeLatex(subTask.tableDataSolution[i][j].DE)
+            } }`;
           }
           latexContent += ` \\\\ \\hline\n`;
         }

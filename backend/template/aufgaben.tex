@@ -10,13 +10,11 @@
 {DE Multiple-Choice Beispiel Aufgabe.}
 {EN Multiple-Choice Example Task.}
 
-\fortype{A}{ % ForType kann weggelassen werden für Klausuren mit nur einem Typ
 \mcstart[10]{1} % 1 Correct answers, 10 Point each
 \mcline{DE Deutscher Text für Choice 1.}{EN English text for choice 1.}{w}
 \mcline{DE Deutscher Text für Choice 2.}{EN English text for choice 2.}{f}
 \mcline{DE Deutscher Text für Choice 3.}{EN English text for choice 3.}{f}
 \mcend
-}
 
 \manualText
 {DE Manuell eingefügter deutscher Text. Falls man mal außerhalb einer Aufgabe Text in Deutsch und Englisch haben möchte.}
@@ -28,7 +26,6 @@
 {DE Multiple-Choice Aufgabe mit zwei Auswahlmöglichkeiten pro Zeile.}
 {EN Multiple-Choice Task with two Choices per line.}
 
-\fortype{A}{
 \mcstarttwo[10]{2} % DE Text, EN Text, Lösung (w/f) für die erste, für die zweite Choice
 \mclinetwo
 {DE Test1}{EN Test1}{w}
@@ -37,7 +34,6 @@
 {DE Test3}{EN Test3}{w}
 {DE Test4}{EN Test4}{f}
 \mcendtwo
-}
 
 \aufgabenteilende
 
@@ -45,7 +41,6 @@
 {DE Beispiel für Eigentschaften Auswahl.}
 {EN Example for property selection.}
 
-\fortype{A}{
 \propertystart{4}{10} % 4 Kästchen, 1 Punkt pro Zeile. Bei 2 oder 3 Kästchen die weiteren ungenutzten Klammern leer lassen, aber hin schreiben
 % Header mit DT Text über der Aufgabe und den Properties (Properties nur EN/DT)
 \propertyheader{DE Text}{EN Text}{Prop1}{Prop2}{Prop3}{Prop4}
@@ -53,15 +48,6 @@
 \propertyline{Beschreibung 1}{Description 1}{w}{f}{f}{w}
 \propertyline{Beschreibung 2}{Description 2}{f}{w}{f}{f}
 \propertyend
-}
-
-\fortype{B}{
-\propertystart{4}{1}
-\propertyheader{DE Text}{EN Text}{Prop1}{Prop2}{Prop3}{Prop4}
-\propertyline{Beschreibung 2}{Description 2}{f}{w}{f}{f}
-\propertyline{Beschreibung 1}{Description 1}{w}{f}{f}{w}
-\propertyend
-}
 \aufgabenteilende
 
 \clearpage
@@ -493,4 +479,3 @@ Wasd}
 \mcendtwo
 \vspace{-1em}
 \aufgabenteilende
-

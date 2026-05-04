@@ -18,7 +18,6 @@
 %\newcommand{\semester}{WS 2008/09}
 %\newcommand{\pruefer}{Prof.\ T.\ Weis, Dr.\ A. Wacker}
 %\newcommand{\datum}{17.02.2009}
-%\newcommand{\klausurtyp}{A}
 %\newcommand{\sprache}{en} % set to de/en, defaults to de
 %\newcommand{\zeigeloesung}{yes} % set to yes/no, no: leere zeilen werden gedruckt, yes, die lösung wird gedruckt
 %
@@ -168,9 +167,6 @@
 % Fix for new PDF Versions (MK)
 % \pdfminorversion=6
 
-\ifthenelse{\equal{\interactive}{Y}}{
-	\usepackage{xstring}% (OC) for correctly sized text lines in \lineloesung
-}{}
 % let's define some colors
 \definecolor{lightgray1}{gray}{.85}
 \definecolor{lightgray2}{gray}{.85}
@@ -184,19 +180,8 @@
 \newcommand{\myarrow}[1][0.1pt]{\tikz[baseline=-0.26em,y=3em, x=3em]{\filldraw[line width=#1] (0.4202,0.0021) .. controls (0.4202,-0.0000) and (0.4188,-0.0018) .. (0.4171,-0.0025) .. controls (0.3917,-0.0092) and (0.3699,-0.0236) .. (0.3509,-0.0401) .. controls (0.3355,-0.0538) and (0.3225,-0.0704) .. (0.3130,-0.0890) .. controls (0.3119,-0.0915) and (0.3094,-0.0929) .. (0.3066,-0.0929) .. controls (0.3028,-0.0929) and (0.2996,-0.0897) .. (0.2996,-0.0858) .. controls (0.2996,-0.0848) and (0.3000,-0.0837) .. (0.3003,-0.0827) .. controls (0.3087,-0.0665) and (0.3193,-0.0517) .. (0.3316,-0.0391) -- (0.1181,-0.0391) .. controls (0.1143,-0.0391) and (0.1111,-0.0359) .. (0.1111,-0.0320) .. controls (0.1111,-0.0282) and (0.1143,-0.0250) .. (0.1181,-0.0250) -- (0.3471,-0.0250) .. controls (0.3611,-0.0137) and (0.3766,-0.0046) .. (0.3935,0.0021) .. controls (0.3766,0.0088) and (0.3611,0.0179) .. (0.3471,0.0292) -- (0.1181,0.0292) .. controls (0.1143,0.0292) and (0.1111,0.0323) .. (0.1111,0.0362) .. controls (0.1111,0.0401) and (0.1143,0.0432) .. (0.1181,0.0432) -- (0.3316,0.0432) .. controls (0.3193,0.0559) and (0.3087,0.0707) .. (0.3003,0.0868) .. controls (0.3000,0.0879) and (0.2996,0.0889) .. (0.2996,0.0900) .. controls (0.2996,0.0939) and (0.3028,0.0970) .. (0.3066,0.0970) .. controls (0.3094,0.0970) and (0.3119,0.0956) .. (0.3130,0.0932) .. controls (0.3225,0.0745) and (0.3355,0.0580) .. (0.3509,0.0443) .. controls (0.3699,0.0278) and (0.3917,0.0133) .. (0.4171,0.0067) .. controls (0.4188,0.0059) and (0.4202,0.0042) .. (0.4202,0.0021) -- cycle;}}
 \newcommand{\declerationbox}{{
   \CheckBox[name=\themycounter, bordercolor=0 0 0, height=13pt, width=18pt, color=black, checkboxsymbol=\ding{56}]{}}\stepcounter{mycounter}}
-
-\ifthenelse{\equal{\interactive}{Y}}{
-  \newcommand{\emptyb}{\mbox{\CheckBox[name=\themycounter, bordercolor=0 0 0, height=13pt, width=13pt, color=black, checkboxsymbol=\ding{56}]{}}\stepcounter{mycounter}}
-}{
-  \newcommand{\emptyb}{\fbox{\phantom{x}}}
-}
+\newcommand{\emptyb}{\fbox{\phantom{x}}}
 \newcommand{\tickedbox}{\fbox{\textbf{x}}}
-\newcommand{\textf}[1]{
-  \mbox{
-    \TextField[name=#1, align=0, width=\textwidth, height=0.89cm, borderstyle=U, bordercolor={0 0 0}, maxlen=50, charsize=12pt]{}
-    %\rule{\linewidth}{0.3mm}
-    }
-  }
 
 \newcommand{\printaufgaben}{\include{aufgaben}}
 \newcommand{\donottouch}{Please do not touch the exam yet.\\[1em]Bitte den Klausurbogen noch nicht öffnen.}
@@ -265,22 +250,16 @@
   \ADD{\schmierblaetteranzahl}{\ergB}{\ergC}
   \forloop{sb}{0}{\value{sb} < \ergC}
   {
-    \ifthenelse{\equal{\interactive}{Y}}{
-      \vspace*{\fill}
-      {\centering\Huge {\ifthenelse{\equal{\sprache}{en}}{Intentionally left blank}{Leerseite}}\\}
-      \vspace*{\fill}
-    }{
-      %\begin{tikzpicture}
-      %   \draw[color=white] (-0.05cm,0cm) -- (0cm,0cm);
-      %   \draw[style=help lines, ystep=5mm, xstep=5mm] (0cm,0cm) grid (17cm,22cm);
-      %\end{tikzpicture}
-      %\total{lastpageexam}
-      {\large\bfseries\textsf {\ifthenelse{\equal{\sprache}{en}}{Space for personal notes}{Konzeptpapier}}\\[2mm]}
-      \begin{tikzpicture}
-         \draw[color=white] (-0.05cm,0cm) -- (0cm,0cm);
-         \draw[style=help lines, ystep=5mm, xstep=5mm] (0cm,0cm) grid (17cm,21.5cm);
-      \end{tikzpicture}
-    }
+    %\begin{tikzpicture}
+    %   \draw[color=white] (-0.05cm,0cm) -- (0cm,0cm);
+    %   \draw[style=help lines, ystep=5mm, xstep=5mm] (0cm,0cm) grid (17cm,22cm);
+    %\end{tikzpicture}
+    %\total{lastpageexam}
+    {\large\bfseries\textsf {\ifthenelse{\equal{\sprache}{en}}{Space for personal notes}{Konzeptpapier}}\\[2mm]}
+    \begin{tikzpicture}
+        \draw[color=white] (-0.05cm,0cm) -- (0cm,0cm);
+        \draw[style=help lines, ystep=5mm, xstep=5mm] (0cm,0cm) grid (17cm,21.5cm);
+    \end{tikzpicture}
 
     \clearpage
   }
@@ -489,16 +468,6 @@
   \ifthenelse{\equal{#1}{0} }
   {}
   {
-  \ifthenelse{\equal{\interactive}{Y}}{
-    \textf{\themycounter}
-    \stepcounter{mycounter}
-    \forloop{ct}{1}{\value{ct} < #1}
-    {
-    \textf{\themycounter}
-    \stepcounter{mycounter}
-    }
-    \vspace{-0.8cm}
-  }{
     \ifthenelse{\equal{#1}{0} }
     {}
     {
@@ -515,30 +484,21 @@
     }
     \vspace{-0.8cm}
   }
-  }
  }
 }
 
 % (CB) zus. Lösungs-Command für Einzeiler, z.B. in Tabellen
-\newcommand{\lineloesung}[2]
-{ \escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
-\ifthenelse{\equal{\zeigeloesung}{yes}}%
-{%
-% yes
-{\color{red}\normalfont\itshape #2}%
-}%
-{%
-% no
-\ifthenelse{\equal{\interactive}{Y}}{%
-\StrDel{#1}{~}%
-\StrCount{#1}{~}[\lineloesungblanks]%
-\typeout{\lineloesungblanks em}%
-\TextField[name=\themycounter, align=0, width={\lineloesungblanks em}, height=13pt, borderstyle=U, bordercolor={0 0 0}, maxlen=\lineloesungblanks, charsize=12pt]{}%
-\stepcounter{mycounter}
-}{%
-#1
-}%
-}%
+\newcommand{\lineloesung}[2]{%
+  \escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
+  \ifthenelse{\equal{\zeigeloesung}{yes}}%
+  {%
+    % yes
+    {\color{red}\normalfont\itshape #2}%
+  }%
+  {%
+    % no
+    #1
+  }%
 }%
 
 
@@ -933,12 +893,6 @@
 
 \newcommand{\note}{\ifthenelse{\equal{\sprache}{de}}{Note}{Grade}}
 
-% (CB) Define Assignments only for one exam type
-\newcommand{\fortype}[2]{
-\ifthenelse{\equal{#1}{\klausurtyp}}{
-#2
-}{}
-}
 
 % (CB) Support for Property questions (NYI)
 
