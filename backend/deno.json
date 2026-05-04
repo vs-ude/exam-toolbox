@@ -3,6 +3,7 @@
     "lib": ["ES2022", "deno.ns", "dom"]
   },
   "imports": {
+    "@bgub/eta": "jsr:@bgub/eta@^4.6.0",
     "@db/mongo": "jsr:@db/mongo@^0.34.0",
     "@mirror/xlsx": "jsr:@mirror/xlsx@^0.20.3",
     "@oak/oak": "jsr:@oak/oak@^17.2.0",

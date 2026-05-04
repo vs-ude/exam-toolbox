@@ -1,7 +1,52 @@
+import { Eta } from "@bgub/eta";
 import type { Exam } from "./exam.ts";
 
-// executes pdflatex to compile a .tex file and returns the resulting pdf and log file
-export async function generateExam(
+const eta = new Eta({ autoEscape: false });
+
+type ExamMetaTemplateData = {
+  veranstaltung: string;
+  semester: string;
+  pruefer: string;
+  datum: string;
+  duration: string;
+  schmierblaetteranzahl: string;
+  englishandgerman: string;
+};
+
+type IndividualMetaTemplateData = {
+  zeigeloesung: string;
+  sprache: string;
+  randomexamnumber: string;
+  sequenznummer: string;
+  vollername: string;
+  matrikelnummer: string;
+};
+
+const DEFAULT_EXAM_META: ExamMetaTemplateData = {
+  veranstaltung: "Probeklausur\\ 2021",
+  semester: "WS\\ 2020/21",
+  pruefer: "Prof.\\ Dr.-Ing.\\ T.\\ Weis",
+  datum: "2021-02-01",
+  duration: "90",
+  schmierblaetteranzahl: "2",
+  englishandgerman: "yes",
+};
+
+const DEFAULT_INDIVIDUAL_META: IndividualMetaTemplateData = {
+  zeigeloesung: "no",
+  sprache: "de",
+  randomexamnumber: "R4ND",
+  sequenznummer: "6",
+  vollername: "Tom\\ Morello",
+  matrikelnummer: "100000",
+};
+
+function escapeLatexWithSpaces(text?: string): string {
+  return escapeLatex(text).replace(/ /g, "\\ ");
+}
+
+// Executes tectonic to compile a .tex file and returns the resulting pdf and log file
+export async function compileExam(
   workingDir: string,
 ): Promise<{ pdfBytes: Uint8Array; logContent: string }> {
   const examPdfPath = `${workingDir}/exam.pdf`;
@@ -49,7 +94,6 @@ export async function generateExam(
   }
 }
 
-// reads the latex template and replaces placeholders with dynamic data
 export async function updateMetaStudent(
   options: {
     zeigeloesung?: "yes" | "no";
@@ -58,84 +102,85 @@ export async function updateMetaStudent(
     sequenznummer?: number;
     vollername?: string;
     matrikelnummer?: number;
-    uploadurl?: string;
   } = {},
   workingDir: string,
 ) {
-  const {
-    zeigeloesung,
-    sprache,
-    randomexamnumber,
-    sequenznummer,
-    vollername,
-    matrikelnummer,
-    uploadurl,
-  } = options;
-  const metaPath = `${workingDir}/meta-exam.tex`;
+  console.log("Updating meta student data", options);
+  const data = {
+    zeigeloesung: options.zeigeloesung === "yes" ? "yes" : "no",
+    sprache: options.sprache || DEFAULT_INDIVIDUAL_META.sprache,
+    randomexamnumber: options.randomexamnumber ||
+      DEFAULT_INDIVIDUAL_META.randomexamnumber,
+    sequenznummer: String(
+      options.sequenznummer ?? DEFAULT_INDIVIDUAL_META.sequenznummer,
+    ),
+    vollername: escapeLatexWithSpaces(options.vollername) ||
+      DEFAULT_INDIVIDUAL_META.vollername,
+    matrikelnummer: String(
+      options.matrikelnummer ?? DEFAULT_INDIVIDUAL_META.matrikelnummer,
+    ),
+  };
+  const metaTemplatePath = `${workingDir}/meta-individual.template.tex`;
+  const metaOutputPath = `${workingDir}/meta-individual.tex`;
 
-  const metaTemplate = await Deno.readTextFile(metaPath);
+  let metaTemplate: string;
+  try {
+    metaTemplate = await Deno.readTextFile(metaTemplatePath);
+  } catch (error) {
+    throw new Error(`Failed to read meta-individual template: ${error}`);
+  }
+  let rendered: string;
+  try {
+    rendered = eta.renderString(metaTemplate, data);
+  } catch (error) {
+    throw new Error(`Failed to render meta-individual template: ${error}`);
+  }
 
-  const updatedMeta = metaTemplate
-    .replace(
-      /\\newcommand\{\\zeigeloesung\}\{.*?\}/,
-      `\\newcommand{\\zeigeloesung}{${zeigeloesung === "yes" ? "yes" : "no"}}`,
-    )
-    .replace(
-      /\\newcommand\{\\sprache\}\{.*?\}/,
-      `\\newcommand{\\sprache}{${sprache || "de"}}`,
-    )
-    .replace(
-      /\\newcommand\{\\randomexamnumber\}\{.*?\}/,
-      `\\newcommand{\\randomexamnumber}{${randomexamnumber || "7PYT"}}`,
-    )
-    .replace(
-      /\\newcommand\{\\sequenznummer\}\{.*?\}/,
-      `\\newcommand{\\sequenznummer}{${sequenznummer || "6"}}`,
-    )
-    .replace(
-      /\\newcommand\{\\vollername\}\{.*?\}/,
-      `\\newcommand{\\vollername}{${vollername ? vollername.replace(/ /g, "\\ ") : "Tom\ Morello"
-      }}`,
-    )
-    .replace(
-      /\\newcommand\{\\matrikelnummer\}\{.*?\}/,
-      `\\newcommand{\\matrikelnummer}{${matrikelnummer || "3120434"}}`,
-    );
+  if (typeof rendered !== "string") {
+    throw new Error("Failed to render meta-individual template");
+  }
 
-  await Deno.writeTextFile(metaPath, updatedMeta);
+  await Deno.writeTextFile(metaOutputPath, rendered);
 }
 
-export async function updateMetaTemplate(exam: Exam, workingDir: string) {
-  const metaPath = `${workingDir}/meta-exam.tex`;
-  const { courseName, examinerName, semester, date, examLengthMinutes, tasks } =
-    exam;
-  const metaTemplate = await Deno.readTextFile(metaPath);
-  const updatedMeta = metaTemplate
-    .replace(
-      /\\newcommand\{\\veranstaltung\}\{.*?\}/,
-      `\\newcommand{\\veranstaltung}{ ${courseName.replace(/([#\$%&_\{\}~^\\ ])/g, "\\$1")
-      } }`,
-    )
-    .replace(
-      /\\newcommand\{\\semester\}\{.*?\}/,
-      `\\newcommand{\\semester}{${semester.replace(/ /g, "\\ ")}}`,
-    )
-    .replace(
-      /\\newcommand\{\\pruefer\}\{.*?\}/,
-      `\\newcommand{\\pruefer}{${examinerName.replace(/([#\$%&_\{\}~^\\ ])/g, "\\$1")
-      }}`,
-    )
-    .replace(
-      /\\newcommand\{\\datum\}\{.*?\}/,
-      `\\newcommand{\\datum}{${date}}`,
-    );
-  await Deno.writeTextFile(metaPath, updatedMeta);
+export async function updateMetaExam(exam: Exam, workingDir: string) {
+  const { courseName, examinerName, semester, date, examLengthMinutes } = exam;
+
+  const data: ExamMetaTemplateData = {
+    ...DEFAULT_EXAM_META,
+    veranstaltung: escapeLatexWithSpaces(courseName),
+    semester: escapeLatexWithSpaces(semester),
+    pruefer: escapeLatexWithSpaces(examinerName),
+    datum: date,
+    duration: String(examLengthMinutes ?? DEFAULT_EXAM_META.duration),
+  };
+
+  const metaTemplatePath = `${workingDir}/meta-exam.template.tex`;
+  const metaOutputPath = `${workingDir}/meta-exam.tex`;
+
+  let metaTemplate: string;
+  try {
+    metaTemplate = await Deno.readTextFile(metaTemplatePath);
+  } catch (error) {
+    throw new Error(`Failed to read meta-exam template: ${error}`);
+  }
+
+  let rendered: string;
+  try {
+    rendered = eta.renderString(metaTemplate, data);
+  } catch (error) {
+    throw new Error(`Failed to render meta-exam template: ${error}`);
+  }
+
+  if (typeof rendered !== "string") {
+    throw new Error("Failed to render meta-exam template");
+  }
+
+  await Deno.writeTextFile(metaOutputPath, rendered);
 }
 
 function escapeLatex(text?: string): string {
   if (!text) return "";
-
-  console.log("Escaped LaTeX text:", text);
 
   // Escape special LaTeX characters
   text = text.replace(/([&%$#_{}~^\\])/g, "\\$1");
@@ -148,8 +193,6 @@ function escapeLatex(text?: string): string {
     .replace(/<u>(.*?)<\/u>/g, "\\underline{$1}")
     .replace(/<div>([\s\S]*?)<\/div>/g, "\\\\ $1")
     .replace(/\n/g, "\\\\");
-
-  console.log("Escaped LaTeX text:", text);
 
   return text;
 }

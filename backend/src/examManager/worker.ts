@@ -1,6 +1,6 @@
 import { copy } from "@std/fs";
 
-import { generateExam, updateMetaStudent } from "./generation.ts";
+import { compileExam, updateMetaStudent } from "./generation.ts";
 
 // this worker receives a task, generates a single artifact (like a student pdf or a solution), and sends back the result
 self.onmessage = async (e: MessageEvent) => {
@@ -24,7 +24,7 @@ self.onmessage = async (e: MessageEvent) => {
         randomexamnumber: deRandomNumber,
         sequenznummer: seatNumber,
       }, workerTempDir);
-      const { pdfBytes: pdfBytesDE } = await generateExam(workerTempDir);
+      const { pdfBytes: pdfBytesDE } = await compileExam(workerTempDir);
       const pdfPathDE =
         `${outputDir}/student_pdfs/${seatNumber}_${student.studentId}_DE.pdf`;
       await Deno.writeFile(pdfPathDE, pdfBytesDE);
@@ -37,7 +37,7 @@ self.onmessage = async (e: MessageEvent) => {
         randomexamnumber: enRandomNumber,
         sequenznummer: seatNumber,
       }, workerTempDir);
-      const { pdfBytes: pdfBytesEN } = await generateExam(workerTempDir);
+      const { pdfBytes: pdfBytesEN } = await compileExam(workerTempDir);
       const pdfPathEN =
         `${outputDir}/student_pdfs/${seatNumber}_${student.studentId}_EN.pdf`;
       await Deno.writeFile(pdfPathEN, pdfBytesEN);
@@ -52,26 +52,31 @@ self.onmessage = async (e: MessageEvent) => {
       });
     } else if (type === "solution") {
       await updateMetaStudent({
-        vollername: "Max Musterloesung",
+        vollername: "Max Musterlösung",
         matrikelnummer: 0,
         zeigeloesung: "yes",
         sprache: "de",
       }, workerTempDir);
-      const { pdfBytes } = await generateExam(workerTempDir);
+      const { pdfBytes } = await compileExam(workerTempDir);
       const solutionPdfPath = `${outputDir}/exam_solution_de.pdf`;
       await Deno.writeFile(solutionPdfPath, pdfBytes);
       self.postMessage({ status: "success", type, jobId, solutionPdfPath });
     } else if (type === "log") {
       const { lang } = task;
       await updateMetaStudent({ sprache: lang }, workerTempDir);
-      const { logContent } = await generateExam(workerTempDir);
+      const { logContent } = await compileExam(workerTempDir);
       const logPath = `${outputDir}/exam_${lang}.log`;
       await Deno.writeTextFile(logPath, logContent);
       self.postMessage({ status: "success", type, jobId, lang, logPath });
     }
   } catch (error) {
     console.error(`Error in worker for task type ${type}:`, error);
-    self.postMessage({ status: "error", type, jobId, error: error instanceof Error ? error.message : String(error) });
+    self.postMessage({
+      status: "error",
+      type,
+      jobId,
+      error: error instanceof Error ? error.message : String(error),
+    });
   } finally {
     // ensures the temporary directory is always cleaned up to save space
     await Deno.remove(workerTempDir, { recursive: true });

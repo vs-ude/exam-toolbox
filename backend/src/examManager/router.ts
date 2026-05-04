@@ -7,10 +7,10 @@ import * as fs from "@std/fs";
 
 import { Exam } from "./exam.ts";
 import {
-  generateExam,
+  compileExam,
   generateTasksLatex,
+  updateMetaExam,
   updateMetaStudent,
-  updateMetaTemplate,
 } from "./generation.ts";
 
 interface ExamGenerationJob {
@@ -291,11 +291,10 @@ export function configureExamManagerRouter({
         const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
         await fs.copy(basePath, tempDir, { overwrite: true });
         const tasksPath = `${tempDir}/aufgaben.tex`;
-        await updateMetaTemplate(exam, tempDir);
+        await updateMetaExam(exam, tempDir);
         await updateMetaStudent(
           {
-            vollername: "Max Musterloesung",
-            matrikelnummer: 0,
+            vollername: "Max Musterlösung",
             zeigeloesung: "yes",
             sprache: "de",
           },
@@ -306,7 +305,7 @@ export function configureExamManagerRouter({
           tempDir,
         );
         await Deno.writeTextFile(tasksPath, tasksContentLatex);
-        const { pdfBytes: examPDF, logContent } = await generateExam(tempDir);
+        const { pdfBytes: examPDF, logContent } = await compileExam(tempDir);
 
         const subtaskInfo = parseLogFileForSubtaskInfo(logContent);
         const subtaskInfoJson = JSON.stringify(subtaskInfo);
@@ -428,13 +427,17 @@ export function configureExamManagerRouter({
 
         const jobId = crypto.randomUUID();
         const jobDir = `${JOBS_DIR}/${jobId}`;
-        const jobTemplatePath = `${jobDir}/template`;
         const tempOutputDir = `${jobDir}/temp_output`;
         const studentPdfDir = `${tempOutputDir}/student_pdfs`;
         await Deno.mkdir(studentPdfDir, { recursive: true });
 
+        const jobTemplatePath = await Deno.makeTempDir({
+          prefix: "exam_template_",
+          dir: jobDir,
+        });
+
         await fs.copy(basePath, jobTemplatePath, { overwrite: true });
-        await updateMetaTemplate(examJson, jobTemplatePath);
+        await updateMetaExam(examJson, jobTemplatePath);
         const tasksContentLatex = await generateTasksLatex(
           examJson,
           jobTemplatePath,

@@ -4,10 +4,10 @@ export { configureTagRouter } from "./tagRouter.ts";
 export type { Exam, Task, Task as TaskType, TaskGroup } from "./exam.ts";
 export type { Tag } from "./tag.ts";
 export {
-  generateExam,
+  compileExam,
   generateTasksLatex,
+  updateMetaExam,
   updateMetaStudent,
-  updateMetaTemplate,
 } from "./generation.ts";
 export type { FileTracker } from "./fileTracker.ts";
 export * from "./runtime.ts";
