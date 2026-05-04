@@ -7,8 +7,9 @@ import {
   configureTaskPoolRouter,
   createExamManagerRuntime,
 } from "./src/examManager/mod.ts";
+import { TEMPLATE_BASE_PATH } from "./src/config/paths.ts";
 
-const basePath = "/app/template";
+const basePath = TEMPLATE_BASE_PATH;
 const JOBS_DIR = "/app/jobs";
 const REQUIRED_GROUP = "researcher";
 const port = 3000;

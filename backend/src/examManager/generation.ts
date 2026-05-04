@@ -1,7 +1,22 @@
 import { Eta } from "@bgub/eta";
+import { TEMPLATE_BASE_PATH } from "../config/paths.ts";
 import type { Exam } from "./exam.ts";
 
-const eta = new Eta({ autoEscape: false });
+let cachedEta: Eta;
+
+function getEta(): Eta {
+  if (cachedEta) return cachedEta;
+
+  cachedEta = new Eta({
+    autoEscape: false,
+    rmWhitespace: false,
+    tags: ["<#", "#>"],
+    views: TEMPLATE_BASE_PATH,
+    defaultExtension: ".template.tex",
+    cache: true,
+  });
+  return cachedEta;
+}
 
 type ExamMetaTemplateData = {
   veranstaltung: string;
@@ -105,7 +120,6 @@ export async function updateMetaStudent(
   } = {},
   workingDir: string,
 ) {
-  console.log("Updating meta student data", options);
   const data = {
     zeigeloesung: options.zeigeloesung === "yes" ? "yes" : "no",
     sprache: options.sprache || DEFAULT_INDIVIDUAL_META.sprache,
@@ -120,21 +134,8 @@ export async function updateMetaStudent(
       options.matrikelnummer ?? DEFAULT_INDIVIDUAL_META.matrikelnummer,
     ),
   };
-  const metaTemplatePath = `${workingDir}/meta-individual.template.tex`;
   const metaOutputPath = `${workingDir}/meta-individual.tex`;
-
-  let metaTemplate: string;
-  try {
-    metaTemplate = await Deno.readTextFile(metaTemplatePath);
-  } catch (error) {
-    throw new Error(`Failed to read meta-individual template: ${error}`);
-  }
-  let rendered: string;
-  try {
-    rendered = eta.renderString(metaTemplate, data);
-  } catch (error) {
-    throw new Error(`Failed to render meta-individual template: ${error}`);
-  }
+  const rendered = getEta().render("meta-individual", data);
 
   if (typeof rendered !== "string") {
     throw new Error("Failed to render meta-individual template");
@@ -143,7 +144,10 @@ export async function updateMetaStudent(
   await Deno.writeTextFile(metaOutputPath, rendered);
 }
 
-export async function updateMetaExam(exam: Exam, workingDir: string) {
+export async function updateMetaExam(
+  exam: Exam,
+  workingDir: string,
+) {
   const { courseName, examinerName, semester, date, examLengthMinutes } = exam;
 
   const data: ExamMetaTemplateData = {
@@ -155,22 +159,8 @@ export async function updateMetaExam(exam: Exam, workingDir: string) {
     duration: String(examLengthMinutes ?? DEFAULT_EXAM_META.duration),
   };
 
-  const metaTemplatePath = `${workingDir}/meta-exam.template.tex`;
   const metaOutputPath = `${workingDir}/meta-exam.tex`;
-
-  let metaTemplate: string;
-  try {
-    metaTemplate = await Deno.readTextFile(metaTemplatePath);
-  } catch (error) {
-    throw new Error(`Failed to read meta-exam template: ${error}`);
-  }
-
-  let rendered: string;
-  try {
-    rendered = eta.renderString(metaTemplate, data);
-  } catch (error) {
-    throw new Error(`Failed to render meta-exam template: ${error}`);
-  }
+  const rendered = getEta().render("meta-exam", data);
 
   if (typeof rendered !== "string") {
     throw new Error("Failed to render meta-exam template");

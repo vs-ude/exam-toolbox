@@ -16,27 +16,33 @@ self.onmessage = async (e: MessageEvent) => {
       const { student, deRandomNumber, enRandomNumber, seatNumber } = task;
 
       // generates the german pdf first, then modifies the same template to generate the english pdf sequentially
-      await updateMetaStudent({
-        vollername: `${student.firstName} ${student.lastName}`,
-        matrikelnummer: student.studentId,
-        zeigeloesung: "no",
-        sprache: "de",
-        randomexamnumber: deRandomNumber,
-        sequenznummer: seatNumber,
-      }, workerTempDir);
+      await updateMetaStudent(
+        {
+          vollername: `${student.firstName} ${student.lastName}`,
+          matrikelnummer: student.studentId,
+          zeigeloesung: "no",
+          sprache: "de",
+          randomexamnumber: deRandomNumber,
+          sequenznummer: seatNumber,
+        },
+        workerTempDir,
+      );
       const { pdfBytes: pdfBytesDE } = await compileExam(workerTempDir);
       const pdfPathDE =
         `${outputDir}/student_pdfs/${seatNumber}_${student.studentId}_DE.pdf`;
       await Deno.writeFile(pdfPathDE, pdfBytesDE);
 
-      await updateMetaStudent({
-        vollername: `${student.firstName} ${student.lastName}`,
-        matrikelnummer: student.studentId,
-        zeigeloesung: "no",
-        sprache: "en",
-        randomexamnumber: enRandomNumber,
-        sequenznummer: seatNumber,
-      }, workerTempDir);
+      await updateMetaStudent(
+        {
+          vollername: `${student.firstName} ${student.lastName}`,
+          matrikelnummer: student.studentId,
+          zeigeloesung: "no",
+          sprache: "en",
+          randomexamnumber: enRandomNumber,
+          sequenznummer: seatNumber,
+        },
+        workerTempDir,
+      );
       const { pdfBytes: pdfBytesEN } = await compileExam(workerTempDir);
       const pdfPathEN =
         `${outputDir}/student_pdfs/${seatNumber}_${student.studentId}_EN.pdf`;
@@ -51,12 +57,15 @@ self.onmessage = async (e: MessageEvent) => {
         pdfPathEN,
       });
     } else if (type === "solution") {
-      await updateMetaStudent({
-        vollername: "Max Musterlösung",
-        matrikelnummer: 0,
-        zeigeloesung: "yes",
-        sprache: "de",
-      }, workerTempDir);
+      await updateMetaStudent(
+        {
+          vollername: "Max Musterlösung",
+          matrikelnummer: 0,
+          zeigeloesung: "yes",
+          sprache: "de",
+        },
+        workerTempDir,
+      );
       const { pdfBytes } = await compileExam(workerTempDir);
       const solutionPdfPath = `${outputDir}/exam_solution_de.pdf`;
       await Deno.writeFile(solutionPdfPath, pdfBytes);
