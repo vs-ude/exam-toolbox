@@ -1,3 +1,4 @@
+import { Eta } from "@bgub/eta";
 import type { Tag } from "./tag.ts";
 
 export class Exam {
@@ -57,6 +58,14 @@ export interface BaseTask {
   usedIn: string[];
   parent?: string;
   children: string[];
+
+  render?: (
+    /* optional for now while we transition */
+    e: Eta,
+    lang: string,
+    solution: boolean,
+    dest: string,
+  ) => Promise<Error>;
 }
 
 export interface Question {
@@ -66,6 +75,7 @@ export interface Question {
 
 export interface MultipleChoiceTask extends BaseTask {
   type: "multipleChoice";
+  numCorrect?: number;
   answerOptions: AnswerOptions[];
 }
 

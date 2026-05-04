@@ -1,0 +1,34 @@
+<# let pointsPerCorrect = Math.round(it.points / it.numCorrect * 2) / 2 /* round to 0.5 points */ #>
+\escapedStringTypeout{VSEXAM: {'Typ':'MCStart', 'PunkteKorrekt': '<# pointsPerCorrect #>', 'AnzahlKorrekt':'<# it.numCorrect #>'}}
+
+\begin{longtable}{cp{14.5cm}}
+\blacktoprule
+
+\multicolumn{2}{p{14.5cm}}{
+<# if (it.numCorrect == 1) { #>
+  \ifthenelse{\equal{\sprache}{de}}
+  {Single Response: Für die korrekt markierte Aussage erhalten Sie <# pointsPerCorrect #> Punkte.}
+  {Single response: You get <# pointsPerCorrect #> points for marking the correct statement.}
+<# } else { #>
+  \ifthenelse{\equal{\sprache}{de}}
+  {Multiple Response: Es gibt \textbf{<# it.numCorrect #>} richtige Aussagen. Sie erhalten <# pointsPerCorrect #> Punkte für jede markierte korrekte Aussage, jedoch 0 Punkte für die Teilaufgabe, falls eine falsche Aussage markiert wurde.}
+  {Multiple response: There are \textbf{<# it.numCorrect #>} correct statements. You get <# pointsPerCorrect#> points for each correct statement, but 0 points for the question if you mark a wrong statement.}
+<# } #>
+} \\
+
+<# it.answerOptions.forEach((option) => { #>
+<# let correct = option.correct ? "w" : "f" #>
+\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLine', 'Antwort': '<# correct #>'}}
+
+<# if (it.solution) { #>
+  <# if option.correct { #>
+  \color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{<# option.DE #>}{<# option.EN #>} \\
+  <# } else { #>
+  \color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{<# option.DE #>}{<# option.EN #>} \\
+  <# } #>
+<# } else { #>
+  \emptyb & \ifthenelse{\equal{\sprache}{de}}{<# option.DE #>}{<# option.EN #>} \\
+<# }}) #>
+
+\blackbottomrule
+\end{longtable}
