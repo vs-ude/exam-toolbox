@@ -12,14 +12,14 @@
 
 ## Proposed approach
 
-### 1) Template-driven `meta-exam.tex`
-- Create a new template file copied from `${templateRoot}/meta-exam.tex` (e.g., `${templateRoot}/meta-exam.template.tex`).
-- Choose a templating library compatible with Deno (e.g., `nunjucks` via npm, `eta`, or `mustache`).
-- Replace `updateMetaStudent` and `updateMetaTemplate` with a single renderer that:
-  - Loads the template file.
-  - Injects all meta values in one render pass.
-  - Performs LaTeX escaping in a central helper (including spaces).
-- Keep `meta-exam.tex` as the output file written into the working directory.
+### 1) Template-driven metadata (`meta-exam.tex` + `meta-individual.tex`)
+- Use Eta for templating with custom tags (e.g., `<# #>`) and cache enabled.
+- Store the template root in a shared config (`TEMPLATE_BASE_PATH`) instead of threading a base path through function calls.
+- Split metadata into two templates:
+  - `${templateRoot}/meta-exam.template.tex` for exam-wide variables.
+  - `${templateRoot}/meta-individual.template.tex` for per-student/per-language variables.
+- Update `updateMetaExam` and `updateMetaStudent` to render these templates into the working directory.
+- Perform LaTeX escaping in a central helper (including spaces) for injected values.
 
 ### 2) Task templates for `vs-exams.tex`
 - Inspect `${templateRoot}/vs-exams.tex` to locate sections for task types:
@@ -51,6 +51,7 @@
 ## Deliverables
 - `PLAN.md` (this document) committed.
 - Template files added/updated under the runtime `${templateRoot}` directory (path resolved from configuration).
+- Shared template base path configuration (`TEMPLATE_BASE_PATH`) added and used by generation utilities.
 - Updated `backend/src/examManager/generation.ts` using templates and QR assets.
 - Updated LaTeX templates that no longer depend on `qrcodes.sty`.
 
