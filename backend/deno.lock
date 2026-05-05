@@ -1,6 +1,7 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@bgub/eta@^4.6.0": "4.6.0",
     "jsr:@db/mongo@0.34": "0.34.0",
     "jsr:@lucsoft/web-bson@0.4": "0.4.0",
     "jsr:@mirror/xlsx@~0.20.3": "0.20.3",
@@ -25,6 +26,9 @@
     "npm:path-to-regexp@^6.3.0": "6.3.0"
   },
   "jsr": {
+    "@bgub/eta@4.6.0": {
+      "integrity": "fe872004cd6c64ca25c7e71fd80bbbad7d8d552cefd31828bddddb7db0f79eb1"
+    },
     "@db/mongo@0.34.0": {
       "integrity": "48960c99392e9899579b1e23ca87c7a3b42fb5788bcc6fa72b2f2a0090f52a6e",
       "dependencies": [
@@ -113,6 +117,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@bgub/eta@^4.6.0",
       "jsr:@db/mongo@0.34",
       "jsr:@mirror/xlsx@~0.20.3",
       "jsr:@oak/oak@^17.2.0",
