@@ -1,22 +1,6 @@
-import { Eta } from "@bgub/eta";
-import { TEMPLATE_BASE_PATH } from "../config/paths.ts";
 import type { Exam } from "./exam.ts";
-
-let cachedEta: Eta;
-
-function getEta(): Eta {
-  if (cachedEta) return cachedEta;
-
-  cachedEta = new Eta({
-    autoEscape: false,
-    rmWhitespace: false,
-    tags: ["<#", "#>"],
-    views: TEMPLATE_BASE_PATH,
-    defaultExtension: ".template.tex",
-    cache: true,
-  });
-  return cachedEta;
-}
+import { getTaskRenderer, type RenderOptions } from "./taskRenderer.ts";
+import { escapeLatex, getEta } from "../services/mod.ts";
 
 type ExamMetaTemplateData = {
   veranstaltung: string;
@@ -169,28 +153,12 @@ export async function updateMetaExam(
   await Deno.writeTextFile(metaOutputPath, rendered);
 }
 
-function escapeLatex(text?: string): string {
-  if (!text) return "";
-
-  // Escape special LaTeX characters
-  text = text.replace(/([&%$#_{}~^\\])/g, "\\$1");
-
-  // Convert basic HTML formatting to LaTeX commands
-  text = text
-    .replace(/<b>(.*?)<\/b>/g, "\\textbf{$1}")
-    .replace(/<i>(.*?)<\/i>/g, "\\textit{$1}")
-    .replace(/<br\s*\/?>/g, "\\\\")
-    .replace(/<u>(.*?)<\/u>/g, "\\underline{$1}")
-    .replace(/<div>([\s\S]*?)<\/div>/g, "\\\\ $1")
-    .replace(/\n/g, "\\\\");
-
-  return text;
-}
-
 export async function generateTasksLatex(
   exam: Exam,
   workingDir: string,
-): Promise<string> {
+  dest: string,
+  options: RenderOptions,
+): Promise<void> {
   const taskGroups = exam.tasks; // get the array of task groups
   let latexContent = "";
 
@@ -238,22 +206,10 @@ export async function generateTasksLatex(
 
       // --- handle multiple choice task ---
       if (subTask.type === "multipleChoice" && subTask.answerOptions) {
-        const answerOptions = subTask.answerOptions;
-        const correctAnswersCount = answerOptions.filter(
-          (opt) => opt.correct,
-        ).length; // calculate points per correct answer
-        const totalMcPoints = subTask.points;
-
-        latexContent += `\\mcstart[${totalMcPoints}]{${correctAnswersCount}}\n`; // use total points for the question
-
-        answerOptions.forEach((option) => {
-          const de = escapeLatex(option.DE);
-          const en = escapeLatex(option.EN);
-          const correctness = option.correct ? "w" : "f";
-          latexContent += `\\mcline{${de}}{${en}}{${correctness}}\n`;
+        const rendered = getTaskRenderer().renderMultipleChoice(subTask, {
+          solution: options.solution,
         });
-
-        latexContent += `\\mcend\n\n`; // end and add newline
+        latexContent += `${rendered}\n\n`;
       } // --- handle short answer task ---
       else if (subTask.type === "shortAnswer" && subTask.solution) {
         const solutionDE = escapeLatex(subTask.solution.DE);
@@ -356,5 +312,9 @@ export async function generateTasksLatex(
       latexContent += "\\aufgabenteilende\n\n\n";
     }
   }
-  return latexContent;
+
+  await Deno.writeTextFile(
+    dest,
+    latexContent,
+  );
 }

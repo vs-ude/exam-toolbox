@@ -11,3 +11,4 @@ export {
 } from "./generation.ts";
 export type { FileTracker } from "./fileTracker.ts";
 export * from "./runtime.ts";
+export * from "./err.ts";

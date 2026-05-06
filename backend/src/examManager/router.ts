@@ -300,11 +300,13 @@ export function configureExamManagerRouter({
           },
           tempDir,
         );
-        const tasksContentLatex = await generateTasksLatex(
+        await generateTasksLatex(
           exam,
           tempDir,
+          tasksPath,
+          { solution: true },
         );
-        await Deno.writeTextFile(tasksPath, tasksContentLatex);
+
         const { pdfBytes: examPDF, logContent } = await compileExam(tempDir);
 
         const subtaskInfo = parseLogFileForSubtaskInfo(logContent);
@@ -438,13 +440,11 @@ export function configureExamManagerRouter({
 
         await fs.copy(basePath, jobTemplatePath, { overwrite: true });
         await updateMetaExam(examJson, jobTemplatePath);
-        const tasksContentLatex = await generateTasksLatex(
+        await generateTasksLatex(
           examJson,
           jobTemplatePath,
-        );
-        await Deno.writeTextFile(
           `${jobTemplatePath}/aufgaben.tex`,
-          tasksContentLatex,
+          { solution: false },
         );
 
         const workbook = read(await file.arrayBuffer());
