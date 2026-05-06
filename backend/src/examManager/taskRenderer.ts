@@ -1,6 +1,6 @@
 import { type Eta } from "@bgub/eta";
 import { escapeLatex, getEta } from "../services/mod.ts";
-import type { MultipleChoiceTask } from "./exam.ts";
+import type { MultipleChoiceTask, ShortAnswerTask } from "./exam.ts";
 import { LatexRenderError } from "./err.ts";
 
 let cachedTaskRenderer: TaskRenderer;
@@ -63,6 +63,29 @@ export class TaskRenderer {
 
     return this.render("task_types/multipleChoice", data);
   }
+
+  renderMultilineText(
+    task: ShortAnswerTask,
+    options: RenderOptions,
+  ): string {
+    const solutionTexts = [];
+    let maxNoLines = 0;
+    for (const val of Object.values(task.solution)) {
+      const escaped = escapeLatex(val);
+      solutionTexts.push(escaped);
+      maxNoLines = Math.max(maxNoLines, Math.ceil(escaped.length / 50));
+    }
+
+    const data: MultilineTextTemplateData = {
+      solution: options.solution ?? false,
+      solutionText: solutionTexts,
+      noLines: task.noLines == undefined || task.noLines == 0
+        ? maxNoLines
+        : task.noLines,
+    };
+
+    return this.render("task_types/multilineText", data);
+  }
 }
 
 export type RenderOptions = {
@@ -71,7 +94,7 @@ export type RenderOptions = {
 };
 
 type TemplateData = {
-  points: number;
+  points?: number;
   solution: boolean;
 };
 
@@ -83,4 +106,9 @@ type MultipleChoiceTemplateData = TemplateData & {
   numCorrect: number;
   pointsPerCorrect: number;
   answerOptions: { DE: string; EN: string; correct: "w" | "f" }[];
+};
+
+type MultilineTextTemplateData = TemplateData & {
+  solutionText: string[];
+  noLines: number;
 };

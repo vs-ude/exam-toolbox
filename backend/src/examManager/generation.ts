@@ -207,16 +207,13 @@ export async function generateTasksLatex(
         latexContent += `${rendered}\n\n`;
       } // --- handle short answer task ---
       else if (subTask.type === "shortAnswer" && subTask.solution) {
-        const solutionDE = escapeLatex(subTask.solution.DE);
-        const solutionEN = escapeLatex(subTask.solution.EN);
-
-        // Estimates number of lines needed based on the solution. Better more lines than less.
-        const numberLnDE = Math.max(3, Math.ceil(solutionDE.length / 50));
-        const numberLnEN = Math.max(3, Math.ceil(solutionEN.length / 50));
-        const numberLn = Math.max(numberLnDE, numberLnEN);
-
-        latexContent +=
-          `\\loesung{${numberLn}}{${solutionDE} / ${solutionEN}}\n\n`;
+        const rendered = getTaskRenderer().renderMultilineText(
+          subTask,
+          {
+            solution: options.solution,
+          },
+        );
+        latexContent += `${rendered}\n\n`;
       } // --- handle latex task ---
       else if (subTask.type === "latex") {
         // Insert raw LaTeX content directly

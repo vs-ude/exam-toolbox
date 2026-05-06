@@ -87,6 +87,7 @@ export interface AnswerOptions {
 
 export interface ShortAnswerTask extends BaseTask {
   type: "shortAnswer";
+  noLines?: number;
   solution: Translation;
 }
 

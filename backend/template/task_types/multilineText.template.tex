@@ -1,0 +1,15 @@
+\escapedStringTypeout{VSEXAM: {'Typ':'Freitext', 'Zeilen': '<#~ it.noLines #>', 'Loesung': ''}}
+
+<# if (it.solution) { #>
+<# it.solutionText.forEach(text => { #>
+{\color{red}\normalfont\itshape <#~ text #> \phantom{0.1mm}\newline}
+<# }) #>
+<# } else { #>
+
+<# for (let i = 0; i < it.noLines; i++) { #>
+\phantom{0.1mm}\newline
+\vspace{-2mm}
+\rule{\linewidth}{0.2mm}
+<# } #>
+\vspace{-2mm}
+<# } #>
