@@ -158,7 +158,7 @@ export async function generateTasksLatex(
   let latexContent = "";
 
   // iterate over each task group
-  for (let group of taskGroups) {
+  for (const group of taskGroups) {
     // newPage is in the tasks list but its not really a task (need to be handles differently)
     // case for group with just newPage in it
     if (group.tasks.length === 1 && group.tasks[0].type === "newPage") {
@@ -175,7 +175,7 @@ export async function generateTasksLatex(
     }}\n\n`;
 
     // iterate over the sub-tasks within this group
-    for (let subTask of group.tasks) {
+    for (const subTask of group.tasks) {
       // handle newPage differently since its not really a task
       // case for a createPage in between subtasks
       if (subTask.type === "newPage") {
