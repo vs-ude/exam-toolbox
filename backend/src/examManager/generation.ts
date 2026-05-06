@@ -1,6 +1,7 @@
 import type { Exam } from "./exam.ts";
 import { getTaskRenderer, type RenderOptions } from "./taskRenderer.ts";
 import { escapeLatex, getEta } from "../services/mod.ts";
+import { LatexCompileError } from "./err.ts";
 
 type ExamMetaTemplateData = {
   veranstaltung: string;
@@ -51,45 +52,39 @@ export async function compileExam(
   const examPdfPath = `${workingDir}/exam.pdf`;
   const examLogPath = `${workingDir}/exam.log`;
 
+  const cmd = new Deno.Command("tectonic", {
+    args: [
+      "--chatter",
+      "minimal",
+      "-X",
+      "compile",
+      "--untrusted",
+      "--keep-logs",
+      "exam.tex",
+    ],
+    stdout: "piped",
+    stderr: "piped",
+    cwd: workingDir,
+  });
+
+  const child = cmd.spawn();
+  const stderrStr = await new Response(child.stderr).text();
+
+  const status = await child.status;
+  if (!status.success) {
+    const errorLines = stderrStr.slice(stderrStr.indexOf("error:"));
+    throw new LatexCompileError(
+      `tectonic exit code ${status.code}; error during compilation: ${errorLines}`,
+    );
+  }
+
   try {
-    const cmd = new Deno.Command("tectonic", {
-      args: [
-        "--chatter",
-        "minimal",
-        "-X",
-        "compile",
-        "--untrusted",
-        "--keep-logs",
-        "exam.tex",
-      ],
-      stdout: "piped",
-      stderr: "piped",
-      cwd: workingDir,
-    });
-
-    const child = cmd.spawn();
-    const stderrStr = await new Response(child.stderr).text();
-
-    const status = await child.status;
-    if (!status.success) {
-      console.error(
-        `tectonic: code ${status.code}; errors:\n${stderrStr}`,
-      );
-    }
-
-    try {
-      await Deno.stat(examPdfPath);
-    } catch (_) {
-      throw new Error("PDF output file was not generated");
-    }
-
     const pdfBytes = await Deno.readFile(examPdfPath);
     const logContent = await Deno.readTextFile(examLogPath);
     return { pdfBytes, logContent };
   } catch (error) {
-    console.error("Error during PDF generation:", error);
     const message = error instanceof Error ? error.message : String(error);
-    throw new Error("Failed to generate PDF: " + message);
+    throw new LatexCompileError("Failed to read PDF or log file: " + message);
   }
 }
 
