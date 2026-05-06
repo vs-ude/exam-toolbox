@@ -7,7 +7,7 @@ RUN cargo install --git https://github.com/tectonic-typesetting/tectonic.git --r
 
 WORKDIR /tmp
 ENV HOME=/tmp
-COPY template/ /tmp
+COPY --exclude="*.template.tex" --exclude="task_types/*" "template/" "/tmp/"
 RUN tectonic -X compile exam.tex --untrusted
 
 
