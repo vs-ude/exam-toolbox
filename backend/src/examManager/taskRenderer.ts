@@ -1,6 +1,13 @@
 import { type Eta } from "@bgub/eta";
 import { escapeLatex, getEta } from "../services/mod.ts";
-import type { MultipleChoiceTask, ShortAnswerTask } from "./exam.ts";
+import type {
+  BaseTask,
+  MultipleChoiceTask,
+  Question,
+  ShortAnswerTask,
+  TaskGroup,
+  Translation,
+} from "./exam.ts";
 import { LatexRenderError } from "./err.ts";
 
 let cachedTaskRenderer: TaskRenderer;
@@ -36,6 +43,39 @@ export class TaskRenderer {
       );
     }
     return rendered;
+  }
+
+  renderTaskHeading(
+    group: TaskGroup,
+  ): string {
+    const data: HeadingTemplateData = {
+      id: String(group.groupNumber),
+      title: {
+        DE: escapeLatex(group.groupTitle.DE),
+        EN: escapeLatex(group.groupTitle.EN),
+      },
+      points: group.points,
+      solution: false,
+    };
+    return this.render("task_types/taskHeading", data);
+  }
+
+  renderSubTaskStart(
+    task: BaseTask,
+  ): string {
+    const data: TaskTemplateData = {
+      points: task.points,
+      question: {
+        DE: escapeLatex(task.question.DE),
+        EN: escapeLatex(task.question.EN),
+      },
+      solution: false,
+    };
+    return this.render("task_types/subTaskStart", data);
+  }
+
+  renderSubTaskEnd(): string {
+    return this.render("task_types/subTaskEnd", { solution: false });
   }
 
   renderMultipleChoice(
@@ -109,6 +149,15 @@ type TemplateData = {
 
 type RenderMultipleChoiceOptions = RenderOptions & {
   granularity?: number; /* Which point granularity to use, e.g. 0.5 or 0.25 */
+};
+
+type TaskTemplateData = TemplateData & {
+  question: Question;
+};
+
+type HeadingTemplateData = TemplateData & {
+  id: string;
+  title: Translation;
 };
 
 type MultipleChoiceTemplateData = TemplateData & {

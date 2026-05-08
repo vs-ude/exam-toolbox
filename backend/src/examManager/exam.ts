@@ -9,6 +9,7 @@ export class Exam {
   date: string;
   examLengthMinutes: number;
   tasks: TaskGroup[];
+  points?: number;
   public lastEditedBy?: string;
   public updatedAt?: Date;
 
@@ -34,6 +35,7 @@ export interface TaskGroup {
   groupNumber: number;
   groupTitle: Translation;
   tasks: Task[];
+  points?: number;
 }
 
 export type Task =

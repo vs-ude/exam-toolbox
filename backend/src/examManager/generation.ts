@@ -11,6 +11,7 @@ type ExamMetaTemplateData = {
   duration: string;
   schmierblaetteranzahl: string;
   englishandgerman: string;
+  points: number;
 };
 
 type IndividualMetaTemplateData = {
@@ -30,6 +31,7 @@ const DEFAULT_EXAM_META: ExamMetaTemplateData = {
   duration: "90",
   schmierblaetteranzahl: "2",
   englishandgerman: "yes",
+  points: 42,
 };
 
 const DEFAULT_INDIVIDUAL_META: IndividualMetaTemplateData = {
@@ -128,6 +130,12 @@ export async function renderMetaExam(
   workingDir: string,
 ) {
   const { courseName, examinerName, semester, date, examLengthMinutes } = exam;
+  const points = exam.tasks.reduce(
+    (acc, group) =>
+      acc +
+      (group.tasks.reduce((acc, task) => acc + (task.points ?? 0), 0) ?? 0),
+    0,
+  );
 
   const data: ExamMetaTemplateData = {
     ...DEFAULT_EXAM_META,
@@ -136,6 +144,7 @@ export async function renderMetaExam(
     pruefer: escapeLatexWithSpaces(examinerName),
     datum: date,
     duration: String(examLengthMinutes ?? DEFAULT_EXAM_META.duration),
+    points,
   };
 
   const metaOutputPath = `${workingDir}/meta-exam.tex`;
@@ -166,13 +175,13 @@ export async function generateTasksLatex(
       continue;
     }
 
-    const groupTitleDE = group.groupTitle.DE;
-    const groupTitleEN = group.groupTitle.EN;
+    group.points = group.tasks.reduce(
+      (acc, task) => acc + (task.points ?? 0),
+      0,
+    );
 
     // start a main task (\aufgabe) for the group
-    latexContent += `\\aufgabe{${escapeLatex(groupTitleDE)}}{${
-      escapeLatex(groupTitleEN)
-    }}\n\n`;
+    latexContent += `${getTaskRenderer().renderTaskHeading(group)}\n`;
 
     // iterate over the sub-tasks within this group
     for (const subTask of group.tasks) {
@@ -194,10 +203,8 @@ export async function generateTasksLatex(
         continue; // skip to the next sub-task
       }
 
-      // start a sub-task (\aufgabenteil)
-      latexContent += `\\aufgabenteil{${subTask.points ?? 0}}\n`;
-      latexContent += `{${escapeLatex(questionDE)}}\n`;
-      latexContent += `{${escapeLatex(questionEN)}}\n\n`;
+      // start a sub-task
+      latexContent += `${getTaskRenderer().renderSubTaskStart(subTask)}\n`;
 
       // --- handle multiple choice task ---
       if (subTask.type === "multipleChoice" && subTask.answerOptions) {
@@ -301,10 +308,11 @@ export async function generateTasksLatex(
         latexContent += `\\end{center}\n\n`;
       }
 
-      latexContent += "\\aufgabenteilende\n\n\n";
+      latexContent += `${getTaskRenderer().renderSubTaskEnd()}\n`;
     }
   }
 
+  // console.log("Generated tasks:\n", latexContent);
   await Deno.writeTextFile(
     dest,
     latexContent,

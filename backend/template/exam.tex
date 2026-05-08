@@ -93,14 +93,13 @@
 
 
   \def\totpagecount{\getpagerefnumber{LastPage}}
-  \DIVIDE{\totvalue{exampoints}}{\anpassung}{\div}
 
-    \gesamtpunktzahl: \ifthenelse{\totvalue{exampoints}<0}{\textcolor{red}{\textbf{RECOMPILE}}}{\div}\\
+    \gesamtpunktzahl: \examPoints\\
     \totalpages: \totpagecount
 
-    \vspace{1.5cm}
-  \escapedStringTypeout{VSEXAM: {'Typ':'mainQR', 'content': {'v':'\removebs{\veranstaltung}','s':'\semester','d':'\datum','l':'\sprache','c':\totpagecount,'t':\div,'r':\randomexamnumber}}}%
-  \qrcode[height=4cm,level=H]{\{'v':'\removebs{\veranstaltung}','s':'\semester','d':'\datum','l':'\sprache','c':\totpagecount,'t':\div,'r':'\randomexamnumber'\}}
+  \vspace{1.5cm}
+  \escapedStringTypeout{VSEXAM: {'Typ':'mainQR', 'content': {'v':'\removebs{\veranstaltung}','s':'\semester','d':'\datum','l':'\sprache','c':\totpagecount,'t':\examPoints,'r':\randomexamnumber}}}%
+  \qrcode[height=4cm,level=H]{\{'v':'\removebs{\veranstaltung}','s':'\semester','d':'\datum','l':'\sprache','c':\totpagecount,'t':\examPoints,'r':'\randomexamnumber'\}}
   \\
   \ifthenelse{\equal{\vollername}{}}{%
   \vspace{0.4cm}
