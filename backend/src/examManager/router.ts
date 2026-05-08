@@ -9,8 +9,8 @@ import { Exam } from "./exam.ts";
 import {
   compileExam,
   generateTasksLatex,
-  updateMetaExam,
-  updateMetaStudent,
+  renderMetaExam,
+  renderMetaStudent,
 } from "./generation.ts";
 
 interface ExamGenerationJob {
@@ -291,8 +291,8 @@ export function configureExamManagerRouter({
         const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
         await fs.copy(basePath, tempDir, { overwrite: true });
         const tasksPath = `${tempDir}/aufgaben.tex`;
-        await updateMetaExam(exam, tempDir);
-        await updateMetaStudent(
+        await renderMetaExam(exam, tempDir);
+        await renderMetaStudent(
           {
             vollername: "Max Musterlösung",
             zeigeloesung: "yes",
@@ -439,7 +439,7 @@ export function configureExamManagerRouter({
         });
 
         await fs.copy(basePath, jobTemplatePath, { overwrite: true });
-        await updateMetaExam(examJson, jobTemplatePath);
+        await renderMetaExam(examJson, jobTemplatePath);
         await generateTasksLatex(
           examJson,
           jobTemplatePath,

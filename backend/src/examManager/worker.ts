@@ -1,6 +1,6 @@
 import { copy } from "@std/fs";
 
-import { compileExam, updateMetaStudent } from "./generation.ts";
+import { compileExam, renderMetaStudent } from "./generation.ts";
 
 // this worker receives a task, generates a single artifact (like a student pdf or a solution), and sends back the result
 self.onmessage = async (e: MessageEvent) => {
@@ -16,7 +16,7 @@ self.onmessage = async (e: MessageEvent) => {
       const { student, deRandomNumber, enRandomNumber, seatNumber } = task;
 
       // generates the german pdf first, then modifies the same template to generate the english pdf sequentially
-      await updateMetaStudent(
+      await renderMetaStudent(
         {
           vollername: `${student.firstName} ${student.lastName}`,
           matrikelnummer: student.studentId,
@@ -32,7 +32,7 @@ self.onmessage = async (e: MessageEvent) => {
         `${outputDir}/student_pdfs/${seatNumber}_${student.studentId}_DE.pdf`;
       await Deno.writeFile(pdfPathDE, pdfBytesDE);
 
-      await updateMetaStudent(
+      await renderMetaStudent(
         {
           vollername: `${student.firstName} ${student.lastName}`,
           matrikelnummer: student.studentId,
@@ -57,7 +57,7 @@ self.onmessage = async (e: MessageEvent) => {
         pdfPathEN,
       });
     } else if (type === "solution") {
-      await updateMetaStudent(
+      await renderMetaStudent(
         {
           vollername: "Max Musterlösung",
           matrikelnummer: 0,
@@ -72,7 +72,7 @@ self.onmessage = async (e: MessageEvent) => {
       self.postMessage({ status: "success", type, jobId, solutionPdfPath });
     } else if (type === "log") {
       const { lang } = task;
-      await updateMetaStudent({ sprache: lang }, workerTempDir);
+      await renderMetaStudent({ sprache: lang }, workerTempDir);
       const { logContent } = await compileExam(workerTempDir);
       const logPath = `${outputDir}/exam_${lang}.log`;
       await Deno.writeTextFile(logPath, logContent);

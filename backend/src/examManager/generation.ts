@@ -88,7 +88,7 @@ export async function compileExam(
   }
 }
 
-export async function updateMetaStudent(
+export async function renderMetaStudent(
   options: {
     zeigeloesung?: "yes" | "no";
     sprache?: string;
@@ -123,7 +123,7 @@ export async function updateMetaStudent(
   await Deno.writeTextFile(metaOutputPath, rendered);
 }
 
-export async function updateMetaExam(
+export async function renderMetaExam(
   exam: Exam,
   workingDir: string,
 ) {

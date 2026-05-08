@@ -6,8 +6,8 @@ export type { Tag } from "./tag.ts";
 export {
   compileExam,
   generateTasksLatex,
-  updateMetaExam,
-  updateMetaStudent,
+  renderMetaExam,
+  renderMetaStudent,
 } from "./generation.ts";
 export type { FileTracker } from "./fileTracker.ts";
 export * from "./runtime.ts";
