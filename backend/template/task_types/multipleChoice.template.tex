@@ -1,9 +1,11 @@
 \escapedStringTypeout{VSEXAM: {'Typ':'MCStart', 'PunkteKorrekt': '<#~ it.pointsPerCorrect #>', 'AnzahlKorrekt':'<#~ it.numCorrect #>'}}
 
-\begin{longtable}{cp{14.3cm}}
+<# let tableConf = "cp{14.3cm}"; let inc = 1; if (it.condensed) {tableConf="cp{6.5cm}cp{6.5cm}"; inc = 2;} #>
+
+\begin{longtable}{<#~ tableConf #>}
 \blacktoprule
 
-\multicolumn{2}{p{14.3cm}}{
+\multicolumn{<# if (it.condensed) { #>4<# } else { #>2<# } #>}{p{14.3cm}}{
 <# if (it.numCorrect == 1) { #>
   \ifthenelse{\equal{\sprache}{de}}
   {Single Response: Für die korrekt markierte Aussage erhalten Sie <#~ it.pointsPerCorrect #> Punkt(e).}
@@ -15,17 +17,26 @@
 <# } #>
 } \\
 
-<# it.answerOptions.forEach(opt => { #>
-\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLine', 'Antwort': '<#~ opt.correct #>'}}
+<# let delim = "\\\\" /* Escaped LaTeX newline */ #>
+<# for (let i = 0; i < it.answerOptions.length; i++) { #>
+<# if (!it.condensed) { #>
+\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLine', 'Antwort': '<#~ it.answerOptions[i].correct #>'}}
+<# delim = "\\\\" #>
+<# } else if (i % 2 == 0) { #>
+\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLineTwo', 'Antwort1': '<#~ it.answerOptions[i].correct #>', 'Antwort2': '<#~ it.answerOptions[i+1].correct #>'}}
+<# delim = "&" #>
+<# } else { #>
+<# delim = "\\\\" #>
+<# } #>
 <# if (it.solution) { #>
-  <# if (opt.correct == "w") { #>
-  \color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{<#~ opt.DE #>}{<#~ opt.EN #>} \\
+  <# if (it.answerOptions[i].correct == "w") { #>
+  \color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].DE #>}{<#~ it.answerOptions[i].EN #>} <#~ delim #>
   <# } else { #>
-  \color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{<#~ opt.DE #>}{<#~ opt.EN #>} \\
+  \color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].DE #>}{<#~ it.answerOptions[i].EN #>} <#~ delim #>
   <# } #>
 <# } else { #>
-  \emptyb & \ifthenelse{\equal{\sprache}{de}}{<#~ opt.DE #>}{<#~ opt.EN #>} \\
-<# }}) #>
+  \emptyb & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].DE #>}{<#~ it.answerOptions[i].EN #>} <#~ delim #>
+<# }} #>
 
 \blackbottomrule
 \end{longtable}

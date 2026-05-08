@@ -44,11 +44,19 @@ export class TaskRenderer {
   ): string {
     const numCorrect = task.numCorrect ??
       task.answerOptions.filter((option) => option.correct).length;
-    const modificator = 1 / (options.granularity ?? 0.5);
-    const pointsPerCorrect = task.points
-      ? Math.round(task.points / numCorrect * modificator) / modificator
-      : 0;
+    const pointsPerCorrect = Math.round(task.points / numCorrect);
 
+    let condensed = false;
+    const maxLenCondensed = 16; // Empirically determined with 'M' characters
+    if (task.answerOptions.length % 2 == 0) {
+      if (
+        task.answerOptions.every((opt) =>
+          opt.DE.length <= maxLenCondensed && opt.EN.length <= maxLenCondensed
+        )
+      ) {
+        condensed = true;
+      }
+    }
     const data: MultipleChoiceTemplateData = {
       points: task.points ?? 0,
       numCorrect,
@@ -59,6 +67,7 @@ export class TaskRenderer {
         correct: opt.correct ? "w" : "f",
       })),
       solution: options.solution ?? false,
+      condensed: condensed,
     };
 
     return this.render("task_types/multipleChoice", data);
@@ -106,6 +115,7 @@ type MultipleChoiceTemplateData = TemplateData & {
   numCorrect: number;
   pointsPerCorrect: number;
   answerOptions: { DE: string; EN: string; correct: "w" | "f" }[];
+  condensed: boolean;
 };
 
 type MultilineTextTemplateData = TemplateData & {
