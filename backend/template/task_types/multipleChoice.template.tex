@@ -22,7 +22,7 @@
 <# if (!it.condensed) { #>
 \addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLine', 'Antwort': '<#~ it.answerOptions[i].correct #>'}}
 <# delim = "\\\\" #>
-<# } else if (i % 2 == 0) { #>
+<# } else if (i & 1 == 0) /* Linter-friendly check if num is even */ { #>
 \addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLineTwo', 'Antwort1': '<#~ it.answerOptions[i].correct #>', 'Antwort2': '<#~ it.answerOptions[i+1].correct #>'}}
 <# delim = "&" #>
 <# } else { #>
