@@ -1,7 +1,8 @@
 import type { Exam } from "./exam.ts";
 import { getTaskRenderer, type RenderOptions } from "./taskRenderer.ts";
 import { escapeLatex, getEta } from "../services/mod.ts";
-import { LatexCompileError } from "./err.ts";
+import { InvalidPageBreakError, LatexCompileError } from "./err.ts";
+import { TaskGroup } from "./mod.ts";
 
 type ExamMetaTemplateData = {
   veranstaltung: string;
@@ -77,6 +78,7 @@ export async function compileExam(
     const errorLines = stderrStr.slice(stderrStr.indexOf("error:"));
     throw new LatexCompileError(
       `tectonic exit code ${status.code}; error during compilation: ${errorLines}`,
+      workingDir + "/aufgaben.tex",
     );
   }
 
@@ -86,7 +88,9 @@ export async function compileExam(
     return { pdfBytes, logContent };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw new LatexCompileError("Failed to read PDF or log file: " + message);
+    throw new LatexCompileError(
+      "Failed to read PDF or log file: " + message,
+    );
   }
 }
 
@@ -164,27 +168,36 @@ export async function generateTasksLatex(
   options: RenderOptions,
 ): Promise<void> {
   const taskGroups = exam.tasks; // get the array of task groups
+  const offenses = checkForInvalidPageBreaks(taskGroups);
+  if (offenses.length > 0) {
+    throw new InvalidPageBreakError(
+      `Exam contains ${offenses.length} invalid page breaks`,
+      offenses,
+    );
+  }
+
   let latexContent = "";
 
   // iterate over each task group
-  for (const group of taskGroups) {
-    // newPage is in the tasks list but its not really a task (need to be handles differently)
-    // case for group with just newPage in it
-    if (group.tasks.length === 1 && group.tasks[0].type === "newPage") {
-      latexContent += `\\clearpage\n\n`;
-      continue;
-    }
-
+  for (let g = 0; g < taskGroups.length; g++) {
+    const group = taskGroups[g];
     group.points = group.tasks.reduce(
       (acc, task) => acc + (task.points ?? 0),
       0,
     );
 
+    latexContent += `%% MARKER: {"group": ${
+      g + 1
+    }, "task": -1, "type": "heading"}\n`;
     // start a main task (\aufgabe) for the group
     latexContent += `${getTaskRenderer().renderTaskHeading(group)}\n`;
 
     // iterate over the sub-tasks within this group
-    for (const subTask of group.tasks) {
+    for (let t = 0; t < group.tasks.length; t++) {
+      const subTask = group.tasks[t];
+      latexContent += `%% MARKER: {"group": ${g + 1}, "task": ${
+        t + 1
+      }, "type": "${subTask.type}"}\n`;
       // handle newPage differently since its not really a task
       // case for a createPage in between subtasks
       if (subTask.type === "newPage") {
@@ -309,6 +322,8 @@ export async function generateTasksLatex(
       }
 
       latexContent += `${getTaskRenderer().renderSubTaskEnd()}\n`;
+
+      latexContent += "\n";
     }
   }
 
@@ -317,4 +332,24 @@ export async function generateTasksLatex(
     dest,
     latexContent,
   );
+}
+
+function checkForInvalidPageBreaks(taskGroups: TaskGroup[]): string[] {
+  const offenses: string[] = [];
+  for (let g = 0; g < taskGroups.length; g++) {
+    if (taskGroups[g].tasks[0].type === "newPage") {
+      offenses.push(`Assignment ${g + 1} contains a newPage as first item`);
+    }
+    for (let t = 1; t < taskGroups[g].tasks.length; t++) {
+      if (
+        taskGroups[g].tasks[t].type === "newPage" &&
+        taskGroups[g].tasks[t - 1].type === "newPage"
+      ) {
+        offenses.push(
+          `Assignment ${g + 1} contains two newPage items at position ${t}`,
+        );
+      }
+    }
+  }
+  return offenses;
 }
