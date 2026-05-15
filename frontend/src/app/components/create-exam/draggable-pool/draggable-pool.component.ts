@@ -6,6 +6,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIcon } from "@angular/material/icon";
 import { ApiService } from '../../../services/api.service';
 import { Observable, Subscription } from 'rxjs';
+import { PoolTaskComponent } from './pool-task/pool-task.component';
 
 enum SortPoints {
   Ascending,
@@ -21,7 +22,7 @@ interface TypeOption {
 @Component({
   selector: 'app-draggable-pool',
   standalone: true,
-  imports: [AddTaskComponent, MatTooltipModule, MatIcon],
+  imports: [AddTaskComponent, PoolTaskComponent, MatTooltipModule, MatIcon],
   templateUrl: './draggable-pool.component.html',
   styleUrl: './draggable-pool.component.scss'
 })

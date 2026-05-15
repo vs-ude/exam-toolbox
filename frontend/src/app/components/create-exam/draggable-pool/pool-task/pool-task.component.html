@@ -1,0 +1,8 @@
+<div class="task_container" (mouseover)="hovered=true" (mouseleave)="hovered=false"
+    [style.backgroundColor]="hovered ? color : 'var(--color-bg-lifted)'">
+    <div class="task_icon" [style.backgroundColor]="hovered ? '#0000002a' : color" >
+        <img src="{{ iconName }}">
+    </div>
+    <div class="task_name" [style.color]="hovered ? '#fff' : ''" ><span> {{ task.question.DE }} </span></div>
+    <div class="task-points" [style.color]="hovered ? '#fff' : ''" ><span> {{ task.points }} Pts. </span></div>
+</div>

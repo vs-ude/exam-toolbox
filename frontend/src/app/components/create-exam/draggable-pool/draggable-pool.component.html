@@ -34,13 +34,10 @@
 
 
     @for (task of filteredTaskPool; track $index){
-    <app-AddTask class="task_wrapper" [name]="task.question.DE" [color]="colorProvider.getTaskColor(task.type)"
+    <app-pool-task class="task_wrapper" [task]="task" [color]="colorProvider.getTaskColor(task.type)"
         [iconName]="task.type + '.svg'" id="{{ task.taskId }}" draggable="true" (dragstart)="dragStart.emit($event)"
         (dragend)="drop.emit($event)" matTooltip="{{ task.question.DE }}" [matTooltipShowDelay]="800">
-    </app-AddTask>
+    </app-pool-task>
     }
-
-
-
-
+    
 </div>
