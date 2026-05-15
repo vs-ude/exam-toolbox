@@ -32,6 +32,7 @@ export class DraggablePoolComponent {
   @Output() drop = new EventEmitter<DragEvent>();
 
   public taskPool: Task[] = [];
+  public filteredTaskPool: Task[] = [];
   private refreshSubscription: Subscription = new Subscription();
 
   public SortPoints = SortPoints;
@@ -59,7 +60,6 @@ export class DraggablePoolComponent {
     this.refreshSubscription.unsubscribe();
   }
 
-
   constructor(public colorProvider: ColorProviderService, private api: ApiService) {
     this.refreshTaskPool();
   }
@@ -69,10 +69,6 @@ export class DraggablePoolComponent {
       {
         next: (tasks) => {
           this.taskPool = tasks;
-
-          if (this.currentTypeFilter !== '') {
-            this.onFilterType(this.currentTypeFilter);
-          }
           this.applyCurrentFilters();
         },
         error: (error) => { console.error('Error fetching tasks from pool:', error); }
@@ -82,35 +78,7 @@ export class DraggablePoolComponent {
 
   public onFilterType(type: string): void {
     this.currentTypeFilter = type;
-    if (type === '') {
-      this.refreshTaskPool();
-      return;
-    }
-
-    this.api.getTaskWithTypeFromPool(type).subscribe(
-      (tasks) => {
-        this.taskPool = tasks;
-        this.applyCurrentFilters();
-      },
-      (error) => { console.error('Error fetching tasks from pool by type:', error); }
-    );
-  }
-
-
-  public onSearch(search: string): void {
-    this.currentSearchTerm = search;
-
-    if (search === '') {
-      this.refreshTaskPool();
-      return;
-    }
-
-    this.taskPool = this.taskPool.filter(task => {
-      const questionDE = task.question.DE.toLowerCase();
-      const questionEN = task.question.EN.toLowerCase();
-      const searchTerm = search.toLowerCase();
-      return questionDE.includes(searchTerm) || questionEN.includes(searchTerm);
-    })
+    this.applyCurrentFilters();
   }
 
   public onSortPoints(sort: SortPoints): void {
@@ -119,23 +87,55 @@ export class DraggablePoolComponent {
       return;
     }
     this.sortPoints = sort;
-    this.sortTasksByPoints();
+    this.applyCurrentFilters();
   }
 
-  private sortTasksByPoints(): void {
-    if (this.sortPoints === SortPoints.Ascending) {
-      this.taskPool.sort((a, b) => a.points - b.points);
-    } else if (this.sortPoints === SortPoints.Descending) {
-      this.taskPool.sort((a, b) => b.points - a.points);
-    }
+  public onTextSearch(search: string): void {
+    this.currentSearchTerm = search;
+    this.applyCurrentFilters();
   }
 
   private applyCurrentFilters(): void {
-    this.sortTasksByPoints();
-    if (this.currentSearchTerm !== '') {
-      this.onSearch(this.currentSearchTerm);
-    }
+    console.log("applying filters")
+    this.filteredTaskPool = this.taskPool;
+    this.filteredTaskPool = this.filterTasksByType();
+    this.filteredTaskPool = this.filterTasksBySearchTerm();
+    this.filteredTaskPool = this.sortTasksByPoints();
   }
+
+  private filterTasksByType(): Task[] {
+    if (this.currentTypeFilter === "") {
+      return this.filteredTaskPool;
+    }
+    return this.filteredTaskPool.filter(task => task.type === this.currentTypeFilter);
+  }
+
+  private filterTasksBySearchTerm(): Task[] {
+    if (this.currentSearchTerm === "") {
+      return this.filteredTaskPool;
+    }
+    const lowerSearchTerm = this.currentSearchTerm.toLowerCase();
+    return this.filteredTaskPool.filter(task =>
+      task.question.DE.toLowerCase().includes(lowerSearchTerm) ||
+      task.question.EN.toLowerCase().includes(lowerSearchTerm)
+    );
+  }
+
+  private sortTasksByPoints(): Task[] {
+
+    if (this.sortPoints === SortPoints.None) {
+      return this.filteredTaskPool;
+    }
+    return this.filteredTaskPool.sort((a, b) => {
+      if (this.sortPoints === SortPoints.Ascending) {
+        return a.points - b.points;
+      } else {
+        return b.points - a.points;
+      }
+    }
+    );
+  }
+
 
 }
 

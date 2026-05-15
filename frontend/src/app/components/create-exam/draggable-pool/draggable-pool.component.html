@@ -8,7 +8,7 @@
             </svg>
             <input type="text" placeholder="Search..." class="search-input" aria-label="Search" aria-autocomplete="list"
                 aria-controls="mat-autocomplete-0" aria-activedescendant="mat-option-0" #search
-                (keydown.enter)="onSearch(search.value)">
+                (keydown.enter)="onTextSearch(search.value)">
         </div>
 
 
@@ -33,7 +33,7 @@
     </div>
 
 
-    @for (task of taskPool; track $index){
+    @for (task of filteredTaskPool; track $index){
     <app-AddTask class="task_wrapper" [name]="task.question.DE" [color]="colorProvider.getTaskColor(task.type)"
         [iconName]="task.type + '.svg'" id="{{ task.taskId }}" draggable="true" (dragstart)="dragStart.emit($event)"
         (dragend)="drop.emit($event)" matTooltip="{{ task.question.DE }}" [matTooltipShowDelay]="800">
