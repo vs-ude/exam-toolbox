@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Task } from '../../../exam';
-import { AddTaskComponent } from "../add-task/add-task.component";
 import { ColorProviderService } from '../../../services/color-provider.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIcon } from "@angular/material/icon";
 import { ApiService } from '../../../services/api.service';
-import { Observable, Subscription } from 'rxjs';
+import { forkJoin, Observable, Subscription } from 'rxjs';
 import { PoolTaskComponent } from './pool-task/pool-task.component';
+import { Tag } from '../../../tag';
 
 enum SortPoints {
   Ascending,
@@ -22,7 +22,7 @@ interface TypeOption {
 @Component({
   selector: 'app-draggable-pool',
   standalone: true,
-  imports: [AddTaskComponent, PoolTaskComponent, MatTooltipModule, MatIcon],
+  imports: [PoolTaskComponent, MatTooltipModule, MatIcon],
   templateUrl: './draggable-pool.component.html',
   styleUrl: './draggable-pool.component.scss'
 })
@@ -66,16 +66,25 @@ export class DraggablePoolComponent {
   }
 
   private refreshTaskPool(): void {
-    this.api.getTasksFromPool().subscribe(
-      {
-        next: (tasks) => {
-          this.taskPool = tasks;
-          this.applyCurrentFilters();
-        },
-        error: (error) => { console.error('Error fetching tasks from pool:', error); }
+
+    forkJoin({
+      tasks: this.api.getTasksFromPool(),
+      tags: this.api.getAllTags()
+    }).subscribe({
+      next: ({ tasks, tags }) => {
+        this.taskPool = (tasks as Task[]).map(task => ({
+          ...task,
+          tags: (tags as Tag[]).filter(tag => task.tagIds.includes(tag._id!))
+        }));
+        this.applyCurrentFilters();
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
       }
-    );
+    });
   }
+
+
 
   public onFilterType(type: string): void {
     this.currentTypeFilter = type;
@@ -97,7 +106,6 @@ export class DraggablePoolComponent {
   }
 
   private applyCurrentFilters(): void {
-    console.log("applying filters")
     this.filteredTaskPool = this.taskPool;
     this.filteredTaskPool = this.filterTasksByType();
     this.filteredTaskPool = this.filterTasksBySearchTerm();
@@ -118,12 +126,14 @@ export class DraggablePoolComponent {
     const lowerSearchTerm = this.currentSearchTerm.toLowerCase();
     return this.filteredTaskPool.filter(task =>
       task.question.DE.toLowerCase().includes(lowerSearchTerm) ||
-      task.question.EN.toLowerCase().includes(lowerSearchTerm)
+      task.question.EN.toLowerCase().includes(lowerSearchTerm) ||
+      task.tags.some(tag => tag.name.toLowerCase().includes(lowerSearchTerm))
     );
   }
 
-  private sortTasksByPoints(): Task[] {
 
+
+  private sortTasksByPoints(): Task[] {
     if (this.sortPoints === SortPoints.None) {
       return this.filteredTaskPool;
     }
@@ -136,7 +146,6 @@ export class DraggablePoolComponent {
     }
     );
   }
-
 
 }
 
