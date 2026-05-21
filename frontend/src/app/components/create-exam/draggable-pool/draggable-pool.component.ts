@@ -19,6 +19,39 @@ interface TypeOption {
   viewValue: string,
 }
 
+const dummyTasks: Task[] = [
+  {
+    taskId: '1',
+    type: 'multipleChoice',
+    question: { DE: 'Was ist die Hauptstadt von Frankreich?', EN: 'What is the capital of France?' },
+    answerOptions: [],
+    points: 5,
+    tagIds: [],
+    tags: [],
+    createdBy: 'user1',
+    createdAt: new Date(),
+    lastUsed: new Date(),
+    usedIn: [],
+    parent: undefined,
+    children: []
+  },
+    {
+    taskId: '1',
+    type: 'multipleChoice',
+    question: { DE: 'Was ist die Hauptstadt von Frankreich?', EN: 'What is the capital of France?' },
+    answerOptions: [],
+    points: 5,
+    tagIds: [],
+    tags: [],
+    createdBy: 'user1',
+    createdAt: new Date(),
+    lastUsed: new Date(),
+    usedIn: [],
+    parent: undefined,
+    children: []
+  }
+];
+
 @Component({
   selector: 'app-draggable-pool',
   standalone: true,
@@ -82,6 +115,8 @@ export class DraggablePoolComponent {
         console.error('Error fetching data:', error);
       }
     });
+    this.taskPool = dummyTasks; // TODO: Remove this line when the backend is implemented
+    this.filteredTaskPool = dummyTasks; // TODO: Remove this line when the backend is implemented
   }
 
 
