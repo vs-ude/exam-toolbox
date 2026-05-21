@@ -6,14 +6,5 @@
     <div class="task_name" [style.color]="hovered ? '#fff' : ''" ><span> {{ task.question.DE }} </span></div>
     <div class="task-points" [style.color]="hovered ? '#fff' : ''" ><span> {{ task.points }} Pts. </span></div>
 
-    <div class="task_tooltip" *ngIf="tooltipVisible">
-        <div class="tooltip_question">{{ task.question.DE }}</div>
-        <div class="tooltip_tags" *ngIf="task.tags.length">
-            <span class="tooltip_tag" *ngFor="let tag of task.tags"
-                [style.backgroundColor]="tag.color"
-                [style.color]="tag.textColor">
-                {{ tag.name }}
-            </span>
-        </div>
-    </div>
+    <!-- tooltip is created dynamically and appended to document.body -->
 </div>

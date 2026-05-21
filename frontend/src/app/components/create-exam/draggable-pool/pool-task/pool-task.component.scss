@@ -54,6 +54,17 @@
     line-height: 1.4;
 }
 
+/* fade + slight slide animation */
+.task_tooltip {
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+.task_tooltip.tooltip-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .tooltip_question {
     white-space: normal;
     overflow: auto;
