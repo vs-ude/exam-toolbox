@@ -433,6 +433,9 @@ export function configureExamManagerRouter({
         const studentPdfDir = `${tempOutputDir}/student_pdfs`;
         await Deno.mkdir(studentPdfDir, { recursive: true });
 
+        /*
+         * Student PDF generation
+         */
         const jobTemplatePath = await Deno.makeTempDir({
           prefix: "exam_template_",
           dir: jobDir,
@@ -497,12 +500,6 @@ export function configureExamManagerRouter({
         });
 
         taskQueue.push({
-          type: "solution",
-          jobId,
-          jobTemplatePath,
-          outputDir: tempOutputDir,
-        });
-        taskQueue.push({
           type: "log",
           jobId,
           jobTemplatePath,
@@ -515,6 +512,30 @@ export function configureExamManagerRouter({
           jobTemplatePath,
           outputDir: tempOutputDir,
           lang: "en",
+        });
+
+        /*
+         * Solution PDF generation
+         */
+        const solutionJobTemplatePath = await Deno.makeTempDir({
+          prefix: "exam_template_solution_",
+          dir: jobDir,
+        });
+
+        await fs.copy(basePath, solutionJobTemplatePath, { overwrite: true });
+        await renderMetaExam(examJson, solutionJobTemplatePath);
+        await generateTasksLatex(
+          examJson,
+          solutionJobTemplatePath,
+          `${solutionJobTemplatePath}/aufgaben.tex`,
+          { solution: true },
+        );
+
+        taskQueue.push({
+          type: "solution",
+          jobId,
+          jobTemplatePath: solutionJobTemplatePath,
+          outputDir: tempOutputDir,
         });
 
         jobs.set(jobId, newJob);
