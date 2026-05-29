@@ -11,7 +11,7 @@ backend_unittests:
   stage: test
   script:
     - cd backend
-    - deno test
+    - deno test --allow-env --allow-read
 
 # Cypress Tests
 cypress_e2e:
