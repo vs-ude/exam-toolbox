@@ -60,14 +60,14 @@ export interface BaseTask {
   usedIn: string[];
   parent?: string;
   children: string[];
+}
 
-  render?: (
-    /* optional for now while we transition */
-    e: Eta,
-    lang: string,
-    solution: boolean,
-    dest: string,
-  ) => Promise<Error>;
+export type Language = "DE" | "EN";
+
+export interface Dimension {
+  unit: "cm" | "mm" | "relative";
+  dimension: "width" | "height";
+  scalar: number;
 }
 
 export interface Question {
@@ -97,6 +97,7 @@ export interface PictureTask extends BaseTask {
   type: "pictureTask";
   questionPicture: Image;
   solutionPicture: Image;
+  size?: Dimension;
 }
 
 export interface Image {

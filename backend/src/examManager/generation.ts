@@ -1,7 +1,11 @@
 import type { Exam } from "./exam.ts";
 import { getTaskRenderer, type RenderOptions } from "./taskRenderer.ts";
 import { escapeLatex, getEta } from "../services/mod.ts";
-import { InvalidPageBreakError, LatexCompileError } from "./err.ts";
+import {
+  InvalidPageBreakError,
+  LatexCompileError,
+  LatexRenderError,
+} from "./err.ts";
 import { TaskGroup } from "./mod.ts";
 
 type ExamMetaTemplateData = {
@@ -205,120 +209,61 @@ export async function generateTasksLatex(
         continue;
       }
 
-      const questionDE = subTask.question.DE;
-      const questionEN = subTask.question.EN;
-
       if (subTask.type === "manualText") {
-        // Handle manual text task separately because it does not start with "\aufgabenteil"
-        latexContent += `\\manualText\n`;
-        latexContent += `{${escapeLatex(questionDE)}}\n`;
-        latexContent += `{${escapeLatex(questionEN)}}\n\n`;
+        latexContent += getTaskRenderer().renderManualText(subTask.question) +
+          "\n";
         continue; // skip to the next sub-task
       }
 
       // start a sub-task
-      latexContent += `${getTaskRenderer().renderSubTaskStart(subTask)}\n`;
+      latexContent += getTaskRenderer().renderSubTaskStart(subTask) + "\n";
 
-      // --- handle multiple choice task ---
-      if (subTask.type === "multipleChoice" && subTask.answerOptions) {
-        const rendered = getTaskRenderer().renderMultipleChoice(subTask, {
-          solution: options.solution,
-        });
-        latexContent += `${rendered}\n\n`;
-      } // --- handle short answer task ---
-      else if (subTask.type === "shortAnswer" && subTask.solution) {
-        const rendered = getTaskRenderer().renderMultilineText(
-          subTask,
-          {
-            solution: options.solution,
-          },
-        );
-        latexContent += `${rendered}\n\n`;
-      } // --- handle latex task ---
-      else if (subTask.type === "latex") {
-        // Insert raw LaTeX content directly
-        if (subTask.questionLatex?.DE) {
-          latexContent += subTask.questionLatex.DE + "\n\n";
-        }
-        if (subTask.questionLatex?.EN) {
-          latexContent += subTask.questionLatex.EN + "\n\n";
-        }
-      } else if (subTask.type === "pictureTask") {
-        // copy the images to the img folder
-        const questionImageName = subTask.questionPicture.urlDE
-          .split("/")
-          .pop();
-        const solutionImageName = subTask.solutionPicture.urlDE
-          .split("/")
-          .pop();
-        await Deno.copyFile(
-          subTask.questionPicture.urlDE,
-          `${workingDir}/img/${questionImageName}`,
-        );
-        await Deno.copyFile(
-          subTask.solutionPicture.urlDE,
-          `${workingDir}/img/${solutionImageName}`,
-        );
-
-        latexContent += `\\bildAufgabe{}`;
-        latexContent +=
-          `{1.0\\textwidth}{img/${questionImageName}}{img/${solutionImageName}}\n`;
-        latexContent += `\\manualText{${
-          subTask.questionPicture.altTextDE || ""
-        }}{${subTask.questionPicture.altTextEN || ""}}\n\n`;
-      } else if (subTask.type === "table") {
-        if (!subTask.tableDataQuestion || !subTask.tableDataSolution) {
-          console.warn("Table task missing data:", subTask.taskId);
-          continue; // skip this task if data is missing
-        }
-        const numberOfRows = subTask.tableDataQuestion[0].length;
-        const numberOfColumns = subTask.tableDataQuestion.length;
-
-        let tableFormat = ""; // e.g. "|l|l|l|l|l|l"
-        for (let i = 0; i < numberOfRows; i++) {
-          tableFormat += "|l";
-        }
-
-        //find longest solution text to set the column width
-        const longestSolution = subTask.tableDataSolution
-          .map((col) =>
-            col.reduce((maxLength, cell) =>
-              maxLength.DE.length > cell.DE.length ? maxLength : cell
-            )
-          )
-          .reduce((maxLength, cell) =>
-            maxLength.DE.length > cell.DE.length ? maxLength : cell
-          ).DE.length;
-
-        latexContent += `\\begin{center}\n`;
-        latexContent += `\\begin{tabular}`;
-        latexContent += `{${tableFormat}|}\n`;
-
-        latexContent += `\\hline\n`;
-
-        for (let i = 0; i < numberOfColumns; i++) {
-          latexContent += `%line ${i + 1}\n`;
-          for (let j = 0; j < numberOfRows; j++) {
-            // add & between columns
-            latexContent += j === 0 ? "" : " & ";
-
-            latexContent += `\\lineloesung`;
-            if (subTask.tableDataQuestion[i][j].DE) {
-              latexContent += `{${
-                escapeLatex(subTask.tableDataQuestion[i][j].DE)
-              }}`;
-            } else {
-              latexContent += `{${"~".repeat(longestSolution)}}`;
-            }
-            latexContent += `{ ${
-              escapeLatex(subTask.tableDataSolution[i][j].DE)
-            } }`;
+      switch (subTask.type) {
+        case "multipleChoice":
+          if (subTask.answerOptions) {
+            latexContent += getTaskRenderer().renderMultipleChoice(subTask, {
+              solution: options.solution,
+            });
           }
-          latexContent += ` \\\\ \\hline\n`;
-        }
-
-        latexContent += `\\end{tabular}\n`;
-        latexContent += `\\end{center}\n\n`;
+          +"\n";
+          break;
+        case "shortAnswer":
+          if (subTask.solution) {
+            latexContent += getTaskRenderer().renderMultilineText(
+              subTask,
+              {
+                solution: options.solution,
+              },
+            ) + "\n";
+          }
+          break;
+        case "latex":
+          // Insert raw LaTeX content directly
+          if (subTask.questionLatex?.DE) {
+            latexContent += subTask.questionLatex.DE + "\n\n";
+          }
+          if (subTask.questionLatex?.EN) {
+            latexContent += subTask.questionLatex.EN + "\n\n";
+          }
+          break;
+        case "pictureTask":
+          latexContent += getTaskRenderer().renderPictureTask(subTask, {
+            solution: options.solution,
+            workingDir: workingDir,
+          }) + "\n";
+          break;
+        case "table":
+          if (!subTask.tableDataQuestion || !subTask.tableDataSolution) {
+            throw new LatexRenderError(
+              `Assignment ${g + 1} table task at position ${
+                t + 1
+              } is missing data`,
+            );
+          }
+          latexContent += getTaskRenderer().renderTableTask(subTask, {
+            solution: options.solution,
+          }) + "\n";
+          break;
       }
 
       latexContent += `${getTaskRenderer().renderSubTaskEnd()}\n`;

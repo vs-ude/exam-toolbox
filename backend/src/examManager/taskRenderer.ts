@@ -1,10 +1,14 @@
-import { type Eta } from "@bgub/eta";
+import { type Eta, EtaError } from "@bgub/eta";
 import { escapeLatex, getEta } from "../services/mod.ts";
 import type {
   BaseTask,
+  Dimension,
+  Language,
   MultipleChoiceTask,
+  PictureTask,
   Question,
   ShortAnswerTask,
+  TableTask,
   TaskGroup,
   Translation,
 } from "./exam.ts";
@@ -28,9 +32,9 @@ export class TaskRenderer {
       rendered = this.eta.render(template, data);
     } catch (err) {
       throw new LatexRenderError(
-        `Failed to render ${template} template`,
+        `Error during ${template} template rendering`,
         {
-          cause: err,
+          cause: err instanceof Error ? err.message : "unknown error",
         },
       );
     }
@@ -135,20 +139,102 @@ export class TaskRenderer {
 
     return this.render("task_types/multilineText", data);
   }
+
+  renderPictureTask(
+    task: PictureTask,
+    options: RenderOptionsWithAux,
+  ): string {
+    const taskPath = "img/" + copyUrlToPath(
+      options.workingDir + "/img",
+      task.questionPicture.urlDE,
+    );
+    const solutionPath = "img/" + copyUrlToPath(
+      options.workingDir + "/img",
+      task.solutionPicture.urlDE,
+    );
+    return this.renderPictureTaskImpl(task, options, taskPath, solutionPath);
+  }
+
+  renderPictureTaskImpl(
+    task: PictureTask,
+    options: RenderOptionsWithAux,
+    taskPath: string,
+    solutionPath: string,
+  ): string {
+    const taskText = task.questionPicture.altTextDE
+      ? {
+        DE: task.questionPicture.altTextDE,
+        EN: task.questionPicture.altTextEN ?? task.questionPicture.altTextDE,
+      }
+      : undefined;
+
+    const data: PictureTaskTemplateData = {
+      solution: options.solution ?? false,
+      lang: options.lang ?? "DE",
+      taskPath: taskPath,
+      solutionPath: solutionPath,
+      text: taskText,
+      dimension: task.size ? dimToLatex(task.size) : "height=5cm",
+    };
+
+    return this.render("task_types/pictureTask", data);
+  }
+
+  renderManualText(
+    text: Translation,
+  ): string {
+    const data: ManualTextTemplateData = { solution: false, text: text };
+    return this.render("task_types/manualText", data);
+  }
+
+  renderTableTask(
+    subTask: TableTask,
+    options: RenderOptions,
+  ): string {
+    const solution = options.solution ?? false;
+
+    const cellWidthInt =
+      [subTask.tableHeadersSolution].concat(subTask.tableDataSolution)
+        .map((col) =>
+          col.reduce((maxLength, cell) =>
+            maxLength.DE.length > cell.DE.length ? maxLength : cell
+          )
+        )
+        .reduce((maxLength, cell) =>
+          maxLength.DE.length > cell.DE.length ? maxLength : cell
+        ).DE.length;
+
+    const hasHeaders = subTask.tableHeadersSolution[0].DE ?? false;
+    const tableData: TableTaskTemplateData = {
+      solution,
+      lang: options.lang ?? "DE",
+      header: hasHeaders ? subTask.tableHeadersSolution : [],
+      cells: solution ? subTask.tableDataSolution : subTask.tableDataQuestion,
+      columns: subTask.tableDataSolution[0].length,
+      cellWidth: `${cellWidthInt}em`,
+    };
+
+    return this.render("task_types/tableTask", tableData);
+  }
 }
 
 export type RenderOptions = {
   solution?: boolean;
-  lang?: string;
+  lang?: Language;
 };
 
 type TemplateData = {
   points?: number;
+  lang?: Language;
   solution: boolean;
 };
 
 type RenderMultipleChoiceOptions = RenderOptions & {
   granularity?: number; /* Which point granularity to use, e.g. 0.5 or 0.25 */
+};
+
+type RenderOptionsWithAux = RenderOptions & {
+  workingDir: string;
 };
 
 type TaskTemplateData = TemplateData & {
@@ -158,6 +244,10 @@ type TaskTemplateData = TemplateData & {
 type HeadingTemplateData = TemplateData & {
   id: string;
   title: Translation;
+};
+
+type ManualTextTemplateData = TemplateData & {
+  text: Translation;
 };
 
 type MultipleChoiceTemplateData = TemplateData & {
@@ -171,3 +261,29 @@ type MultilineTextTemplateData = TemplateData & {
   solutionText: string[];
   noLines: number;
 };
+
+type PictureTaskTemplateData = TemplateData & {
+  taskPath: string;
+  solutionPath: string;
+  text?: Translation;
+  dimension: string;
+};
+
+type TableTaskTemplateData = TemplateData & {
+  header: Translation[];
+  cells: Translation[][];
+  columns: number;
+  cellWidth: string;
+};
+
+/* Copies the image from the given URL to the working directory and returns the name */
+function copyUrlToPath(workingDir: string, url: string): string {
+  const name = url.split("/").pop();
+  Deno.copyFileSync(url, `${workingDir}/${name}`);
+  return `${name}`;
+}
+
+function dimToLatex(dim: Dimension): string {
+  const unit = dim.unit === "relative" ? `\\text${dim.dimension}` : dim.unit;
+  return `${dim.dimension}=${dim.scalar}${unit}`;
+}
