@@ -1,0 +1,30 @@
+
+\clearpage
+\ifhmode\par\fi
+\removelastskip
+\vskip 3ex\goodbreak
+%\noindent
+\refstepcounter{section} % manually increment the chapter number
+% manually add the chapter to the table of contents
+\addcontentsline{toc}{section}{\protect\numberline{\thesection}<#~ it.id #>}
+% and now format the header according to spec.
+\arrayrulecolor{lightgray2}
+\setlength{\arrayrulewidth}{1pt}
+\begingroup
+\begin{tabular}{|p{0.87\textwidth}p{0.13\textwidth}}
+\hline
+\vspace{0.1pt}
+{%
+\large\bfseries\textsf \afg\ \thesection\ - \normalfont\itshape{%
+\textsf{\ifthenelse{\equal{\sprache}{de}}{<#~ it.title.DE #>}{<#~ it.title.EN #>}}%
+}%
+} &
+\vspace{0.1pt}\hspace{-7pt}%
+\textsf{[<#~ it.points #>P]}\\
+\end{tabular}
+\escapedStringTypeout{VSEXAM: {'Typ':'AufgabeStart', 'Punkte': <#~ it.points #>, 'Seite':'\thepage'}}
+\quad
+\par
+\endgroup
+\nobreak
+\vskip 2ex

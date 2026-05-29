@@ -5,29 +5,28 @@
 % (CB) Counter-Anpassung für ungerade Zahlen: 2 für .5er Schritte, 4 für 0.25er Schritte
 \COPY{4}{\anpassung}
 
-% (CB) Background Image
 \newcommand{\pageBorderFactor}{0.9235}
-\ifthenelse{\equal{\zeigeloesung}{yes}}{\backgroundsetup{
-	scale=\pageBorderFactor,
-	color=black,
-	angle=0,
-	opacity=1,
-	contents={%
-		\includegraphics[width=\paperwidth,height=\paperheight]{background-svg-muster-first}
-	}
-}}{\backgroundsetup{
-	scale=\pageBorderFactor,
-	color=black,
-	angle=0,
-	opacity=1,
-	contents={%
-		\includegraphics[width=\paperwidth,height=\paperheight]{background-svg}
-		%\includesvg{background-svg}
-	}
-}}
 \typeout{VSEXAM: {'Typ':'borderGeo', 'borderFactor': '\pageBorderFactor'}}%
 
 \begin{document}
+% (OC) Background Image
+\ifthenelse{\equal{\zeigeloesung}{yes}}{
+	\AddToHook{shipout/background}[firstpagebackground]{%
+		\begin{tikzpicture}[remember picture,overlay]%
+			\node[opacity=1,inner sep=0pt,scale=\pageBorderFactor] at (current page.center){%
+				\includegraphics[width=\paperwidth,height=\paperheight]{background-svg-muster-first}%
+			};%
+		\end{tikzpicture}%
+	}
+}{%
+	\AddToHook{shipout/background}{%
+		\begin{tikzpicture}[remember picture,overlay]%
+			\node[opacity=1,inner sep=0pt,scale=\pageBorderFactor] at (current page.center){%
+				\includegraphics[width=\paperwidth,height=\paperheight]{background-svg}%
+			};%
+		\end{tikzpicture}%
+	}
+}
 \begin{Form}
 
 %%% Lecker Listings usw.
@@ -51,9 +50,9 @@
 		\end{color}
 		}
 		{}
-    
-    \vfill 
-    	%\vspace*{2cm}	
+
+    \vfill
+    %\vspace*{2cm}
     {\large\normalfont\bfseries \klausur}
     \vspace{0.1cm}
 
@@ -85,37 +84,36 @@
   %\newtotcounter{pointsforassignment18}
   %\newtotcounter{pointsforassignment19}
   %\newtotcounter{pointsforassignment20}
-  
+
   % Counter für die Punkte
   \newtotcounter{numberofassignments}
   \newtotcounter{exampoints}
-  
+
   %  \large
 
-  
-  \def\totpagecount{\getpagerefnumber{LastPage}}
-  \DIVIDE{\totvalue{exampoints}}{\anpassung}{\div}
 
-    \gesamtpunktzahl: \ifthenelse{\totvalue{exampoints}<0}{\textcolor{red}{\textbf{RECOMPILE}}}{\div}\\
+  \def\totpagecount{\getpagerefnumber{LastPage}}
+
+    \gesamtpunktzahl: \examPoints\\
     \totalpages: \totpagecount
-    
-    \vspace{1.5cm}
-  \escapedStringTypeout{VSEXAM: {'Typ':'mainQR', 'content': {'v':'\removebs{\veranstaltung}','s':'\semester','d':'\datum','l':'\sprache','c':\totpagecount,'t':\div,'r':\randomexamnumber}}}%
-  \qrcode[height=4cm,level=H]{\{'v':'\removebs{\veranstaltung}','s':'\semester','d':'\datum','l':'\sprache','c':\totpagecount,'t':\div,'r':'\randomexamnumber'\}}
+
+  \vspace{1.5cm}
+  \escapedStringTypeout{VSEXAM: {'Typ':'mainQR', 'content': {'v':'\removebs{\veranstaltung}','s':'\semester','d':'\datum','l':'\sprache','c':\totpagecount,'t':\examPoints,'r':\randomexamnumber}}}%
+  \qrcode[height=4cm,level=H]{\{'v':'\removebs{\veranstaltung}','s':'\semester','d':'\datum','l':'\sprache','c':\totpagecount,'t':\examPoints,'r':'\randomexamnumber'\}}
   \\
   \ifthenelse{\equal{\vollername}{}}{%
   \vspace{0.4cm}
-  \barcode[code=Code39,X=.35mm]{\randomexamnumber} 
+  \barcode[code=Code39,X=.35mm]{\randomexamnumber}
   \\
   \vspace{0.4cm}
   }{%
   \vspace{1.2cm}
   }
-  
+
   \#\textbf{\randomexamnumber}
   \ifthenelse{\equal{\vollername}{}}{}{\\[0.5em]
   \seqnr:\ \textbf{\ifthenelse{\equal{\sequenznummer}{}}{\SequenznummerFehlt}{\sequenznummer}}}
-  
+
   % Ausnutzen der vollen Seitengroesse
   \vfill
 
@@ -125,7 +123,7 @@
 \setlength\extrarowheight{6pt}
 
 	\begin{tabular}{|c|c|}
-      \hline	
+      \hline
 	  ~~\note~~  & ~~~~~~~~~~ \\
       \hline
 	\end{tabular}
@@ -146,7 +144,7 @@
     \end{tabular}
     }
 	%\def\pagetotalnew{\pageref{LastPage}}
-	
+
 	\ifthenelse{\equal{\vollername}{}}{%
   \vspace{0.2cm}
 	\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|}
@@ -167,15 +165,16 @@
 \end{center}
 \end{titlepage}
 
-\ifthenelse{\equal{\zeigeloesung}{yes}}{\backgroundsetup{
-	scale=\pageBorderFactor,
-	color=black,
-	angle=0,
-	opacity=1,
-	contents={%
-		\includegraphics[width=\paperwidth,height=\paperheight]{background-svg-muster}
+\ifthenelse{\equal{\zeigeloesung}{yes}}{
+	\RemoveFromHook{shipout/background}[firstpagebackground]
+	\AddToHook{shipout/background}{%
+		\begin{tikzpicture}[remember picture,overlay]%
+			\node[opacity=1,inner sep=0pt,scale=\pageBorderFactor] at (current page.center){%
+				\includegraphics[width=\paperwidth,height=\paperheight]{background-svg-muster}%
+			};%
+		\end{tikzpicture}%
 	}
-}}{}
+}{}
 
 % prints the cover sheet in the right language
 \printcover

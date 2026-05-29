@@ -6,6 +6,13 @@ image: docker:25.0.5
 variables:
   DOCKER_TLS_CERTDIR: ""
 
+backend_unittests:
+  image: denoland/deno:latest
+  stage: test
+  script:
+    - cd backend
+    - deno test --allow-env --allow-read
+
 # Cypress Tests
 cypress_e2e:
   stage: test

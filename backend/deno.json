@@ -1,15 +1,17 @@
 {
-    "compilerOptions": {
-        "lib": ["ES2022", "deno.ns", "dom"]
-    },
-    "imports": {
-        "@db/mongo": "jsr:@db/mongo@^0.34.0",
-        "@mirror/xlsx": "jsr:@mirror/xlsx@^0.20.3",
-        "@oak/oak": "jsr:@oak/oak@^17.2.0",
-        "@std/crypto": "jsr:@std/crypto@^1.0.5",
-        "@std/encoding": "jsr:@std/encoding@^1.0.10",
-        "@std/fs": "jsr:@std/fs@^1.0.22",
-        "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.8.20",
-        "nodemailer": "npm:nodemailer@^8.0.1"
-    }
+  "compilerOptions": {
+    "lib": ["ES2022", "deno.ns", "dom"]
+  },
+  "imports": {
+    "@bgub/eta": "jsr:@bgub/eta@^4.6.0",
+    "@db/mongo": "jsr:@db/mongo@^0.34.0",
+    "@mirror/xlsx": "jsr:@mirror/xlsx@^0.20.3",
+    "@oak/oak": "jsr:@oak/oak@^17.2.0",
+    "@std/assert": "jsr:@std/assert@^1.0.19",
+    "@std/crypto": "jsr:@std/crypto@^1.0.5",
+    "@std/encoding": "jsr:@std/encoding@^1.0.10",
+    "@std/fs": "jsr:@std/fs@^1.0.22",
+    "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.8.20",
+    "nodemailer": "npm:nodemailer@^8.0.1"
+  }
 }

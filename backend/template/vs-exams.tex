@@ -4,7 +4,7 @@
 % - vs-exams.tex -
 %
 % LaTeX-Vorlage zur Verwendung als Vorlage für Klausuren
-% 
+%
 % Version 0.9 vom 5. Februar 2010, Matthäus Wander (Booktabs hinzugefügt, Komascript-Dings auskommentiert)
 % Version 0.8 vom 11.Februar 2009, Arno Wacker
 % basierend auf v1.4 von Jörg Schwerdtfeger
@@ -18,7 +18,6 @@
 %\newcommand{\semester}{WS 2008/09}
 %\newcommand{\pruefer}{Prof.\ T.\ Weis, Dr.\ A. Wacker}
 %\newcommand{\datum}{17.02.2009}
-%\newcommand{\klausurtyp}{A}
 %\newcommand{\sprache}{en} % set to de/en, defaults to de
 %\newcommand{\zeigeloesung}{yes} % set to yes/no, no: leere zeilen werden gedruckt, yes, die lösung wird gedruckt
 %
@@ -33,7 +32,7 @@
 %\aufgabe{Atmel ATMega 128 Assembler}{5}
 %blah blah
 %
-%	
+%
 %\aufgabenteil{2}
 %What is the purpose of this code segment?
 %
@@ -46,15 +45,26 @@
 % Diese Übungsdatei dann z. B. mit TeXnicCenter direkt in PDF übersetzen lassen.
 % (die hier vorliegende vs-exams.tex muss sich im selben Verzeichnis befinden)
 
-\documentclass[DIV0,a4paper,12pt,titlepage,pdftex,fleqn]{scrartcl}
-\usepackage[utf8]{inputenc}
+\documentclass[DIV=0,a4paper,12pt,titlepage,fleqn]{scrartcl}
+
+\ifdefined\XeTeXversion
+	% XeTeX // tectonic
+	\usepackage{fontspec}
+	\usepackage{polyglossia}
+	\setmainlanguage[spelling=new,babelshorthands=true]{german}
+	\setotherlanguage[variant=uk]{english}
+\else
+	% default: pdfLaTeX
+	\usepackage[english,german, provide=*]{babel}
+	\usepackage[T1]{fontenc}
+	\usepackage[utf8]{inputenc}
+\fi
+
 \input{meta-exam.tex}
 
 
-\usepackage{etex}
 %\reserveinsert{28}
-\usepackage[pdftex,
-            pdfauthor={\pruefer},
+\usepackage[pdfauthor={\pruefer},
             pdftitle={Klausur \veranstaltung\ im \semester},
             pdfsubject={Klausur zu \veranstaltung\ im \semester\ am \datum},
             pdffitwindow=true,
@@ -66,17 +76,16 @@
             pdfview=FitH,
             hidelinks]{hyperref}
 \hypersetup{colorlinks=false}
-\usepackage[pdftex]{color}
+\usepackage{color}
 \usepackage{pdfcolmk}
-\usepackage[pdftex]{graphicx}
+\usepackage{graphicx}
 \usepackage{pdfpages}
 \usepackage{qrcode}
-\usepackage{makebarcode} 
+\usepackage{makebarcode}
 \usepackage{csquotes}
 \usepackage{xstring}
 
 \newcounter{mycounter}
-
 
 {\catcode`\ =12\relax\gdef\viktorotherspace{ }}%
 \def\vcodes{%
@@ -109,14 +118,13 @@
 \escapedStringTypeout{VSEXAM: {'Typ':'pageGeo', 'hsize': '\strip@pt\DimX'}}%
 \makeatother
 
-\usepackage[english,ngerman]{babel}
-\usepackage{ae,amsmath,amssymb,amsfonts,bbm}
+\usepackage{amsmath,amssymb,amsfonts,bbm}
 \usepackage{amsthm}   % AMS-Theoremumgebung
 \usepackage{stmaryrd}	% Symbole, u. A. \lightning
 %\usepackage{fancybox}[2000/09/19]  % für hübsche Rahmen, usage: \shadowbox{}
 %\usepackage{secnum}  % Abbildungs- und Tabellennummern nach section
 %\usepackage[small,bf,hang]{caption}[2003/12/20] % Abbildungs- und Tabellenunterschriften anpassen
-\usepackage{lastpage}
+% \usepackage{lastpage}
 \usepackage{flafter}  % Abb. und Tabellen nie vor dem ersten Verweis im Text plazieren!
 \usepackage{footnpag} % Fußnotenzähler auf jeder Seite bei 1 beginnen
 \usepackage[normalem]{ulem} % Für div. Unterstreichungen, (\uline,\sout,\uwave)
@@ -145,7 +153,6 @@
 \usepackage{calc}       % Berechnungen Counter
 \usepackage{calculator} % Berechnungen Anzeige
 \usepackage{lastpage}   % Schmierblätter Seitenberechnung
-\usepackage{background}
 \usepackage{rotating}
 
 % theo
@@ -158,11 +165,8 @@
 \usepackage{boolexpr}
 
 % Fix for new PDF Versions (MK)
-\pdfminorversion=6
+% \pdfminorversion=6
 
-\ifthenelse{\equal{\interactive}{Y}}{
-	\usepackage{xstring}% (OC) for correctly sized text lines in \lineloesung
-}{}
 % let's define some colors
 \definecolor{lightgray1}{gray}{.85}
 \definecolor{lightgray2}{gray}{.85}
@@ -176,19 +180,8 @@
 \newcommand{\myarrow}[1][0.1pt]{\tikz[baseline=-0.26em,y=3em, x=3em]{\filldraw[line width=#1] (0.4202,0.0021) .. controls (0.4202,-0.0000) and (0.4188,-0.0018) .. (0.4171,-0.0025) .. controls (0.3917,-0.0092) and (0.3699,-0.0236) .. (0.3509,-0.0401) .. controls (0.3355,-0.0538) and (0.3225,-0.0704) .. (0.3130,-0.0890) .. controls (0.3119,-0.0915) and (0.3094,-0.0929) .. (0.3066,-0.0929) .. controls (0.3028,-0.0929) and (0.2996,-0.0897) .. (0.2996,-0.0858) .. controls (0.2996,-0.0848) and (0.3000,-0.0837) .. (0.3003,-0.0827) .. controls (0.3087,-0.0665) and (0.3193,-0.0517) .. (0.3316,-0.0391) -- (0.1181,-0.0391) .. controls (0.1143,-0.0391) and (0.1111,-0.0359) .. (0.1111,-0.0320) .. controls (0.1111,-0.0282) and (0.1143,-0.0250) .. (0.1181,-0.0250) -- (0.3471,-0.0250) .. controls (0.3611,-0.0137) and (0.3766,-0.0046) .. (0.3935,0.0021) .. controls (0.3766,0.0088) and (0.3611,0.0179) .. (0.3471,0.0292) -- (0.1181,0.0292) .. controls (0.1143,0.0292) and (0.1111,0.0323) .. (0.1111,0.0362) .. controls (0.1111,0.0401) and (0.1143,0.0432) .. (0.1181,0.0432) -- (0.3316,0.0432) .. controls (0.3193,0.0559) and (0.3087,0.0707) .. (0.3003,0.0868) .. controls (0.3000,0.0879) and (0.2996,0.0889) .. (0.2996,0.0900) .. controls (0.2996,0.0939) and (0.3028,0.0970) .. (0.3066,0.0970) .. controls (0.3094,0.0970) and (0.3119,0.0956) .. (0.3130,0.0932) .. controls (0.3225,0.0745) and (0.3355,0.0580) .. (0.3509,0.0443) .. controls (0.3699,0.0278) and (0.3917,0.0133) .. (0.4171,0.0067) .. controls (0.4188,0.0059) and (0.4202,0.0042) .. (0.4202,0.0021) -- cycle;}}
 \newcommand{\declerationbox}{{
   \CheckBox[name=\themycounter, bordercolor=0 0 0, height=13pt, width=18pt, color=black, checkboxsymbol=\ding{56}]{}}\stepcounter{mycounter}}
-
-\ifthenelse{\equal{\interactive}{Y}}{
-  \newcommand{\emptyb}{\mbox{\CheckBox[name=\themycounter, bordercolor=0 0 0, height=13pt, width=13pt, color=black, checkboxsymbol=\ding{56}]{}}\stepcounter{mycounter}}
-}{
-  \newcommand{\emptyb}{\fbox{\phantom{x}}}
-}
+\newcommand{\emptyb}{\fbox{\phantom{x}}}
 \newcommand{\tickedbox}{\fbox{\textbf{x}}}
-\newcommand{\textf}[1]{
-  \mbox{
-    \TextField[name=#1, align=0, width=\textwidth, height=0.89cm, borderstyle=U, bordercolor={0 0 0}, maxlen=50, charsize=12pt]{}
-    %\rule{\linewidth}{0.3mm}
-    }
-  }
 
 \newcommand{\printaufgaben}{\include{aufgaben}}
 \newcommand{\donottouch}{Please do not touch the exam yet.\\[1em]Bitte den Klausurbogen noch nicht öffnen.}
@@ -197,7 +190,11 @@
 \ifthenelse{\equal{\sprache}{en}}
 {
  % english
- \selectlanguage{english}
+ \ifdefined\XeTeXversion
+  \setmainlanguage{english}
+ \else
+  \selectlanguage{english}
+ \fi
  \newcommand{\seite}{Page}
  \newcommand{\udue}{University of Duisburg-Essen}
  \newcommand{\mtr}{Matriculation Nr.}
@@ -214,6 +211,11 @@
  %\newcommand{\printaufgaben}{\include{aufgaben-en}}
 }{
  % deutsch
+ \ifdefined\XeTeXversion
+  \setmainlanguage{german}
+ \else
+  \selectlanguage{german}
+ \fi
  \newcommand{\seite}{Seite}
  \newcommand{\udue}{Universität Duisburg-Essen}
  \newcommand{\mtr}{Matrikelnummer}
@@ -229,19 +231,6 @@
  \newcommand{\seqnr}{Klausurnummer}
  %\newcommand{\printaufgaben}{\include{aufgaben-de}}
 }
-
-
-%\newenvironment{de}{
-%\ifx\equal{\sprache}{de}
-%}{
-%\fi
-%}
-%
-%\newenvironment{en}{
-%\ifx\equal{\sprache}{en}
-%}{
-%\fi
-%}
 
 
 %----- (CB) Schmierblätter ---------------------------------------
@@ -261,22 +250,16 @@
   \ADD{\schmierblaetteranzahl}{\ergB}{\ergC}
   \forloop{sb}{0}{\value{sb} < \ergC}
   {
-    \ifthenelse{\equal{\interactive}{Y}}{
-      \vspace*{\fill}
-      {\centering\Huge {\ifthenelse{\equal{\sprache}{en}}{Intentionally left blank}{Leerseite}}\\}
-      \vspace*{\fill}
-    }{
-      %\begin{tikzpicture}
-      %   \draw[color=white] (-0.05cm,0cm) -- (0cm,0cm);
-      %   \draw[style=help lines, ystep=5mm, xstep=5mm] (0cm,0cm) grid (17cm,22cm);
-      %\end{tikzpicture}
-      %\total{lastpageexam}
-      {\large\bfseries\textsf {\ifthenelse{\equal{\sprache}{en}}{Space for personal notes}{Konzeptpapier}}\\[2mm]}
-      \begin{tikzpicture}
-         \draw[color=white] (-0.05cm,0cm) -- (0cm,0cm);
-         \draw[style=help lines, ystep=5mm, xstep=5mm] (0cm,0cm) grid (17cm,21.5cm);
-      \end{tikzpicture}
-    }
+    %\begin{tikzpicture}
+    %   \draw[color=white] (-0.05cm,0cm) -- (0cm,0cm);
+    %   \draw[style=help lines, ystep=5mm, xstep=5mm] (0cm,0cm) grid (17cm,22cm);
+    %\end{tikzpicture}
+    %\total{lastpageexam}
+    {\large\bfseries\textsf {\ifthenelse{\equal{\sprache}{en}}{Space for personal notes}{Konzeptpapier}}\\[2mm]}
+    \begin{tikzpicture}
+        \draw[color=white] (-0.05cm,0cm) -- (0cm,0cm);
+        \draw[style=help lines, ystep=5mm, xstep=5mm] (0cm,0cm) grid (17cm,21.5cm);
+    \end{tikzpicture}
 
     \clearpage
   }
@@ -326,7 +309,7 @@
 
 %----- Header + Footer ---------------------------------------
 \pagestyle{scrheadings}
-\clearscrheadfoot
+\clearpairofpagestyles
 \addtolength{\topmargin}{1.05cm}
 \addtolength{\headsep}{-2em}
 \setlength{\footskip}{32pt}
@@ -368,17 +351,17 @@
 \ifthenelse{\equal{\fusszeile}{yes}}{
 \cfoot{
  % \color{black}
- % \begin{tabular}{cc} 
+ % \begin{tabular}{cc}
  %  \#\randomexamnumber
  %  &
  %  \multirow{2}*{\qrcode[height=1.5cm,level=H]{\{'p':\thepage,'r':\randomexamnumber\}}} \printPos{pageQr}
  %  \\
- %  \barcode[code=Code39,X=.25mm,H=1cm]{\randomexamnumber} 
- %  &  
+ %  \barcode[code=Code39,X=.25mm,H=1cm]{\randomexamnumber}
+ %  &
  % \end{tabular}
  % \color{black}
-%  \begin{tabular}{c}   
-%   \barcode[code=Code39,X=.25mm,H=.5cm]{\randomexamnumber} 
+%  \begin{tabular}{c}
+%   \barcode[code=Code39,X=.25mm,H=.5cm]{\randomexamnumber}
 %    \\
 %   \#\randomexamnumber
 %  \end{tabular}
@@ -435,33 +418,6 @@
 \vskip 2ex
 }
 
-% (CB) Old Version
-% 2 Argumente: 1: Titel, 2: mögliche Punkte
-%\newcommand{\aufgabe}[2]{
-% \clearpage
-% \ifhmode\par\fi
-% \removelastskip
-% \vskip 3ex\goodbreak
- %\noindent
-% \refstepcounter{section} % manually increment the chapter number
-% manually add the chapter to the table of contents
-% \addcontentsline{toc}{section}{\protect\numberline{\thesection}#1}
-% and now format the header according to spec.
-%\arrayrulecolor{lightgray2}
-%\setlength{\arrayrulewidth}{1pt}
-%\vspace{10pt}
-%\begingroup
-%\begin{tabular}{|p{0.87\textwidth}p{0.13\textwidth}}
-%\hline
-%\vspace{0.1pt}
-%{\large\bfseries\textsf \afg\ \thesection\ - \it{\textsf{#1}}} & \vspace{0.1pt}\textsf{[#2 \pts]}\\
-%\end{tabular}
-%\quad
-%\par
-%\endgroup
-%\nobreak
-%\vskip 2ex
-%}
 
 %----- Definition für Teilaufgabe ---------------------------------------
 %\titleformat{hcommandi}[hshapei]{hformati}{hlabeli}{hsepi}{hbeforei}[hafteri]
@@ -504,7 +460,7 @@
 % 2 Argumente: Anzahl zeilen, Lösung
 \newcounter{ct}
 \newcommand{\loesung}[2]
-{  \escapedStringTypeout{VSEXAM: {'Typ':'Freitext', 'Zeilen': '#1', 'Loesung': '#2'}}
+{  \escapedStringTypeout{VSEXAM: {'Typ':'Freitext', 'Zeilen': '#1', 'Loesung': ''}}
  \ifthenelse{\equal{\zeigeloesung}{yes}}
  { % print solution
  {\color{red}\normalfont\itshape #2}
@@ -512,16 +468,6 @@
   \ifthenelse{\equal{#1}{0} }
   {}
   {
-  \ifthenelse{\equal{\interactive}{Y}}{
-    \textf{\themycounter}
-    \stepcounter{mycounter}
-    \forloop{ct}{1}{\value{ct} < #1}
-    {
-    \textf{\themycounter}
-    \stepcounter{mycounter}
-    }
-    \vspace{-0.8cm}
-  }{
     \ifthenelse{\equal{#1}{0} }
     {}
     {
@@ -535,36 +481,24 @@
     \rule{\linewidth}{0.2mm}
     \newline
     }
-    \vspace{-1.2cm}
     }
-    %\vspace{-1.2cm}
-    %\vspace{-0.8cm}
+    \vspace{-0.8cm}
   }
-  }
-  %\vspace{-0.8cm}
  }
 }
 
 % (CB) zus. Lösungs-Command für Einzeiler, z.B. in Tabellen
-\newcommand{\lineloesung}[2]
-{ \escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '#1', 'Loesung': '#2'}}%
-\ifthenelse{\equal{\zeigeloesung}{yes}}%
-{%
-% yes
-{\color{red}\normalfont\itshape #2}%
-}%
-{%
-% no
-\ifthenelse{\equal{\interactive}{Y}}{%
-\StrDel{#1}{~}%
-\StrCount{#1}{~}[\lineloesungblanks]%
-\typeout{\lineloesungblanks em}%
-\TextField[name=\themycounter, align=0, width={\lineloesungblanks em}, height=13pt, borderstyle=U, bordercolor={0 0 0}, maxlen=\lineloesungblanks, charsize=12pt]{}%
-\stepcounter{mycounter}
-}{%
-#1
-}%
-}%
+\newcommand{\lineloesung}[2]{%
+  \escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
+  \ifthenelse{\equal{\zeigeloesung}{yes}}%
+  {%
+    % yes
+    {\color{red}\normalfont\itshape #2}%
+  }%
+  {%
+    % no
+    #1
+  }%
 }%
 
 
@@ -575,7 +509,7 @@
  { % print solution
     {\color{red}\normalfont\itshape #1}
  }{ % print as many lines as requested
-    \underline{\color{white} #1}    
+    \underline{\color{white} #1}
  }
 }
 
@@ -954,17 +888,11 @@
 \ifthenelse{\equal{\zeigeloesung}{yes}}
 {\ifthenelse{\equal{#3}{f}}{\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} &}{\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} &}
 \ifthenelse{\equal{#6}{f}}{\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\}{\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\}}
-{\emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} & \emptyb & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\ } 
+{\emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} & \emptyb & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\ }
 }
 
 \newcommand{\note}{\ifthenelse{\equal{\sprache}{de}}{Note}{Grade}}
 
-% (CB) Define Assignments only for one exam type
-\newcommand{\fortype}[2]{
-\ifthenelse{\equal{#1}{\klausurtyp}}{
-#2
-}{}
-}
 
 % (CB) Support for Property questions (NYI)
 
@@ -991,7 +919,7 @@
   {You get \mcpoints{#2} for each correct row. You don't get negative points for wrong rows.}
 } \\
 \case{=4}
-\begin{longtable}{ccccp{7.5cm}}
+\begin{longtable}{ccccp{8.5cm}}
 \blacktoprule
 \multicolumn{5}{p{15.5cm}}{
   \ifthenelse{\equal{\sprache}{de}}
@@ -1055,7 +983,7 @@
 \ifthenelse{\equal{\sprache}{de}}{#1}{#2}
 }
 
-\newcommand{\bildAufgabe}[4]{\escapedStringTypeout{VSEXAM: {'Typ':'BildAufgabe', 'Bildtext': '#1', 'Loesungsbild': '#4'}}\ifthenelse{\equal{\zeigeloesung}{no}}{
+\newcommand{\bildAufgabe}[4]{\escapedStringTypeout{VSEXAM: {'Typ':'BildAufgabe', 'Bildtext': '', 'Loesungsbild': ''}}\ifthenelse{\equal{\zeigeloesung}{no}}{
 %\begin{figure}[h]
 %\centering
 \includegraphics[width=#2]{#3}

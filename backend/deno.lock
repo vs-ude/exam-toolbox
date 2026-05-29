@@ -1,12 +1,14 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@bgub/eta@^4.6.0": "4.6.0",
     "jsr:@db/mongo@0.34": "0.34.0",
     "jsr:@lucsoft/web-bson@0.4": "0.4.0",
     "jsr:@mirror/xlsx@~0.20.3": "0.20.3",
     "jsr:@oak/commons@1": "1.0.1",
     "jsr:@oak/oak@^17.2.0": "17.2.0",
-    "jsr:@std/assert@1": "1.0.18",
+    "jsr:@std/assert@1": "1.0.19",
+    "jsr:@std/assert@^1.0.19": "1.0.19",
     "jsr:@std/bytes@1": "1.0.6",
     "jsr:@std/crypto@1": "1.0.5",
     "jsr:@std/crypto@^1.0.3": "1.0.5",
@@ -25,6 +27,9 @@
     "npm:path-to-regexp@^6.3.0": "6.3.0"
   },
   "jsr": {
+    "@bgub/eta@4.6.0": {
+      "integrity": "fe872004cd6c64ca25c7e71fd80bbbad7d8d552cefd31828bddddb7db0f79eb1"
+    },
     "@db/mongo@0.34.0": {
       "integrity": "48960c99392e9899579b1e23ca87c7a3b42fb5788bcc6fa72b2f2a0090f52a6e",
       "dependencies": [
@@ -42,7 +47,7 @@
     "@oak/commons@1.0.1": {
       "integrity": "889ff210f0b4292591721be07244ecb1b5c118742f5273c70cf30d7cd4184d0c",
       "dependencies": [
-        "jsr:@std/assert",
+        "jsr:@std/assert@1",
         "jsr:@std/bytes",
         "jsr:@std/crypto@1",
         "jsr:@std/encoding@1",
@@ -54,7 +59,7 @@
       "integrity": "938537a92fc7922a46a9984696c65fb189c9baad164416ac3e336768a9ff0cd1",
       "dependencies": [
         "jsr:@oak/commons",
-        "jsr:@std/assert",
+        "jsr:@std/assert@1",
         "jsr:@std/bytes",
         "jsr:@std/http",
         "jsr:@std/media-types",
@@ -64,6 +69,12 @@
     },
     "@std/assert@1.0.18": {
       "integrity": "270245e9c2c13b446286de475131dc688ca9abcd94fc5db41d43a219b34d1c78"
+    },
+    "@std/assert@1.0.19": {
+      "integrity": "eaada96ee120cb980bc47e040f82814d786fe8162ecc53c91d8df60b8755991e",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
     },
     "@std/bytes@1.0.6": {
       "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
@@ -113,9 +124,11 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@bgub/eta@^4.6.0",
       "jsr:@db/mongo@0.34",
       "jsr:@mirror/xlsx@~0.20.3",
       "jsr:@oak/oak@^17.2.0",
+      "jsr:@std/assert@^1.0.19",
       "jsr:@std/crypto@^1.0.5",
       "jsr:@std/encoding@^1.0.10",
       "jsr:@std/fs@^1.0.22",

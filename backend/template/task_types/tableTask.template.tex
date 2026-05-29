@@ -1,0 +1,44 @@
+\begin{center}
+\begin{tabular}{<#~ '|l'.repeat(it.columns) #>|}
+
+\hline
+<# for (let c = 0; c < it.header.length; c++) { #>
+\ifthenelse{\equal{\sprache}{de}}{%
+\textbf{<#~ it.header[c].DE #>}
+}{%
+\textbf{<#~ it.header[c].EN #>}
+}
+<# if (c+1 < it.columns) { #>
+&
+<# } else { #>
+\\
+\hline
+<# }} #>
+<# it.cells.forEach((row) => { #>
+<# for (let c = 0; c < it.columns; c++) { #>
+\escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
+<# if (it.solution) { #>
+\ifthenelse{\equal{\sprache}{de}}{%
+<#~ row[c].DE #>%
+}{%
+<#~ row[c].EN #>%
+}
+<# } else { #>
+<# if (row[c].DE.length > 0) { #>
+\ifthenelse{\equal{\sprache}{de}}{%
+<#~ row[c].DE #>%
+}{%
+<#~ row[c].EN #>%
+}
+<# } else { #>
+\hspace{<#~ it.cellWidth #>}
+<# }} #>
+<# if (c+1 < it.columns) { #>
+&
+<# }} #>
+\\
+\hline
+<# }) #>
+
+\end{tabular}
+\end{center}

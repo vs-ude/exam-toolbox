@@ -1,0 +1,16 @@
+
+\escapedStringTypeout{VSEXAM: {'Typ':'BildAufgabe', 'Bildtext': '', 'Loesungsbild': ''}}
+\includegraphics[<#~ it.dimension #>]%
+<# if (it.solution) { #>
+{<#~ it.solutionPath #>}
+<# } else { #>
+{<#~ it.taskPath #>}
+<# } #>
+
+<# if (it.text) { #>
+\centerline{\textit{%
+\ifthenelse{\equal{\sprache}{de}}%
+{<#~ it.text.DE #>}%
+{<#~ it.text.EN #>}%
+}}
+<# } #>

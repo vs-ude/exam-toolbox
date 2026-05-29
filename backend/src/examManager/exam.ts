@@ -1,4 +1,5 @@
-import { Tag } from "./tag.ts";
+import { Eta } from "@bgub/eta";
+import type { Tag } from "./tag.ts";
 
 export class Exam {
   _id?: string = undefined;
@@ -8,6 +9,7 @@ export class Exam {
   date: string;
   examLengthMinutes: number;
   tasks: TaskGroup[];
+  points?: number;
   public lastEditedBy?: string;
   public updatedAt?: Date;
 
@@ -33,6 +35,7 @@ export interface TaskGroup {
   groupNumber: number;
   groupTitle: Translation;
   tasks: Task[];
+  points?: number;
 }
 
 export type Task =
@@ -59,6 +62,14 @@ export interface BaseTask {
   children: string[];
 }
 
+export type Language = "DE" | "EN";
+
+export interface Dimension {
+  unit: "cm" | "mm" | "relative";
+  dimension: "width" | "height";
+  scalar: number;
+}
+
 export interface Question {
   DE: string;
   EN: string;
@@ -66,6 +77,7 @@ export interface Question {
 
 export interface MultipleChoiceTask extends BaseTask {
   type: "multipleChoice";
+  numCorrect?: number;
   answerOptions: AnswerOptions[];
 }
 
@@ -77,6 +89,7 @@ export interface AnswerOptions {
 
 export interface ShortAnswerTask extends BaseTask {
   type: "shortAnswer";
+  noLines?: number;
   solution: Translation;
 }
 
@@ -84,6 +97,7 @@ export interface PictureTask extends BaseTask {
   type: "pictureTask";
   questionPicture: Image;
   solutionPicture: Image;
+  size?: Dimension;
 }
 
 export interface Image {
