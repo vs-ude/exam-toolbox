@@ -1,4 +1,4 @@
-import { type Eta, EtaError } from "@bgub/eta";
+import { type Eta } from "@bgub/eta";
 import { escapeLatex, getEta } from "../services/mod.ts";
 import type {
   BaseTask,
@@ -11,7 +11,7 @@ import type {
   TableTask,
   TaskGroup,
   Translation,
-} from "./exam.ts";
+} from "../types/exam.ts";
 import { LatexRenderError } from "./err.ts";
 
 let cachedTaskRenderer: TaskRenderer;

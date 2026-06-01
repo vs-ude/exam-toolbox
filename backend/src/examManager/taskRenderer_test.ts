@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import type { PictureTask, TableTask } from "./exam.ts";
+import type { PictureTask, TableTask } from "../types/exam.ts";
 
 Deno.env.set("TEMPLATE_BASE_PATH", "./template");
 

@@ -1,4 +1,4 @@
-import type { Exam } from "./exam.ts";
+import { type Exam, TaskGroup } from "../types/exam.ts";
 import { getTaskRenderer, type RenderOptions } from "./taskRenderer.ts";
 import { escapeLatex, getEta } from "../services/mod.ts";
 import {
@@ -6,7 +6,6 @@ import {
   LatexCompileError,
   LatexRenderError,
 } from "./err.ts";
-import { TaskGroup } from "./mod.ts";
 
 type ExamMetaTemplateData = {
   veranstaltung: string;

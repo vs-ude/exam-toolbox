@@ -5,7 +5,7 @@ import { crypto } from "@std/crypto";
 import { encodeHex } from "@std/encoding";
 import * as fs from "@std/fs";
 
-import { Exam } from "./exam.ts";
+import { type Exam } from "../types/exam.ts";
 import {
   compileExam,
   generateTasksLatex,

@@ -1,4 +1,3 @@
-import { Eta } from "@bgub/eta";
 import type { Tag } from "./tag.ts";
 
 export class Exam {
