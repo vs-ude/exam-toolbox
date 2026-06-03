@@ -9,10 +9,25 @@ variables:
 backend_tests:
   image: denoland/deno:latest
   stage: test
+  variables:
+    DENO_DIR: $CI_PROJECT_DIR/.deno_cache
+  cache:
+    - key:
+        files:
+          - backend/deno.lock
+      paths:
+        - .deno_cache/
+    - key:
+        files:
+          - .ci/backend_integration_packages.txt
+      paths:
+        - .apt-cache/lists/
+        - .apt-cache/archives/
   before_script:
-    - apt update && apt install zbar-tools qrencode
-  script:
+    - bash .ci/prepare_backend_integration.sh .ci/backend_integration_packages.txt
     - cd backend
+    - deno install
+  script:
     - deno run test:integration
 
 # Cypress Tests
