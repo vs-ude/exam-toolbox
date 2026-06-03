@@ -1,8 +1,9 @@
 import { assertEquals, assertInstanceOf, assertRejects } from "@std/assert";
 import { generateExamQR, generatePageQR, parseQR, QRError } from "./qr.ts";
 import { Exam } from "../types/exam.ts";
-import { ExamPageScan, ExamScan } from "../types/scan.ts";
+import { ExamPageQRData, ExamQRData } from "../types/scan.ts";
 import { skipIntegration } from "../config/test.ts";
+import { contrastAdjust } from "./preprocess.ts";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -137,7 +138,7 @@ Deno.test({
 // ---------------------------------------------------------------------------
 
 Deno.test({
-  name: "round-trip: generateExamQR → parseQR returns matching ExamScan",
+  name: "round-trip: generateExamQR → parseQR returns matching ExamQRData",
   ignore: skipIntegration,
   async fn() {
     const tmpDir = await Deno.makeTempDir();
@@ -148,7 +149,7 @@ Deno.test({
 
       const result = await parseQR(path);
 
-      assertInstanceOf(result, ExamScan);
+      assertInstanceOf(result, ExamQRData);
       assertEquals(result.courseName, "Testlauf vong Exascan 2");
       assertEquals(result.semester, "WS 2016/17");
       assertEquals(result.date, "2017-02-10");
@@ -173,7 +174,7 @@ Deno.test({
 
       const result = await parseQR(path);
 
-      assertInstanceOf(result, ExamScan);
+      assertInstanceOf(result, ExamQRData);
       assertEquals(result.language, "DE");
       assertEquals(result.code, "XYZT");
     } finally {
@@ -184,7 +185,7 @@ Deno.test({
 
 Deno.test({
   name:
-    "round-trip: generatePageQR → parseQR returns matching ExamPageScan (page 4)",
+    "round-trip: generatePageQR → parseQR returns matching ExamPageQRData (page 4)",
   ignore: skipIntegration,
   async fn() {
     const tmpDir = await Deno.makeTempDir();
@@ -194,7 +195,7 @@ Deno.test({
 
       const result = await parseQR(path);
 
-      assertInstanceOf(result, ExamPageScan);
+      assertInstanceOf(result, ExamPageQRData);
       assertEquals(result.code, "FFPN");
       assertEquals(result.page, 4);
     } finally {
@@ -205,7 +206,7 @@ Deno.test({
 
 Deno.test({
   name:
-    "round-trip: generatePageQR → parseQR returns matching ExamPageScan (page 5)",
+    "round-trip: generatePageQR → parseQR returns matching ExamPageQRData (page 5)",
   ignore: skipIntegration,
   async fn() {
     const tmpDir = await Deno.makeTempDir();
@@ -215,7 +216,7 @@ Deno.test({
 
       const result = await parseQR(path);
 
-      assertInstanceOf(result, ExamPageScan);
+      assertInstanceOf(result, ExamPageQRData);
       assertEquals(result.code, "FFPN");
       assertEquals(result.page, 5);
     } finally {
@@ -236,12 +237,121 @@ Deno.test({
 
         const result = await parseQR(path);
 
-        assertInstanceOf(result, ExamPageScan);
+        assertInstanceOf(result, ExamPageQRData);
         assertEquals(result.code, "ABCD", `page ${page}: wrong code`);
         assertEquals(result.page, page, `page ${page}: wrong page number`);
       }
     } finally {
       await Deno.remove(tmpDir, { recursive: true });
+    }
+  },
+});
+
+Deno.test({
+  name: "full-page: parseQR finds easy QR codes correctly",
+  ignore: skipIntegration,
+  async fn() {
+    const baseDir = "../testdata/old_scans/";
+    const files: Record<string, ExamPageQRData | ExamQRData> = {
+      "Exam_1/exam_1.jpg": new ExamQRData(
+        "Testlauf vong Exascan 2",
+        "WS 2016/17",
+        "2017-02-10",
+        "EN",
+        12,
+        157,
+        "FFPN",
+      ),
+      "Exam_1/exam_4.jpg": new ExamPageQRData("FFPN", 4),
+      "Exam_1/exam_5.jpg": new ExamPageQRData("FFPN", 5),
+      "Exam_1/exam_6.jpg": new ExamPageQRData("FFPN", 6),
+      "Exam_1/exam_9.jpg": new ExamPageQRData("FFPN", 9),
+      "Exam_1/exam_12.jpg": new ExamPageQRData("FFPN", 12),
+      "Exam_2/exam_3.jpg": new ExamPageQRData("7Q1J", 3),
+      "Exam_2/exam_6.jpg": new ExamPageQRData("7Q1J", 6),
+      "Exam_2/exam_8.jpg": new ExamPageQRData("7Q1J", 8),
+      "Exam_2/exam_9.jpg": new ExamPageQRData("7Q1J", 9),
+      "Exam_2/exam_10.jpg": new ExamPageQRData("7Q1J", 10),
+      "Exam_2/exam_12.jpg": new ExamPageQRData("7Q1J", 12),
+    };
+    for (const file in files) {
+      const path = `${baseDir}${file}`;
+      const result = await parseQR(path);
+
+      assertEquals(result.code, files[file].code, `file ${file}: wrong code`);
+      assertEquals(
+        result,
+        files[file],
+      );
+    }
+  },
+});
+
+Deno.test({
+  name:
+    "full-page: parseQR finds hard page QR codes correctly after level adjustment",
+  ignore: skipIntegration,
+  async fn() {
+    const baseDir = "../testdata/old_scans/";
+    const files: Record<string, ExamPageQRData> = {
+      "Exam_1/exam_2.jpg": new ExamPageQRData("FFPN", 2),
+      "Exam_1/exam_7.jpg": new ExamPageQRData("FFPN", 7),
+      "Exam_1/exam_8.jpg": new ExamPageQRData("FFPN", 8),
+      "Exam_1/exam_11.jpg": new ExamPageQRData("FFPN", 11),
+      "Exam_2/exam_2.jpg": new ExamPageQRData("7Q1J", 2),
+      "Exam_2/exam_4.jpg": new ExamPageQRData("7Q1J", 4),
+      "Exam_2/exam_5.jpg": new ExamPageQRData("7Q1J", 5),
+      "Exam_2/exam_7.jpg": new ExamPageQRData("7Q1J", 7),
+    };
+    const tempDir = await Deno.makeTempDir();
+    for (const file in files) {
+      const path = `${baseDir}${file}`;
+      let result;
+      let err = undefined;
+      try {
+        result = await contrastAdjust(
+          path,
+          `${tempDir}/${file.replaceAll("/", "_")}`,
+          15,
+        ).then((p) => parseQR(p));
+      } catch (e) {
+        err = e;
+      }
+
+      assertInstanceOf(result, ExamPageQRData, `file ${file}, error: ${err}`);
+      assertEquals(result.code, files[file].code, `file ${file}: wrong code`);
+      assertEquals(
+        result.page,
+        files[file].page,
+        `file ${file}: wrong page number`,
+      );
+    }
+  },
+});
+
+Deno.test({
+  name: "full-page: parseQR fails with broken codes even after enhancement",
+  ignore: skipIntegration,
+  async fn() {
+    const baseDir = "../testdata/old_scans/";
+    const files: string[] = [
+      "Exam_1/exam_3.jpg",
+      "Exam_2/exam_1.jpg",
+      "Exam_2/exam_11.jpg",
+    ];
+    const tempDir = await Deno.makeTempDir();
+    for (const file of files) {
+      const path = `${baseDir}${file}`;
+      assertRejects(async () => {
+        await parseQR(path);
+      });
+      assertRejects(async () => {
+        await contrastAdjust(
+          path,
+          `${tempDir}/${file.replaceAll("/", "_")}`,
+          15,
+        ).then((p) => parseQR(p));
+      });
     }
   },
 });

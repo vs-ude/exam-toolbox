@@ -1,6 +1,6 @@
 import type { Language } from "./exam.ts";
 
-export class ExamScan {
+export class ExamQRData {
   courseName: string;
   semester: string;
   date: string;
@@ -28,7 +28,7 @@ export class ExamScan {
   }
 }
 
-export class ExamPageScan {
+export class ExamPageQRData {
   code: string;
   page: number;
 

@@ -1,5 +1,5 @@
 import { type Exam, Language } from "../types/exam.ts";
-import { ExamPageScan, ExamScan } from "../types/scan.ts";
+import { ExamPageQRData, ExamQRData as ExamQRData } from "../types/scan.ts";
 
 export class QRError extends Error {
   constructor(msg: string, opt?: ErrorOptions) {
@@ -9,7 +9,14 @@ export class QRError extends Error {
   }
 }
 
-/* Generates codes in the form {'v':'\coursename','s':'\semester','d':'\date','l':'\language','c':\totpagecount,'t':\points,'r':\code} with qr error correction level H */
+/**
+ * Generates front page QR codes with error correction level H.
+ * @param path the path to save the QR code image.
+ * @param exam the {@link Exam} data.
+ * @param language the language of the exam.
+ * @param code the exam random code.
+ * @returns the content of the QR code.
+ */
 export async function generateExamQR(
   path: string,
   exam: Exam,
@@ -32,7 +39,13 @@ export async function generateExamQR(
   return content;
 }
 
-/* Generates codes in the form {'p':\page,'r':'\code'} with qr error correction level H */
+/**
+ * Generates per-page codes with qr error correction level H.
+ * @param path the path to save the QR code image.
+ * @param examCode the exam random code.
+ * @param page the page number.
+ * @returns the content of the QR code.
+ */
 export async function generatePageQR(
   path: string,
   examCode: string,
@@ -74,7 +87,14 @@ async function generate(
   }
 }
 
-export async function parseQR(path: string): Promise<ExamScan | ExamPageScan> {
+/**
+ * Parses a QR code from an image at the given path and returns the decoded data.
+ * @param path the path to the QR code image.
+ * @returns the decoded data as an {@link ExamQRData} or {@link ExamPageQRData} object.
+ */
+export async function parseQR(
+  path: string,
+): Promise<ExamQRData | ExamPageQRData> {
   const cmd = new Deno.Command("zbarimg", {
     args: [
       "-q",
@@ -122,7 +142,7 @@ export async function parseQR(path: string): Promise<ExamScan | ExamPageScan> {
   throw new QRError(`Failed to parse data: ${stdoutStr}`);
 }
 
-function parsePageData(line: string): ExamPageScan {
+function parsePageData(line: string): ExamPageQRData {
   const fields = line.split(",");
   const map: Record<string, string> = {};
   for (const f of fields) {
@@ -139,7 +159,7 @@ function parsePageData(line: string): ExamPageScan {
   return mapToExamPageScan(map);
 }
 
-function parseExamData(line: string): ExamScan {
+function parseExamData(line: string): ExamQRData {
   const fields = line.split(",");
   const map: Record<string, string> = {};
   for (const f of fields) {
@@ -171,20 +191,20 @@ function parseExamData(line: string): ExamScan {
   return mapToExamScan(map);
 }
 
-function mapToExamScan(map: Record<string, string>): ExamScan {
-  return new ExamScan(
+function mapToExamScan(map: Record<string, string>): ExamQRData {
+  return new ExamQRData(
     map.courseName,
     map.semester,
     map.date,
-    map.language as Language,
+    map.language.toUpperCase() as Language,
     parseInt(map.pageCount),
     parseInt(map.points),
     map.code,
   );
 }
 
-function mapToExamPageScan(map: Record<string, string>): ExamPageScan {
-  return new ExamPageScan(
+function mapToExamPageScan(map: Record<string, string>): ExamPageQRData {
+  return new ExamPageQRData(
     map.code,
     parseInt(map.page),
   );
