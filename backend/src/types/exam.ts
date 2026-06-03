@@ -9,6 +9,7 @@ export class Exam {
   examLengthMinutes: number;
   tasks: TaskGroup[];
   points?: number;
+  pageCount?: number;
   public lastEditedBy?: string;
   public updatedAt?: Date;
 

@@ -1,0 +1,191 @@
+import { type Exam, Language } from "../types/exam.ts";
+import { ExamPageScan, ExamScan } from "../types/scan.ts";
+
+export class QRError extends Error {
+  constructor(msg: string, opt?: ErrorOptions) {
+    super(msg, opt);
+    this.name = "QRError";
+    Object.setPrototypeOf(this, QRError.prototype);
+  }
+}
+
+/* Generates codes in the form {'v':'\coursename','s':'\semester','d':'\date','l':'\language','c':\totpagecount,'t':\points,'r':\code} with qr error correction level H */
+export async function generateExamQR(
+  path: string,
+  exam: Exam,
+  language: Language,
+  code: string,
+): Promise<string> {
+  if (exam.points === undefined || exam.points < 1) {
+    throw new QRError("Exam points must be defined and greater than 0");
+  }
+
+  if (exam.pageCount === undefined || exam.pageCount < 4) {
+    throw new QRError("Undefined or invalid exam page count (<4)");
+  }
+
+  const content =
+    `{'v':'${exam.courseName}','s':'${exam.semester}','d':'${exam.date}','l':'${language}','c':${exam.pageCount},'t':${exam.points},'r':'${code}'}`;
+
+  await generate(path, content);
+
+  return content;
+}
+
+/* Generates codes in the form {'p':\page,'r':'\code'} with qr error correction level H */
+export async function generatePageQR(
+  path: string,
+  examCode: string,
+  page: number,
+): Promise<string> {
+  const content = `{'p':${page},'r':'${examCode}'}`;
+
+  await generate(path, content);
+  return content;
+}
+
+async function generate(
+  path: string,
+  content: string,
+) {
+  const cmd = new Deno.Command("qrencode", {
+    args: [
+      "--level",
+      "H",
+      "--size", // per pixel
+      "5",
+      "--dpi",
+      "300",
+      "--type",
+      "PNG",
+      "--output",
+      path,
+      content,
+    ],
+    stdout: "piped",
+    stderr: "piped",
+  });
+
+  const child = cmd.spawn();
+  const status = await child.status;
+  if (!status.success) {
+    const stderr = await new Response(child.stderr).text();
+    throw new QRError(`Failed generating QR code: ${stderr}`);
+  }
+}
+
+export async function parseQR(path: string): Promise<ExamScan | ExamPageScan> {
+  const cmd = new Deno.Command("zbarimg", {
+    args: [
+      "-q",
+      "-Sdisable",
+      "-Sqrcode.enable",
+      path,
+    ],
+    stdout: "piped",
+    stderr: "piped",
+  });
+
+  const child = cmd.spawn();
+
+  const status = await child.status;
+  switch (status.code) {
+    case 0:
+      break;
+    case 1:
+      throw new QRError("IO error or ImageMagick error");
+    case 2:
+      throw new QRError("ImageMagick fatal error");
+    // 3 is not possible since we are not running in interactive mode
+    case 4:
+      throw new QRError("QR code not found");
+    default:
+      throw new QRError("Unknown error");
+  }
+
+  const stdoutStr = await new Response(child.stdout).text();
+  if (!stdoutStr.startsWith("QR-Code:")) {
+    throw new QRError(`Unexpected data found: ${stdoutStr}`);
+  }
+  for (let line of stdoutStr.split("\n")) {
+    line = line.slice(9, line.length - 1); // Removes the Prefix and "{" "}"
+    try {
+      if (line.startsWith("'v'")) {
+        return parseExamData(line);
+      } else if (line.startsWith("'p'")) {
+        return parsePageData(line);
+      }
+    } catch (e) {
+      throw new QRError(`Failed to parse line: ${e}`);
+    }
+  }
+  throw new QRError(`Failed to parse data: ${stdoutStr}`);
+}
+
+function parsePageData(line: string): ExamPageScan {
+  const fields = line.split(",");
+  const map: Record<string, string> = {};
+  for (const f of fields) {
+    const [key, value] = f.split(":");
+    switch (key) {
+      case "'p'":
+        map.page = value;
+        break;
+      case "'r'":
+        map.code = value.slice(1, -1);
+        break;
+    }
+  }
+  return mapToExamPageScan(map);
+}
+
+function parseExamData(line: string): ExamScan {
+  const fields = line.split(",");
+  const map: Record<string, string> = {};
+  for (const f of fields) {
+    const [key, value] = f.split(":");
+    switch (key) {
+      case "'r'":
+        map.code = value.slice(1, -1);
+        break;
+      case "'v'":
+        map.courseName = value.slice(1, -1);
+        break;
+      case "'s'":
+        map.semester = value.slice(1, -1);
+        break;
+      case "'d'":
+        map.date = value.slice(1, -1);
+        break;
+      case "'l'":
+        map.language = value.slice(1, -1);
+        break;
+      case "'t'":
+        map.points = value;
+        break;
+      case "'c'":
+        map.pageCount = value;
+        break;
+    }
+  }
+  return mapToExamScan(map);
+}
+
+function mapToExamScan(map: Record<string, string>): ExamScan {
+  return new ExamScan(
+    map.courseName,
+    map.semester,
+    map.date,
+    map.language as Language,
+    parseInt(map.pageCount),
+    parseInt(map.points),
+    map.code,
+  );
+}
+
+function mapToExamPageScan(map: Record<string, string>): ExamPageScan {
+  return new ExamPageScan(
+    map.code,
+    parseInt(map.page),
+  );
+}

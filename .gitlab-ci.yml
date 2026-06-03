@@ -6,12 +6,14 @@ image: docker:25.0.5
 variables:
   DOCKER_TLS_CERTDIR: ""
 
-backend_unittests:
+backend_tests:
   image: denoland/deno:latest
   stage: test
+  before_script:
+    - apt update && apt install zbar-tools qrencode
   script:
     - cd backend
-    - deno test --allow-env --allow-read
+    - deno run test:integration
 
 # Cypress Tests
 cypress_e2e:
