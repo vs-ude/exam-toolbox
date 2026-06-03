@@ -278,7 +278,6 @@ Deno.test({
       const path = `${baseDir}${file}`;
       const result = await parseQR(path);
 
-      assertEquals(result.code, files[file].code, `file ${file}: wrong code`);
       assertEquals(
         result,
         files[file],
@@ -304,27 +303,30 @@ Deno.test({
       "Exam_2/exam_7.jpg": new ExamPageQRData("7Q1J", 7),
     };
     const tempDir = await Deno.makeTempDir();
-    for (const file in files) {
-      const path = `${baseDir}${file}`;
-      let result;
-      let err = undefined;
-      try {
-        result = await contrastAdjust(
-          path,
-          `${tempDir}/${file.replaceAll("/", "_")}`,
-          15,
-        ).then((p) => parseQR(p));
-      } catch (e) {
-        err = e;
-      }
+    try {
+      for (const file in files) {
+        const path = `${baseDir}${file}`;
+        let result;
+        let err = undefined;
+        try {
+          result = await contrastAdjust(
+            path,
+            `${tempDir}/${file.replaceAll("/", "_")}`,
+            15,
+          ).then((p) => parseQR(p));
+        } catch (e) {
+          err = e;
+        }
 
-      assertInstanceOf(result, ExamPageQRData, `file ${file}, error: ${err}`);
-      assertEquals(result.code, files[file].code, `file ${file}: wrong code`);
-      assertEquals(
-        result.page,
-        files[file].page,
-        `file ${file}: wrong page number`,
-      );
+        assertInstanceOf(result, ExamPageQRData, `file ${file}, error: ${err}`);
+        assertEquals(
+          result,
+          files[file],
+          `file ${file}: wrong data`,
+        );
+      }
+    } finally {
+      await Deno.remove(tempDir, { recursive: true });
     }
   },
 });
@@ -340,18 +342,22 @@ Deno.test({
       "Exam_2/exam_11.jpg",
     ];
     const tempDir = await Deno.makeTempDir();
-    for (const file of files) {
-      const path = `${baseDir}${file}`;
-      assertRejects(async () => {
-        await parseQR(path);
-      });
-      assertRejects(async () => {
-        await contrastAdjust(
-          path,
-          `${tempDir}/${file.replaceAll("/", "_")}`,
-          15,
-        ).then((p) => parseQR(p));
-      });
+    try {
+      for (const file of files) {
+        const path = `${baseDir}${file}`;
+        await assertRejects(async () => {
+          await parseQR(path);
+        });
+        await assertRejects(async () => {
+          await contrastAdjust(
+            path,
+            `${tempDir}/${file.replaceAll("/", "_")}`,
+            15,
+          ).then((p) => parseQR(p));
+        });
+      }
+    } finally {
+      await Deno.remove(tempDir, { recursive: true });
     }
   },
 });

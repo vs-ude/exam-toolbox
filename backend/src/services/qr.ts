@@ -75,16 +75,17 @@ async function generate(
       path,
       content,
     ],
-    stdout: "piped",
+    stdout: "null",
     stderr: "piped",
   });
 
   const child = cmd.spawn();
   const status = await child.status;
   if (!status.success) {
-    const stderr = await new Response(child.stderr).text();
+    const stderr = await child.stderr.text();
     throw new QRError(`Failed generating QR code: ${stderr}`);
   }
+  await child.stderr.cancel();
 }
 
 /**
@@ -103,7 +104,7 @@ export async function parseQR(
       path,
     ],
     stdout: "piped",
-    stderr: "piped",
+    stderr: "null",
   });
 
   const child = cmd.spawn();
@@ -113,17 +114,21 @@ export async function parseQR(
     case 0:
       break;
     case 1:
+      await child.stdout.cancel();
       throw new QRError("IO error or ImageMagick error");
     case 2:
+      await child.stdout.cancel();
       throw new QRError("ImageMagick fatal error");
     // 3 is not possible since we are not running in interactive mode
     case 4:
+      await child.stdout.cancel();
       throw new QRError("QR code not found");
     default:
+      await child.stdout.cancel();
       throw new QRError("Unknown error");
   }
 
-  const stdoutStr = await new Response(child.stdout).text();
+  const stdoutStr = await child.stdout.text();
   if (!stdoutStr.startsWith("QR-Code:")) {
     throw new QRError(`Unexpected data found: ${stdoutStr}`);
   }

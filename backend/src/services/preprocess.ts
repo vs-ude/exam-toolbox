@@ -23,7 +23,7 @@ export async function contrastAdjust(
       `${threshold}%,${100 - threshold}%`, // lowest x% map to black, highest x% to white
       dest,
     ],
-    stdout: "piped",
+    stdout: "null",
     stderr: "piped",
   });
 
@@ -33,12 +33,13 @@ export async function contrastAdjust(
   let stderr: string;
   switch (status.code) {
     case 0:
+      await child.stderr.cancel();
       return dest;
     case 1:
-      stderr = await new Response(child.stderr).text();
+      stderr = await child.stderr.text();
       throw new ImageProcessingError(`Image processing failed: ${stderr}`);
     default:
-      stderr = await new Response(child.stderr).text();
+      stderr = await child.stderr.text();
       throw new ImageProcessingError(`Unknown error: ${stderr}`);
   }
 }
