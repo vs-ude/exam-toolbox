@@ -1,3 +1,5 @@
+import { Language } from "../types/exam.ts";
+
 const ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const MODULUS = ALPHABET.length;
 
@@ -36,9 +38,9 @@ export function calcCheckDigit(value: string): string {
  * - de => prefix "1"
  * - en => prefix "2"
  */
-export function genRandomNumber(lang: "de" | "en", counter: number): string {
+export function genRandomNumber(lang: Language, counter: number): string {
   const paddedCount = counter.toString().padStart(4, "0");
-  const langPrefix = lang === "de" ? "1" : "2";
+  const langPrefix = lang === "DE" ? "1" : "2";
 
   const body = parseInt(`${langPrefix}${paddedCount}`, 10)
     .toString(36)

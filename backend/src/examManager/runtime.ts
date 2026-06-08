@@ -6,6 +6,7 @@ import {
   mergePdfs,
   sendEmail,
 } from "../services/mod.ts";
+import { Language } from "../types/exam.ts";
 
 // output from a successful student PDF generation
 export interface StudentResult {
@@ -64,7 +65,7 @@ export interface ExamManagerRuntime {
   getDownloadableJobs: () => Promise<{ examId: string; jobId: string }[]>;
   getActiveJobForExam: (examId: string) => ExamGenerationJob | null;
   scheduleDailyCleanup: () => void;
-  genRandomNumber: (lang: "de" | "en", counter: number) => string;
+  genRandomNumber: (lang: Language, counter: number) => string;
 }
 
 export function createExamManagerRuntime(

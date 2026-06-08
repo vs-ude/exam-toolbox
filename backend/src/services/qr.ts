@@ -1,5 +1,7 @@
-import { type Exam, Language } from "../types/exam.ts";
+import { type Exam, type Language } from "../types/exam.ts";
 import { ExamPageQRData, ExamQRData as ExamQRData } from "../types/scan.ts";
+
+const QR_CACHE_LANGUAGES: Language[] = ["DE", "EN"];
 
 export class QRError extends Error {
   constructor(msg: string, opt?: ErrorOptions) {

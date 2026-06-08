@@ -5,7 +5,7 @@ import { crypto } from "@std/crypto";
 import { encodeHex } from "@std/encoding";
 import * as fs from "@std/fs";
 
-import { type Exam } from "../types/exam.ts";
+import { type Exam, Language } from "../types/exam.ts";
 import {
   compileExam,
   generateTasksLatex,
@@ -39,7 +39,7 @@ interface AppState {
   basePath: string;
   JOBS_DIR: string;
   processQueue: () => void;
-  genRandomNumber: (lang: "de" | "en", counter: number) => string;
+  genRandomNumber: (lang: Language, counter: number) => string;
   getDownloadableJobs: () => Promise<{ examId: string; jobId: string }[]>;
   parseLogFileForSubtaskInfo: (logContent: string) => any[];
 }
@@ -483,8 +483,8 @@ export function configureExamManagerRouter({
 
         studentData.forEach((student: any, index: number) => {
           const seatNumber = index + startSeatNumber;
-          const deRandomNumber = genRandomNumber("de", seatNumber);
-          const enRandomNumber = genRandomNumber("en", seatNumber);
+          const deRandomNumber = genRandomNumber("DE", seatNumber);
+          const enRandomNumber = genRandomNumber("EN", seatNumber);
 
           newJob.randomNumbers.push({ de: deRandomNumber, en: enRandomNumber });
           taskQueue.push({
