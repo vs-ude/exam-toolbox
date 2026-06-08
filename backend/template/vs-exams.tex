@@ -347,41 +347,12 @@
 
 
 %----- Seitenfooter ---------------------------------------
-\newcommand{\fusszeile}{yes} % (CB) set to yes, no: no exascan
-\ifthenelse{\equal{\fusszeile}{yes}}{
 \cfoot{
- % \color{black}
  % \begin{tabular}{cc}
- %  \#\randomexamnumber
- %  &
- %  \multirow{2}*{\qrcode[height=1.5cm,level=H]{\{'p':\thepage,'r':\randomexamnumber\}}} \printPos{pageQr}
- %  \\
- %  \barcode[code=Code39,X=.25mm,H=1cm]{\randomexamnumber}
- %  &
+ \includegraphics[height=1.5cm]{\qrcachepath/\randomexamnumber_\thepage.png} \printPos{pageQr}
+ % \includegraphics[height=1.5cm]{\qrcachepath/\randomexamnumber_\thepage.png} \printPos{pageQr} & \#\randomexamnumber
  % \end{tabular}
- % \color{black}
-%  \begin{tabular}{c}
-%   \barcode[code=Code39,X=.25mm,H=.5cm]{\randomexamnumber}
-%    \\
-%   \#\randomexamnumber
-%  \end{tabular}
-% \color{darkgray2}
-% \arrayrulecolor{darkgray1}
-% \setlength{\arrayrulewidth}{1pt}
-% \begin{tabular}{|p{0.5\textwidth}|}
-% \hline
-% \rowcolor{lightgray1}
-% \mtr \\
-% \hline
-% \rowcolor{lightgray2}
-%  \\
-% \hline
-% \end{tabular}
- \color{black}
- \begin{tabular}{cc}
- \qrcode[height=1.5cm,level=H]{\{'p':\thepage,'r':'\randomexamnumber'\}} \printPos{pageQr} & \#\randomexamnumber
- \end{tabular}
-}}{}
+}
 
 %----- Definition für Aufgabe ---------------------------------------
 % (CB) Added counter for points

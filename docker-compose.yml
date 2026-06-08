@@ -37,6 +37,7 @@ services:
     #   - "3000:3000"
     volumes:
       - ./backend/uploads:/app/uploads
+      - ./backend/cache:/app/cache
       - backend_jobs:/app/jobs
     environment:
       - MONGODB_URI=mongodb://mongo:27017/examToolboxDB
@@ -44,6 +45,7 @@ services:
       - SMTP_PORT=1025
       - SMTP_FROM=noreply@example.com
       - CADDY_DOMAIN=${CADDY_DOMAIN}
+      - CACHE_DIR=/app/cache
     depends_on:
       - mongo
       - mailcrab

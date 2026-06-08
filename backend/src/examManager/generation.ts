@@ -6,6 +6,7 @@ import {
   LatexCompileError,
   LatexRenderError,
 } from "./err.ts";
+import { QR_CACHE_PATH } from "../config/paths.ts";
 
 type ExamMetaTemplateData = {
   veranstaltung: string;
@@ -16,6 +17,7 @@ type ExamMetaTemplateData = {
   schmierblaetteranzahl: string;
   englishandgerman: string;
   points: number;
+  qrCachePath: string;
 };
 
 type IndividualMetaTemplateData = {
@@ -36,6 +38,7 @@ const DEFAULT_EXAM_META: ExamMetaTemplateData = {
   schmierblaetteranzahl: "2",
   englishandgerman: "yes",
   points: 42,
+  qrCachePath: QR_CACHE_PATH,
 };
 
 const DEFAULT_INDIVIDUAL_META: IndividualMetaTemplateData = {
@@ -152,6 +155,7 @@ export async function renderMetaExam(
     datum: date,
     duration: String(examLengthMinutes ?? DEFAULT_EXAM_META.duration),
     points,
+    qrCachePath: QR_CACHE_PATH,
   };
 
   const metaOutputPath = `${workingDir}/meta-exam.tex`;

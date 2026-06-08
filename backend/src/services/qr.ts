@@ -88,6 +88,28 @@ async function generate(
     throw new QRError(`Failed generating QR code: ${stderr}`);
   }
   await child.stderr.cancel();
+  await removeAlphaChannel(path);
+}
+
+async function removeAlphaChannel(path: string) {
+  const cmd = new Deno.Command("magick", {
+    args: [
+      path,
+      "-alpha",
+      "off",
+      path,
+    ],
+    stdout: "null",
+    stderr: "piped",
+  });
+
+  const child = cmd.spawn();
+  const status = await child.status;
+  if (!status.success) {
+    const stderr = await child.stderr.text();
+    throw new QRError(`Failed removing alpha channel: ${stderr}`);
+  }
+  await child.stderr.cancel();
 }
 
 /**
@@ -215,4 +237,73 @@ function mapToExamPageScan(map: Record<string, string>): ExamPageQRData {
     map.code,
     parseInt(map.page),
   );
+}
+
+function qrCachePopulated(cacheDir: string, lastFile: string): boolean {
+  try {
+    Deno.statSync(`${cacheDir}/${lastFile}`).isFile;
+    return true;
+  } catch {
+    console.log(
+      `QR cache not populated: ${cacheDir}/${lastFile} does not exist.`,
+    );
+    return false;
+  }
+}
+
+export async function preGeneratePageQRCache(
+  cacheDir: string,
+  studentsPerLanguage = 200,
+  pagesPerStudent = 26,
+): Promise<void> {
+  await Deno.mkdir(cacheDir, { recursive: true });
+
+  if (
+    qrCachePopulated(
+      cacheDir,
+      `R4ND_${pagesPerStudent}.png`,
+    )
+  ) {
+    console.log(`QR cache already populated in ${cacheDir}, skipping warmup.`);
+    return;
+  }
+
+  await new Promise<void>((resolve, reject) => {
+    const worker = new Worker(
+      new URL("./qr_cache_worker.ts", import.meta.url).href,
+      { type: "module" },
+    );
+
+    worker.onmessage = (e: MessageEvent) => {
+      const data = e.data;
+
+      if (data?.status === "success") {
+        console.log(
+          `QR cache warmup completed: generated ${data.generatedCount} files in ${cacheDir}.`,
+        );
+        worker.terminate();
+        resolve();
+        return;
+      }
+
+      worker.terminate();
+      reject(
+        new QRError(
+          `QR cache warmup failed: ${data?.error ?? "unknown worker error"}`,
+        ),
+      );
+    };
+
+    worker.onerror = (error) => {
+      worker.terminate();
+      reject(new QRError(`QR cache warmup worker failed: ${error.message}`));
+    };
+
+    worker.postMessage({
+      cacheDir,
+      studentsPerLanguage,
+      pagesPerStudent,
+      languages: QR_CACHE_LANGUAGES,
+    });
+  });
 }

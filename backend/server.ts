@@ -1,13 +1,14 @@
 import { Application } from "@oak/oak";
 import { MongoClient } from "@db/mongo";
 import { parseLogFileForSubtaskInfo } from "./src/services/mod.ts";
+import { preGeneratePageQRCache } from "./src/services/qr.ts";
 import {
   configureExamManagerRouter,
   configureTagRouter,
   configureTaskPoolRouter,
   createExamManagerRuntime,
 } from "./src/examManager/mod.ts";
-import { TEMPLATE_BASE_PATH } from "./src/config/paths.ts";
+import { QR_CACHE_PATH, TEMPLATE_BASE_PATH } from "./src/config/paths.ts";
 
 const basePath = TEMPLATE_BASE_PATH;
 const JOBS_DIR = "/app/jobs";
@@ -33,6 +34,7 @@ const examRuntime = createExamManagerRuntime(
 );
 
 await Deno.mkdir(examRuntime.jobsDir, { recursive: true });
+preGeneratePageQRCache(QR_CACHE_PATH, 200, 26);
 
 // Create Oak application + routers
 const app = new Application();
