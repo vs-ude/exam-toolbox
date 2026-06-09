@@ -1,0 +1,27 @@
+\chead{}
+\vspace{2cm}
+\ifthenelse{\equal{\zeigeloesung}{yes}}{
+  \begin{center}
+  ~\\
+  \vspace{8cm}
+  \begin{color}{red}\normalfont
+  \textbf{\LARGE MUSTERLÖSUNG}
+  \end{color}
+  \end{center}
+}{
+  \begin{center}
+    \textbf{\LARGE\donottouch}
+  \end{center}
+  \vspace{2cm}
+  \ifthenelse{\equal{\vollername}{}}{%Wenn Kein Name angegeben
+    % Keine weiteren Informationen ausgeben
+  }{%
+    \begin{center}
+      \begin{tabular}{rl}
+        {\Large \seqnr:} & {\Large\textbf{\ifthenelse{\equal{\sequenznummer}{}}{\SequenznummerFehlt}{\sequenznummer}}} \\[1em]
+        {\Large Name:} & {\Large\textbf{\vollername}} \\[1em]
+        {\Large \mtr:} & {\Large\textbf{\ifthenelse{\equal{\matrikelnummer}{}}{\MatrikelnummerFehlt}{\matrikelnummer}}}
+      \end{tabular}
+    \end{center}
+  }
+}

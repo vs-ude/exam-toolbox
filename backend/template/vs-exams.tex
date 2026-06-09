@@ -1,5 +1,4 @@
 \RequirePackage{scrlfile}
-\ReplacePackage{scrpage2}{scrlayer-scrpage}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % - vs-exams.tex -
 %
@@ -62,7 +61,6 @@
 
 \input{meta-exam.tex}
 
-
 %\reserveinsert{28}
 \usepackage[pdfauthor={\pruefer},
             pdftitle={Klausur \veranstaltung\ im \semester},
@@ -84,8 +82,11 @@
 \usepackage{makebarcode}
 \usepackage{csquotes}
 \usepackage{xstring}
+\usepackage{tabularx}
 
 \newcounter{mycounter}
+
+\setlength{\parskip}{0ex} % Abstand zwischen Absaetzen
 
 {\catcode`\ =12\relax\gdef\viktorotherspace{ }}%
 \def\vcodes{%
@@ -133,7 +134,7 @@
 \usepackage{colortbl}
 \usepackage{path}
 \usepackage{epic}
-\usepackage{scrpage2}
+\usepackage{scrlayer-scrpage}
 \usepackage{textcomp}
 \usepackage{units}
 \usepackage{sistyle} % für physikalische Einheiten z. B. \SI{1000}{m/s^2}
@@ -184,53 +185,9 @@
 \newcommand{\tickedbox}{\fbox{\textbf{x}}}
 
 \newcommand{\printaufgaben}{\include{aufgaben}}
-\newcommand{\donottouch}{Please do not touch the exam yet.\\[1em]Bitte den Klausurbogen noch nicht öffnen.}
 
 %----- Lokalisierung ---------------------------------------
-\ifthenelse{\equal{\sprache}{en}}
-{
- % english
- \ifdefined\XeTeXversion
-  \setmainlanguage{english}
- \else
-  \selectlanguage{english}
- \fi
- \newcommand{\seite}{Page}
- \newcommand{\udue}{University of Duisburg-Essen}
- \newcommand{\mtr}{Matriculation Nr.}
- \newcommand{\ktyp}{Exam type}
- \newcommand{\afg}{Assignment}
- \newcommand{\pts}{Points}
- \newcommand{\klausur}{Exam (English)}
- \newcommand{\stud}{Studies}
- \newcommand{\sig}{Signature}
- \newcommand{\printcover}{\include{cover-en}}
- \newcommand{\gesamtpunktzahl}{Total points}
- \newcommand{\totalpages}{Total pages}
- \newcommand{\seqnr}{Exam number}
- %\newcommand{\printaufgaben}{\include{aufgaben-en}}
-}{
- % deutsch
- \ifdefined\XeTeXversion
-  \setmainlanguage{german}
- \else
-  \selectlanguage{german}
- \fi
- \newcommand{\seite}{Seite}
- \newcommand{\udue}{Universität Duisburg-Essen}
- \newcommand{\mtr}{Matrikelnummer}
- \newcommand{\ktyp}{Klausurtyp}
- \newcommand{\afg}{Aufgabe}
- \newcommand{\pts}{Punkte}
- \newcommand{\klausur}{Klausur}
- \newcommand{\stud}{Studiengang}
- \newcommand{\sig}{Unterschrift}
- \newcommand{\printcover}{\include{cover-de}}
- \newcommand{\gesamtpunktzahl}{Gesamtpunktzahl}
- \newcommand{\totalpages}{Gesamtseitenzahl}
- \newcommand{\seqnr}{Klausurnummer}
- %\newcommand{\printaufgaben}{\include{aufgaben-de}}
-}
+\input{meta/localization.tex}
 
 
 %----- (CB) Schmierblätter ---------------------------------------
@@ -308,52 +265,7 @@
 \newcommand{\removebs}[1]{\if#1\@backslashchar\else#1\fi}
 
 %----- Header + Footer ---------------------------------------
-\pagestyle{scrheadings}
-\clearpairofpagestyles
-\addtolength{\topmargin}{1.05cm}
-\addtolength{\headsep}{-2em}
-\setlength{\footskip}{32pt}
-\addtolength{\textheight}{1.28cm}
-%\addtolength{\textheight}{1.43cm} // VIKTOR: old value
-%\setkomafont{pageheadfoot}{\normalfont} %Fix for new koma script (MK)
-
-%\ihead{\semester \\ \datum}
-%\chead{\veranstaltung\\ \pruefer}
-%\ohead{Verteilte Systeme\\ \pagemark/\pageref{LastPage}}
-
-
-%----- Seitenheader ---------------------------------------
-\chead{
-\color{darkgray2}
-\arrayrulecolor{darkgray1}
-\setlength{\arrayrulewidth}{1pt}
-\vspace{-0.09mm}
-\ifthenelse{\equal{\vollername}{}}{%
-\begin{tabular}{p{0.22\textwidth}|p{0.6\textwidth}|p{0.14\textwidth}|}
-\cline{2-3}
-\multirow{2}*{\textcolor{black}{\barcode[code=Code39,X=.3mm,H=1cm]{\randomexamnumber}}} & \cellcolor{lightgray1} \textcolor{black}{\veranstaltung} & \cellcolor{lightgray1} \semester \\
-\cline{2-3}
-& \cellcolor{lightgray2}  \pruefer & \cellcolor{lightgray2} \seite \ \pagemark/\pageref{LastPage} \\
-\cline{2-3}
-\end{tabular}}{%
-\begin{tabular}{|p{0.22\textwidth}|p{0.6\textwidth}|p{0.14\textwidth}|}
-\cline{1-3}
-\cellcolor{lightgray1} \hspace{3.4cm}\mbox{\raisebox{2.2mm}{\begin{rotate}{180}\textcolor{black}{\matrikelnummer}\end{rotate}}} & \cellcolor{lightgray1} \textcolor{black}{\veranstaltung} & \cellcolor{lightgray1} \semester \\
-\cline{1-3}
-\cellcolor{lightgray2} \hspace{3.4cm}\mbox{\raisebox{2.2mm}{\begin{rotate}{180}\textcolor{black}{\#\randomexamnumber}\end{rotate}}} & \cellcolor{lightgray2}  \pruefer & \cellcolor{lightgray2} \seite \ \pagemark/\pageref{LastPage} \\
-\cline{1-3}
-\end{tabular}}
-}
-
-
-
-%----- Seitenfooter ---------------------------------------
-\cfoot{
- % \begin{tabular}{cc}
- \includegraphics[height=1.5cm]{\qrcachepath/\randomexamnumber_\thepage.png} \printPos{pageQr}
- % \includegraphics[height=1.5cm]{\qrcachepath/\randomexamnumber_\thepage.png} \printPos{pageQr} & \#\randomexamnumber
- % \end{tabular}
-}
+\input{meta/header-footer.tex}
 
 %----- Definition für Aufgabe ---------------------------------------
 % (CB) Added counter for points

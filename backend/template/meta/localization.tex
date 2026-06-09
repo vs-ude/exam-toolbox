@@ -1,0 +1,46 @@
+\ifthenelse{\equal{\sprache}{en}}
+{
+ % english
+ \ifdefined\XeTeXversion
+  \setmainlanguage{english}
+ \else
+  \selectlanguage{english}
+ \fi
+ \newcommand{\seite}{Page}
+ \newcommand{\udue}{University of Duisburg-Essen}
+ \newcommand{\mtr}{Matriculation Nr.}
+ \newcommand{\ktyp}{Exam type}
+ \newcommand{\afg}{Assignment}
+ \newcommand{\pts}{Points}
+ \newcommand{\klausur}{Exam (English)}
+ \newcommand{\stud}{Studies}
+ \newcommand{\sig}{Signature}
+ \newcommand{\gesamtpunktzahl}{Total points}
+ \newcommand{\totalpages}{Total pages}
+ \newcommand{\seqnr}{Exam number}
+ \newcommand{\konzeptpapier}{Space for personal notes}
+ %\newcommand{\printaufgaben}{\include{aufgaben-en}}
+}{
+ % deutsch
+ \ifdefined\XeTeXversion
+  \setmainlanguage{german}
+ \else
+  \selectlanguage{german}
+ \fi
+ \newcommand{\seite}{Seite}
+ \newcommand{\udue}{Universität Duisburg-Essen}
+ \newcommand{\mtr}{Matrikelnummer}
+ \newcommand{\ktyp}{Klausurtyp}
+ \newcommand{\afg}{Aufgabe}
+ \newcommand{\pts}{Punkte}
+ \newcommand{\klausur}{Klausur}
+ \newcommand{\stud}{Studiengang}
+ \newcommand{\sig}{Unterschrift}
+ \newcommand{\gesamtpunktzahl}{Gesamtpunktzahl}
+ \newcommand{\totalpages}{Gesamtseitenzahl}
+ \newcommand{\seqnr}{Klausurnummer}
+ \newcommand{\konzeptpapier}{Konzeptpapier}
+ %\newcommand{\printaufgaben}{\include{aufgaben-de}}
+}
+
+\newcommand{\donottouch}{Please do not touch the exam yet.\\[1em]Bitte den Klausurbogen noch nicht öffnen.}
