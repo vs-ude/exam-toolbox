@@ -14,9 +14,10 @@ type ExamMetaTemplateData = {
   pruefer: string;
   datum: string;
   duration: string;
-  schmierblaetteranzahl: string;
+  schmierblaetteranzahl: number;
   englishandgerman: string;
   points: number;
+  pages: number;
   qrCachePath: string;
 };
 
@@ -35,9 +36,10 @@ const DEFAULT_EXAM_META: ExamMetaTemplateData = {
   pruefer: "Prof.\\ Dr.-Ing.\\ T.\\ Weis",
   datum: "2021-02-01",
   duration: "90",
-  schmierblaetteranzahl: "2",
+  schmierblaetteranzahl: 2,
   englishandgerman: "yes",
   points: 42,
+  pages: 4,
   qrCachePath: QR_CACHE_PATH,
 };
 
@@ -139,22 +141,20 @@ export async function renderMetaExam(
   exam: Exam,
   workingDir: string,
 ) {
-  const { courseName, examinerName, semester, date, examLengthMinutes } = exam;
-  const points = exam.tasks.reduce(
-    (acc, group) =>
-      acc +
-      (group.tasks.reduce((acc, task) => acc + (task.points ?? 0), 0) ?? 0),
-    0,
-  );
+  if (!exam.points || !exam.pageCount) {
+    exam.fillPagesAndPoints();
+  }
 
   const data: ExamMetaTemplateData = {
     ...DEFAULT_EXAM_META,
-    veranstaltung: escapeLatexWithSpaces(courseName),
-    semester: escapeLatexWithSpaces(semester),
-    pruefer: escapeLatexWithSpaces(examinerName),
-    datum: date,
-    duration: String(examLengthMinutes ?? DEFAULT_EXAM_META.duration),
-    points,
+    veranstaltung: escapeLatexWithSpaces(exam.courseName),
+    semester: escapeLatexWithSpaces(exam.semester),
+    pruefer: escapeLatexWithSpaces(exam.examinerName),
+    datum: exam.date,
+    duration: String(exam.examLengthMinutes ?? DEFAULT_EXAM_META.duration),
+    points: exam.points!,
+    pages: exam.pageCount!,
+    schmierblaetteranzahl: exam.conceptPages!,
     qrCachePath: QR_CACHE_PATH,
   };
 

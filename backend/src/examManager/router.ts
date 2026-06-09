@@ -289,6 +289,7 @@ export function configureExamManagerRouter({
       try {
         const exam: Exam = await ctx.request.body.json();
         const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
+        exam.fillPagesAndPoints();
         await fs.copy(basePath, tempDir, { overwrite: true });
         const tasksPath = `${tempDir}/aufgaben.tex`;
         await renderMetaExam(exam, tempDir);
@@ -441,6 +442,7 @@ export function configureExamManagerRouter({
           dir: jobDir,
         });
 
+        examJson.fillPagesAndPoints();
         await fs.copy(basePath, jobTemplatePath, { overwrite: true });
         await renderMetaExam(examJson, jobTemplatePath);
         await generateTasksLatex(

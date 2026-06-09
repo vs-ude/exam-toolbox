@@ -10,6 +10,7 @@ export class Exam {
   tasks: TaskGroup[];
   points?: number;
   pageCount?: number;
+  conceptPages?: number;
   public lastEditedBy?: string;
   public updatedAt?: Date;
 
@@ -28,6 +29,38 @@ export class Exam {
     this.date = date;
     this.examLengthMinutes = examLengthMinutes;
     this.tasks = tasks;
+  }
+
+  fillPagesAndPoints(this: Exam) {
+    this.fillPages();
+    this.fillPoints();
+  }
+
+  private fillPages(this: Exam) {
+    this.pageCount = 1 + this.tasks.reduce( // first page + number of newPages
+      (acc, group) =>
+        acc +
+        (group.tasks.reduce(
+          (acc, task) => acc + (task.type === "newPage" ? 1 : 0),
+          0,
+        ) ?? 0),
+      0,
+    );
+    this.conceptPages = this.conceptPages ?? 2;
+    this.pageCount += this.conceptPages + 3; // + front + info + back
+    if (this.pageCount % 2 == 0) {
+      this.conceptPages += 1;
+      this.pageCount += 1;
+    }
+  }
+
+  private fillPoints(this: Exam) {
+    this.points = this.tasks.reduce(
+      (acc, group) =>
+        acc +
+        (group.tasks.reduce((acc, task) => acc + (task.points ?? 0), 0) ?? 0),
+      0,
+    );
   }
 }
 
