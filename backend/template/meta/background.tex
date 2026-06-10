@@ -1,0 +1,29 @@
+%%
+% Background for first page (solution) or all pages (standard)
+%%
+\ifthenelse{\equal{\zeigeloesung}{yes}}{
+	\AddToHook{shipout/background}[firstpagebackground]{% First page of solution
+		\begin{tikzpicture}[remember picture,overlay]%
+			\node[opacity=1,inner sep=0pt,scale=\pageBorderFactor] at (current page.center){%
+				\includegraphics[width=\paperwidth,height=\paperheight]{background-svg-muster-first}%
+			};%
+		\end{tikzpicture}%
+		\RemoveFromHook{shipout/background}[firstpagebackground] % Remove the hook in the first run so it's never run again
+	}
+	\AddToHook{shipout/background}{% Following pages
+	  \ifthenelse{\equal{\thepage}{1}}{}{%
+		\begin{tikzpicture}[remember picture,overlay]%
+			\node[opacity=1,inner sep=0pt,scale=\pageBorderFactor] at (current page.center){%
+				\includegraphics[width=\paperwidth,height=\paperheight]{background-svg-muster}%
+			};%
+		\end{tikzpicture}}%
+	}
+}{%
+	\AddToHook{shipout/background}{%
+		\begin{tikzpicture}[remember picture,overlay]%
+			\node[opacity=1,inner sep=0pt,scale=\pageBorderFactor] at (current page.center){%
+				\includegraphics[width=\paperwidth,height=\paperheight]{background-svg}%
+			};%
+		\end{tikzpicture}%
+	}
+}

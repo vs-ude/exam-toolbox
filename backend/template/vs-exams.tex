@@ -59,8 +59,6 @@
 	\usepackage[utf8]{inputenc}
 \fi
 
-\input{meta-exam.tex}
-
 %\reserveinsert{28}
 \usepackage[pdfauthor={\pruefer},
             pdftitle={Klausur \veranstaltung\ im \semester},
@@ -184,11 +182,28 @@
 \newcommand{\emptyb}{\fbox{\phantom{x}}}
 \newcommand{\tickedbox}{\fbox{\textbf{x}}}
 
-\newcommand{\printaufgaben}{\include{aufgaben}}
+%------ Lecker Listings usw. ------------------------------------
+\definecolor{gray}{gray}{0.5}
+\lstset{
+	basicstyle=\ttfamily\small,
+	%numbersep=10pt,
+	numberstyle=\ttfamily\color{gray}\scriptsize,
+	numbers=left,
+	numberblanklines = false,
+	escapechar=\%,
+	breaklines=true,
+	%frame=lines,
+}
 
 %----- Lokalisierung ---------------------------------------
 \input{meta/localization.tex}
 
+%----- Backgrounds -----------------------------------------
+\input{meta/background.tex}
+
+%----- Page Border Factor ----------------------------------
+\newcommand{\pageBorderFactor}{0.9235}
+\typeout{VSEXAM: {'Typ':'borderGeo', 'borderFactor': '\pageBorderFactor'}}%
 
 %----- (CB) Schmierblätter ---------------------------------------
 

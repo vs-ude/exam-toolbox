@@ -1,70 +1,49 @@
+%%
+% Exam metadata
+%%
+\newcommand{\veranstaltung}{Probeklausur\ 2021}
+\newcommand{\semester}{WS\ 2020/21} % z.B. SS\ 2012
+\newcommand{\pruefer}{Prof.\ Dr.-Ing.\ T.\ Weis}
+\newcommand{\datum}{2021-02-01} % Format: YYYY-MM-DD
+\newcommand{\examduration}{85} % In minutes
+\newcommand{\schmierblaetteranzahl}{2} % (CB) set to 0 for no empty pages at the end. Will be filled to a even number of pages
+\newcommand{\englishandgerman}{yes} % (CB) set to yes if a german and an english version are provided
+\newcommand{\examPoints}{80}
+\newcommand{\pageCount}{14}
+\newcommand{\qrcachepath}{cache/qr}
+
+% Include the variables for the individual exam
+\input{student.tex}
+
+% Setup
 \include{vs-exams.tex}
-
-\graphicspath{{img/}}
-
 % (CB) Counter-Anpassung für ungerade Zahlen: 2 für .5er Schritte, 4 für 0.25er Schritte
 \COPY{4}{\anpassung}
 
-\newcommand{\pageBorderFactor}{0.9235}
-\typeout{VSEXAM: {'Typ':'borderGeo', 'borderFactor': '\pageBorderFactor'}}%
+\graphicspath{{img/}}
 
 \begin{document}
-% (OC) Background Image
-\ifthenelse{\equal{\zeigeloesung}{yes}}{
-	\AddToHook{shipout/background}[firstpagebackground]{%
-		\begin{tikzpicture}[remember picture,overlay]%
-			\node[opacity=1,inner sep=0pt,scale=\pageBorderFactor] at (current page.center){%
-				\includegraphics[width=\paperwidth,height=\paperheight]{background-svg-muster-first}%
-			};%
-		\end{tikzpicture}%
-	}
-}{%
-	\AddToHook{shipout/background}{%
-		\begin{tikzpicture}[remember picture,overlay]%
-			\node[opacity=1,inner sep=0pt,scale=\pageBorderFactor] at (current page.center){%
-				\includegraphics[width=\paperwidth,height=\paperheight]{background-svg}%
-			};%
-		\end{tikzpicture}%
-	}
-}
-
-%%% Lecker Listings usw.
-\definecolor{gray}{gray}{0.5}
-\lstset{
-	basicstyle=\ttfamily\small,
-	%numbersep=10pt,
-	numberstyle=\ttfamily\color{gray}\scriptsize,
-	numbers=left,
-	numberblanklines = false,
-	escapechar=\%,
-	breaklines=true,
-	%frame=lines,
-}
 
 \include{pages/title.tex}
-
-\ifthenelse{\equal{\zeigeloesung}{yes}}{
-	\RemoveFromHook{shipout/background}[firstpagebackground]
-	\AddToHook{shipout/background}{%
-		\begin{tikzpicture}[remember picture,overlay]%
-			\node[opacity=1,inner sep=0pt,scale=\pageBorderFactor] at (current page.center){%
-				\includegraphics[width=\paperwidth,height=\paperheight]{background-svg-muster}%
-			};%
-		\end{tikzpicture}%
-	}
-}{}
-
 \include{pages/info-de.tex}
 
 \include{aufgaben.tex}
 
+\ifthenelse{\equal{\zeigeloesung}{yes}}{
+\chead{}
+\begin{center}
+~\\
+\vspace{8cm}
+\begin{color}{red}\normalfont
+\textbf{\LARGE MUSTERLÖSUNG}
+\end{color}
+\end{center}
+}{
 \input{pages/concept.tex}
 \input{pages/concept.tex}
+\chead{}
 \input{pages/do-not-touch.tex}
+}
 
-%\includepdf{TargetMachine.pdf}
-%\includepdf{ATMEL_1.pdf}
-%\includepdf{ATMEL_2.pdf}
-%
 \end{document}
 \endinput

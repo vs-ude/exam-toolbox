@@ -127,11 +127,11 @@ export async function renderMetaStudent(
       options.matrikelnummer ?? DEFAULT_INDIVIDUAL_META.matrikelnummer,
     ),
   };
-  const metaOutputPath = `${workingDir}/meta-individual.tex`;
-  const rendered = getEta().render("meta-individual", data);
+  const metaOutputPath = `${workingDir}/student.tex`;
+  const rendered = getEta().render("student", data);
 
   if (typeof rendered !== "string") {
-    throw new Error("Failed to render meta-individual template");
+    throw new Error("Failed to render student metadata template");
   }
 
   await Deno.writeTextFile(metaOutputPath, rendered);
@@ -158,11 +158,11 @@ export async function renderMetaExam(
     qrCachePath: QR_CACHE_PATH,
   };
 
-  const metaOutputPath = `${workingDir}/meta-exam.tex`;
-  const rendered = getEta().render("meta-exam", data);
+  const metaOutputPath = `${workingDir}/exam.tex`;
+  const rendered = getEta().render("exam", data);
 
   if (typeof rendered !== "string") {
-    throw new Error("Failed to render meta-exam template");
+    throw new Error("Failed to render exam template");
   }
 
   await Deno.writeTextFile(metaOutputPath, rendered);
