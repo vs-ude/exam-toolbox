@@ -17,7 +17,7 @@ type ExamMetaTemplateData = {
   schmierblaetteranzahl: number;
   englishandgerman: string;
   points: number;
-  pages: number;
+  pageCount: number;
   qrCachePath: string;
 };
 
@@ -39,7 +39,7 @@ const DEFAULT_EXAM_META: ExamMetaTemplateData = {
   schmierblaetteranzahl: 2,
   englishandgerman: "yes",
   points: 42,
-  pages: 4,
+  pageCount: 4,
   qrCachePath: QR_CACHE_PATH,
 };
 
@@ -153,7 +153,7 @@ export async function renderMetaExam(
     datum: exam.date,
     duration: String(exam.examLengthMinutes ?? DEFAULT_EXAM_META.duration),
     points: exam.points!,
-    pages: exam.pageCount!,
+    pageCount: exam.pageCount!,
     schmierblaetteranzahl: exam.conceptPages!,
     qrCachePath: QR_CACHE_PATH,
   };

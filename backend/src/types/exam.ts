@@ -15,20 +15,20 @@ export class Exam {
   public updatedAt?: Date;
 
   constructor(
-    courseName: string,
-    examinerName: string,
-    semester: string,
-    date: string,
-    examLengthMinutes: number,
-    tasks: TaskGroup[],
+    courseName?: string,
+    examinerName?: string,
+    semester?: string,
+    date?: string,
+    examLengthMinutes?: number,
+    tasks?: TaskGroup[],
     _id?: string,
   ) {
-    this.courseName = courseName;
-    this.examinerName = examinerName;
-    this.semester = semester;
-    this.date = date;
-    this.examLengthMinutes = examLengthMinutes;
-    this.tasks = tasks;
+    this.courseName = courseName ?? "placeholder";
+    this.examinerName = examinerName ?? "placeholder";
+    this.semester = semester ?? "placeholder";
+    this.date = date ?? "placeholder";
+    this.examLengthMinutes = examLengthMinutes ?? 0;
+    this.tasks = tasks ?? [];
   }
 
   fillPagesAndPoints(this: Exam) {
@@ -37,9 +37,9 @@ export class Exam {
   }
 
   private fillPages(this: Exam) {
-    this.pageCount = 1 + this.tasks.reduce( // first page + number of newPages
+    this.pageCount = this.tasks.reduce( // 1 per task group + number of newPages
       (acc, group) =>
-        acc +
+        acc + 1 +
         (group.tasks.reduce(
           (acc, task) => acc + (task.type === "newPage" ? 1 : 0),
           0,
@@ -48,7 +48,7 @@ export class Exam {
     );
     this.conceptPages = this.conceptPages ?? 2;
     this.pageCount += this.conceptPages + 3; // + front + info + back
-    if (this.pageCount % 2 == 0) {
+    if (this.pageCount % 2 != 0) {
       this.conceptPages += 1;
       this.pageCount += 1;
     }

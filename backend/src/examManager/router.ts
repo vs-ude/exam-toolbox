@@ -1,11 +1,11 @@
 import { Router } from "@oak/oak";
-import { Database, ObjectId } from "@db/mongo";
+import { Database, Document, ObjectId } from "@db/mongo";
 import { read, utils } from "@mirror/xlsx";
 import { crypto } from "@std/crypto";
 import { encodeHex } from "@std/encoding";
 import * as fs from "@std/fs";
 
-import { type Exam, Language } from "../types/exam.ts";
+import { Exam, Language } from "../types/exam.ts";
 import {
   compileExam,
   generateTasksLatex,
@@ -287,7 +287,10 @@ export function configureExamManagerRouter({
     })
     .post("/generate-exam", async (ctx) => {
       try {
-        const exam: Exam = await ctx.request.body.json();
+        const exam: Exam = Object.assign(
+          new Exam(),
+          await ctx.request.body.json(),
+        );
         const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
         exam.fillPagesAndPoints();
         await fs.copy(basePath, tempDir, { overwrite: true });
@@ -353,7 +356,7 @@ export function configureExamManagerRouter({
       await Deno.mkdir(uploadDir, { recursive: true });
       await Deno.writeFile(filePath, data);
       console.log("File saved to:", filePath);
-      const fileTrackerEntry: any = {
+      const fileTrackerEntry: Document = {
         name: file.name,
         refs: [],
         timeToLive: 7,
@@ -379,13 +382,17 @@ export function configureExamManagerRouter({
     .post("/generate-exams", async (ctx) => {
       try {
         const formData = await ctx.request.body.formData();
-        const examJson: Exam = JSON.parse(formData.get("exam")!.toString());
+        const examJson = JSON.parse(formData.get("exam")!.toString());
+        const exam: Exam = Object.assign(
+          new Exam(),
+          examJson,
+        );
         const startSeatNumber = parseInt(
           formData.get("startSeatNumber")?.toString() || "1",
           10,
         );
         const file = formData.get("list") as File;
-        if (!file || !examJson || file.size == 0 || !examJson._id) {
+        if (!file || !exam || file.size == 0 || !exam._id) {
           ctx.response.status = 400;
           ctx.response.body = {
             message: "Missing file, file content, exam data or exam id",
@@ -393,7 +400,7 @@ export function configureExamManagerRouter({
           return;
         }
 
-        const examId = examJson._id;
+        const examId = exam._id;
 
         for (const [jobId, existingJob] of jobs.entries()) {
           if (existingJob.examId === examId) {
@@ -442,11 +449,11 @@ export function configureExamManagerRouter({
           dir: jobDir,
         });
 
-        examJson.fillPagesAndPoints();
+        exam.fillPagesAndPoints();
         await fs.copy(basePath, jobTemplatePath, { overwrite: true });
-        await renderMetaExam(examJson, jobTemplatePath);
+        await renderMetaExam(exam, jobTemplatePath);
         await generateTasksLatex(
-          examJson,
+          exam,
           jobTemplatePath,
           `${jobTemplatePath}/aufgaben.tex`,
           { solution: false },
@@ -525,9 +532,9 @@ export function configureExamManagerRouter({
         });
 
         await fs.copy(basePath, solutionJobTemplatePath, { overwrite: true });
-        await renderMetaExam(examJson, solutionJobTemplatePath);
+        await renderMetaExam(exam, solutionJobTemplatePath);
         await generateTasksLatex(
-          examJson,
+          exam,
           solutionJobTemplatePath,
           `${solutionJobTemplatePath}/aufgaben.tex`,
           { solution: true },
