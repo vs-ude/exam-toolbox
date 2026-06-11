@@ -6,11 +6,12 @@ import { encodeHex } from "@std/encoding";
 import * as fs from "@std/fs";
 
 import { Exam, Language } from "../types/exam.ts";
+import { Student } from "../types/student.ts";
 import {
   compileExam,
+  generateSolution,
   generateTasksLatex,
   renderMetaExam,
-  renderMetaStudent,
 } from "./generation.ts";
 
 interface ExamGenerationJob {
@@ -294,22 +295,7 @@ export function configureExamManagerRouter({
         const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
         exam.fillPagesAndPoints();
         await fs.copy(basePath, tempDir, { overwrite: true });
-        const tasksPath = `${tempDir}/aufgaben.tex`;
-        await renderMetaExam(exam, tempDir);
-        await renderMetaStudent(
-          {
-            vollername: "Max Musterlösung",
-            zeigeloesung: "yes",
-            sprache: "de",
-          },
-          tempDir,
-        );
-        await generateTasksLatex(
-          exam,
-          tempDir,
-          tasksPath,
-          { solution: true },
-        );
+        await generateSolution(tempDir, exam);
 
         const { pdfBytes: examPDF, logContent } = await compileExam(tempDir);
 
@@ -490,15 +476,26 @@ export function configureExamManagerRouter({
           studentResults: [],
         };
 
-        studentData.forEach((student: any, index: number) => {
+        studentData.forEach((studentLine: any, index: number) => {
           const seatNumber = index + startSeatNumber;
           const deRandomNumber = genRandomNumber("DE", seatNumber);
           const enRandomNumber = genRandomNumber("EN", seatNumber);
+
+          const student = new Student(
+            `${studentLine.firstName} ${studentLine.lastName}`,
+            studentLine.studentId,
+            {
+              DE: deRandomNumber,
+              EN: enRandomNumber,
+            },
+            seatNumber,
+          );
 
           newJob.randomNumbers.push({ de: deRandomNumber, en: enRandomNumber });
           taskQueue.push({
             type: "student",
             jobId,
+            exam,
             student,
             jobTemplatePath,
             outputDir: tempOutputDir,
@@ -532,16 +529,10 @@ export function configureExamManagerRouter({
         });
 
         await fs.copy(basePath, solutionJobTemplatePath, { overwrite: true });
-        await renderMetaExam(exam, solutionJobTemplatePath);
-        await generateTasksLatex(
-          exam,
-          solutionJobTemplatePath,
-          `${solutionJobTemplatePath}/aufgaben.tex`,
-          { solution: true },
-        );
 
         taskQueue.push({
           type: "solution",
+          exam,
           jobId,
           jobTemplatePath: solutionJobTemplatePath,
           outputDir: tempOutputDir,

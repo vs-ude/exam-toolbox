@@ -1,4 +1,4 @@
-import { type Exam, TaskGroup } from "../types/exam.ts";
+import { type Exam, Language, TaskGroup } from "../types/exam.ts";
 import { getTaskRenderer, type RenderOptions } from "./taskRenderer.ts";
 import { escapeLatex, getEta } from "../services/mod.ts";
 import {
@@ -7,6 +7,8 @@ import {
   LatexRenderError,
 } from "./err.ts";
 import { QR_CACHE_PATH } from "../config/paths.ts";
+import { Student } from "../types/student.ts";
+import { generateExamQR } from "../services/qr.ts";
 
 type ExamMetaTemplateData = {
   veranstaltung: string;
@@ -23,7 +25,7 @@ type ExamMetaTemplateData = {
 
 type IndividualMetaTemplateData = {
   zeigeloesung: string;
-  sprache: string;
+  sprache: Language;
   randomexamnumber: string;
   sequenznummer: string;
   vollername: string;
@@ -45,7 +47,7 @@ const DEFAULT_EXAM_META: ExamMetaTemplateData = {
 
 const DEFAULT_INDIVIDUAL_META: IndividualMetaTemplateData = {
   zeigeloesung: "no",
-  sprache: "de",
+  sprache: "DE",
   randomexamnumber: "R4ND",
   sequenznummer: "6",
   vollername: "Tom\\ Morello",
@@ -103,28 +105,26 @@ export async function compileExam(
 }
 
 export async function renderMetaStudent(
+  student: Student,
   options: {
     zeigeloesung?: "yes" | "no";
-    sprache?: string;
-    randomexamnumber?: string;
-    sequenznummer?: number;
-    vollername?: string;
-    matrikelnummer?: number;
+    sprache?: Language;
   } = {},
   workingDir: string,
 ) {
+  const sprache = options.sprache ?? DEFAULT_INDIVIDUAL_META.sprache;
   const data = {
     zeigeloesung: options.zeigeloesung === "yes" ? "yes" : "no",
-    sprache: options.sprache || DEFAULT_INDIVIDUAL_META.sprache,
-    randomexamnumber: options.randomexamnumber ||
+    sprache,
+    randomexamnumber: student.codes[sprache] ||
       DEFAULT_INDIVIDUAL_META.randomexamnumber,
     sequenznummer: String(
-      options.sequenznummer ?? DEFAULT_INDIVIDUAL_META.sequenznummer,
+      student.sequenceNumber ?? DEFAULT_INDIVIDUAL_META.sequenznummer,
     ),
-    vollername: escapeLatexWithSpaces(options.vollername) ||
+    vollername: escapeLatexWithSpaces(student.name) ||
       DEFAULT_INDIVIDUAL_META.vollername,
     matrikelnummer: String(
-      options.matrikelnummer ?? DEFAULT_INDIVIDUAL_META.matrikelnummer,
+      student.matriculation ?? DEFAULT_INDIVIDUAL_META.matrikelnummer,
     ),
   };
   const metaOutputPath = `${workingDir}/student.tex`;
@@ -300,4 +300,30 @@ function checkForInvalidPageBreaks(taskGroups: TaskGroup[]): string[] {
     }
   }
   return offenses;
+}
+
+export async function generateSolution(tempDir: string, exam: Exam) {
+  const tasksPath = `${tempDir}/aufgaben.tex`;
+  await renderMetaExam(exam, tempDir);
+  const student = new Student();
+  await generateExamQR(
+    `${tempDir}/img/mainQr.png`,
+    exam,
+    "DE",
+    student.codes.DE,
+  );
+  await renderMetaStudent(
+    student,
+    {
+      zeigeloesung: "yes",
+      sprache: "DE",
+    },
+    tempDir,
+  );
+  await generateTasksLatex(
+    exam,
+    tempDir,
+    tasksPath,
+    { solution: true },
+  );
 }

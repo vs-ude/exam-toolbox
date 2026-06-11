@@ -96,7 +96,7 @@ export interface BaseTask {
   children: string[];
 }
 
-export type Language = "DE" | "EN";
+export type Language = keyof Translation;
 
 export interface Dimension {
   unit: "cm" | "mm" | "relative";
