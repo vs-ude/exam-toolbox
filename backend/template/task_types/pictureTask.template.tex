@@ -1,11 +1,13 @@
 
 \escapedStringTypeout{VSEXAM: {'Typ':'BildAufgabe', 'Bildtext': '', 'Loesungsbild': ''}}
+\begin{center}
 \includegraphics[<#~ it.dimension #>]%
 <# if (it.solution) { #>
 {<#~ it.solutionPath #>}
 <# } else { #>
 {<#~ it.taskPath #>}
 <# } #>
+\end{center}
 
 <# if (it.text) { #>
 \centerline{\textit{%
