@@ -48,8 +48,10 @@ Deno.test("TaskRenderer.renderPictureTaskImpl renders picture task template", ()
 
   const expected = `
 \\escapedStringTypeout{VSEXAM: {'Typ':'BildAufgabe', 'Bildtext': '', 'Loesungsbild': ''}}
+\\begin{center}
 \\includegraphics[width=0.5\\textwidth]%
 {img/q.png}
+\\end{center}
 
 \\centerline{\\textit{%
 \\ifthenelse{\\equal{\\sprache}{de}}%
