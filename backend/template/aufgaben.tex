@@ -2,231 +2,358 @@
 % Assignment
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\aufgabe
-{DE Beispielklausur Aufgabe 1}
-{EN Example-exam Assignment 1}
-
-\aufgabenteil{10}
-{DE Multiple-Choice Beispiel Aufgabe.}
-{EN Multiple-Choice Example Task.}
-
-\mcstart[10]{1} % 1 Correct answers, 10 Point each
-\mcline{DE Deutscher Text für Choice 1.}{EN English text for choice 1.}{w}
-\mcline{DE Deutscher Text für Choice 2.}{EN English text for choice 2.}{f}
-\mcline{DE Deutscher Text für Choice 3.}{EN English text for choice 3.}{f}
-\mcend
-
-\manualText
-{DE Manuell eingefügter deutscher Text. Falls man mal außerhalb einer Aufgabe Text in Deutsch und Englisch haben möchte.}
-{EN Manually inserted english text. If you want to use text in german or english outside of an assignment.}
-
-\aufgabenteilende
-
-\aufgabenteil{20}
-{DE Multiple-Choice Aufgabe mit zwei Auswahlmöglichkeiten pro Zeile.}
-{EN Multiple-Choice Task with two Choices per line.}
-
-\mcstarttwo[10]{2} % DE Text, EN Text, Lösung (w/f) für die erste, für die zweite Choice
-\mclinetwo
-{DE Test1}{EN Test1}{w}
-{DE Test2}{EN Test2}{f}
-\mclinetwo
-{DE Test3}{EN Test3}{w}
-{DE Test4}{EN Test4}{f}
-\mcendtwo
-
-\aufgabenteilende
-
-\aufgabenteil{20}
-{DE Beispiel für Eigentschaften Auswahl.}
-{EN Example for property selection.}
-
-\propertystart{4}{10} % 4 Kästchen, 1 Punkt pro Zeile. Bei 2 oder 3 Kästchen die weiteren ungenutzten Klammern leer lassen, aber hin schreiben
-% Header mit DT Text über der Aufgabe und den Properties (Properties nur EN/DT)
-\propertyheader{DE Text}{EN Text}{Prop1}{Prop2}{Prop3}{Prop4}
-% Eigentliche aufgabe mit Kästchen.
-\propertyline{Beschreibung 1}{Description 1}{w}{f}{f}{w}
-\propertyline{Beschreibung 2}{Description 2}{f}{w}{f}{f}
-\propertyend
-\aufgabenteilende
+ %% MARKER: {"group": 1, "task": -1, "type": "heading"}
 
 \clearpage
+\ifhmode\par\fi
+\removelastskip
+\vskip 3ex\goodbreak
+%\noindent
+\refstepcounter{section} % manually increment the chapter number
+% manually add the chapter to the table of contents
+\addcontentsline{toc}{section}{\protect\numberline{\thesection}1}
+% and now format the header according to spec.
+\arrayrulecolor{lightgray2}
+\setlength{\arrayrulewidth}{1pt}
+\begingroup
+\def\arraystretch{2}
+\begin{tabularx}{\textwidth}{|Xr}
+\hline
+{%
+\large\bfseries\textsf \afg\ \thesection\ - \normalfont\itshape{%
+\textsf{\ifthenelse{\equal{\sprache}{de}}{DE Beispielklausur Aufgabe 1}{EN Example-exam Assignment 1}}%
+}%
+} &
+\textsf{[15P]}\\
+\end{tabularx}
+\escapedStringTypeout{VSEXAM: {'Typ':'AufgabeStart', 'Punkte': 15, 'Seite':'\thepage'}}
+\quad
+\par
+\endgroup
+\nobreak
+\vskip 2ex
 
-\aufgabe{Beispiel Aufgabe 2}{Example Task 2}
+%% MARKER: {"group": 1, "task": 1, "type": "multipleChoice"}
 
-\aufgabenteil{20}
-{DE Beispiel für eine Freitext-Aufgabe.}
-{EN Example for a free-text task.}
+\noindent
+\begin{minipage}{\textwidth}
+\escapedStringTypeout{VSEXAM: {'Typ':'AufgabenTeil', 'Punkte': '5', 'Seite':'\thepage'}}
+\begin{tikzpicture}%
+\draw (0,-0.1) -- (0,0) -- (0.1,0);\printPos{edgeStart}%
+\end{tikzpicture}%
+\vspace{-0.7cm}
+\subsection{[5P]}%
+\ifthenelse{\equal{\sprache}{de}}{DE Multiple-Choice Beispiel Aufgabe.}{EN Multiple-Choice Example Task.}
 
-% 3 Linien für die Lösung + Musterlösung
-\loesung{3}{Loesungstext}
-
-\aufgabenteilende
+\escapedStringTypeout{VSEXAM: {'Typ':'MCStart', 'PunkteKorrekt': '5', 'AnzahlKorrekt':'1'}}
 
 
-\aufgabenteil{10}
-{DE Inline-Lösungs Beispiel zum Anzeigen von Musterlösungen innerhalb einer Tabelle.}
-{EN Inline solution example for showing solutions within tables.}
+\begin{tabularx}{\textwidth}{cX}
+\blacktoprule
+
+\multicolumn{2}{p{\textwidth}}{
+\ifthenelse{\equal{\sprache}{de}}
+{Single Response: Für die korrekt markierte Aussage erhalten Sie 5 Punkt(e).}
+{Single response: You get 5 point(s) for marking the correct statement.}
+} \\
+
+
+\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLine', 'Antwort': 'w'}}
+
+  \color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{DE Deutscher Text für Choice 1.}{EN English text for choice 1.} \\
+\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLine', 'Antwort': 'f'}}
+
+  \color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{DE Deutscher Text für Choice 2.}{EN English text for choice 2.} \\
+\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLine', 'Antwort': 'f'}}
+
+  \color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{DE Deutscher Text für Choice 3.}{EN English text for choice 3.} \\
+\blackbottomrule
+\end{tabularx}
+
+\hspace{\textwidth}%
+\begin{tikzpicture}%
+\draw (-0.1,0) -- (0,0) -- (0,0.1);\printPos{edgeEnd}%
+\end{tikzpicture}%
+\end{minipage}
+\vspace{\parskip}
+\vspace{0.1cm}
+
+
+%% MARKER: {"group": 1, "task": 2, "type": "manualText"}
+
+\ifthenelse{\equal{\sprache}{de}}{%
+DE Manuell eingefügter deutscher Text. Falls man mal außerhalb einer Aufgabe Text in Deutsch und Englisch haben möchte.%
+}{%
+EN Manually inserted english text. If you want to use text in german or english outside of an assignment.%
+}
+
+%% MARKER: {"group": 1, "task": 3, "type": "multipleChoice"}
+
+\noindent
+\begin{minipage}{\textwidth}
+\escapedStringTypeout{VSEXAM: {'Typ':'AufgabenTeil', 'Punkte': '10', 'Seite':'\thepage'}}
+\begin{tikzpicture}%
+\draw (0,-0.1) -- (0,0) -- (0.1,0);\printPos{edgeStart}%
+\end{tikzpicture}%
+\vspace{-0.7cm}
+\subsection{[10P]}%
+\ifthenelse{\equal{\sprache}{de}}{DE Multiple-Choice Aufgabe mit zwei Auswahlmöglichkeiten pro Zeile.}{EN Multiple-Choice Task with two Choices per line.}
+
+\escapedStringTypeout{VSEXAM: {'Typ':'MCStart', 'PunkteKorrekt': '5', 'AnzahlKorrekt':'2'}}
+
+
+\begin{tabularx}{\textwidth}{cXcX}
+\blacktoprule
+
+\multicolumn{4}{p{\textwidth}}{
+\ifthenelse{\equal{\sprache}{de}}
+{Multiple Response: Es gibt \textbf{2} richtige Aussagen. Sie erhalten 5 Punkt(e) für jede markierte korrekte Aussage, jedoch 0 Punkte für die Teilaufgabe, falls eine falsche Aussage markiert wurde.}
+{Multiple response: There are \textbf{2} correct statements. You get 5 point(s) for each correct statement, but 0 points for the question if you mark a wrong statement.}
+} \\
+
+
+\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLineTwo', 'Antwort1': 'w', 'Antwort2': 'f'}}
+
+  \color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{DE Test1}{EN Test1} &
+
+  \color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{DE Test2}{EN Test2} \\
+\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLineTwo', 'Antwort1': 'w', 'Antwort2': 'f'}}
+
+  \color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{DE Test3}{EN Test3} &
+
+  \color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{DE Test4}{EN Test4} \\
+\blackbottomrule
+\end{tabularx}
+
+\hspace{\textwidth}%
+\begin{tikzpicture}%
+\draw (-0.1,0) -- (0,0) -- (0,0.1);\printPos{edgeEnd}%
+\end{tikzpicture}%
+\end{minipage}
+\vspace{\parskip}
+\vspace{0.1cm}
+
+
+%% MARKER: {"group": 2, "task": -1, "type": "heading"}
+
+\clearpage
+\ifhmode\par\fi
+\removelastskip
+\vskip 3ex\goodbreak
+%\noindent
+\refstepcounter{section} % manually increment the chapter number
+% manually add the chapter to the table of contents
+\addcontentsline{toc}{section}{\protect\numberline{\thesection}2}
+% and now format the header according to spec.
+\arrayrulecolor{lightgray2}
+\setlength{\arrayrulewidth}{1pt}
+\begingroup
+\def\arraystretch{1.5}
+\begin{tabularx}{\textwidth}{|Xr}
+\hline
+{%
+\large\bfseries\textsf \afg\ \thesection\ - \normalfont\itshape{%
+\textsf{\ifthenelse{\equal{\sprache}{de}}{DE Beispielklausur Aufgabe 2}{EN Example-exam Assignment 2}}%
+}%
+} &
+\textsf{[16P]}\\
+\end{tabularx}
+\escapedStringTypeout{VSEXAM: {'Typ':'AufgabeStart', 'Punkte': 16, 'Seite':'\thepage'}}
+\quad
+\par
+\endgroup
+\nobreak
+\vskip 2ex
+
+%% MARKER: {"group": 2, "task": 1, "type": "shortAnswer"}
+
+\noindent
+\begin{minipage}{\textwidth}
+\escapedStringTypeout{VSEXAM: {'Typ':'AufgabenTeil', 'Punkte': '10', 'Seite':'\thepage'}}
+\begin{tikzpicture}%
+\draw (0,-0.1) -- (0,0) -- (0.1,0);\printPos{edgeStart}%
+\end{tikzpicture}%
+\vspace{-0.7cm}
+\subsection{[10P]}%
+\ifthenelse{\equal{\sprache}{de}}{DE Beispiel für eine Freitext-Aufgabe mit \textit{kursivem Text}.}{EN Example for a free-text task with \textit{cursive text}.}
+
+\escapedStringTypeout{VSEXAM: {'Typ':'Freitext', 'Zeilen': '1', 'Loesung': ''}}
+
+{\color{red}\normalfont\itshape Lösungstext\\\\\\\\\\ \phantom{0.1mm}\newline}
+{\color{red}\normalfont\itshape Solution Text\\\\\\\\\\ \phantom{0.1mm}\newline}
+
+
+\hspace{\textwidth}%
+\begin{tikzpicture}%
+\draw (-0.1,0) -- (0,0) -- (0,0.1);\printPos{edgeEnd}%
+\end{tikzpicture}%
+\end{minipage}
+\vspace{\parskip}
+\vspace{0.1cm}
+
+
+%% MARKER: {"group": 2, "task": 2, "type": "table"}
+
+\noindent
+\begin{minipage}{\textwidth}
+\escapedStringTypeout{VSEXAM: {'Typ':'AufgabenTeil', 'Punkte': '4', 'Seite':'\thepage'}}
+\begin{tikzpicture}%
+\draw (0,-0.1) -- (0,0) -- (0.1,0);\printPos{edgeStart}%
+\end{tikzpicture}%
+\vspace{-0.7cm}
+\subsection{[4P]}%
+\ifthenelse{\equal{\sprache}{de}}{DE Inline-Lösungs Beispiel zum Anzeigen von Musterlösungen innerhalb einer Tabelle.}{EN Inline solution example for showing solutions within tables.}
 
 \begin{center}
-ISO/OSI Layer:\\
-\begin{tabular}{|c|}
+\begin{tabular}{|l|l|}
+
 \hline
-% Text in der Klausur an der Stelle (z.b. in Tabelle) + Lösung an der Stelle
-\lineloesung{L4:~~~~~~~~~~}{Transport} \\
+\escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
+\ifthenelse{\equal{\sprache}{de}}{%
+L4%
+}{%
+L4%
+}
+&
+\escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
+\ifthenelse{\equal{\sprache}{de}}{%
+Transport%
+}{%
+Transport%
+}
+\\
 \hline
-\lineloesung{L3:~~~~~~~~~~}{Network} \\
+\escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
+\ifthenelse{\equal{\sprache}{de}}{%
+L3%
+}{%
+L3%
+}
+&
+\escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
+\ifthenelse{\equal{\sprache}{de}}{%
+Network%
+}{%
+Network%
+}
+\\
 \hline
-\lineloesung{L2:~~~~~~~~~~}{Data Link} \\
+\escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
+\ifthenelse{\equal{\sprache}{de}}{%
+L2%
+}{%
+L2%
+}
+&
+\escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
+\ifthenelse{\equal{\sprache}{de}}{%
+Data Link%
+}{%
+Data Link%
+}
+\\
 \hline
-\lineloesung{L1:~~~~~~~~~~}{Physical} \\
+\escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
+\ifthenelse{\equal{\sprache}{de}}{%
+L1%
+}{%
+L1%
+}
+&
+\escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
+\ifthenelse{\equal{\sprache}{de}}{%
+Physical%
+}{%
+Physical%
+}
+\\
 \hline
+
 \end{tabular}
 \end{center}
-\aufgabenteilende
-
-\aufgabenteil{10}
-{DE Ein Bild und die Ausgefüllte Version für die Musterlösung.}
-{EN An image to fill out and an image with the correct solution.}
-
-% \bildAufgabe{Caption}{BREITE}{Aufgabenbild Pfad}{Lösungsbild Pfad}
-% Caption kann mit \manualText auch in mehreren Sprachen angegeben werden
-\bildAufgabe{Image Caption}{0.3\textwidth}{img/bildAfg}{img/bildLsg}
-\aufgabenteilende
-
-\aufgabe
-{Dolor sit amet}
-{Non dolor mundus}
-
-\aufgabenteil{4}
-{Freitext}
-{Freitext}
-
-\loesung{3}{42 42 42}
-
-\aufgabenteilende
 
 
-\aufgabenteil{6}
-{consectetur adipiscing eli}
-{Lorem ipsum dolor sit ame}
-
-\centerline{Beschreibungstect}
-
-\manualText
-{Donec iaculis eros ut sodales faucibus?}
-{convallis varius ante?}
-
-\loesung{4}{Nunc}
-
-\vspace{0.8cm}
-
-\manualText
-{In interdum in lorem non blandit?}
-{In hac habitasse platea dic?}
-
-\loesung{4}{4242 \\
-euh ueee\\
-1000 \\
-Wasd}
-
-\aufgabenteilende
+\hspace{\textwidth}%
+\begin{tikzpicture}%
+\draw (-0.1,0) -- (0,0) -- (0,0.1);\printPos{edgeEnd}%
+\end{tikzpicture}%
+\end{minipage}
+\vspace{\parskip}
+\vspace{0.1cm}
 
 
-\aufgabenteil{1}
-{Nunc ultricies aliquet turpis?}
-{ Etiam dignissim augue ?}
+%% MARKER: {"group": 2, "task": 3, "type": "pictureTask"}
 
-\mcstarttwo[1]{1}
-\mclinetwo
-{awgh}{finibus.}{f}
-{hrhrjj}{consectetur.}{w}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
-
-\aufgabe
-{erat}{semper}
+\noindent
+\begin{minipage}{\textwidth}
+\escapedStringTypeout{VSEXAM: {'Typ':'AufgabenTeil', 'Punkte': '2', 'Seite':'\thepage'}}
+\begin{tikzpicture}%
+\draw (0,-0.1) -- (0,0) -- (0.1,0);\printPos{edgeStart}%
+\end{tikzpicture}%
+\vspace{-0.7cm}
+\subsection{[2P]}%
+\ifthenelse{\equal{\sprache}{de}}{DE Ein Bild und die Ausgefüllte Version für die Musterlösung.}{EN An image to fill out and an image with the correct solution.}
 
 
-\aufgabenteil{3}
-{Donec dapibus eu turpis in egestas}
-{ Ut vitae faucibus leo, ut tincidunt lacu}
-
-\propertystart{3}{1}
-\propertyheader{aawgh}{reh}{congue}{sapien}{sollicitudin nulla}{}
-\propertyline{trjfqe}{consectetur}{w}{f}{w}{}
-\propertyline{fwerh}{id}{w}{f}{f}{}
-\propertyline{tejrzj}{pharetra}{w}{f}{f}{}
-\propertyend
-
-\vspace{-1em}
-\aufgabenteilende
-
-\aufgabenteil{3}
-{Nullam ut ex aliquam?}
-{Vivamus erat ligula?}
-
-\mcstart[1,5]{2}
-\mcline{Integer molestie maximus dui, et ornare tortor suscipit sed.}{Vestibulum ante ip.}{f}
-\mcline{Maecenas non tempor tortor.}{Aenean congue leo eu sapien pretium aliquam}{f}
-\mcline{Proin porta posuere fermentum.}{Morbi facilisis feugiat ex, et placerat arcu semper sodales.}{w}
-\mcline{Integer lobortis augue eu.}{Ut consectetur ex id iaculis efficitur. }{f}
-\mcline{Aenean a malesuada ante.}{Pellentesque pharetra nec nisl ut fermentum.}{w}
-\mcend
-\vspace{-1em}
-
-\aufgabenteilende
-
-
-\aufgabenteil{3}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
-
-\mcstarttwo[1,5]{2}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{w}
-\mclinetwo
-{hrzh wrg wr}{gawg}{w}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{f}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
-
-
-\aufgabe{Tabellen}{Tables}
-
-\aufgabenteil{6}
-{Table fun\\}
-{Table :3\\}
-
-\manualText
-{Do table}
-{mach mal tabelle}
-
+\escapedStringTypeout{VSEXAM: {'Typ':'BildAufgabe', 'Bildtext': '', 'Loesungsbild': ''}}
 \begin{center}
-\begin{tabular}{|l|l|l|l|l|l|}
-\hline
-\multicolumn{6}{|l|}{Table} \\ \hline
-\scriptsize$F_1$: \lineloesung{~~~~~~}{234} & \scriptsize$F_2$: \lineloesung{~~~~~~}{152} & \scriptsize$F_3$: \lineloesung{~~~~~~}{321} & \scriptsize$F_4$: \lineloesung{~~~~~~}{2412} & \scriptsize$F_5$: \lineloesung{~~~~~~}{215} & \scriptsize$F_6$: \lineloesung{~~~~~~}{23} \\ \hline
-\end{tabular}
+\includegraphics[height=5cm]%
+{img/loesung.png}
 \end{center}
 
-\aufgabenteilende
 
 
-\aufgabenteil{5}
-{Hier erklärung}
-{Ex. Plain.}
-\vspace{1em}
+\hspace{\textwidth}%
+\begin{tikzpicture}%
+\draw (-0.1,0) -- (0,0) -- (0,0.1);\printPos{edgeEnd}%
+\end{tikzpicture}%
+\end{minipage}
+\vspace{\parskip}
+\vspace{0.1cm}
 
-\manualText
-{Tablle.}
-{Just table it}
+
+%% MARKER: {"group": 3, "task": -1, "type": "heading"}
+
+\clearpage
+\ifhmode\par\fi
+\removelastskip
+\vskip 3ex\goodbreak
+%\noindent
+\refstepcounter{section} % manually increment the chapter number
+% manually add the chapter to the table of contents
+\addcontentsline{toc}{section}{\protect\numberline{\thesection}3}
+% and now format the header according to spec.
+\arrayrulecolor{lightgray2}
+\setlength{\arrayrulewidth}{1pt}
+\begingroup
+\def\arraystretch{1.5}
+\begin{tabularx}{\textwidth}{|Xr}
+\hline
+{%
+\large\bfseries\textsf \afg\ \thesection\ - \normalfont\itshape{%
+\textsf{\ifthenelse{\equal{\sprache}{de}}{DE Beispielklausur Aufgabe 3}{EN Example-exam Assignment 3}}%
+}%
+} &
+\textsf{[13P]}\\
+\end{tabularx}
+\escapedStringTypeout{VSEXAM: {'Typ':'AufgabeStart', 'Punkte': 13, 'Seite':'\thepage'}}
+\quad
+\par
+\endgroup
+\nobreak
+\vskip 2ex
+
+%% MARKER: {"group": 3, "task": 1, "type": "latex"}
+
+\noindent
+\begin{minipage}{\textwidth}
+\escapedStringTypeout{VSEXAM: {'Typ':'AufgabenTeil', 'Punkte': '10', 'Seite':'\thepage'}}
+\begin{tikzpicture}%
+\draw (0,-0.1) -- (0,0) -- (0.1,0);\printPos{edgeStart}%
+\end{tikzpicture}%
+\vspace{-0.7cm}
+\subsection{[10P]}%
+\ifthenelse{\equal{\sprache}{de}}{DE LaTeX-Aufgabe für komplexere Konstrukte.}{EN LaTeX task for more complex constructs.}
 
 \begin{center}
 \begin{tabular}{|l|l|l|l|l|l|}
@@ -247,235 +374,40 @@ Wasd}
 \end{tabular}
 \end{center}
 
-\aufgabenteilende
 
-\aufgabe{Platzschinden, groesser 10}{was er geadsgt hat}
-
-\aufgabenteil{3}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
-
-\mcstarttwo[1,5]{2}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{w}
-\mclinetwo
-{hrzh wrg wr}{gawg}{w}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{f}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
+\hspace{\textwidth}%
+\begin{tikzpicture}%
+\draw (-0.1,0) -- (0,0) -- (0,0.1);\printPos{edgeEnd}%
+\end{tikzpicture}%
+\end{minipage}
+\vspace{\parskip}
+\vspace{0.1cm}
 
 
-\aufgabenteil{3}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
+%% MARKER: {"group": 3, "task": 2, "type": "latex"}
 
-\mcstarttwo[1,5]{2}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{w}
-\mclinetwo
-{hrzh wrg wr}{gawg}{w}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{f}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
+\noindent
+\begin{minipage}{\textwidth}
+\escapedStringTypeout{VSEXAM: {'Typ':'AufgabenTeil', 'Punkte': '3', 'Seite':'\thepage'}}
+\begin{tikzpicture}%
+\draw (0,-0.1) -- (0,0) -- (0.1,0);\printPos{edgeStart}%
+\end{tikzpicture}%
+\vspace{-0.7cm}
+\subsection{[3P]}%
+\ifthenelse{\equal{\sprache}{de}}{DE Property Task via LaTeX-Task (workaround).}{EN Property task via LaTeX task (workaround).}
 
-
-\aufgabenteil{3}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
-
-\mcstarttwo[1,5]{2}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{w}
-\mclinetwo
-{hrzh wrg wr}{gawg}{w}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{f}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
+\propertystart{3}{1}
+\propertyheader{aawgh}{reh}{congue}{sapien}{sollicitudin nulla}{}
+\propertyline{trjfqe}{consectetur}{w}{f}{w}{}
+\propertyline{fwerh}{id}{w}{f}{f}{}
+\propertyline{tejrzj}{pharetra}{w}{f}{f}{}
+\propertyend
 
 
-\aufgabenteil{3}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
-
-\mcstarttwo[1,5]{2}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{w}
-\mclinetwo
-{hrzh wrg wr}{gawg}{w}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{f}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
-
-\newpage
-
-\aufgabenteil{3}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
-
-\mcstarttwo[1,5]{2}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{w}
-\mclinetwo
-{hrzh wrg wr}{gawg}{w}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{f}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
-
-
-\aufgabenteil{3}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
-
-\mcstarttwo[1,5]{2}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{w}
-\mclinetwo
-{hrzh wrg wr}{gawg}{w}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{f}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
-
-
-\aufgabenteil{3}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
-
-\mcstarttwo[1,5]{2}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{w}
-\mclinetwo
-{hrzh wrg wr}{gawg}{w}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{f}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
-
-
-\aufgabenteil{3}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
-
-\mcstarttwo[1,5]{2}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{w}
-\mclinetwo
-{hrzh wrg wr}{gawg}{w}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{f}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
-
-\newpage
-
-\aufgabenteil{3}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
-
-\mcstarttwo[1,5]{2}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{w}
-\mclinetwo
-{hrzh wrg wr}{gawg}{w}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{f}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
-
-
-\aufgabenteil{2,5}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
-
-\mcstarttwo[2,5]{1}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{w}
-\mclinetwo
-{hrzh wrg wr}{gawg}{f}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{f}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
-
-
-\aufgabenteil{1,5}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
-
-\mcstarttwo[1,5]{1}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{f}
-\mclinetwo
-{hrzh wrg wr}{gawg}{w}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{f}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
-
-
-\aufgabenteil{1,5}
-{Fusce laoreet lacus torto?}
-{Proin viverra ligula a pretium semper?}
-
-\mcstarttwo[1,5]{1}
-\mclinetwo
-{wasd}{gfawg.}{f}
-{gaw}{wag.}{f}
-\mclinetwo
-{hrzh wrg wr}{gawg}{f}
-{grgerh erhre}{rhrehr}{f}
-\mclinetwo
-{wrgh het }{awdasg}{f}
-{r zkrz e}{hseghsf}{w}
-\mcendtwo
-\vspace{-1em}
-\aufgabenteilende
+\hspace{\textwidth}%
+\begin{tikzpicture}%
+\draw (-0.1,0) -- (0,0) -- (0,0.1);\printPos{edgeEnd}%
+\end{tikzpicture}%
+\end{minipage}
+\vspace{\parskip}
+\vspace{0.1cm}

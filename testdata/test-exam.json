@@ -1,0 +1,330 @@
+{
+  "_id": "69f9fbb4902f531ec6a95d7c",
+  "courseName": "Probeklausur",
+  "examinerName": "Dr. Jane Smith",
+  "semester": "SS 26",
+  "date": "2025-12-15",
+  "examLengthMinutes": 85,
+  "tasks": [
+    {
+      "groupNumber": 1,
+      "groupTitle": {
+        "DE": "DE Beispielklausur Aufgabe 1",
+        "EN": "EN Example-exam Assignment 1"
+      },
+      "tasks": [
+        {
+          "taskId": "multipleChoice-1781100392160",
+          "type": "multipleChoice",
+          "question": {
+            "DE": "DE Multiple-Choice Beispiel Aufgabe.",
+            "EN": "EN Multiple-Choice Example Task."
+          },
+          "answerOptions": [
+            {
+              "DE": "DE Deutscher Text für Choice 1.",
+              "EN": "EN English text for choice 1.",
+              "correct": true
+            },
+            {
+              "DE": "DE Deutscher Text für Choice 2.",
+              "EN": "EN English text for choice 2.",
+              "correct": false
+            },
+            {
+              "DE": "DE Deutscher Text für Choice 3.",
+              "EN": "EN English text for choice 3.",
+              "correct": false
+            }
+          ],
+          "points": 5,
+          "createdBy": "test",
+          "createdAt": "2026-06-10T14:06:32.160Z",
+          "lastUsed": "2026-06-10T14:06:32.160Z",
+          "usedIn": ["69f9fbb4902f531ec6a95d7c"],
+          "tags": [],
+          "tagIds": [],
+          "children": []
+        },
+        {
+          "taskId": "manualText-1781100457890",
+          "type": "manualText",
+          "question": {
+            "DE": "DE Manuell eingefügter deutscher Text. Falls man mal außerhalb einer Aufgabe Text in Deutsch und Englisch haben möchte.",
+            "EN": "EN Manually inserted english text. If you want to use text in german or english outside of an assignment."
+          },
+          "points": 0,
+          "tagIds": [],
+          "tags": [],
+          "createdBy": "test",
+          "createdAt": "2026-06-10T14:07:37.890Z",
+          "lastUsed": "2026-06-10T14:07:37.890Z",
+          "usedIn": ["69f9fbb4902f531ec6a95d7c"],
+          "children": []
+        },
+        {
+          "taskId": "multipleChoice-1781100491578",
+          "type": "multipleChoice",
+          "question": {
+            "DE": "DE Multiple-Choice Aufgabe mit zwei Auswahlmöglichkeiten pro Zeile.",
+            "EN": "EN Multiple-Choice Task with two Choices per line."
+          },
+          "answerOptions": [
+            {
+              "DE": "DE Test1",
+              "EN": "EN Test1",
+              "correct": true
+            },
+            {
+              "DE": "DE Test2",
+              "EN": "EN Test2",
+              "correct": false
+            },
+            {
+              "DE": "DE Test3",
+              "EN": "EN Test3",
+              "correct": true
+            },
+            {
+              "DE": "DE Test4",
+              "EN": "EN Test4",
+              "correct": false
+            }
+          ],
+          "points": 10,
+          "createdBy": "test",
+          "createdAt": "2026-06-10T14:08:11.578Z",
+          "lastUsed": "2026-06-10T14:08:11.578Z",
+          "usedIn": ["69f9fbb4902f531ec6a95d7c"],
+          "tags": [],
+          "tagIds": [],
+          "children": []
+        }
+      ]
+    },
+    {
+      "groupNumber": 2,
+      "groupTitle": {
+        "DE": "DE Beispielklausur Aufgabe 2",
+        "EN": "EN Example-exam Assignment 2"
+      },
+      "tasks": [
+        {
+          "taskId": "shortAnswer-1781100604157",
+          "type": "shortAnswer",
+          "question": {
+            "DE": "DE Beispiel für eine Freitext-Aufgabe mit <i>kursivem Text</i>.",
+            "EN": "EN Example for a free-text task with <i>cursive text</i>."
+          },
+          "solution": {
+            "DE": "Lösungstext\n\n\n\n\n",
+            "EN": "Solution Text\n\n\n\n\n"
+          },
+          "points": 10,
+          "createdBy": "test",
+          "createdAt": "2026-06-10T14:10:04.157Z",
+          "lastUsed": "2026-06-10T14:10:04.157Z",
+          "usedIn": ["69f9fbb4902f531ec6a95d7c"],
+          "tags": [],
+          "tagIds": [],
+          "children": []
+        },
+        {
+          "taskId": "table-1781100939200",
+          "type": "table",
+          "question": {
+            "DE": "DE Inline-Lösungs Beispiel zum Anzeigen von Musterlösungen innerhalb einer Tabelle.",
+            "EN": "EN Inline solution example for showing solutions within tables."
+          },
+          "tableHeadersQuestion": [
+            {
+              "DE": "",
+              "EN": ""
+            },
+            {
+              "DE": "",
+              "EN": ""
+            }
+          ],
+          "tableDataQuestion": [
+            [
+              {
+                "DE": "L4",
+                "EN": "L4"
+              },
+              {
+                "DE": "",
+                "EN": ""
+              }
+            ],
+            [
+              {
+                "DE": "L3",
+                "EN": "L3"
+              },
+              {
+                "DE": "",
+                "EN": ""
+              }
+            ],
+            [
+              {
+                "DE": "L2",
+                "EN": "L2"
+              },
+              {
+                "DE": "",
+                "EN": ""
+              }
+            ],
+            [
+              {
+                "DE": "L1",
+                "EN": "L1"
+              },
+              {
+                "DE": "",
+                "EN": ""
+              }
+            ]
+          ],
+          "tableHeadersSolution": [
+            {
+              "DE": "",
+              "EN": ""
+            },
+            {
+              "DE": "",
+              "EN": ""
+            }
+          ],
+          "tableDataSolution": [
+            [
+              {
+                "DE": "L4",
+                "EN": "L4"
+              },
+              {
+                "DE": "Transport",
+                "EN": "Transport"
+              }
+            ],
+            [
+              {
+                "DE": "L3",
+                "EN": "L3"
+              },
+              {
+                "DE": "Network",
+                "EN": "Network"
+              }
+            ],
+            [
+              {
+                "DE": "L2",
+                "EN": "L2"
+              },
+              {
+                "DE": "Data Link",
+                "EN": "Data Link"
+              }
+            ],
+            [
+              {
+                "DE": "L1",
+                "EN": "L1"
+              },
+              {
+                "DE": "Physical",
+                "EN": "Physical"
+              }
+            ]
+          ],
+          "points": 4,
+          "tags": [],
+          "tagIds": [],
+          "createdBy": "test",
+          "createdAt": "2026-06-10T14:15:39.200Z",
+          "lastUsed": "2026-06-10T14:15:39.200Z",
+          "usedIn": ["69f9fbb4902f531ec6a95d7c"],
+          "children": []
+        },
+        {
+          "taskId": "picture-1781101090441",
+          "type": "pictureTask",
+          "question": {
+            "DE": "DE Ein Bild und die Ausgefüllte Version für die Musterlösung.",
+            "EN": "EN An image to fill out and an image with the correct solution."
+          },
+          "questionPicture": {
+            "urlDE": "./uploads/a55b3c3c366f6cd0fa3a504582fe1a266d607dd037c6eb9907eb5cfc71a38e73.png",
+            "urlEN": "./uploads/3ef307f1f05595d59eade033de165878a617f6f6ab9356e8f3d61b3cd8a5b45d.png"
+          },
+          "solutionPicture": {
+            "urlDE": "./uploads/e9901bd000c1150d488ae263bef78952274d78970965081b0d0653c5221cd318.png",
+            "urlEN": "./uploads/8e44e3c07a8b030593c48d6b137fd747c01505772a741c607d824bb9558a5a29.png"
+          },
+          "points": 2,
+          "createdBy": "test",
+          "createdAt": "2026-06-10T14:18:10.441Z",
+          "lastUsed": "2026-06-10T14:18:10.441Z",
+          "usedIn": ["69f9fbb4902f531ec6a95d7c"],
+          "tagIds": [],
+          "tags": [],
+          "children": []
+        }
+      ]
+    },
+    {
+      "groupNumber": 3,
+      "groupTitle": {
+        "DE": "DE Beispielklausur Aufgabe 3",
+        "EN": "EN Example-exam Assignment 3"
+      },
+      "tasks": [
+        {
+          "taskId": "latex-1781101573087",
+          "type": "latex",
+          "question": {
+            "DE": "DE LaTeX-Aufgabe für komplexere Konstrukte.",
+            "EN": "EN LaTeX task for more complex constructs."
+          },
+          "questionLatex": {
+            "DE": "\\begin{center}\n\\begin{tabular}{|l|l|l|l|l|l|}\n\\hline\n\\multicolumn{6}{|l|}{Table} \\\\ \\hline\n% Line1\n\\scriptsize$A_{11}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{12}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{13}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{14}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{15}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{16}$ \\lineloesung{~~~~~}{4242} \\\\ \\hline\n% Line2\n\\scriptsize$A_{21}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{22}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{23}$ \\lineloesung{~~~~~}{4242)} & \\scriptsize$A_{24}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{25}$ \\lineloesung{~~~~~}{4242)} & \\scriptsize$A_{26}$ \\lineloesung{~~~~~}{4242} \\\\ \\hline\n% Line3\n\\scriptsize$A_{31}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{32}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{33}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{34}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{35}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{36}$ \\lineloesung{~~~~~}{4242} \\\\ \\hline\n% Line4\n\\scriptsize$A_{41}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{42}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{43}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{44}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{45}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$A_{46}$ \\lineloesung{~~~~~}{4242} \\\\ \\hline\n\\multicolumn{6}{|l|}{Sub Table} \\\\ \\hline\n\\multicolumn{3}{|l|}{Subtext \\manualText{(Deutsch)}{}} & \\multicolumn{3}{l|}{Textlol \\manualText{(:9)}{}}  \\\\ \\hline\n\\scriptsize$L_{1}$ 2412 & \\scriptsize$L_{2}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$L_{3}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$L_{4}$ ~~~2356 & \\scriptsize$L_{5}$ ~~~2471 & \\scriptsize$L_{6}$ \\lineloesung{~~~~~}{4242} \\\\\n\\hline\n\\end{tabular}\n\\end{center}",
+            "EN": ""
+          },
+          "points": 10,
+          "tags": [],
+          "tagIds": [],
+          "createdBy": "test",
+          "createdAt": "2026-06-10T14:26:13.087Z",
+          "lastUsed": "2026-06-10T14:26:13.087Z",
+          "usedIn": ["69f9fbb4902f531ec6a95d7c"],
+          "children": []
+        },
+        {
+          "taskId": "latex-1781101830534",
+          "type": "latex",
+          "question": {
+            "DE": "DE Property Task via LaTeX-Task (workaround).",
+            "EN": "EN Property task via LaTeX task (workaround)."
+          },
+          "questionLatex": {
+            "DE": "\\propertystart{3}{1}\n\\propertyheader{aawgh}{reh}{congue}{sapien}{sollicitudin nulla}{}\n\\propertyline{trjfqe}{consectetur}{w}{f}{w}{}\n\\propertyline{fwerh}{id}{w}{f}{f}{}\n\\propertyline{tejrzj}{pharetra}{w}{f}{f}{}\n\\propertyend",
+            "EN": ""
+          },
+          "points": 3,
+          "tags": [],
+          "tagIds": [],
+          "createdBy": "test",
+          "createdAt": "2026-06-10T14:30:30.534Z",
+          "lastUsed": "2026-06-10T14:30:30.534Z",
+          "usedIn": ["69f9fbb4902f531ec6a95d7c"],
+          "children": []
+        }
+      ]
+    }
+  ],
+  "lastEditedBy": "test",
+  "updatedAt": "2026-06-10T12:14:03.798Z"
+}
