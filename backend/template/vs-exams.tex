@@ -1,49 +1,16 @@
-\RequirePackage{scrlfile}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % - vs-exams.tex -
 %
 % LaTeX-Vorlage zur Verwendung als Vorlage für Klausuren
 %
+% Version 2.0 vom 11. Juni 2026, Oskar Carl (Neubau für exam-toolbox)
 % Version 0.9 vom 5. Februar 2010, Matthäus Wander (Booktabs hinzugefügt, Komascript-Dings auskommentiert)
 % Version 0.8 vom 11.Februar 2009, Arno Wacker
 % basierend auf v1.4 von Jörg Schwerdtfeger
 % http://www.joerg-schwerdtfeger.de/
-%
-% Verwendung:
-% Für jede Klausur eine neue Datei anlegen (z. B. mcs-ws0809.tex)
-% die so aufgebaut ist:
-% -----------------------------------------------------------------------
-%\newcommand{\veranstaltung}{Microcomputer Systems / Datenverarbeitung I}
-%\newcommand{\semester}{WS 2008/09}
-%\newcommand{\pruefer}{Prof.\ T.\ Weis, Dr.\ A. Wacker}
-%\newcommand{\datum}{17.02.2009}
-%\newcommand{\sprache}{en} % set to de/en, defaults to de
-%\newcommand{\zeigeloesung}{yes} % set to yes/no, no: leere zeilen werden gedruckt, yes, die lösung wird gedruckt
-%
-%
-%\input{vs-exams.tex}
-%
-%\begin{document}
-%
-%% prints the cover sheet in the right language
-%\printcover
-%
-%\aufgabe{Atmel ATMega 128 Assembler}{5}
-%blah blah
-%
-%
-%\aufgabenteil{2}
-%What is the purpose of this code segment?
-%
-%\loesung{4}{
-%Dieser Code initialisiert den Stackpointer. Dabei wird 0x160 = 352 in das Registerpaar SPL/SPH geschrieben. Da die unteren 0x60 Register für interne Zwecke verwendet werden, muss 0x60 noch abgezogen werden. D.h. 0x160 - 0x60 = 352 - 96 = 256 Byte
-%}
-% ...
-% -----------------------------------------------------------------------
-%
-% Diese Übungsdatei dann z. B. mit TeXnicCenter direkt in PDF übersetzen lassen.
-% (die hier vorliegende vs-exams.tex muss sich im selben Verzeichnis befinden)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\RequirePackage{scrlfile}
 \documentclass[DIV=0,a4paper,12pt,titlepage,fleqn]{scrartcl}
 
 \ifdefined\XeTeXversion
@@ -59,7 +26,8 @@
 	\usepackage[utf8]{inputenc}
 \fi
 
-%\reserveinsert{28}
+%------ Core packages -------------------------------------------------------
+\usepackage{scrlayer-scrpage}
 \usepackage[pdfauthor={\pruefer},
             pdftitle={Klausur \veranstaltung\ im \semester},
             pdfsubject={Klausur zu \veranstaltung\ im \semester\ am \datum},
@@ -73,98 +41,30 @@
             hidelinks]{hyperref}
 \hypersetup{colorlinks=false}
 \usepackage{color}
-\usepackage{pdfcolmk}
 \usepackage{graphicx}
 \usepackage{pdfpages}
-\usepackage{qrcode}
-\usepackage{makebarcode}
-\usepackage{csquotes}
-\usepackage{xstring}
-\usepackage{tabularx}
-
-\newcounter{mycounter}
-
-\setlength{\parskip}{0ex} % Abstand zwischen Absaetzen
-
-{\catcode`\ =12\relax\gdef\viktorotherspace{ }}%
-\def\vcodes{%
-  \catcode`\ =12\relax
-}%
-
-\def\setescape{%
-  \let\ =\viktorotherspace%
-}
-
-\def\escapedStringTypeout#1{\escapeStringSec{#1}}%
-\newcommand\escapeStringSec[1]{%
-  \begingroup%
-    \bgroup\vcodes\setescape\typeout{#1}\egroup
-  \endgroup
-}%
-
-% Ausgabe der Ecken um Aufgaben
-\newdimen\DimX \newdimen\DimY
-\usepackage{xcolor,zref-savepos}
-\makeatletter
-\newcommand\printPos[1]{% IMPORTANT: end every line with a comment! otherwise spaces might leak!
-\zsavepos{pos#1\thesection\thesubsection\thepage}%
-\DimX=\zposx{pos#1\thesection\thesubsection\thepage}sp\relax \DimX=0.03515\DimX%
-\DimY=\zposy{pos#1\thesection\thesubsection\thepage}sp\relax \DimY=0.03515\DimY%
-\escapedStringTypeout{VSEXAM: {'Typ':'#1', 'X': '\strip@pt\DimX', 'Y':'\strip@pt\DimY'}}%
-}
-%\DimX=\textwidth\relax%
-\DimX=0.03515\hsize%
-\escapedStringTypeout{VSEXAM: {'Typ':'pageGeo', 'hsize': '\strip@pt\DimX'}}%
-\makeatother
-
-\usepackage{amsmath,amssymb,amsfonts,bbm}
-\usepackage{amsthm}   % AMS-Theoremumgebung
-\usepackage{stmaryrd}	% Symbole, u. A. \lightning
-%\usepackage{fancybox}[2000/09/19]  % für hübsche Rahmen, usage: \shadowbox{}
-%\usepackage{secnum}  % Abbildungs- und Tabellennummern nach section
-%\usepackage[small,bf,hang]{caption}[2003/12/20] % Abbildungs- und Tabellenunterschriften anpassen
-% \usepackage{lastpage}
-\usepackage{flafter}  % Abb. und Tabellen nie vor dem ersten Verweis im Text plazieren!
-\usepackage{footnpag} % Fußnotenzähler auf jeder Seite bei 1 beginnen
-\usepackage[normalem]{ulem} % Für div. Unterstreichungen, (\uline,\sout,\uwave)
-\usepackage{cancel}   % zum Kürzen in Brüchen
-\usepackage{hhline}   % verhindert unerwünschte Überdeckungen von Tabellenlinien
-\usepackage{colortbl}
-\usepackage{path}
-\usepackage{epic}
-\usepackage{scrlayer-scrpage}
+\usepackage{latexsym}
 \usepackage{textcomp}
-\usepackage{units}
-\usepackage{sistyle} % für physikalische Einheiten z. B. \SI{1000}{m/s^2}
-\usepackage{mathcomp}
-%\usepackage{floatflt}
-\usepackage{subcaption}
-\usepackage{icomma}
 \usepackage{titlesec}
-\usepackage{forloop}
-\usepackage{listings}
 \usepackage{ifthen}
+\usepackage[normalem]{ulem} % Für div. Unterstreichungen, (\uline,\sout,\uwave)
+\usepackage{hhline}   % verhindert unerwünschte Überdeckungen von Tabellenlinien
 
-% (CB)
-\usepackage{tikz}       % Karrierte Schmierblätter zeichnen
-\usetikzlibrary{backgrounds}
-\usepackage{totcount}   % Counter für Punkte-Tabellen
-\usepackage{calc}       % Berechnungen Counter
-\usepackage{calculator} % Berechnungen Anzeige
-\usepackage{lastpage}   % Schmierblätter Seitenberechnung
-\usepackage{rotating}
-
-% theo
-\usepackage{booktabs}
+%-------- Tables -------------------------------------------------------------
+\usepackage{tabularx}
+\usepackage{colortbl}
 \usepackage{multirow}
-\usepackage{longtable}
+\usepackage{booktabs}
 \def\blacktoprule{\arrayrulecolor{lightgray1}\toprule}
 \def\blackbottomrule{\arrayrulecolor{lightgray1}\bottomrule}
-\usepackage{latexsym}
-\usepackage{boolexpr}
 
-% Fix for new PDF Versions (MK)
-% \pdfminorversion=6
+
+\usepackage{listings}
+
+% Drawing and moving
+\usepackage{tikz}       % Karrierte Schmierblätter zeichnen
+\usetikzlibrary{backgrounds}
+\usepackage{rotating}
 
 % let's define some colors
 \definecolor{lightgray1}{gray}{.85}
@@ -176,9 +76,8 @@
 \setlength{\fboxrule}{1pt}
 \hypersetup{pdflinkmargin=-0.5pt}
 
-\newcommand{\myarrow}[1][0.1pt]{\tikz[baseline=-0.26em,y=3em, x=3em]{\filldraw[line width=#1] (0.4202,0.0021) .. controls (0.4202,-0.0000) and (0.4188,-0.0018) .. (0.4171,-0.0025) .. controls (0.3917,-0.0092) and (0.3699,-0.0236) .. (0.3509,-0.0401) .. controls (0.3355,-0.0538) and (0.3225,-0.0704) .. (0.3130,-0.0890) .. controls (0.3119,-0.0915) and (0.3094,-0.0929) .. (0.3066,-0.0929) .. controls (0.3028,-0.0929) and (0.2996,-0.0897) .. (0.2996,-0.0858) .. controls (0.2996,-0.0848) and (0.3000,-0.0837) .. (0.3003,-0.0827) .. controls (0.3087,-0.0665) and (0.3193,-0.0517) .. (0.3316,-0.0391) -- (0.1181,-0.0391) .. controls (0.1143,-0.0391) and (0.1111,-0.0359) .. (0.1111,-0.0320) .. controls (0.1111,-0.0282) and (0.1143,-0.0250) .. (0.1181,-0.0250) -- (0.3471,-0.0250) .. controls (0.3611,-0.0137) and (0.3766,-0.0046) .. (0.3935,0.0021) .. controls (0.3766,0.0088) and (0.3611,0.0179) .. (0.3471,0.0292) -- (0.1181,0.0292) .. controls (0.1143,0.0292) and (0.1111,0.0323) .. (0.1111,0.0362) .. controls (0.1111,0.0401) and (0.1143,0.0432) .. (0.1181,0.0432) -- (0.3316,0.0432) .. controls (0.3193,0.0559) and (0.3087,0.0707) .. (0.3003,0.0868) .. controls (0.3000,0.0879) and (0.2996,0.0889) .. (0.2996,0.0900) .. controls (0.2996,0.0939) and (0.3028,0.0970) .. (0.3066,0.0970) .. controls (0.3094,0.0970) and (0.3119,0.0956) .. (0.3130,0.0932) .. controls (0.3225,0.0745) and (0.3355,0.0580) .. (0.3509,0.0443) .. controls (0.3699,0.0278) and (0.3917,0.0133) .. (0.4171,0.0067) .. controls (0.4188,0.0059) and (0.4202,0.0042) .. (0.4202,0.0021) -- cycle;}}
-\newcommand{\declerationbox}{{
-  \CheckBox[name=\themycounter, bordercolor=0 0 0, height=13pt, width=18pt, color=black, checkboxsymbol=\ding{56}]{}}\stepcounter{mycounter}}
+
+
 \newcommand{\emptyb}{\fbox{\phantom{x}}}
 \newcommand{\tickedbox}{\fbox{\textbf{x}}}
 
@@ -201,69 +100,6 @@
 %----- Backgrounds -----------------------------------------
 \input{meta/background.tex}
 
-%----- Page Border Factor ----------------------------------
-\newcommand{\pageBorderFactor}{0.9235}
-\typeout{VSEXAM: {'Typ':'borderGeo', 'borderFactor': '\pageBorderFactor'}}%
-
-%----- (CB) Schmierblätter ---------------------------------------
-
-\newcounter{sb}
-\newcommand{\schmierblaetter}
-{
- % Nicht in der Musterlösung anzeigen
- \ifthenelse{\equal{\zeigeloesung}{no}}
- {
- \ifthenelse{\equal{\schmierblaetteranzahl}{0}}
-  {}
-  {
-	\ADD{\schmierblaetteranzahl}{\thelastpageexam}{\ergX}
-	\ADD{\ergX}{1}{\ergA} % 1 Seite für do-not-touch einbeziehen
-	\MODULO{\ergA}{2}{\ergB}
-  \ADD{\schmierblaetteranzahl}{\ergB}{\ergC}
-  \forloop{sb}{0}{\value{sb} < \ergC}
-  {
-    %\begin{tikzpicture}
-    %   \draw[color=white] (-0.05cm,0cm) -- (0cm,0cm);
-    %   \draw[style=help lines, ystep=5mm, xstep=5mm] (0cm,0cm) grid (17cm,22cm);
-    %\end{tikzpicture}
-    %\total{lastpageexam}
-    {\large\bfseries\textsf {\ifthenelse{\equal{\sprache}{en}}{Space for personal notes}{Konzeptpapier}}\\[2mm]}
-    \begin{tikzpicture}
-        \draw[color=white] (-0.05cm,0cm) -- (0cm,0cm);
-        \draw[style=help lines, ystep=5mm, xstep=5mm] (0cm,0cm) grid (17cm,21.5cm);
-    \end{tikzpicture}
-
-    \clearpage
-  }
-  }
- }
- {}
-}
-
-%------ (CB) Do-Not-Touch Seite ----------
-
-\newcommand{\donottouchpage}{
- % Nicht in der Musterlösung anzeigen
- \ifthenelse{\equal{\zeigeloesung}{no}}
- {
-  \chead{}
-  \vspace{2cm}
-  \begin{center}
-    \textbf{\LARGE\donottouch}
-  \end{center}
-  \vspace{2cm}
-  \ifthenelse{\equal{\vollername}{}}{%Wenn Kein Name angegeben
-    % Keine weiteren Informationen ausgeben
-  }{%
-    \begin{center}
-      \begin{tabular}{rl}
-        {\Large \seqnr:} & {\Large\textbf{\ifthenelse{\equal{\sequenznummer}{}}{\SequenznummerFehlt}{\sequenznummer}}} \\[1em]
-        {\Large Name:} & {\Large\textbf{\vollername}} \\[1em]
-        {\Large \mtr:} & {\Large\textbf{\ifthenelse{\equal{\matrikelnummer}{}}{\MatrikelnummerFehlt}{\matrikelnummer}}}
-      \end{tabular}
-    \end{center}
-  }
-}{}}
 
 %------ (CB) Added TODO command from papers/proposals --------
 
@@ -274,7 +110,6 @@
 \newcommand{\todo}[1]{\textcolor{red}{$| ^{\thetodocounter}$}\marginpar{\scriptsize\textcolor{red}{\thetodocounter:} #1}\stepcounter{todocounter}}
 % um kommentare auszublenden
 %\renewcommand{\todo}[1]{}
-\usepackage{color}
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 
 \newcommand{\removebs}[1]{\if#1\@backslashchar\else#1\fi}
@@ -282,140 +117,9 @@
 %----- Header + Footer ---------------------------------------
 \input{meta/header-footer.tex}
 
-%----- Definition für Aufgabe ---------------------------------------
-% (CB) Added counter for points
-% (CB) Reworked for Multilanguage in one .tex
-\newcommand{\aufgabe}[2]{
- \clearpage
- \ifhmode\par\fi
- \removelastskip
- \vskip 3ex\goodbreak
- %\noindent
- \refstepcounter{section} % manually increment the chapter number
-% manually add the chapter to the table of contents
- \addcontentsline{toc}{section}{\protect\numberline{\thesection}#1}
-% and now format the header according to spec.
-\arrayrulecolor{lightgray2}
-\setlength{\arrayrulewidth}{1pt}
-%\vspace{10pt}
-\begingroup
-\begin{tabular}{|p{0.87\textwidth}p{0.13\textwidth}}
-\hline
-\vspace{0.1pt}
-\stepcounter{numberofassignments}
-\addtocounter{exampoints}{\totvalue{pointsforassignment\thesection}}%
-{\large\bfseries\textsf \afg\ \thesection\ - \normalfont\itshape{\textsf{\ifthenelse{\equal{\sprache}{de}}{#1}{#2}}}} & \vspace{0.1pt}\hspace{-7pt}\textsf{
-\ifthenelse{\totvalue{pointsforassignment\thesection} > 0}
-{[\DIVIDE{\totvalue{pointsforassignment\thesection}}{\anpassung}{\div} \div\ \pts \escapedStringTypeout{VSEXAM: {'Typ':'AufgabeStart', 'Punkte': \div, 'Seite':'\thepage'}}]}
-{\hspace{-0.5cm} \textcolor{red}{\textbf{RECOMPILE}}}
-}\\
-\end{tabular}
-\quad
-\par
-\endgroup
-\nobreak
-\vskip 2ex
-}
-
-
-%----- Definition für Teilaufgabe ---------------------------------------
-%\titleformat{hcommandi}[hshapei]{hformati}{hlabeli}{hsepi}{hbeforei}[hafteri]
+%----- Config for subsections --------------------------------
 \titleformat{\subsection}[runin]{\normalsize\bfseries}{\thesubsection.)}{0.1em}{}
 \renewcommand{\thesubsection}{\alph{subsection}}
-
-\def\IsInAufgabe{false}
-
-\newcommand{\aufgabenteil}[3]
-{
-%\vspace{0.3cm}
-\noindent
-\begin{minipage}{\textwidth}
-\ifthenelse{\equal{\IsInAufgabe}{false}}{}{\LaufendeAufgabeNichtGeschlossen}
-\def\IsInAufgabe{true}
-\setcounter{pointsforassignment\thesection}{\value{pointsforassignment\thesection}+\anpassung*\real{#1}}
-\escapedStringTypeout{VSEXAM: {'Typ':'AufgabenTeil', 'Punkte': '#1', 'Seite':'\thepage'}}
-\begin{tikzpicture}%
-\draw (0,-0.1) -- (0,0) -- (0.1,0);\printPos{edgeStart}%
-\end{tikzpicture}%
-\vspace{-0.7cm}
-\subsection{[#1P]}\ifthenelse{\equal{\sprache}{de}}{#2}{#3}
-}
-
-\newcommand{\aufgabenteilende}
-{
-\ifthenelse{\equal{\IsInAufgabe}{true}}{}{\AufgabeEndeOhneLaufendeAufgabe}
-\def\IsInAufgabe{false}
-%TODO: this fails if no newline before \aufgabenteilende is present
-\hspace{\textwidth}%
-\begin{tikzpicture}%
-\draw (-0.1,0) -- (0,0) -- (0,0.1);\printPos{edgeEnd}%
-\end{tikzpicture}%
-\end{minipage}
-\vspace{\parskip}
-\vspace{0.1cm}
-}
-
-%----- Definition für Lösungen ---------------------------------------
-% 2 Argumente: Anzahl zeilen, Lösung
-\newcounter{ct}
-\newcommand{\loesung}[2]
-{  \escapedStringTypeout{VSEXAM: {'Typ':'Freitext', 'Zeilen': '#1', 'Loesung': ''}}
- \ifthenelse{\equal{\zeigeloesung}{yes}}
- { % print solution
- {\color{red}\normalfont\itshape #2}
- }{ % print as many lines as requested
-  \ifthenelse{\equal{#1}{0} }
-  {}
-  {
-    \ifthenelse{\equal{#1}{0} }
-    {}
-    {
-    \vspace{1em}
-    \hrulefill
-    \vspace{1.0em}
-    \newline
-    \forloop{ct}{1}{\value{ct} < #1}
-    {
-    \vspace{1.0em}
-    \rule{\linewidth}{0.2mm}
-    \newline
-    }
-    }
-    \vspace{-0.8cm}
-  }
- }
-}
-
-% (CB) zus. Lösungs-Command für Einzeiler, z.B. in Tabellen
-\newcommand{\lineloesung}[2]{%
-  \escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
-  \ifthenelse{\equal{\zeigeloesung}{yes}}%
-  {%
-    % yes
-    {\color{red}\normalfont\itshape #2}%
-  }%
-  {%
-    % no
-    #1
-  }%
-}%
-
-
-\newcommand{\hidden}[1]
-{
- \ifthenelse{\equal{\zeigeloesung}{yes}}
-
- { % print solution
-    {\color{red}\normalfont\itshape #1}
- }{ % print as many lines as requested
-    \underline{\color{white} #1}
- }
-}
-
-%\ifthenelse{\equal{\zeigeloesung}{yes}}
-%{ % print solution
-% \pagecolor{lightred}
-%}
 
 %----- Mathetypische Aufzählungen ---------------------------------------
 %\renewcommand{\labelenumi}{\normalfont\itshape(\theenumi)}
@@ -423,9 +127,6 @@
 %\renewcommand{\labelenumii}{(\theenumii)}
 %\renewcommand{\theenumii}{\alph{enumii}}
 %------------------------------------------------------------------------
-
-%----- Technical symbols ------------------------------------------------
-\include{meta/symbols.tex}
 
 %----- Bild- und Tabellenunterschriften ---------------------------------
 %\renewcommand{\figurename}{Abbildung}
@@ -494,188 +195,16 @@
 }%
 %------------------------------------------------------------------------
 
+%------ Functions for logging of data for scanning ----------------------
+\input{meta/logging.tex}
 
-%----- commands for multiple/single choice tables
+\ifthenelse{\equal{\hasCustomLatexTask}{yes}}{
+%----- Technical symbols ------------------------------------------------
+\include{meta/symbols.tex}
+\typeout{(vs-exams.tex) Including symbols.tex}
+}{}
 
-% Optionaler Parameter: Punkte pro richtigem Kreuz
-% 1. Parameter: Anzahl korrekter Antworten
-\newcommand{\mcstart}[2][1,5]{
-\escapedStringTypeout{VSEXAM: {'Typ':'MCStart', 'PunkteKorrekt': '#1', 'AnzahlKorrekt':'#2'}}
-\begin{longtable}{cp{14.5cm}}
-\blacktoprule
-\switch[#2]
-\case{=1}\multicolumn{2}{p{13.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Single Response: Für die korrekt markierte Aussage erhalten Sie \mcpoints{#1}.}
-  {Single response: You get \mcpoints{#1} for marking the correct statement.}
-} \\
-\case{=2}\multicolumn{2}{p{14.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Multiple Response: Es gibt \textbf{zwei} richtige Aussagen. Sie erhalten \mcpoints{#1} für jede markierte korrekte Aussage, jedoch \mcpoints{0} für die Teilaufgabe, falls eine falsche Aussage markiert wurde.}
-  {Multiple response: There are \textbf{two} correct statements. You get \mcpoints{#1} for each correct statement, but \mcpoints{0} for the question if you mark a wrong statement.}
-} \\
-\case{=3}\multicolumn{2}{p{14.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Multiple Response: Es gibt \textbf{drei} richtige Aussagen. Sie erhalten \mcpoints{#1} für jede markierte korrekte Aussage, jedoch \mcpoints{0} für die Teilaufgabe, falls eine falsche Aussage markiert wurde.}
-  {Multiple response: There are \textbf{three} correct statements. You get \mcpoints{#1} for each correct statement, but \mcpoints{0} for the question if you mark a wrong statement.}
-} \\
-\endswitch
-}
-
-\newcommand{\mcpoints}[1]{\ifthenelse{\equal{\sprache}{de}}{\ifthenelse{\equal{#1}{1}}{1 Punkt}{#1 Punkte}}{\ifthenelse{\equal{#1}{1}}{1 point}{#1 points}}}
-
-\newcommand{\mcend}[0]{
-\blackbottomrule
-\end{longtable}
-}
-
-% 1.+2. Parameter: DT+EN Frage, 3. Parameter w wenn wahr oder f wenn falsch
-\newcommand{\mcline}[3]{
-\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLine', 'Antwort': '#3'}}
-\ifthenelse{\equal{\zeigeloesung}{yes}}
-{\ifthenelse{\equal{#3}{f}}{\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\}{\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\}}
-{\emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\}
-}
-
-% Optionaler Parameter: Punkte pro richtigem Kreuz
-% 1. Parameter: Anzahl korrekter Antworten
-\newcommand{\mcstarttwo}[2][1,5]{
-\begin{longtable}{cp{6.75cm}cp{6.75cm}}
-\blacktoprule
-\switch[#2]
-\case{=1}\multicolumn{4}{p{14.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Single Response: Für die korrekt markierte Aussage erhalten Sie \mcpoints{#1}.}
-  {Single response: You get \mcpoints{#1} for marking the correct statement.}
-} \\
-\case{=2}\multicolumn{4}{p{14.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Multiple Response: Es gibt \textbf{zwei} richtige Aussagen. Sie erhalten \mcpoints{#1} für jede markierte korrekte Aussage, jedoch \mcpoints{0} für die Teilaufgabe, falls eine falsche Aussage markiert wurde.}
-  {Multiple response: There are \textbf{two} correct statements. You get \mcpoints{#1} for each correct statement, but \mcpoints{0} for the question if you mark a wrong statement.}
-} \\
-\endswitch
-}
-
-\newcommand{\mcendtwo}[0]{
-\blackbottomrule
-\end{longtable}
-}
-
-% 1.+2. Parameter: DT+EN 1. Frage, 3. Parameter w wenn wahr oder f wenn falsch
-% 4.+5. Parameter: DT+EN 2. Frage, 6. Parameter w wenn wahr oder f wenn falsch
-\newcommand{\mclinetwo}[6]{
-\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLineTwo', 'Antwort1': '#3', 'Antwort2': '#6'}}
-\ifthenelse{\equal{\zeigeloesung}{yes}}
-{\ifthenelse{\equal{#3}{f}}{\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} &}{\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} &}
-\ifthenelse{\equal{#6}{f}}{\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\}{\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\}}
-{\emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} & \emptyb & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\ }
-}
-
-\newcommand{\note}{\ifthenelse{\equal{\sprache}{de}}{Note}{Grade}}
-
-
-% (CB) Support for Property questions (NYI)
-
-\newcommand{\actualboxes}{0}
-
-% Parameter 1: Anzahl von Kästen, 2. Punkte pro row
-\newcommand{\propertystart}[2]{
-\renewcommand{\actualboxes}{#1}
-\switch[#1]
-\case{=2}
-\begin{longtable}{ccp{10.5cm}}
-\blacktoprule
-\multicolumn{3}{p{15.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Für jede richtige Zeile gibt es \mcpoints{#2}. Für falsche Zeilen gibt es keine Negativpunkte.}
-  {You get \mcpoints{#2} for each correct row. You don't get negative points for wrong rows.}
-} \\
-\case{=3}
-\begin{longtable}{cccp{9cm}}
-\blacktoprule
-\multicolumn{4}{p{15.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Für jede richtige Zeile gibt es \mcpoints{#2}. Für falsche Zeilen gibt es keine Negativpunkte.}
-  {You get \mcpoints{#2} for each correct row. You don't get negative points for wrong rows.}
-} \\
-\case{=4}
-\begin{longtable}{ccccp{8.5cm}}
-\blacktoprule
-\multicolumn{5}{p{15.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Für jede richtige Zeile gibt es \mcpoints{#2}. Für falsche Zeilen gibt es keine Negativpunkte.}
-  {You get \mcpoints{#2} for each correct row. You don't get negative points for wrong rows.}
-} \\
-\endswitch
-}
-
-\newcommand{\propertyheader}[6]{
-\switch[\number\actualboxes]
-\case{=2}
-#3 & #4 & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-\case{=3}
-#3 & #4 & #5 & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-\case{=4}
-#3 & #4 & #5 & #6 & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-\endswitch
-}
-
-\newcommand{\propertyline}[6]{
-\addlinespace
-\switch[\number\actualboxes]
-\case{=2} \escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': '#3', 'Antwort2': '#4'}}
-\ifthenelse{\equal{\zeigeloesung}{yes}}{
-\ifthenelse{\equal{#3}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{#4}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-}{
-\emptyb & \emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-}
-\case{=3} \escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': '#3', 'Antwort2': '#4', 'Antwort3': '#5'}}
-\ifthenelse{\equal{\zeigeloesung}{yes}}{
-\ifthenelse{\equal{#3}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{#4}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{#5}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-}{
-\emptyb & \emptyb & \emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-}
-\case{=4} \escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': '#3', 'Antwort2': '#4', 'Antwort3': '#5', 'Antwort4': '#6'}}
-\ifthenelse{\equal{\zeigeloesung}{yes}}{
-\ifthenelse{\equal{#3}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{#4}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{#5}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{#6}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-}{
-\emptyb & \emptyb & \emptyb & \emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-}
-\endswitch
-}
-
-\newcommand{\propertyend}[0]{
-\blackbottomrule
-\end{longtable}
-\renewcommand{\actualboxes}{0}
-}
-
-\newcommand{\manualText}[2]{
-\ifthenelse{\equal{\sprache}{de}}{#1}{#2}
-}
-
-\newcommand{\bildAufgabe}[4]{\escapedStringTypeout{VSEXAM: {'Typ':'BildAufgabe', 'Bildtext': '', 'Loesungsbild': ''}}\ifthenelse{\equal{\zeigeloesung}{no}}{
-%\begin{figure}[h]
-%\centering
-\includegraphics[width=#2]{#3}
-\centerline{\textit{#1}}
-%\end{figure}
-}{
-%\begin{figure}[h]
-%\centering
-\includegraphics[width=#2]{#4}
-\centerline{\textit{#1}}
-%\end{figure}
-}}
-
+%------ Commands for latex task type
+\input{meta/commands.tex}
 
 \endinput

@@ -11,14 +11,13 @@
 \newcommand{\qrcachepath}{<#~ it.qrCachePath #>}
 \newcommand{\pageCount}{<#~ it.pageCount #>}
 \newcommand{\schmierblaetteranzahl}{<#~ it.schmierblaetteranzahl #>}
+\newcommand{\hasCustomLatexTask}{<#~ it.hasCustomLatexTask ? "yes" : "no" #>}
 
 % Include the variables for the individual exam
 \input{student.tex}
 
 % Setup
 \include{vs-exams.tex}
-% (CB) Counter-Anpassung für ungerade Zahlen: 2 für .5er Schritte, 4 für 0.25er Schritte
-\COPY{4}{\anpassung}
 
 \graphicspath{{img/}}
 

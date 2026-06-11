@@ -21,6 +21,7 @@ type ExamMetaTemplateData = {
   points: number;
   pageCount: number;
   qrCachePath: string;
+  hasCustomLatexTask: boolean;
 };
 
 type IndividualMetaTemplateData = {
@@ -43,6 +44,7 @@ const DEFAULT_EXAM_META: ExamMetaTemplateData = {
   points: 42,
   pageCount: 4,
   qrCachePath: QR_CACHE_PATH,
+  hasCustomLatexTask: false,
 };
 
 const DEFAULT_INDIVIDUAL_META: IndividualMetaTemplateData = {
@@ -156,6 +158,9 @@ export async function renderMetaExam(
     pageCount: exam.pageCount!,
     schmierblaetteranzahl: exam.conceptPages!,
     qrCachePath: QR_CACHE_PATH,
+    hasCustomLatexTask: exam.tasks.some((t) =>
+      t.tasks.some((t) => t.type === "latex")
+    ),
   };
 
   const metaOutputPath = `${workingDir}/exam.tex`;
