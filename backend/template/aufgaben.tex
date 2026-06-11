@@ -396,12 +396,35 @@ Physical%
 \subsection{[3P]}%
 \ifthenelse{\equal{\sprache}{de}}{DE Property Task via LaTeX-Task (workaround).}{EN Property task via LaTeX task (workaround).}
 
-\propertystart{3}{1}
-\propertyheader{aawgh}{reh}{congue}{sapien}{sollicitudin nulla}{}
-\propertyline{trjfqe}{consectetur}{w}{f}{w}{}
-\propertyline{fwerh}{id}{w}{f}{f}{}
-\propertyline{tejrzj}{pharetra}{w}{f}{f}{}
-\propertyend
+\begin{tabularx}{\textwidth}{ccX}
+\blacktoprule
+
+\multicolumn{3}{p{\textwidth}}{
+\ifthenelse{\equal{\sprache}{de}}
+{Für jede richtige Zeile gibt es 1 Punkt(e). Für falsche Zeilen gibt es keine Negativpunkte.}
+{You get 1 point(s) for each correct row. You don't get negative points for wrong rows.}
+} \\
+
+\addlinespace
+
+\ifthenelse{\equal{\sprache}{de}}{Opt A}{Opt A} &
+\ifthenelse{\equal{\sprache}{de}}{Opt B}{Opt B} &
+\ifthenelse{\equal{\sprache}{de}}{Aussage}{Statement} \\
+
+\addlinespace
+\escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': 'w', 'Antwort2': 'f'}}
+{\color{red} $\tickedbox$} & {\color{red} \emptyb} & \ifthenelse{\equal{\sprache}{de}}{Aussage 1}{Statement 1} \\
+
+\addlinespace
+\escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': 'f', 'Antwort2': 'w'}}
+{\color{red} \emptyb} & {\color{red} $\tickedbox$} & \ifthenelse{\equal{\sprache}{de}}{Aussage 2}{Statement 2} \\
+
+\addlinespace
+\escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': 'w', 'Antwort2': 'w'}}
+{\color{red} $\tickedbox$} & {\color{red} $\tickedbox$} & \ifthenelse{\equal{\sprache}{de}}{Aussage 3}{Statement 3} \\
+
+\blackbottomrule
+\end{tabularx}
 
 
 \hspace{\textwidth}%

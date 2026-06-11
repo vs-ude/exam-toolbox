@@ -1,0 +1,40 @@
+
+\begin{tabularx}{\textwidth}{<#~ 'c'.repeat(it.columns) #>X}
+\blacktoprule
+
+\multicolumn{<#~ it.columns + 1 #>}{p{\textwidth}}{
+\ifthenelse{\equal{\sprache}{de}}
+{Für jede richtige Zeile gibt es <#~ it.pointsPerCorrect #> Punkt(e). Für falsche Zeilen gibt es keine Negativpunkte.}
+{You get <#~ it.pointsPerCorrect #> point(s) for each correct row. You don't get negative points for wrong rows.}
+} \\
+
+<# for (let i = 0; i < it.header.length - 1; i++) { #>
+\ifthenelse{\equal{\sprache}{de}}{<#~ it.header[i].DE #>}{<#~ it.header[i].EN #>} &
+<# } #>
+\ifthenelse{\equal{\sprache}{de}}{<#~ it.header[it.header.length - 1].DE #>}{<#~ it.header[it.header.length - 1].EN #>} \\
+
+<#- for (let i = 0; i < it.lines.length; i++) { /* for lines */ -#>
+<# const line = it.lines[i] -#>
+
+\addlinespace
+\escapedStringTypeout{VSEXAM: {'Typ':'PropLine'
+<#- for (let j = 0; j < line.options.length; j++) { /* for options */ -#>
+, 'Antwort<#~ j + 1 #>': '<#~ line.options[j] ? "w" : "f" #>'
+<#- } /* end for options */ -#>
+}}
+
+<#- if (it.solution) { -#>
+
+<#- line.options.forEach((option) => { /* for options 2 */ -#>
+<#~ option ? "{\\color{red} $\\tickedbox$} & " : "{\\color{red} \\emptyb} & " -#>
+<#- }) /* end for options 2 */ -#>
+
+<#- } else { #>
+<#~ '\\emptyb & '.repeat(line.options.length) #>
+<# } -#>
+\ifthenelse{\equal{\sprache}{de}}{<#~ line.text.DE #>}{<#~ line.text.EN #>} \\
+
+<#- } /* end for lines */ #>
+
+\blackbottomrule
+\end{tabularx}

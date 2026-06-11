@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import type { PictureTask, TableTask } from "../types/exam.ts";
+import type { PictureTask, PropertyTask, TableTask } from "../types/exam.ts";
 
 Deno.env.set("TEMPLATE_BASE_PATH", "./template");
 
@@ -256,4 +256,115 @@ QE21%
 `;
 
   assertEquals(renderedQuestion, expectedQuestion);
+});
+
+const propertyTask: PropertyTask = {
+  taskId: "task-prop-1",
+  type: "property",
+  question: {
+    DE: "Welche Eigenschaften treffen zu?",
+    EN: "Which properties apply?",
+  },
+  points: 6,
+  tagIds: [],
+  tags: [],
+  createdBy: "user",
+  createdAt: new Date(),
+  lastUsed: new Date(),
+  usedIn: [],
+  children: [],
+  header: [
+    { DE: "Opt A", EN: "Opt A" },
+    { DE: "Opt B", EN: "Opt B" },
+    { DE: "Aussage", EN: "Statement" },
+  ],
+  lines: [
+    { options: [true, false], text: { DE: "Aussage 1", EN: "Statement 1" } },
+    { options: [false, true], text: { DE: "Aussage 2", EN: "Statement 2" } },
+    { options: [true, true], text: { DE: "Aussage 3", EN: "Statement 3" } },
+  ],
+};
+
+Deno.test("TaskRenderer.renderPropertyTask renders property task template for student version", () => {
+  const eta = getEta();
+  const renderer = new TaskRenderer(eta);
+
+  const expected = `
+\\begin{tabularx}{\\textwidth}{ccX}
+\\blacktoprule
+
+\\multicolumn{3}{p{\\textwidth}}{
+\\ifthenelse{\\equal{\\sprache}{de}}
+{Für jede richtige Zeile gibt es 2 Punkt(e). Für falsche Zeilen gibt es keine Negativpunkte.}
+{You get 2 point(s) for each correct row. You don't get negative points for wrong rows.}
+} \\\\
+
+\\ifthenelse{\\equal{\\sprache}{de}}{Opt A}{Opt A} &
+\\ifthenelse{\\equal{\\sprache}{de}}{Opt B}{Opt B} &
+\\ifthenelse{\\equal{\\sprache}{de}}{Aussage}{Statement} \\\\
+
+\\addlinespace
+\\escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': 'w', 'Antwort2': 'f'}}
+\\emptyb & \\emptyb & \\ifthenelse{\\equal{\\sprache}{de}}{Aussage 1}{Statement 1} \\\\
+
+\\addlinespace
+\\escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': 'f', 'Antwort2': 'w'}}
+\\emptyb & \\emptyb & \\ifthenelse{\\equal{\\sprache}{de}}{Aussage 2}{Statement 2} \\\\
+
+\\addlinespace
+\\escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': 'w', 'Antwort2': 'w'}}
+\\emptyb & \\emptyb & \\ifthenelse{\\equal{\\sprache}{de}}{Aussage 3}{Statement 3} \\\\
+
+\\blackbottomrule
+\\end{tabularx}
+`;
+
+  const rendered = renderer.renderPropertyTask(
+    propertyTask,
+    { solution: false, lang: "DE" },
+  );
+
+  assertEquals(rendered, expected);
+});
+
+Deno.test("TaskRenderer.renderPropertyTask renders property task template for solution", () => {
+  const eta = getEta();
+  const renderer = new TaskRenderer(eta);
+
+  const expected = `
+\\begin{tabularx}{\\textwidth}{ccX}
+\\blacktoprule
+
+\\multicolumn{3}{p{\\textwidth}}{
+\\ifthenelse{\\equal{\\sprache}{de}}
+{Für jede richtige Zeile gibt es 2 Punkt(e). Für falsche Zeilen gibt es keine Negativpunkte.}
+{You get 2 point(s) for each correct row. You don't get negative points for wrong rows.}
+} \\\\
+
+\\ifthenelse{\\equal{\\sprache}{de}}{Opt A}{Opt A} &
+\\ifthenelse{\\equal{\\sprache}{de}}{Opt B}{Opt B} &
+\\ifthenelse{\\equal{\\sprache}{de}}{Aussage}{Statement} \\\\
+
+\\addlinespace
+\\escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': 'w', 'Antwort2': 'f'}}
+{\\color{red} $\\tickedbox$} & {\\color{red} \\emptyb} & \\ifthenelse{\\equal{\\sprache}{de}}{Aussage 1}{Statement 1} \\\\
+
+\\addlinespace
+\\escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': 'f', 'Antwort2': 'w'}}
+{\\color{red} \\emptyb} & {\\color{red} $\\tickedbox$} & \\ifthenelse{\\equal{\\sprache}{de}}{Aussage 2}{Statement 2} \\\\
+
+\\addlinespace
+\\escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': 'w', 'Antwort2': 'w'}}
+{\\color{red} $\\tickedbox$} & {\\color{red} $\\tickedbox$} & \\ifthenelse{\\equal{\\sprache}{de}}{Aussage 3}{Statement 3} \\\\
+
+\\blackbottomrule
+\\end{tabularx}
+`;
+
+  const rendered = renderer.renderPropertyTask(
+    propertyTask,
+    { solution: true, lang: "DE" },
+  );
+
+  assertEquals(rendered, expected);
 });

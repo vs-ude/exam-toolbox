@@ -73,6 +73,7 @@ export interface TaskGroup {
 
 export type Task =
   | MultipleChoiceTask
+  | PropertyTask
   | ShortAnswerTask
   | PictureTask
   | LatexTask
@@ -118,6 +119,17 @@ export interface AnswerOptions {
   DE: string;
   EN: string;
   correct: boolean;
+}
+
+export interface PropertyTask extends BaseTask {
+  type: "property";
+  header: Translation[];
+  lines: PropertyLine[];
+}
+
+export interface PropertyLine {
+  options: boolean[];
+  text: Translation;
 }
 
 export interface ShortAnswerTask extends BaseTask {
