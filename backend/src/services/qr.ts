@@ -1,7 +1,9 @@
+import { QRConfig } from "../config/mod.ts";
+
 import { type Exam, type Language } from "../types/exam.ts";
 import { ExamPageQRData, ExamQRData as ExamQRData } from "../types/scan.ts";
-
-const QR_CACHE_LANGUAGES: Language[] = ["DE", "EN"];
+import { getOrCreateDb, QRCacheDocument } from "./db.ts";
+import { parseExamCode } from "./exam_code.ts";
 
 export class QRError extends Error {
   constructor(msg: string, opt?: ErrorOptions) {
@@ -239,34 +241,145 @@ function mapToExamPageScan(map: Record<string, string>): ExamPageQRData {
   );
 }
 
-function qrCachePopulated(cacheDir: string, lastFile: string): boolean {
+export type QRCacheStats = {
+  studentsPerLanguage: number;
+  pagesPerStudent: number;
+};
+
+/**
+ * Scans the QR cache directory and returns how many students per language
+ * and how many pages per student are currently cached.
+ *
+ * Detection strategy:
+ * - `pagesPerStudent`: the highest page number found among `R4ND_N.png` sentinel files.
+ * - `studentsPerLanguage`: non-sentinel `.png` files / (numLanguages * pagesPerStudent).
+ *
+ * Returns zeros when the directory is empty or does not exist.
+ */
+export function getQRCacheStats(cacheDir: string): QRCacheStats {
+  let pagesPerStudent = 0;
+  const studentFilenames: string[] = [];
+
   try {
-    Deno.statSync(`${cacheDir}/${lastFile}`).isFile;
-    return true;
+    for (const entry of Deno.readDirSync(cacheDir)) {
+      if (!entry.isFile || !entry.name.endsWith(".png")) continue;
+
+      if (entry.name.startsWith("R4ND_")) {
+        const pageNum = parseInt(entry.name.slice(5, -4), 10);
+        if (!isNaN(pageNum) && pageNum > pagesPerStudent) {
+          pagesPerStudent = pageNum;
+        }
+      } else {
+        studentFilenames.push(entry.name);
+      }
+    }
   } catch {
-    console.log(
-      `QR cache not populated: ${cacheDir}/${lastFile} does not exist.`,
-    );
-    return false;
+    return { studentsPerLanguage: 0, pagesPerStudent: 0 };
   }
+
+  if (studentFilenames.length === 0 || pagesPerStudent === 0) {
+    return { studentsPerLanguage: 0, pagesPerStudent: 0 };
+  }
+
+  // All student codes are fixed-width base-36 (same character count), so
+  // lexicographic order matches numeric order. The last filename after sorting
+  // therefore contains the highest student counter.
+  studentFilenames.sort();
+
+  for (let i = studentFilenames.length - 1; i >= 0; i--) {
+    const name = studentFilenames[i];
+    const code = name.slice(0, name.indexOf("_"));
+    try {
+      const { counter } = parseExamCode(code);
+      return { studentsPerLanguage: counter, pagesPerStudent };
+    } catch {
+      continue;
+    }
+  }
+
+  return { studentsPerLanguage: 0, pagesPerStudent };
+}
+
+/**
+ * Ensures the QR code cache contains at least `requiredStudentsPerLanguage`
+ * students and `requiredPagesPerStudent` pages. Call this before starting a
+ * mass-generation job.
+ *
+ * The current cache dimensions are read from the filesystem via
+ * {@link getQRCacheStats}. If the cache is already sufficient the function
+ * returns immediately. Otherwise it generates the missing codes and updates
+ * the `qrCacheStats` collection in MongoDB so subsequent calls can short-
+ * circuit without re-scanning the filesystem.
+ *
+ * @param requiredStudentsPerLanguage minimum number of pre-generated student codes per language
+ * @param requiredPagesPerStudent minimum number of pre-generated page codes per student
+ * @param qrCacheCollection the MongoDB collection used to persist cache metadata
+ */
+export async function ensureQRCache(
+  requiredStudentsPerLanguage: number,
+  requiredPagesPerStudent: number,
+): Promise<void> {
+  const current = getQRCacheStats(QRConfig.cachePath);
+
+  if (
+    current.studentsPerLanguage >= requiredStudentsPerLanguage &&
+    current.pagesPerStudent >= requiredPagesPerStudent
+  ) {
+    return;
+  }
+
+  console.log(
+    `QR cache insufficient before generation ` +
+      `(have ${current.studentsPerLanguage} students / ${current.pagesPerStudent} pages, ` +
+      `need ${
+        Math.max(requiredStudentsPerLanguage, current.studentsPerLanguage)
+      } / ${
+        Math.max(requiredPagesPerStudent, current.pagesPerStudent)
+      }. Generating more…`,
+  );
+
+  await preGeneratePageQRCache(
+    requiredStudentsPerLanguage,
+    requiredPagesPerStudent,
+  );
 }
 
 export async function preGeneratePageQRCache(
-  cacheDir: string,
-  studentsPerLanguage = 200,
-  pagesPerStudent = 26,
+  studentsPerLanguage: number,
+  pagesPerStudent: number,
 ): Promise<void> {
-  await Deno.mkdir(cacheDir, { recursive: true });
+  await Deno.mkdir(QRConfig.cachePath, { recursive: true });
+
+  const current = getQRCacheStats(QRConfig.cachePath);
 
   if (
-    qrCachePopulated(
-      cacheDir,
-      `R4ND_${pagesPerStudent}.png`,
-    )
+    current.studentsPerLanguage >= studentsPerLanguage &&
+    current.pagesPerStudent >= pagesPerStudent
   ) {
-    console.log(`QR cache already populated in ${cacheDir}, skipping warmup.`);
+    console.log(
+      `QR cache already sufficient in ${QRConfig.cachePath} ` +
+        `(${current.studentsPerLanguage} students, ${current.pagesPerStudent} pages), skipping warmup.`,
+    );
     return;
   }
+
+  // If we only need more students (page count unchanged), generate incrementally.
+  // If the required page count grew we must regenerate from student 1 so every
+  // existing student also gets the extra page files.
+  const startStudentNumber = current.pagesPerStudent >= pagesPerStudent
+    ? current.studentsPerLanguage + 1
+    : 1;
+
+  const targetStudents = Math.max(
+    studentsPerLanguage,
+    current.studentsPerLanguage,
+  );
+  const targetPages = Math.max(pagesPerStudent, current.pagesPerStudent);
+
+  console.log(
+    `QR cache warmup starting from student ${startStudentNumber} ` +
+      `(target: ${targetStudents} students, ${targetPages} pages).`,
+  );
 
   await new Promise<void>((resolve, reject) => {
     const worker = new Worker(
@@ -279,10 +392,25 @@ export async function preGeneratePageQRCache(
 
       if (data?.status === "success") {
         console.log(
-          `QR cache warmup completed: generated ${data.generatedCount} files in ${cacheDir}.`,
+          `QR cache warmup completed: generated ${data.generatedCount} files in ${QRConfig.cachePath}.`,
         );
         worker.terminate();
-        resolve();
+
+        const updated: QRCacheDocument = {
+          studentsPerLanguage: targetStudents,
+          pagesPerStudent: targetPages,
+          lastUpdated: new Date().toISOString(),
+        };
+
+        getOrCreateDb().then((db) => {
+          db.setQRCache(updated);
+
+          console.log(
+            `QR cache updated and persisted: ${targetStudents} students, ` +
+              `${targetPages} pages.`,
+          );
+          resolve();
+        });
         return;
       }
 
@@ -300,10 +428,10 @@ export async function preGeneratePageQRCache(
     };
 
     worker.postMessage({
-      cacheDir,
-      studentsPerLanguage,
-      pagesPerStudent,
-      languages: QR_CACHE_LANGUAGES,
+      startStudentNumber,
+      studentsPerLanguage: targetStudents,
+      pagesPerStudent: targetPages,
+      languages: ["DE", "EN"],
     });
   });
 }

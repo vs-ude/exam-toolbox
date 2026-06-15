@@ -13,24 +13,8 @@ import {
   generateTasksLatex,
   renderMetaExam,
 } from "./generation.ts";
-
-interface ExamGenerationJob {
-  jobId: string;
-  examId: string;
-  userEmail: string;
-  status: "queued" | "processing" | "finalizing" | "completed" | "failed";
-  progress: {
-    total: number;
-    completed: number;
-    failed: number;
-  };
-  jobDir: string;
-  zipPath?: string;
-  createdAt: Date;
-  studentData: any[];
-  randomNumbers: { de: string; en: string }[];
-  studentResults: any[];
-}
+import { ExamGenerationJob } from "./runtime.ts";
+import { ensureQRCache } from "../services/qr.ts";
 
 interface AppState {
   db: Database;
@@ -40,7 +24,7 @@ interface AppState {
   basePath: string;
   JOBS_DIR: string;
   processQueue: () => void;
-  genRandomNumber: (lang: Language, counter: number) => string;
+  genExamCode: (lang: Language, counter: number) => string;
   getDownloadableJobs: () => Promise<{ examId: string; jobId: string }[]>;
   parseLogFileForSubtaskInfo: (logContent: string) => any[];
 }
@@ -53,7 +37,7 @@ export function configureExamManagerRouter({
   basePath,
   JOBS_DIR,
   processQueue,
-  genRandomNumber,
+  genExamCode,
   getDownloadableJobs,
   parseLogFileForSubtaskInfo,
 }: AppState): Router {
@@ -294,6 +278,7 @@ export function configureExamManagerRouter({
         );
         const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
         exam.fillPagesAndPoints();
+        await ensureQRCache(1, exam.pageCount!);
         await fs.copy(basePath, tempDir, { overwrite: true });
         await generateSolution(tempDir, exam);
 
@@ -460,6 +445,10 @@ export function configureExamManagerRouter({
             range: 5,
           })
           .filter((student: any) => student.firstName && student.lastName);
+        const qrCachePromise = ensureQRCache(
+          studentData.length,
+          exam.pageCount!,
+        );
 
         const totalTasks = studentData.length + 3;
 
@@ -472,26 +461,29 @@ export function configureExamManagerRouter({
           jobDir,
           createdAt: new Date(),
           studentData,
-          randomNumbers: [],
+          examCodes: [],
           studentResults: [],
         };
 
+        let placeholderStudentID = 1000000;
         studentData.forEach((studentLine: any, index: number) => {
           const seatNumber = index + startSeatNumber;
-          const deRandomNumber = genRandomNumber("DE", seatNumber);
-          const enRandomNumber = genRandomNumber("EN", seatNumber);
+          const deExamCode = genExamCode("DE", seatNumber);
+          const enExamCode = genExamCode("EN", seatNumber);
 
           const student = new Student(
             `${studentLine.firstName} ${studentLine.lastName}`,
-            studentLine.studentId,
+            studentLine.studentId != ""
+              ? studentLine.studentId
+              : placeholderStudentID++,
             {
-              DE: deRandomNumber,
-              EN: enRandomNumber,
+              DE: deExamCode,
+              EN: enExamCode,
             },
             seatNumber,
           );
 
-          newJob.randomNumbers.push({ de: deRandomNumber, en: enRandomNumber });
+          newJob.examCodes.push({ de: deExamCode, en: enExamCode });
           taskQueue.push({
             type: "student",
             jobId,
@@ -499,8 +491,8 @@ export function configureExamManagerRouter({
             student,
             jobTemplatePath,
             outputDir: tempOutputDir,
-            deRandomNumber,
-            enRandomNumber,
+            deRandomNumber: deExamCode,
+            enRandomNumber: enExamCode,
             seatNumber,
           });
         });
@@ -540,6 +532,7 @@ export function configureExamManagerRouter({
 
         jobs.set(jobId, newJob);
 
+        await qrCachePromise;
         workers.forEach(() => processQueue());
 
         ctx.response.status = 202;

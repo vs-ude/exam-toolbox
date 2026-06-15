@@ -37,7 +37,7 @@ services:
     #   - "3000:3000"
     volumes:
       - ./backend/uploads:/app/uploads
-      - ./backend/cache:/app/cache
+      - backend_cache:/app/cache
       - backend_jobs:/app/jobs
     environment:
       - MONGODB_URI=mongodb://mongo:27017/examToolboxDB
@@ -134,6 +134,7 @@ volumes:
   ldap_data:
   ldap_config:
   backend_jobs:
+  backend_cache:
 
 networks:
   web:

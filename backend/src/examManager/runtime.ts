@@ -2,7 +2,7 @@ import { Collection, Document, ObjectId } from "@db/mongo";
 
 import {
   createZipArchiveFromDirectory,
-  genRandomNumber,
+  genExamCode,
   mergePdfs,
   sendEmail,
 } from "../services/mod.ts";
@@ -30,7 +30,7 @@ export interface ExamGenerationJob {
   zipPath?: string;
   createdAt: Date;
   studentData: any[];
-  randomNumbers: { de: string; en: string }[];
+  examCodes: { de: string; en: string }[];
   studentResults: StudentResult[];
 }
 
@@ -65,7 +65,7 @@ export interface ExamManagerRuntime {
   getDownloadableJobs: () => Promise<{ examId: string; jobId: string }[]>;
   getActiveJobForExam: (examId: string) => ExamGenerationJob | null;
   scheduleDailyCleanup: () => void;
-  genRandomNumber: (lang: Language, counter: number) => string;
+  genExamCode: (lang: Language, counter: number) => string;
 }
 
 export function createExamManagerRuntime(
@@ -130,7 +130,7 @@ export function createExamManagerRuntime(
     let csvContent = "Sitzplatz,Random,Matrikelnr,Name,Anwesend? (X)\n";
     job.studentData.forEach((student, index) => {
       const seatNumber = index + 1;
-      const randoms = job.randomNumbers[index];
+      const randoms = job.examCodes[index];
       const randomCode = `${randoms.de}/${randoms.en}`;
       csvContent +=
         `${seatNumber},${randomCode},${student.studentId},"${student.firstName} ${student.lastName}",\n`;
@@ -478,6 +478,6 @@ export function createExamManagerRuntime(
     getDownloadableJobs,
     getActiveJobForExam,
     scheduleDailyCleanup,
-    genRandomNumber,
+    genExamCode,
   };
 }

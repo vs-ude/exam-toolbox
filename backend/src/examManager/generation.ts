@@ -6,7 +6,7 @@ import {
   LatexCompileError,
   LatexRenderError,
 } from "./err.ts";
-import { QR_CACHE_PATH } from "../config/paths.ts";
+import { QRConfig } from "../config/mod.ts";
 import { Student } from "../types/student.ts";
 import { generateExamQR } from "../services/qr.ts";
 
@@ -43,7 +43,7 @@ const DEFAULT_EXAM_META: ExamMetaTemplateData = {
   englishandgerman: "yes",
   points: 42,
   pageCount: 4,
-  qrCachePath: QR_CACHE_PATH,
+  qrCachePath: QRConfig.cachePath,
   hasCustomLatexTask: false,
 };
 
@@ -157,7 +157,7 @@ export async function renderMetaExam(
     points: exam.points!,
     pageCount: exam.pageCount!,
     schmierblaetteranzahl: exam.conceptPages!,
-    qrCachePath: QR_CACHE_PATH,
+    qrCachePath: QRConfig.cachePath,
     hasCustomLatexTask: exam.tasks.some((t) =>
       t.tasks.some((t) => t.type === "latex")
     ),

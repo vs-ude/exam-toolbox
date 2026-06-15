@@ -1,5 +1,4 @@
 import { Application } from "@oak/oak";
-import { MongoClient } from "@db/mongo";
 import { parseLogFileForSubtaskInfo } from "./src/services/mod.ts";
 import { preGeneratePageQRCache } from "./src/services/qr.ts";
 import {
@@ -8,18 +7,14 @@ import {
   configureTaskPoolRouter,
   createExamManagerRuntime,
 } from "./src/examManager/mod.ts";
-import { QR_CACHE_PATH, TEMPLATE_BASE_PATH } from "./src/config/paths.ts";
+import { QRConfig, TEMPLATE_BASE_PATH } from "./src/config/mod.ts";
+import { getOrCreateDb } from "./src/services/db.ts";
 
 const basePath = TEMPLATE_BASE_PATH;
 const JOBS_DIR = "/app/jobs";
 const REQUIRED_GROUP = "researcher";
 const port = 3000;
-
-// MongoDB setup
-const client = new MongoClient();
-await client.connect("mongodb://mongo:27017/examToolboxDB");
-const db = client.database("examToolboxDB");
-const exams = db.collection("exams");
+const db = await getOrCreateDb();
 
 // Create exam manager runtime (generation queue, workers, finalization, cleanup)
 const examRuntime = createExamManagerRuntime(
@@ -29,35 +24,38 @@ const examRuntime = createExamManagerRuntime(
     workerModulePath: "./worker.ts",
   },
   {
-    exams: exams,
+    exams: db.getExams(),
   },
 );
 
 await Deno.mkdir(examRuntime.jobsDir, { recursive: true });
-preGeneratePageQRCache(QR_CACHE_PATH, 200, 26);
+preGeneratePageQRCache(
+  QRConfig.numStudentsPerLanguage,
+  QRConfig.numPagesPerStudent,
+);
 
 // Create Oak application + routers
 const app = new Application();
 
 const examManagerRouter = configureExamManagerRouter({
-  db,
+  db: db.getDBConn(),
   jobs: examRuntime.jobs,
   taskQueue: examRuntime.taskQueue,
   workers: examRuntime.workers,
   basePath: examRuntime.basePath,
   JOBS_DIR: examRuntime.jobsDir,
   processQueue: examRuntime.processQueue,
-  genRandomNumber: examRuntime.genRandomNumber,
+  genExamCode: examRuntime.genExamCode,
   getDownloadableJobs: examRuntime.getDownloadableJobs,
   parseLogFileForSubtaskInfo,
 });
 
 const taskPoolRouter = configureTaskPoolRouter({
-  db,
+  db: db.getDBConn(),
   basePath: examRuntime.basePath,
 });
 
-const tagRouter = configureTagRouter({ db });
+const tagRouter = configureTagRouter({ db: db.getDBConn() });
 
 // Core middleware: CORS + authentication/authorization
 app.use(async (ctx, next) => {
