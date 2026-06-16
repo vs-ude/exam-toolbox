@@ -1,22 +1,19 @@
 import { Router } from "@oak/oak";
-import { Database, ObjectId } from "@db/mongo";
+import { ObjectId } from "@db/mongo";
 import { Tag } from "../types/tag.ts";
+import { ExamToolboxDatabase } from "../services/db.ts";
 
 interface AppState {
-  db: Database;
+  db: ExamToolboxDatabase;
 }
 
 export function configureTagRouter({ db }: AppState): Router {
   const router = new Router({ prefix: "/api" });
-  const tags = db.collection("tags");
-  const tasks = db.collection("taskPool");
-
   router
     .get("/tags/:id", async (ctx) => {
       try {
         const tagId = ctx.params.id;
-        const mongoId = new ObjectId(tagId);
-        const tag = await tags.findOne({ _id: mongoId });
+        const tag = await db.getTagById(tagId);
         if (!tag) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Tag not found" };
@@ -31,7 +28,7 @@ export function configureTagRouter({ db }: AppState): Router {
     })
     .get("/tags", async (ctx) => {
       try {
-        const tagList = await tags.find().sort({ name: 1 }).toArray();
+        const tagList = await db.getAllTags();
         ctx.response.status = 200;
         ctx.response.body = tagList;
       } catch (error) {
@@ -42,12 +39,9 @@ export function configureTagRouter({ db }: AppState): Router {
     .put("/tags/:id", async (ctx) => {
       try {
         const tagId = ctx.params.id;
-        const mongoId = new ObjectId(tagId);
         const { _id, ...updatedTag }: Tag = await ctx.request.body.json();
 
-        const result = await tags.updateOne({ _id: mongoId }, {
-          $set: updatedTag,
-        });
+        const result = await db.updateTag(tagId, updatedTag);
 
         if (result.matchedCount === 0) {
           ctx.response.status = 404;
@@ -65,7 +59,7 @@ export function configureTagRouter({ db }: AppState): Router {
     .post("/tags", async (ctx) => {
       const { _id, ...tag }: Tag = await ctx.request.body.json();
       try {
-        const result = await tags.insertOne(tag);
+        const result = await db.createTag(tag);
         ctx.response.status = 201;
         ctx.response.body = {
           message: "Tag saved successfully!",
@@ -78,7 +72,7 @@ export function configureTagRouter({ db }: AppState): Router {
     })
     .delete("/tags", async (ctx) => {
       try {
-        const result = await tags.deleteMany({});
+        const result = await db.clearTags();
         ctx.response.status = 200;
         ctx.response.body = {
           message: `${result} tags deleted successfully!`,
@@ -99,8 +93,7 @@ export function configureTagRouter({ db }: AppState): Router {
       }
 
       try {
-        const mongoId = new ObjectId(tagId);
-        const result = await tags.deleteOne({ _id: mongoId });
+        const result = await db.deleteTag(tagId);
 
         if (result === 0) {
           ctx.response.status = 404;
@@ -109,10 +102,7 @@ export function configureTagRouter({ db }: AppState): Router {
         }
 
         // remove the deleted tag from all tasks that reference it
-        await tasks.updateMany(
-          { tagIds: mongoId },
-          { $pull: { tagIds: mongoId } },
-        );
+        await db.removeTagFromTasks(tagId);
 
         ctx.response.status = 200;
         ctx.response.body = { message: "Tag deleted successfully" };

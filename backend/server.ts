@@ -23,9 +23,7 @@ const examRuntime = createExamManagerRuntime(
     jobsDir: JOBS_DIR,
     workerModulePath: "./worker.ts",
   },
-  {
-    exams: db.getExams(),
-  },
+  { db },
 );
 
 await Deno.mkdir(examRuntime.jobsDir, { recursive: true });
@@ -38,7 +36,7 @@ preGeneratePageQRCache(
 const app = new Application();
 
 const examManagerRouter = configureExamManagerRouter({
-  db: db.getDBConn(),
+  db,
   jobs: examRuntime.jobs,
   taskQueue: examRuntime.taskQueue,
   workers: examRuntime.workers,
@@ -51,11 +49,11 @@ const examManagerRouter = configureExamManagerRouter({
 });
 
 const taskPoolRouter = configureTaskPoolRouter({
-  db: db.getDBConn(),
+  db,
   basePath: examRuntime.basePath,
 });
 
-const tagRouter = configureTagRouter({ db: db.getDBConn() });
+const tagRouter = configureTagRouter({ db });
 
 // Core middleware: CORS + authentication/authorization
 app.use(async (ctx, next) => {

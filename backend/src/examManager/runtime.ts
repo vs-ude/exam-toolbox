@@ -1,4 +1,4 @@
-import { Collection, Document, ObjectId } from "@db/mongo";
+import { ExamToolboxDatabase } from "../services/db.ts";
 
 import {
   createZipArchiveFromDirectory,
@@ -50,7 +50,7 @@ export interface RuntimeConfig {
 }
 
 export interface RuntimeDeps {
-  exams: Collection<Document>;
+  db: ExamToolboxDatabase;
 }
 
 export interface ExamManagerRuntime {
@@ -184,8 +184,7 @@ export function createExamManagerRuntime(
     let semester: string | undefined = undefined;
 
     try {
-      const queryId = new ObjectId(job.examId.trim());
-      const exam = await deps.exams.findOne({ _id: queryId });
+      const exam = await deps.db.getExamById(job.examId.trim());
 
       if (exam?.courseName) {
         examName = exam.courseName;

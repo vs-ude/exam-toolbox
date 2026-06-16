@@ -1,10 +1,10 @@
 import { Router } from "@oak/oak";
-import { Database } from "@db/mongo";
-import { type Task } from "../types/exam.ts";
+import { parseTask, type Task } from "../types/exam.ts";
 import { emptyDir } from "@std/fs";
+import { ExamToolboxDatabase } from "../services/db.ts";
 
 interface AppState {
-  db: Database;
+  db: ExamToolboxDatabase;
   basePath: string;
 }
 
@@ -13,13 +13,10 @@ export function configureTaskPoolRouter({
 }: AppState): Router {
   const router = new Router({ prefix: "/api" });
 
-  const pool = db.collection("taskPool");
-  const fileTracker = db.collection("fileTracker");
-
   router
     .get("/taskPool", async (ctx) => {
       try {
-        const taskList = await pool.find().toArray();
+        const taskList = await db.getAllTasks();
         ctx.response.status = 200;
         ctx.response.body = taskList;
       } catch (error) {
@@ -30,7 +27,7 @@ export function configureTaskPoolRouter({
     .get("/taskPool/:taskId", async (ctx) => {
       try {
         const taskId = ctx.params.taskId;
-        const task = await pool.findOne({ taskId: taskId });
+        const task = await db.getTaskById(taskId);
         if (!task) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Task not found" };
@@ -46,7 +43,7 @@ export function configureTaskPoolRouter({
     .get("/taskPool/type/:type", async (ctx) => {
       const taskType = ctx.params.type;
       try {
-        const taskList = await pool.find({ type: taskType }).toArray();
+        const taskList = await db.getTasksByType(taskType);
         ctx.response.status = 200;
         ctx.response.body = taskList;
       } catch (error) {
@@ -57,14 +54,7 @@ export function configureTaskPoolRouter({
     .get("/taskPool/search/:questionText", async (ctx) => {
       try {
         const questionText = ctx.params.questionText;
-        const taskList = await pool
-          .find({
-            $or: [
-              { "question.DE": { $regex: questionText, $options: "i" } },
-              { "question.EN": { $regex: questionText, $options: "i" } },
-            ],
-          })
-          .toArray();
+        const taskList = await db.searchTasks(questionText);
         ctx.response.status = 200;
         ctx.response.body = taskList;
       } catch (error) {
@@ -80,10 +70,7 @@ export function configureTaskPoolRouter({
         const id = ctx.params.taskId;
         const { childTaskId } = await ctx.request.body.json();
 
-        const result = await pool.updateOne(
-          { taskId: id },
-          { $addToSet: { children: childTaskId } },
-        );
+        const result = await db.addChildTask(id, childTaskId);
 
         if (result.matchedCount === 0) {
           ctx.response.status = 404;
@@ -102,7 +89,7 @@ export function configureTaskPoolRouter({
     .get("/taskPool/user/:userId", async (ctx) => {
       const userId = ctx.params.userId;
       try {
-        const taskList = await pool.find({ createdBy: userId }).toArray();
+        const taskList = await db.getTasksByUser(userId);
         ctx.response.status = 200;
         ctx.response.body = taskList;
       } catch (error) {
@@ -111,9 +98,9 @@ export function configureTaskPoolRouter({
       }
     })
     .post("/taskPool", async (ctx) => {
-      const task: Task = await ctx.request.body.json();
+      const task = parseTask(await ctx.request.body.json());
       try {
-        await pool.insertOne(task);
+        await db.createTask(task);
         ctx.response.status = 200;
         ctx.response.body = { message: "Task added to pool" };
       } catch (err) {
@@ -127,16 +114,12 @@ export function configureTaskPoolRouter({
           task.solutionPicture.urlDE,
           task.solutionPicture.urlEN,
         ];
-        console.log("File URLs: ", fileURLs);
         for (const fileURL of fileURLs) {
-          const fileName = fileURL.split("/").pop();
+          const fileName = fileURL.split("/").pop() ?? "";
           try {
-            await fileTracker.updateOne(
-              { name: fileName },
-              { $addToSet: { refs: task.taskId } },
-            );
+            await db.addFileRef(fileName, task.taskId);
           } catch (error) {
-            console.error("Error fetching file tracker enttry:", error);
+            console.error("Error fetching file tracker entry:", error);
           }
         }
       }
@@ -145,11 +128,8 @@ export function configureTaskPoolRouter({
       try {
         const id = ctx.params.taskId;
         const { _id, ...updateData } = await ctx.request.body.json();
-
-        const result = await pool.updateOne(
-          { taskId: id },
-          { $set: updateData },
-        );
+        const task = parseTask(updateData);
+        const result = await db.updateTask(id, task);
 
         if (result.matchedCount === 0) {
           ctx.response.status = 404;
@@ -170,7 +150,7 @@ export function configureTaskPoolRouter({
     })
     .delete("/taskPool/:taskId", async (ctx) => {
       try {
-        const result = await pool.deleteOne({ taskId: ctx.params.taskId });
+        const result = await db.deleteTask(ctx.params.taskId);
         if (result === 0) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Task not found" };
@@ -185,8 +165,8 @@ export function configureTaskPoolRouter({
     })
     .delete("/taskPool", async (ctx) => {
       try {
-        const result = await pool.deleteMany({});
-        await fileTracker.deleteMany({});
+        const result = await db.clearTaskPool();
+        await db.clearFileTracker();
         await emptyDir("./uploads");
         ctx.response.status = 200;
         ctx.response.body = {
@@ -201,7 +181,7 @@ export function configureTaskPoolRouter({
     .get("/taskPool/tags/:tagId", async (ctx) => {
       const tagId = ctx.params.tagId;
       try {
-        const taskList = await pool.find({ tagIds: tagId }).toArray();
+        const taskList = await db.getTasksByTag(tagId);
         ctx.response.status = 200;
         ctx.response.body = taskList;
       } catch (error) {

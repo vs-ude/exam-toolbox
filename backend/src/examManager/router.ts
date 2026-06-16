@@ -1,5 +1,5 @@
 import { Router } from "@oak/oak";
-import { Database, Document, ObjectId } from "@db/mongo";
+import { Document } from "@db/mongo";
 import { read, utils } from "@mirror/xlsx";
 import { crypto } from "@std/crypto";
 import { encodeHex } from "@std/encoding";
@@ -14,10 +14,11 @@ import {
   renderMetaExam,
 } from "./generation.ts";
 import { ExamGenerationJob } from "./runtime.ts";
+import { ExamToolboxDatabase } from "../services/db.ts";
 import { ensureQRCache } from "../services/qr.ts";
 
 interface AppState {
-  db: Database;
+  db: ExamToolboxDatabase;
   jobs: Map<string, ExamGenerationJob>;
   taskQueue: any[];
   workers: any[];
@@ -43,9 +44,6 @@ export function configureExamManagerRouter({
 }: AppState): Router {
   const router = new Router({ prefix: "/api" });
 
-  const exams = db.collection("exams");
-  const fileTracker = db.collection("fileTracker");
-
   router
     .get("/", (ctx) => {
       ctx.response.body = "API is running...";
@@ -62,7 +60,7 @@ export function configureExamManagerRouter({
     })
     .get("/exams", async (ctx) => {
       try {
-        const examList = await exams.find().toArray();
+        const examList = await db.getAllExams();
         ctx.response.status = 200;
         ctx.response.body = examList;
       } catch (error) {
@@ -73,11 +71,7 @@ export function configureExamManagerRouter({
     .get("/exams/recent", async (ctx) => {
       try {
         const userId = ctx.state.user.id;
-        const recentExams = await exams
-          .find({ lastEditedBy: userId })
-          .sort({ updatedAt: -1 })
-          .limit(8)
-          .toArray();
+        const recentExams = await db.getRecentExams(userId, 8);
 
         ctx.response.status = 200;
         ctx.response.body = recentExams;
@@ -89,8 +83,7 @@ export function configureExamManagerRouter({
     .get("/exam/:id", async (ctx) => {
       try {
         const examId = ctx.params.id;
-        const mongoId = new ObjectId(examId);
-        const exam = await exams.findOne({ _id: mongoId });
+        const exam = await db.getExamById(examId);
         if (!exam) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Exam not found" };
@@ -106,14 +99,7 @@ export function configureExamManagerRouter({
     .get("/exams/search/:searchText", async (ctx) => {
       try {
         const searchText = ctx.params.searchText;
-        const examList = await exams
-          .find({
-            $or: [
-              { courseName: { $regex: searchText, $options: "i" } },
-              { semester: { $regex: searchText, $options: "i" } },
-            ],
-          })
-          .toArray();
+        const examList = await db.searchExams(searchText);
         ctx.response.status = 200;
         ctx.response.body = examList;
       } catch (error) {
@@ -259,7 +245,7 @@ export function configureExamManagerRouter({
       exam.lastEditedBy = ctx.state.user.id;
       exam.updatedAt = new Date();
       try {
-        const result = await exams.insertOne(exam);
+        const result = await db.createExam(exam);
         ctx.response.status = 200;
         ctx.response.body = {
           message: "Exam saved successfully! ",
@@ -333,7 +319,7 @@ export function configureExamManagerRouter({
         timeToLive: 7,
       };
       try {
-        await fileTracker.insertOne(fileTrackerEntry);
+        await db.createFileTrackerEntry(fileTrackerEntry);
         console.log("File tracker entry created:", fileTrackerEntry);
       } catch (error) {
         console.error("Error inserting file tracker entry:", error);
@@ -559,17 +545,13 @@ export function configureExamManagerRouter({
           };
           return;
         }
-        const mongoId = new ObjectId(examId);
         const updateData = { ...updatedExam };
         delete updateData._id;
 
         updateData.lastEditedBy = ctx.state.user.id;
         updateData.updatedAt = new Date();
 
-        const result = await exams.updateOne(
-          { _id: mongoId },
-          { $set: updateData },
-        );
+        const result = await db.updateExam(examId, updateData);
         if (result.matchedCount === 0) {
           ctx.response.status = 404;
           ctx.response.body = { message: "Exam not found" };
@@ -584,7 +566,7 @@ export function configureExamManagerRouter({
     })
     .delete("/exams", async (ctx) => {
       try {
-        const result = await exams.deleteMany({});
+        const result = await db.clearExams();
         ctx.response.status = 200;
         ctx.response.body = {
           message: `${result} exams deleted successfully!`,
@@ -605,7 +587,7 @@ export function configureExamManagerRouter({
       }
 
       try {
-        const result = await exams.deleteOne({ _id: new ObjectId(id) });
+        const result = await db.deleteExam(id);
 
         if (result === 0) {
           ctx.response.status = 404;

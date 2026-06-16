@@ -83,7 +83,7 @@ export type Task =
 
 export interface BaseTask {
   taskId: string;
-  type: string;
+  type: TaskType;
   question: Question;
   points: number;
   tagIds: string[];
@@ -173,6 +173,118 @@ export interface ManualText extends BaseTask {
 export interface NewPage extends BaseTask {
   type: "newPage";
   points: 0; // New pages do not have points
+}
+
+const TASK_TYPES = [
+  "multipleChoice",
+  "property",
+  "shortAnswer",
+  "pictureTask",
+  "latex",
+  "table",
+  "manualText",
+  "newPage",
+] as const;
+
+type TaskType = (typeof TASK_TYPES)[number];
+
+/** Required fields per task type beyond {@link BaseTask}. */
+const TASK_TYPE_FIELDS: Record<TaskType, string[]> = {
+  multipleChoice: ["answerOptions"],
+  property: ["header", "lines"],
+  shortAnswer: ["solution"],
+  pictureTask: ["questionPicture", "solutionPicture"],
+  latex: ["questionLatex"],
+  table: [
+    "tableHeadersQuestion",
+    "tableDataQuestion",
+    "tableHeadersSolution",
+    "tableDataSolution",
+  ],
+  manualText: [],
+  newPage: [],
+};
+
+const BASE_TASK_FIELDS: (keyof BaseTask)[] = [
+  "taskId",
+  "type",
+  "question",
+  "points",
+  "tagIds",
+  "createdBy",
+];
+
+const EXAM_FIELDS: (keyof Exam)[] = [
+  "courseName",
+  "examinerName",
+  "semester",
+  "date",
+  "examLengthMinutes",
+  "tasks",
+];
+
+/**
+ * Parses an arbitrary object into an {@link Exam} instance, validating that
+ * all required fields are present. Throws if validation fails.
+ */
+export function parseExam(raw: unknown): Exam {
+  if (typeof raw !== "object" || raw === null) {
+    throw new Error("Exam must be a non-null object");
+  }
+
+  const obj = raw as Record<string, unknown>;
+  const missing = EXAM_FIELDS.filter((f) => !(f in obj));
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Exam is missing required fields: ${missing.join(", ")}.`,
+    );
+  }
+
+  return Object.assign(new Exam(), obj);
+}
+
+/**
+ * Parses an arbitrary object into the most specific {@link Task} type using
+ * the `type` discriminant field. Throws if the type is unknown or required
+ * fields are missing.
+ */
+export function parseTask(raw: unknown): Task {
+  if (typeof raw !== "object" || raw === null) {
+    throw new Error("Task must be a non-null object");
+  }
+
+  const obj = raw as Record<string, unknown>;
+  if (!("type" in obj)) throw new Error("Task must have a type");
+  const type = obj["type"];
+
+  if (!TASK_TYPES.includes(type as TaskType)) {
+    throw new Error(
+      `Unknown task type: ${JSON.stringify(type)}. Expected one of: ${
+        TASK_TYPES.join(", ")
+      }.`,
+    );
+  }
+
+  const taskType = type as TaskType;
+  const missing: string[] = [];
+
+  for (const field of BASE_TASK_FIELDS) {
+    if (!(field in obj)) missing.push(field);
+  }
+  for (const field of TASK_TYPE_FIELDS[taskType]) {
+    if (!(field in obj)) missing.push(field);
+  }
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Task of type "${taskType}" is missing required fields: ${
+        missing.join(", ")
+      }.`,
+    );
+  }
+
+  return obj as unknown as Task;
 }
 
 export interface Translation {
