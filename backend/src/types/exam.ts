@@ -210,7 +210,6 @@ const BASE_TASK_FIELDS: (keyof BaseTask)[] = [
   "type",
   "question",
   "points",
-  "tagIds",
   "createdBy",
 ];
 

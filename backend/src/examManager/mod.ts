@@ -1,6 +1,4 @@
-export { configureExamManagerRouter } from "./router.ts";
-export { configureTaskPoolRouter } from "./taskPoolRouter.ts";
-export { configureTagRouter } from "./tagRouter.ts";
+export * from "./err.ts";
 export {
   compileExam,
   generateTasksLatex,
@@ -8,4 +6,3 @@ export {
   renderMetaStudent,
 } from "./generation.ts";
 export * from "./runtime.ts";
-export * from "./err.ts";

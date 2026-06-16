@@ -1,14 +1,12 @@
 import { Application } from "@oak/oak";
+
+import { configureExamManagerRouter } from "./src/api/examManager.ts";
+import { QRConfig, TEMPLATE_BASE_PATH } from "./src/config/mod.ts";
+import { createExamManagerRuntime } from "./src/examManager/mod.ts";
+import { getOrCreateDb } from "./src/services/db.ts";
 import { parseLogFileForSubtaskInfo } from "./src/services/mod.ts";
 import { preGeneratePageQRCache } from "./src/services/qr.ts";
-import {
-  configureExamManagerRouter,
-  configureTagRouter,
-  configureTaskPoolRouter,
-  createExamManagerRuntime,
-} from "./src/examManager/mod.ts";
-import { QRConfig, TEMPLATE_BASE_PATH } from "./src/config/mod.ts";
-import { getOrCreateDb } from "./src/services/db.ts";
+import { configureUserRouter } from "./src/api/user.ts";
 
 const basePath = TEMPLATE_BASE_PATH;
 const JOBS_DIR = "/app/jobs";
@@ -35,25 +33,21 @@ preGeneratePageQRCache(
 // Create Oak application + routers
 const app = new Application();
 
-const examManagerRouter = configureExamManagerRouter({
-  db,
-  jobs: examRuntime.jobs,
-  taskQueue: examRuntime.taskQueue,
-  workers: examRuntime.workers,
-  basePath: examRuntime.basePath,
-  JOBS_DIR: examRuntime.jobsDir,
-  processQueue: examRuntime.processQueue,
-  genExamCode: examRuntime.genExamCode,
-  getDownloadableJobs: examRuntime.getDownloadableJobs,
-  parseLogFileForSubtaskInfo,
-});
-
-const taskPoolRouter = configureTaskPoolRouter({
-  db,
-  basePath: examRuntime.basePath,
-});
-
-const tagRouter = configureTagRouter({ db });
+const routers = [
+  configureUserRouter(),
+  configureExamManagerRouter({
+    db,
+    jobs: examRuntime.jobs,
+    taskQueue: examRuntime.taskQueue,
+    workers: examRuntime.workers,
+    basePath: examRuntime.basePath,
+    JOBS_DIR: examRuntime.jobsDir,
+    processQueue: examRuntime.processQueue,
+    genExamCode: examRuntime.genExamCode,
+    getDownloadableJobs: examRuntime.getDownloadableJobs,
+    parseLogFileForSubtaskInfo,
+  }),
+];
 
 // Core middleware: CORS + authentication/authorization
 app.use(async (ctx, next) => {
@@ -98,12 +92,10 @@ app.use(async (ctx, next) => {
 });
 
 // Route registration
-app.use(examManagerRouter.routes());
-app.use(examManagerRouter.allowedMethods());
-app.use(taskPoolRouter.routes());
-app.use(taskPoolRouter.allowedMethods());
-app.use(tagRouter.routes());
-app.use(tagRouter.allowedMethods());
+for (const router of routers) {
+  app.use(router.routes());
+  app.use(router.allowedMethods());
+}
 
 // Schedule periodic in-memory job cleanup and start server
 examRuntime.scheduleDailyCleanup();
