@@ -1,4 +1,4 @@
-import { type Eta, EtaError } from "@bgub/eta";
+import { type Eta } from "@bgub/eta";
 import { escapeLatex, getEta } from "../services/mod.ts";
 import type {
   BaseTask,
@@ -6,12 +6,14 @@ import type {
   Language,
   MultipleChoiceTask,
   PictureTask,
+  PropertyLine,
+  PropertyTask,
   Question,
   ShortAnswerTask,
   TableTask,
   TaskGroup,
   Translation,
-} from "./exam.ts";
+} from "../types/exam.ts";
 import { LatexRenderError } from "./err.ts";
 
 let cachedTaskRenderer: TaskRenderer;
@@ -216,6 +218,40 @@ export class TaskRenderer {
 
     return this.render("task_types/tableTask", tableData);
   }
+
+  renderPropertyTask(
+    task: PropertyTask,
+    options: RenderOptions,
+  ): string {
+    /* The header should have one name per box column and one for the texts */
+    task.lines.forEach((line) => {
+      if (line.options.length !== task.header.length - 1) {
+        throw new LatexRenderError("Line options do not match header length", {
+          cause: `(options) ${line.options.length} !== ${
+            task.header.length - 1
+          } (header - 1)`,
+        });
+      }
+    });
+    if (task.header.length - 1 > 4) {
+      throw new LatexRenderError(
+        "Cannot render more than 4 options in PropertyLines",
+        { cause: `${task.header.length - 1} options requested` },
+      );
+    }
+    const pointsPerCorrect = Math.round(task.points / task.lines.length);
+
+    const data: PropertyTaskTemplateData = {
+      solution: options.solution ?? false,
+      lang: options.lang ?? "DE",
+      header: task.header,
+      lines: task.lines,
+      columns: task.lines[0].options.length, // substract the text header column
+      pointsPerCorrect,
+    };
+
+    return this.render("task_types/propertyTask", data);
+  }
 }
 
 export type RenderOptions = {
@@ -255,6 +291,13 @@ type MultipleChoiceTemplateData = TemplateData & {
   pointsPerCorrect: number;
   answerOptions: { DE: string; EN: string; correct: "w" | "f" }[];
   condensed: boolean;
+};
+
+type PropertyTaskTemplateData = TemplateData & {
+  header: Translation[];
+  lines: PropertyLine[];
+  columns: number;
+  pointsPerCorrect: number;
 };
 
 type MultilineTextTemplateData = TemplateData & {

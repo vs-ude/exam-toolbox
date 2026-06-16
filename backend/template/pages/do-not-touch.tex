@@ -1,0 +1,17 @@
+\vspace{2cm}
+
+  \begin{center}
+    \textbf{\LARGE\donottouch}
+  \end{center}
+  \vspace{2cm}
+  \ifthenelse{\equal{\vollername}{}}{%Wenn Kein Name angegeben
+    % Keine weiteren Informationen ausgeben
+  }{%
+    \begin{center}
+      \begin{tabular}{rl}
+        {\Large \seqnr:} & {\Large\textbf{\ifthenelse{\equal{\sequenznummer}{}}{\SequenznummerFehlt}{\sequenznummer}}} \\[1em]
+        {\Large Name:} & {\Large\textbf{\vollername}} \\[1em]
+        {\Large \mtr:} & {\Large\textbf{\ifthenelse{\equal{\matrikelnummer}{}}{\MatrikelnummerFehlt}{\matrikelnummer}}}
+      \end{tabular}
+    \end{center}
+  }

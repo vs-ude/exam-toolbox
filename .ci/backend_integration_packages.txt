@@ -1,0 +1,3 @@
+zbar-tools
+qrencode
+imagemagick

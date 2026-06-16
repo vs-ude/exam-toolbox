@@ -1,50 +1,16 @@
-\RequirePackage{scrlfile}
-\ReplacePackage{scrpage2}{scrlayer-scrpage}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % - vs-exams.tex -
 %
 % LaTeX-Vorlage zur Verwendung als Vorlage für Klausuren
 %
+% Version 2.0 vom 11. Juni 2026, Oskar Carl (Neubau für exam-toolbox)
 % Version 0.9 vom 5. Februar 2010, Matthäus Wander (Booktabs hinzugefügt, Komascript-Dings auskommentiert)
 % Version 0.8 vom 11.Februar 2009, Arno Wacker
 % basierend auf v1.4 von Jörg Schwerdtfeger
 % http://www.joerg-schwerdtfeger.de/
-%
-% Verwendung:
-% Für jede Klausur eine neue Datei anlegen (z. B. mcs-ws0809.tex)
-% die so aufgebaut ist:
-% -----------------------------------------------------------------------
-%\newcommand{\veranstaltung}{Microcomputer Systems / Datenverarbeitung I}
-%\newcommand{\semester}{WS 2008/09}
-%\newcommand{\pruefer}{Prof.\ T.\ Weis, Dr.\ A. Wacker}
-%\newcommand{\datum}{17.02.2009}
-%\newcommand{\sprache}{en} % set to de/en, defaults to de
-%\newcommand{\zeigeloesung}{yes} % set to yes/no, no: leere zeilen werden gedruckt, yes, die lösung wird gedruckt
-%
-%
-%\input{vs-exams.tex}
-%
-%\begin{document}
-%
-%% prints the cover sheet in the right language
-%\printcover
-%
-%\aufgabe{Atmel ATMega 128 Assembler}{5}
-%blah blah
-%
-%
-%\aufgabenteil{2}
-%What is the purpose of this code segment?
-%
-%\loesung{4}{
-%Dieser Code initialisiert den Stackpointer. Dabei wird 0x160 = 352 in das Registerpaar SPL/SPH geschrieben. Da die unteren 0x60 Register für interne Zwecke verwendet werden, muss 0x60 noch abgezogen werden. D.h. 0x160 - 0x60 = 352 - 96 = 256 Byte
-%}
-% ...
-% -----------------------------------------------------------------------
-%
-% Diese Übungsdatei dann z. B. mit TeXnicCenter direkt in PDF übersetzen lassen.
-% (die hier vorliegende vs-exams.tex muss sich im selben Verzeichnis befinden)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\RequirePackage{scrlfile}
 \documentclass[DIV=0,a4paper,12pt,titlepage,fleqn]{scrartcl}
 
 \ifdefined\XeTeXversion
@@ -60,10 +26,8 @@
 	\usepackage[utf8]{inputenc}
 \fi
 
-\input{meta-exam.tex}
-
-
-%\reserveinsert{28}
+%------ Core packages -------------------------------------------------------
+\usepackage{scrlayer-scrpage}
 \usepackage[pdfauthor={\pruefer},
             pdftitle={Klausur \veranstaltung\ im \semester},
             pdfsubject={Klausur zu \veranstaltung\ im \semester\ am \datum},
@@ -77,95 +41,30 @@
             hidelinks]{hyperref}
 \hypersetup{colorlinks=false}
 \usepackage{color}
-\usepackage{pdfcolmk}
 \usepackage{graphicx}
 \usepackage{pdfpages}
-\usepackage{qrcode}
-\usepackage{makebarcode}
-\usepackage{csquotes}
-\usepackage{xstring}
-
-\newcounter{mycounter}
-
-{\catcode`\ =12\relax\gdef\viktorotherspace{ }}%
-\def\vcodes{%
-  \catcode`\ =12\relax
-}%
-
-\def\setescape{%
-  \let\ =\viktorotherspace%
-}
-
-\def\escapedStringTypeout#1{\escapeStringSec{#1}}%
-\newcommand\escapeStringSec[1]{%
-  \begingroup%
-    \bgroup\vcodes\setescape\typeout{#1}\egroup
-  \endgroup
-}%
-
-% Ausgabe der Ecken um Aufgaben
-\newdimen\DimX \newdimen\DimY
-\usepackage{xcolor,zref-savepos}
-\makeatletter
-\newcommand\printPos[1]{% IMPORTANT: end every line with a comment! otherwise spaces might leak!
-\zsavepos{pos#1\thesection\thesubsection\thepage}%
-\DimX=\zposx{pos#1\thesection\thesubsection\thepage}sp\relax \DimX=0.03515\DimX%
-\DimY=\zposy{pos#1\thesection\thesubsection\thepage}sp\relax \DimY=0.03515\DimY%
-\escapedStringTypeout{VSEXAM: {'Typ':'#1', 'X': '\strip@pt\DimX', 'Y':'\strip@pt\DimY'}}%
-}
-%\DimX=\textwidth\relax%
-\DimX=0.03515\hsize%
-\escapedStringTypeout{VSEXAM: {'Typ':'pageGeo', 'hsize': '\strip@pt\DimX'}}%
-\makeatother
-
-\usepackage{amsmath,amssymb,amsfonts,bbm}
-\usepackage{amsthm}   % AMS-Theoremumgebung
-\usepackage{stmaryrd}	% Symbole, u. A. \lightning
-%\usepackage{fancybox}[2000/09/19]  % für hübsche Rahmen, usage: \shadowbox{}
-%\usepackage{secnum}  % Abbildungs- und Tabellennummern nach section
-%\usepackage[small,bf,hang]{caption}[2003/12/20] % Abbildungs- und Tabellenunterschriften anpassen
-% \usepackage{lastpage}
-\usepackage{flafter}  % Abb. und Tabellen nie vor dem ersten Verweis im Text plazieren!
-\usepackage{footnpag} % Fußnotenzähler auf jeder Seite bei 1 beginnen
-\usepackage[normalem]{ulem} % Für div. Unterstreichungen, (\uline,\sout,\uwave)
-\usepackage{cancel}   % zum Kürzen in Brüchen
-\usepackage{hhline}   % verhindert unerwünschte Überdeckungen von Tabellenlinien
-\usepackage{colortbl}
-\usepackage{path}
-\usepackage{epic}
-\usepackage{scrpage2}
+\usepackage{latexsym}
 \usepackage{textcomp}
-\usepackage{units}
-\usepackage{sistyle} % für physikalische Einheiten z. B. \SI{1000}{m/s^2}
-\usepackage{mathcomp}
-%\usepackage{floatflt}
-\usepackage{subcaption}
-\usepackage{icomma}
 \usepackage{titlesec}
-\usepackage{forloop}
-\usepackage{listings}
 \usepackage{ifthen}
+\usepackage[normalem]{ulem} % Für div. Unterstreichungen, (\uline,\sout,\uwave)
+\usepackage{hhline}   % verhindert unerwünschte Überdeckungen von Tabellenlinien
 
-% (CB)
-\usepackage{tikz}       % Karrierte Schmierblätter zeichnen
-\usetikzlibrary{backgrounds}
-\usepackage{totcount}   % Counter für Punkte-Tabellen
-\usepackage{calc}       % Berechnungen Counter
-\usepackage{calculator} % Berechnungen Anzeige
-\usepackage{lastpage}   % Schmierblätter Seitenberechnung
-\usepackage{rotating}
-
-% theo
-\usepackage{booktabs}
+%-------- Tables -------------------------------------------------------------
+\usepackage{tabularx}
+\usepackage{colortbl}
 \usepackage{multirow}
-\usepackage{longtable}
+\usepackage{booktabs}
 \def\blacktoprule{\arrayrulecolor{lightgray1}\toprule}
 \def\blackbottomrule{\arrayrulecolor{lightgray1}\bottomrule}
-\usepackage{latexsym}
-\usepackage{boolexpr}
 
-% Fix for new PDF Versions (MK)
-% \pdfminorversion=6
+
+\usepackage{listings}
+
+% Drawing and moving
+\usepackage{tikz}       % Karrierte Schmierblätter zeichnen
+\usetikzlibrary{backgrounds}
+\usepackage{rotating}
 
 % let's define some colors
 \definecolor{lightgray1}{gray}{.85}
@@ -177,121 +76,30 @@
 \setlength{\fboxrule}{1pt}
 \hypersetup{pdflinkmargin=-0.5pt}
 
-\newcommand{\myarrow}[1][0.1pt]{\tikz[baseline=-0.26em,y=3em, x=3em]{\filldraw[line width=#1] (0.4202,0.0021) .. controls (0.4202,-0.0000) and (0.4188,-0.0018) .. (0.4171,-0.0025) .. controls (0.3917,-0.0092) and (0.3699,-0.0236) .. (0.3509,-0.0401) .. controls (0.3355,-0.0538) and (0.3225,-0.0704) .. (0.3130,-0.0890) .. controls (0.3119,-0.0915) and (0.3094,-0.0929) .. (0.3066,-0.0929) .. controls (0.3028,-0.0929) and (0.2996,-0.0897) .. (0.2996,-0.0858) .. controls (0.2996,-0.0848) and (0.3000,-0.0837) .. (0.3003,-0.0827) .. controls (0.3087,-0.0665) and (0.3193,-0.0517) .. (0.3316,-0.0391) -- (0.1181,-0.0391) .. controls (0.1143,-0.0391) and (0.1111,-0.0359) .. (0.1111,-0.0320) .. controls (0.1111,-0.0282) and (0.1143,-0.0250) .. (0.1181,-0.0250) -- (0.3471,-0.0250) .. controls (0.3611,-0.0137) and (0.3766,-0.0046) .. (0.3935,0.0021) .. controls (0.3766,0.0088) and (0.3611,0.0179) .. (0.3471,0.0292) -- (0.1181,0.0292) .. controls (0.1143,0.0292) and (0.1111,0.0323) .. (0.1111,0.0362) .. controls (0.1111,0.0401) and (0.1143,0.0432) .. (0.1181,0.0432) -- (0.3316,0.0432) .. controls (0.3193,0.0559) and (0.3087,0.0707) .. (0.3003,0.0868) .. controls (0.3000,0.0879) and (0.2996,0.0889) .. (0.2996,0.0900) .. controls (0.2996,0.0939) and (0.3028,0.0970) .. (0.3066,0.0970) .. controls (0.3094,0.0970) and (0.3119,0.0956) .. (0.3130,0.0932) .. controls (0.3225,0.0745) and (0.3355,0.0580) .. (0.3509,0.0443) .. controls (0.3699,0.0278) and (0.3917,0.0133) .. (0.4171,0.0067) .. controls (0.4188,0.0059) and (0.4202,0.0042) .. (0.4202,0.0021) -- cycle;}}
-\newcommand{\declerationbox}{{
-  \CheckBox[name=\themycounter, bordercolor=0 0 0, height=13pt, width=18pt, color=black, checkboxsymbol=\ding{56}]{}}\stepcounter{mycounter}}
+
+
 \newcommand{\emptyb}{\fbox{\phantom{x}}}
 \newcommand{\tickedbox}{\fbox{\textbf{x}}}
 
-\newcommand{\printaufgaben}{\include{aufgaben}}
-\newcommand{\donottouch}{Please do not touch the exam yet.\\[1em]Bitte den Klausurbogen noch nicht öffnen.}
+%------ Lecker Listings usw. ------------------------------------
+\definecolor{gray}{gray}{0.5}
+\lstset{
+	basicstyle=\ttfamily\small,
+	%numbersep=10pt,
+	numberstyle=\ttfamily\color{gray}\scriptsize,
+	numbers=left,
+	numberblanklines = false,
+	escapechar=\%,
+	breaklines=true,
+	%frame=lines,
+}
 
 %----- Lokalisierung ---------------------------------------
-\ifthenelse{\equal{\sprache}{en}}
-{
- % english
- \ifdefined\XeTeXversion
-  \setmainlanguage{english}
- \else
-  \selectlanguage{english}
- \fi
- \newcommand{\seite}{Page}
- \newcommand{\udue}{University of Duisburg-Essen}
- \newcommand{\mtr}{Matriculation Nr.}
- \newcommand{\ktyp}{Exam type}
- \newcommand{\afg}{Assignment}
- \newcommand{\pts}{Points}
- \newcommand{\klausur}{Exam (English)}
- \newcommand{\stud}{Studies}
- \newcommand{\sig}{Signature}
- \newcommand{\printcover}{\include{cover-en}}
- \newcommand{\gesamtpunktzahl}{Total points}
- \newcommand{\totalpages}{Total pages}
- \newcommand{\seqnr}{Exam number}
- %\newcommand{\printaufgaben}{\include{aufgaben-en}}
-}{
- % deutsch
- \ifdefined\XeTeXversion
-  \setmainlanguage{german}
- \else
-  \selectlanguage{german}
- \fi
- \newcommand{\seite}{Seite}
- \newcommand{\udue}{Universität Duisburg-Essen}
- \newcommand{\mtr}{Matrikelnummer}
- \newcommand{\ktyp}{Klausurtyp}
- \newcommand{\afg}{Aufgabe}
- \newcommand{\pts}{Punkte}
- \newcommand{\klausur}{Klausur}
- \newcommand{\stud}{Studiengang}
- \newcommand{\sig}{Unterschrift}
- \newcommand{\printcover}{\include{cover-de}}
- \newcommand{\gesamtpunktzahl}{Gesamtpunktzahl}
- \newcommand{\totalpages}{Gesamtseitenzahl}
- \newcommand{\seqnr}{Klausurnummer}
- %\newcommand{\printaufgaben}{\include{aufgaben-de}}
-}
+\input{meta/localization.tex}
 
+%----- Backgrounds -----------------------------------------
+\input{meta/background.tex}
 
-%----- (CB) Schmierblätter ---------------------------------------
-
-\newcounter{sb}
-\newcommand{\schmierblaetter}
-{
- % Nicht in der Musterlösung anzeigen
- \ifthenelse{\equal{\zeigeloesung}{no}}
- {
- \ifthenelse{\equal{\schmierblaetteranzahl}{0}}
-  {}
-  {
-	\ADD{\schmierblaetteranzahl}{\thelastpageexam}{\ergX}
-	\ADD{\ergX}{1}{\ergA} % 1 Seite für do-not-touch einbeziehen
-	\MODULO{\ergA}{2}{\ergB}
-  \ADD{\schmierblaetteranzahl}{\ergB}{\ergC}
-  \forloop{sb}{0}{\value{sb} < \ergC}
-  {
-    %\begin{tikzpicture}
-    %   \draw[color=white] (-0.05cm,0cm) -- (0cm,0cm);
-    %   \draw[style=help lines, ystep=5mm, xstep=5mm] (0cm,0cm) grid (17cm,22cm);
-    %\end{tikzpicture}
-    %\total{lastpageexam}
-    {\large\bfseries\textsf {\ifthenelse{\equal{\sprache}{en}}{Space for personal notes}{Konzeptpapier}}\\[2mm]}
-    \begin{tikzpicture}
-        \draw[color=white] (-0.05cm,0cm) -- (0cm,0cm);
-        \draw[style=help lines, ystep=5mm, xstep=5mm] (0cm,0cm) grid (17cm,21.5cm);
-    \end{tikzpicture}
-
-    \clearpage
-  }
-  }
- }
- {}
-}
-
-%------ (CB) Do-Not-Touch Seite ----------
-
-\newcommand{\donottouchpage}{
- % Nicht in der Musterlösung anzeigen
- \ifthenelse{\equal{\zeigeloesung}{no}}
- {
-  \chead{}
-  \vspace{2cm}
-  \begin{center}
-    \textbf{\LARGE\donottouch}
-  \end{center}
-  \vspace{2cm}
-  \ifthenelse{\equal{\vollername}{}}{%Wenn Kein Name angegeben
-    % Keine weiteren Informationen ausgeben
-  }{%
-    \begin{center}
-      \begin{tabular}{rl}
-        {\Large \seqnr:} & {\Large\textbf{\ifthenelse{\equal{\sequenznummer}{}}{\SequenznummerFehlt}{\sequenznummer}}} \\[1em]
-        {\Large Name:} & {\Large\textbf{\vollername}} \\[1em]
-        {\Large \mtr:} & {\Large\textbf{\ifthenelse{\equal{\matrikelnummer}{}}{\MatrikelnummerFehlt}{\matrikelnummer}}}
-      \end{tabular}
-    \end{center}
-  }
-}{}}
 
 %------ (CB) Added TODO command from papers/proposals --------
 
@@ -302,221 +110,16 @@
 \newcommand{\todo}[1]{\textcolor{red}{$| ^{\thetodocounter}$}\marginpar{\scriptsize\textcolor{red}{\thetodocounter:} #1}\stepcounter{todocounter}}
 % um kommentare auszublenden
 %\renewcommand{\todo}[1]{}
-\usepackage{color}
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 
 \newcommand{\removebs}[1]{\if#1\@backslashchar\else#1\fi}
 
 %----- Header + Footer ---------------------------------------
-\pagestyle{scrheadings}
-\clearpairofpagestyles
-\addtolength{\topmargin}{1.05cm}
-\addtolength{\headsep}{-2em}
-\setlength{\footskip}{32pt}
-\addtolength{\textheight}{1.28cm}
-%\addtolength{\textheight}{1.43cm} // VIKTOR: old value
-%\setkomafont{pageheadfoot}{\normalfont} %Fix for new koma script (MK)
+\input{meta/header-footer.tex}
 
-%\ihead{\semester \\ \datum}
-%\chead{\veranstaltung\\ \pruefer}
-%\ohead{Verteilte Systeme\\ \pagemark/\pageref{LastPage}}
-
-
-%----- Seitenheader ---------------------------------------
-\chead{
-\color{darkgray2}
-\arrayrulecolor{darkgray1}
-\setlength{\arrayrulewidth}{1pt}
-\ifthenelse{\equal{\vollername}{}}{%
-\begin{tabular}{p{0.22\textwidth}|p{0.6\textwidth}|p{0.14\textwidth}|}
-\cline{2-3}
-\multirow{2}*{\textcolor{black}{\barcode[code=Code39,X=.3mm,H=1cm]{\randomexamnumber}}} & \cellcolor{lightgray1} \textcolor{black}{\veranstaltung} & \cellcolor{lightgray1} \semester \\
-\cline{2-3}
-& \cellcolor{lightgray2}  \pruefer & \cellcolor{lightgray2} \seite \ \pagemark/\pageref{LastPage} \\
-\cline{2-3}
-\end{tabular}}{%
-\begin{tabular}{|p{0.22\textwidth}|p{0.6\textwidth}|p{0.14\textwidth}|}
-\cline{1-3}
-\cellcolor{lightgray1} \hspace{3.4cm}\mbox{\raisebox{2.2mm}{\begin{rotate}{180}\textcolor{black}{\matrikelnummer}\end{rotate}}} & \cellcolor{lightgray1} \textcolor{black}{\veranstaltung} & \cellcolor{lightgray1} \semester \\
-\cline{1-3}
-\cellcolor{lightgray2} \hspace{3.4cm}\mbox{\raisebox{2.2mm}{\begin{rotate}{180}\textcolor{black}{\#\randomexamnumber}\end{rotate}}} & \cellcolor{lightgray2}  \pruefer & \cellcolor{lightgray2} \seite \ \pagemark/\pageref{LastPage} \\
-\cline{1-3}
-\end{tabular}}
-}
-
-
-
-%----- Seitenfooter ---------------------------------------
-\newcommand{\fusszeile}{yes} % (CB) set to yes, no: no exascan
-\ifthenelse{\equal{\fusszeile}{yes}}{
-\cfoot{
- % \color{black}
- % \begin{tabular}{cc}
- %  \#\randomexamnumber
- %  &
- %  \multirow{2}*{\qrcode[height=1.5cm,level=H]{\{'p':\thepage,'r':\randomexamnumber\}}} \printPos{pageQr}
- %  \\
- %  \barcode[code=Code39,X=.25mm,H=1cm]{\randomexamnumber}
- %  &
- % \end{tabular}
- % \color{black}
-%  \begin{tabular}{c}
-%   \barcode[code=Code39,X=.25mm,H=.5cm]{\randomexamnumber}
-%    \\
-%   \#\randomexamnumber
-%  \end{tabular}
-% \color{darkgray2}
-% \arrayrulecolor{darkgray1}
-% \setlength{\arrayrulewidth}{1pt}
-% \begin{tabular}{|p{0.5\textwidth}|}
-% \hline
-% \rowcolor{lightgray1}
-% \mtr \\
-% \hline
-% \rowcolor{lightgray2}
-%  \\
-% \hline
-% \end{tabular}
- \color{black}
- \begin{tabular}{cc}
- \qrcode[height=1.5cm,level=H]{\{'p':\thepage,'r':'\randomexamnumber'\}} \printPos{pageQr} & \#\randomexamnumber
- \end{tabular}
-}}{}
-
-%----- Definition für Aufgabe ---------------------------------------
-% (CB) Added counter for points
-% (CB) Reworked for Multilanguage in one .tex
-\newcommand{\aufgabe}[2]{
- \clearpage
- \ifhmode\par\fi
- \removelastskip
- \vskip 3ex\goodbreak
- %\noindent
- \refstepcounter{section} % manually increment the chapter number
-% manually add the chapter to the table of contents
- \addcontentsline{toc}{section}{\protect\numberline{\thesection}#1}
-% and now format the header according to spec.
-\arrayrulecolor{lightgray2}
-\setlength{\arrayrulewidth}{1pt}
-%\vspace{10pt}
-\begingroup
-\begin{tabular}{|p{0.87\textwidth}p{0.13\textwidth}}
-\hline
-\vspace{0.1pt}
-\stepcounter{numberofassignments}
-\addtocounter{exampoints}{\totvalue{pointsforassignment\thesection}}%
-{\large\bfseries\textsf \afg\ \thesection\ - \normalfont\itshape{\textsf{\ifthenelse{\equal{\sprache}{de}}{#1}{#2}}}} & \vspace{0.1pt}\hspace{-7pt}\textsf{
-\ifthenelse{\totvalue{pointsforassignment\thesection} > 0}
-{[\DIVIDE{\totvalue{pointsforassignment\thesection}}{\anpassung}{\div} \div\ \pts \escapedStringTypeout{VSEXAM: {'Typ':'AufgabeStart', 'Punkte': \div, 'Seite':'\thepage'}}]}
-{\hspace{-0.5cm} \textcolor{red}{\textbf{RECOMPILE}}}
-}\\
-\end{tabular}
-\quad
-\par
-\endgroup
-\nobreak
-\vskip 2ex
-}
-
-
-%----- Definition für Teilaufgabe ---------------------------------------
-%\titleformat{hcommandi}[hshapei]{hformati}{hlabeli}{hsepi}{hbeforei}[hafteri]
+%----- Config for subsections --------------------------------
 \titleformat{\subsection}[runin]{\normalsize\bfseries}{\thesubsection.)}{0.1em}{}
 \renewcommand{\thesubsection}{\alph{subsection}}
-
-\def\IsInAufgabe{false}
-
-\newcommand{\aufgabenteil}[3]
-{
-%\vspace{0.3cm}
-\noindent
-\begin{minipage}{\textwidth}
-\ifthenelse{\equal{\IsInAufgabe}{false}}{}{\LaufendeAufgabeNichtGeschlossen}
-\def\IsInAufgabe{true}
-\setcounter{pointsforassignment\thesection}{\value{pointsforassignment\thesection}+\anpassung*\real{#1}}
-\escapedStringTypeout{VSEXAM: {'Typ':'AufgabenTeil', 'Punkte': '#1', 'Seite':'\thepage'}}
-\begin{tikzpicture}%
-\draw (0,-0.1) -- (0,0) -- (0.1,0);\printPos{edgeStart}%
-\end{tikzpicture}%
-\vspace{-0.7cm}
-\subsection{[#1P]}\ifthenelse{\equal{\sprache}{de}}{#2}{#3}
-}
-
-\newcommand{\aufgabenteilende}
-{
-\ifthenelse{\equal{\IsInAufgabe}{true}}{}{\AufgabeEndeOhneLaufendeAufgabe}
-\def\IsInAufgabe{false}
-%TODO: this fails if no newline before \aufgabenteilende is present
-\hspace{\textwidth}%
-\begin{tikzpicture}%
-\draw (-0.1,0) -- (0,0) -- (0,0.1);\printPos{edgeEnd}%
-\end{tikzpicture}%
-\end{minipage}
-\vspace{\parskip}
-\vspace{0.1cm}
-}
-
-%----- Definition für Lösungen ---------------------------------------
-% 2 Argumente: Anzahl zeilen, Lösung
-\newcounter{ct}
-\newcommand{\loesung}[2]
-{  \escapedStringTypeout{VSEXAM: {'Typ':'Freitext', 'Zeilen': '#1', 'Loesung': ''}}
- \ifthenelse{\equal{\zeigeloesung}{yes}}
- { % print solution
- {\color{red}\normalfont\itshape #2}
- }{ % print as many lines as requested
-  \ifthenelse{\equal{#1}{0} }
-  {}
-  {
-    \ifthenelse{\equal{#1}{0} }
-    {}
-    {
-    \vspace{1em}
-    \hrulefill
-    \vspace{1.0em}
-    \newline
-    \forloop{ct}{1}{\value{ct} < #1}
-    {
-    \vspace{1.0em}
-    \rule{\linewidth}{0.2mm}
-    \newline
-    }
-    }
-    \vspace{-0.8cm}
-  }
- }
-}
-
-% (CB) zus. Lösungs-Command für Einzeiler, z.B. in Tabellen
-\newcommand{\lineloesung}[2]{%
-  \escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
-  \ifthenelse{\equal{\zeigeloesung}{yes}}%
-  {%
-    % yes
-    {\color{red}\normalfont\itshape #2}%
-  }%
-  {%
-    % no
-    #1
-  }%
-}%
-
-
-\newcommand{\hidden}[1]
-{
- \ifthenelse{\equal{\zeigeloesung}{yes}}
-
- { % print solution
-    {\color{red}\normalfont\itshape #1}
- }{ % print as many lines as requested
-    \underline{\color{white} #1}
- }
-}
-
-%\ifthenelse{\equal{\zeigeloesung}{yes}}
-%{ % print solution
-% \pagecolor{lightred}
-%}
 
 %----- Mathetypische Aufzählungen ---------------------------------------
 %\renewcommand{\labelenumi}{\normalfont\itshape(\theenumi)}
@@ -547,6 +150,16 @@
 \endgroup
 %------------------------------------------------------------------------
 
+%----- Mathematische Sonderzeichen in Überschriften auch in bold --------
+\makeatletter
+\g@addto@macro{\sectfont}{\boldmath}
+\DeclareRobustCommand*\textsubscript[1]{%
+  \@textsubscript{\selectfont#1}}
+\def\@textsubscript#1{%
+  {\m@th\ensuremath{_{\mbox{\fontsize\sf@size\z@#1}}}}}
+\makeatother
+%------------------------------------------------------------------------
+%
 %----- Einstellungen zur Vermeidung von Hurenkindern und Schusterjungen -
 \clubpenalty=4500 % möglichst Schusterjungen vermeiden
 \widowpenalty=10000 % keine Hurenkinder
@@ -582,420 +195,16 @@
 }%
 %------------------------------------------------------------------------
 
-%----- Mathematische Sonderzeichen in Überschriften auch in bold --------
-\makeatletter
-\g@addto@macro{\sectfont}{\boldmath}
-\DeclareRobustCommand*\textsubscript[1]{%
-  \@textsubscript{\selectfont#1}}
-\def\@textsubscript#1{%
-  {\m@th\ensuremath{_{\mbox{\fontsize\sf@size\z@#1}}}}}
-\makeatother
-%------------------------------------------------------------------------
+%------ Functions for logging of data for scanning ----------------------
+\input{meta/logging.tex}
 
-%----- Aufzählung, Reihe ------------------------------------------------
-\newcommand{\folge}[2][k]{\mbox{\ensuremath{#2_1, \ldots, #2_{#1}}}}
-%------------------------------------------------------------------------
+\ifthenelse{\equal{\hasCustomLatexTask}{yes}}{
+%----- Technical symbols ------------------------------------------------
+\include{meta/symbols.tex}
+\typeout{(vs-exams.tex) Including symbols.tex}
+}{}
 
-%----- Zusätzliche Mathematische Funktionen -----------------------------
-\newcommand*\abs[1]{\left|#1\right|} % abs{-x}
-\newcommand*\ueber[2]{\left({#1\atop#2}\right)} % \ueber{n}{k}
-%------------------------------------------------------------------------
-
-%----- Befehl \textfrac{z}{n} - für schräge Brüche in Textpassagen ------
-\newcommand*{\textfrac}[2]{\ensuremath{\kern.1em
-\raise.5ex\hbox{\the\scriptfont0 #1}\kern-.1em
-/\kern-.15em\lower.25ex\hbox{\the\scriptfont0 #2}}}
-%------------------------------------------------------------------------
-
-%----- efrag - für Brüche mit (aufrecht gesetzten) Einheiten ------------
-\newcommand{\efrac}[2]{\frac{\mathrm{#1}}{\mathrm{#2}}}
-%------------------------------------------------------------------------
-
-%----- Mathematische Symbole --------------------------------------------
-% Entspricht-Symbol
-%\newcommand{\entspricht}{\mathrel{\widehat{=}}}
-\newcommand{\entspricht}{\stackrel{\scriptscriptstyle\wedge}{=}}
-% Langer Pfeil rechts mit optionalem Argument oben
-\newcommand{\rto}[1][~]{\ensuremath{\xrightarrow{\;#1\;}}}
-% Äquivalenzpfeile
-\newcommand{\same}{\ensuremath{\Leftrightarrow}}
-\newcommand{\qsame}{\quad\same\quad}
-\newcommand{\lsame}{\ensuremath{\Longleftrightarrow}}
-\newcommand{\qlsame}{\quad\lsame\quad}
-\newcommand{\dsame}{\ensuremath{:\Leftrightarrow}}
-\newcommand{\qdsame}{\quad\dsame\quad}
-\newcommand{\ldsame}{\ensuremath{:\Longleftrightarrow}}
-\newcommand{\qldsame}{\quad\ldsame\quad}
-\newcommand{\samedef}{\ensuremath{\us {\text{def}} \Leftrightarrow}}
-\newcommand{\qsamedef}{\quad\samedef\quad}
-\newcommand{\lsamedef}{\ensuremath{\us {\text{def}} \Longleftrightarrow}}
-\newcommand{\qlsamedef}{\quad\lsamedef\quad}
-\newcommand{\lto}{\longrightarrow}
-% Folgepfeil
-\newcommand{\qTo}{\quad\To\quad}
-\newcommand{\sTo}{\ \To\ }
-\newcommand{\To}{\ensuremath{\Rightarrow}}
-% Logisches Und und Oder
-\newcommand{\sand}{\ensuremath{\; \land \;}}
-\newcommand{\sor}{\ensuremath{\; \lor \;}}
-\renewcommand{\*}{\ensuremath{\cdot}}
-\newcommand{\od}{\vee}
-\newcommand{\n}{\neg}
-\newcommand{\un}{\wedge}
-% einige Negationen
-\newcommand{\nin}{\not\in}
-% Bei Integral, Summe,... die Grenzen über bzw. unter das Zeichen
-\newcommand{\I}{\int\limits}
-\newcommand{\Sum}{\sum\limits}
-\newcommand{\Prod}{\prod\limits}
-\newcommand{\Min}{\min\limits}
-\newcommand{\Max}{\max\limits}
-\newcommand{\Lim}{\lim\limits}
-\newcommand{\Inf}{\inf\limits}
-\newcommand{\Sup}{\sup\limits}
-\newcommand{\Liminf}{\liminf\limits}
-\newcommand{\Limsup}{\limsup\limits}
-\renewcommand{\Cup}{\bigcup\limits}
-\renewcommand{\Cap}{\bigcap\limits}
-\newcommand{\Otimes}{\bigotimes\limits}
-\newcommand{\Oplus}{\bigoplus\limits}
-\newcommand{\isqm}{\ensuremath{\stackrel{\mathrm{?}}{=}}}
-\renewcommand{\Re}{\text{Re}}
-\renewcommand{\Im}{\text{Im}}
-\newcommand{\const}{\text{const.}}
-\newcommand{\Epot}{E_{\text{pot}}}
-\newcommand{\Ekin}{E_{\text{kin}}}
-%------------------------------------------------------------------------
-
-%----- Logik-Symbole ----------------------------------------------------
-\newcommand{\band}{\ensuremath{\wedge}}
-\newcommand{\bAnd}{\ensuremath{\bigwedge\limits}}
-\newcommand{\bor}{\ensuremath{\vee}}
-\newcommand{\bOr}{\ensuremath{\bigvee\limits}}
-\newcommand{\xor}{\ensuremath{\oplus}}
-\newcommand{\Xor}{\ensuremath{\bigoplus\limits}}
-%------------------------------------------------------------------------
-
-%----- Mengensymbole ----------------------------------------------------
-\newcommand{\N}{\ensuremath{\mathbbm{N}}}  % natürliche Zahlen
-\newcommand{\Z}{\ensuremath{\mathbbm{Z}}}  % ganze Zahlen
-\newcommand{\Q}{\ensuremath{\mathbbm{Q}}}  % rationale Zahlen
-\newcommand{\R}{\ensuremath{\mathbbm{R}}}  % reelle Zahlen
-\newcommand{\C}{\ensuremath{\mathbbm{C}}}  % komplexe Zahlen
-\newcommand{\qH}{\ensuremath{\mathbbm{H}}} % Quaternionen
-\newcommand{\B}{\ensuremath{\mathbbm{B}}}  % Binärzahlen
-%------------------------------------------------------------------------
-
-%----- alternative griechische Kleinbuchstaben verwenden ----------------
-\newcommand*\defaultepsilon{\epsilon}
-\newcommand*\defaulttheta{\theta}
-\newcommand*\defaultphi{\phi}
-\renewcommand*\epsilon{\varepsilon}
-\renewcommand*\theta{\vartheta}
-\renewcommand*\phi{\varphi}
-\newcommand*\lamda{\lambda}
-%------------------------------------------------------------------------
-
-%----- Caligraphische Zeichen und Frakturbuchstaben ---------------------
-\newcommand{\cA}{\mathcal{A}}
-\newcommand{\cB}{\mathcal{B}}
-\newcommand{\cC}{\mathcal{C}}
-\newcommand{\cD}{\mathcal{D}}
-\newcommand{\cE}{\mathcal{E}}
-\newcommand{\cF}{\mathcal{F}}
-\newcommand{\cG}{\mathcal{G}}
-\newcommand{\cH}{\mathcal{H}}
-\newcommand{\cI}{\mathcal{I}}
-\newcommand{\cJ}{\mathcal{J}}
-\newcommand{\cK}{\mathcal{K}}
-\newcommand{\cL}{\mathcal{L}}
-\newcommand{\cM}{\mathcal{M}}
-\newcommand{\cN}{\mathcal{N}}
-\newcommand{\cO}{\mathcal{O}}
-\newcommand{\cP}{\mathcal{P}\,}
-\newcommand{\cQ}{\mathcal{Q}}
-\newcommand{\cR}{\mathcal{R}}
-\newcommand{\cS}{\mathcal{S}}
-\newcommand{\cT}{\mathcal{T}}
-\newcommand{\cU}{\mathcal{U}}
-\newcommand{\cV}{\mathcal{V}}
-\newcommand{\cW}{\mathcal{W}}
-\newcommand{\cX}{\mathcal{X}}
-\newcommand{\cY}{\mathcal{Y}}
-\newcommand{\cZ}{\mathcal{Z}}
-% Fraktur-Buchstaben
-\newcommand{\fA}{\ensuremath{\mathfrak A}}
-\newcommand{\fB}{\ensuremath{\mathfrak B}}
-\newcommand{\fC}{\ensuremath{\mathfrak C}}
-\newcommand{\fD}{\ensuremath{\mathfrak D}}
-\newcommand{\fE}{\ensuremath{\mathfrak E}}
-\newcommand{\fF}{\ensuremath{\mathfrak F}}
-\newcommand{\fG}{\ensuremath{\mathfrak G}}
-\newcommand{\fH}{\ensuremath{\mathfrak H}}
-\newcommand{\fI}{\ensuremath{\mathfrak I}}
-\newcommand{\fJ}{\ensuremath{\mathfrak J}}
-\newcommand{\fK}{\ensuremath{\mathfrak K}}
-\newcommand{\fL}{\ensuremath{\mathfrak L}}
-\newcommand{\fM}{\ensuremath{\mathfrak M}}
-\newcommand{\fN}{\ensuremath{\mathfrak N}}
-\newcommand{\fO}{\ensuremath{\mathfrak O}}
-\newcommand{\fP}{\ensuremath{\mathfrak P}}
-\newcommand{\fQ}{\ensuremath{\mathfrak Q}}
-\newcommand{\fR}{\ensuremath{\mathfrak R}}
-\newcommand{\fS}{\ensuremath{\mathfrak S}}
-\newcommand{\fT}{\ensuremath{\mathfrak T}}
-\newcommand{\fU}{\ensuremath{\mathfrak U}}
-\newcommand{\fV}{\ensuremath{\mathfrak V}}
-\newcommand{\fW}{\ensuremath{\mathfrak W}}
-\newcommand{\fX}{\ensuremath{\mathfrak X}}
-\newcommand{\fY}{\ensuremath{\mathfrak Y}}
-\newcommand{\fZ}{\ensuremath{\mathfrak Z}}
-%------------------------------------------------------------------------
-
-%----- Arcus Cotangens, Logarithmus -------------------------------------
-\newcommand{\arsin}{\operatorname{arsin}}
-\newcommand{\arcos}{\operatorname{arcos}}
-\newcommand{\arsinh}{\operatorname{arsinh}}
-\newcommand{\arcosh}{\operatorname{arcosh}}
-\newcommand{\artanh}{\operatorname{arctanh}}
-\newcommand{\arcot}{\operatorname{arcot}}
-\newcommand{\arcoth}{\operatorname{arcoth}}
-\newcommand{\Log}{\operatorname{Log}}
-\renewcommand{\exp}{\operatorname{e}}
-%------------------------------------------------------------------------
-
-%----- Bezeichnungen ----------------------------------------------------
-\newcommand{\Mat}{\operatorname{Mat}} % Matrizen
-\newcommand{\Hom}{\operatorname{Hom}} % Homomorphismus
-\newcommand{\grad}{\operatorname{grad}} % Grad
-\newcommand{\Grad}{\operatorname{Grad}} % Grad eines Polynoms
-\newcommand{\Rang}{\operatorname{Rang}} % Rang einer Matrix
-\newcommand{\Pot}{\operatorname{Pot}}   % Potenzmenge
-\newcommand{\id}{\operatorname{id}}     % Identit"at
-\newcommand{\ord}{\operatorname{ord}}   % Ordnung eines Elements
-\newcommand{\Def}{\operatorname{Def}}   % Definitionsbereich
-\newcommand{\Bild}{\operatorname{Bild}} % Bildbereich
-\newcommand{\Feld}{\operatorname{Feld}} % Feld von einer Relation
-\newcommand{\Kern}{\operatorname{Kern}} % Kern eines Homomorphismes
-\newcommand{\Det}{\operatorname{Det}}   % Determinante
-\newcommand{\Rad}{\operatorname{Rad}}   % Radikal
-\newcommand{\kgV}{\operatorname{kgV}}   % Kleinster gemeinsame Vielfache
-\newcommand{\ggT}{\operatorname{ggT}}   % Größter gemeinsame Teiler
-\newcommand{\Spur}{\operatorname{Spur}} % Spur
-\newcommand{\Char}{\operatorname{char}} % Charakteristik
-\newcommand{\diverg}{\operatorname{div}}% Divergenz
-\newcommand{\rot}{\operatorname{rot}}   % Rotation
-\newcommand*{\diff}[1]{\mathrm{d}#1}    % Differentialoperator
-%------------------------------------------------------------------------
-
-%----- häufige Abkürzungen ----------------------------------------------
-\newcommand{\oBdA}{o.\,B.\,d.\,A.\ }
-\newcommand{\zB}{z.\,B.\ }
-\newcommand{\zT}{z.\,T.\ }
-\newcommand{\insbes}{insbes.\ }
-\renewcommand{\dh}{d.\,h.\ }
-%------------------------------------------------------------------------
-
-%----- Physikalische Einheiten ------------------------------------------
-\newcommand*{\micro}{\ensuremath{\mbox{\textmu}}}
-\newcommand*{\mikro}{\ensuremath{\mbox{\textmu}}}
-\newcommand*{\microsec}{\ensureupmath{\micro s}}
-\newcommand{\Ohm}{\mathrm{\Omega}}
-\newcommand{\Celsius}{\degC}
-\SIdecimalsign{,}
-\SIthousandsep{\,}
-\SIproductsign{\cdot}
-\SIgroupfourtrue
-\SIobeyboldtrue
-% siehe Paketdokumentation zu SIstyle
-%------------------------------------------------------------------------
-
-%----- Astronomische Symbole --------------------------------------------
-\usepackage{wasysym}
-% siehe "The comprehensive LaTeX Symbol List"
-%------------------------------------------------------------------------
-
-%----- commands for multiple/single choice tables
-
-% Optionaler Parameter: Punkte pro richtigem Kreuz
-% 1. Parameter: Anzahl korrekter Antworten
-\newcommand{\mcstart}[2][1,5]{
-\escapedStringTypeout{VSEXAM: {'Typ':'MCStart', 'PunkteKorrekt': '#1', 'AnzahlKorrekt':'#2'}}
-\begin{longtable}{cp{14.5cm}}
-\blacktoprule
-\switch[#2]
-\case{=1}\multicolumn{2}{p{13.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Single Response: Für die korrekt markierte Aussage erhalten Sie \mcpoints{#1}.}
-  {Single response: You get \mcpoints{#1} for marking the correct statement.}
-} \\
-\case{=2}\multicolumn{2}{p{14.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Multiple Response: Es gibt \textbf{zwei} richtige Aussagen. Sie erhalten \mcpoints{#1} für jede markierte korrekte Aussage, jedoch \mcpoints{0} für die Teilaufgabe, falls eine falsche Aussage markiert wurde.}
-  {Multiple response: There are \textbf{two} correct statements. You get \mcpoints{#1} for each correct statement, but \mcpoints{0} for the question if you mark a wrong statement.}
-} \\
-\case{=3}\multicolumn{2}{p{14.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Multiple Response: Es gibt \textbf{drei} richtige Aussagen. Sie erhalten \mcpoints{#1} für jede markierte korrekte Aussage, jedoch \mcpoints{0} für die Teilaufgabe, falls eine falsche Aussage markiert wurde.}
-  {Multiple response: There are \textbf{three} correct statements. You get \mcpoints{#1} for each correct statement, but \mcpoints{0} for the question if you mark a wrong statement.}
-} \\
-\endswitch
-}
-
-\newcommand{\mcpoints}[1]{\ifthenelse{\equal{\sprache}{de}}{\ifthenelse{\equal{#1}{1}}{1 Punkt}{#1 Punkte}}{\ifthenelse{\equal{#1}{1}}{1 point}{#1 points}}}
-
-\newcommand{\mcend}[0]{
-\blackbottomrule
-\end{longtable}
-}
-
-% 1.+2. Parameter: DT+EN Frage, 3. Parameter w wenn wahr oder f wenn falsch
-\newcommand{\mcline}[3]{
-\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLine', 'Antwort': '#3'}}
-\ifthenelse{\equal{\zeigeloesung}{yes}}
-{\ifthenelse{\equal{#3}{f}}{\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\}{\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\}}
-{\emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\}
-}
-
-% Optionaler Parameter: Punkte pro richtigem Kreuz
-% 1. Parameter: Anzahl korrekter Antworten
-\newcommand{\mcstarttwo}[2][1,5]{
-\begin{longtable}{cp{6.75cm}cp{6.75cm}}
-\blacktoprule
-\switch[#2]
-\case{=1}\multicolumn{4}{p{14.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Single Response: Für die korrekt markierte Aussage erhalten Sie \mcpoints{#1}.}
-  {Single response: You get \mcpoints{#1} for marking the correct statement.}
-} \\
-\case{=2}\multicolumn{4}{p{14.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Multiple Response: Es gibt \textbf{zwei} richtige Aussagen. Sie erhalten \mcpoints{#1} für jede markierte korrekte Aussage, jedoch \mcpoints{0} für die Teilaufgabe, falls eine falsche Aussage markiert wurde.}
-  {Multiple response: There are \textbf{two} correct statements. You get \mcpoints{#1} for each correct statement, but \mcpoints{0} for the question if you mark a wrong statement.}
-} \\
-\endswitch
-}
-
-\newcommand{\mcendtwo}[0]{
-\blackbottomrule
-\end{longtable}
-}
-
-% 1.+2. Parameter: DT+EN 1. Frage, 3. Parameter w wenn wahr oder f wenn falsch
-% 4.+5. Parameter: DT+EN 2. Frage, 6. Parameter w wenn wahr oder f wenn falsch
-\newcommand{\mclinetwo}[6]{
-\addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLineTwo', 'Antwort1': '#3', 'Antwort2': '#6'}}
-\ifthenelse{\equal{\zeigeloesung}{yes}}
-{\ifthenelse{\equal{#3}{f}}{\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} &}{\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} &}
-\ifthenelse{\equal{#6}{f}}{\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\}{\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\}}
-{\emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} & \emptyb & \ifthenelse{\equal{\sprache}{de}}{#4}{#5} \\ }
-}
-
-\newcommand{\note}{\ifthenelse{\equal{\sprache}{de}}{Note}{Grade}}
-
-
-% (CB) Support for Property questions (NYI)
-
-\newcommand{\actualboxes}{0}
-
-% Parameter 1: Anzahl von Kästen, 2. Punkte pro row
-\newcommand{\propertystart}[2]{
-\renewcommand{\actualboxes}{#1}
-\switch[#1]
-\case{=2}
-\begin{longtable}{ccp{10.5cm}}
-\blacktoprule
-\multicolumn{3}{p{15.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Für jede richtige Zeile gibt es \mcpoints{#2}. Für falsche Zeilen gibt es keine Negativpunkte.}
-  {You get \mcpoints{#2} for each correct row. You don't get negative points for wrong rows.}
-} \\
-\case{=3}
-\begin{longtable}{cccp{9cm}}
-\blacktoprule
-\multicolumn{4}{p{15.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Für jede richtige Zeile gibt es \mcpoints{#2}. Für falsche Zeilen gibt es keine Negativpunkte.}
-  {You get \mcpoints{#2} for each correct row. You don't get negative points for wrong rows.}
-} \\
-\case{=4}
-\begin{longtable}{ccccp{8.5cm}}
-\blacktoprule
-\multicolumn{5}{p{15.5cm}}{
-  \ifthenelse{\equal{\sprache}{de}}
-  {Für jede richtige Zeile gibt es \mcpoints{#2}. Für falsche Zeilen gibt es keine Negativpunkte.}
-  {You get \mcpoints{#2} for each correct row. You don't get negative points for wrong rows.}
-} \\
-\endswitch
-}
-
-\newcommand{\propertyheader}[6]{
-\switch[\number\actualboxes]
-\case{=2}
-#3 & #4 & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-\case{=3}
-#3 & #4 & #5 & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-\case{=4}
-#3 & #4 & #5 & #6 & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-\endswitch
-}
-
-\newcommand{\propertyline}[6]{
-\addlinespace
-\switch[\number\actualboxes]
-\case{=2} \escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': '#3', 'Antwort2': '#4'}}
-\ifthenelse{\equal{\zeigeloesung}{yes}}{
-\ifthenelse{\equal{#3}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{#4}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-}{
-\emptyb & \emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-}
-\case{=3} \escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': '#3', 'Antwort2': '#4', 'Antwort3': '#5'}}
-\ifthenelse{\equal{\zeigeloesung}{yes}}{
-\ifthenelse{\equal{#3}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{#4}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{#5}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-}{
-\emptyb & \emptyb & \emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-}
-\case{=4} \escapedStringTypeout{VSEXAM: {'Typ':'PropLine', 'Antwort1': '#3', 'Antwort2': '#4', 'Antwort3': '#5', 'Antwort4': '#6'}}
-\ifthenelse{\equal{\zeigeloesung}{yes}}{
-\ifthenelse{\equal{#3}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{#4}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{#5}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{#6}{w}}{\color{red} $\tickedbox$}{\color{red} \emptyb} &
-\ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-}{
-\emptyb & \emptyb & \emptyb & \emptyb & \ifthenelse{\equal{\sprache}{de}}{#1}{#2} \\
-}
-\endswitch
-}
-
-\newcommand{\propertyend}[0]{
-\blackbottomrule
-\end{longtable}
-\renewcommand{\actualboxes}{0}
-}
-
-\newcommand{\manualText}[2]{
-\ifthenelse{\equal{\sprache}{de}}{#1}{#2}
-}
-
-\newcommand{\bildAufgabe}[4]{\escapedStringTypeout{VSEXAM: {'Typ':'BildAufgabe', 'Bildtext': '', 'Loesungsbild': ''}}\ifthenelse{\equal{\zeigeloesung}{no}}{
-%\begin{figure}[h]
-%\centering
-\includegraphics[width=#2]{#3}
-\centerline{\textit{#1}}
-%\end{figure}
-}{
-%\begin{figure}[h]
-%\centering
-\includegraphics[width=#2]{#4}
-\centerline{\textit{#1}}
-%\end{figure}
-}}
-
+%------ Commands for latex task type
+\input{meta/commands.tex}
 
 \endinput

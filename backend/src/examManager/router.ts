@@ -1,35 +1,20 @@
 import { Router } from "@oak/oak";
-import { Database, ObjectId } from "@db/mongo";
+import { Database, Document, ObjectId } from "@db/mongo";
 import { read, utils } from "@mirror/xlsx";
 import { crypto } from "@std/crypto";
 import { encodeHex } from "@std/encoding";
 import * as fs from "@std/fs";
 
-import { Exam } from "./exam.ts";
+import { Exam, Language } from "../types/exam.ts";
+import { Student } from "../types/student.ts";
 import {
   compileExam,
+  generateSolution,
   generateTasksLatex,
   renderMetaExam,
-  renderMetaStudent,
 } from "./generation.ts";
-
-interface ExamGenerationJob {
-  jobId: string;
-  examId: string;
-  userEmail: string;
-  status: "queued" | "processing" | "finalizing" | "completed" | "failed";
-  progress: {
-    total: number;
-    completed: number;
-    failed: number;
-  };
-  jobDir: string;
-  zipPath?: string;
-  createdAt: Date;
-  studentData: any[];
-  randomNumbers: { de: string; en: string }[];
-  studentResults: any[];
-}
+import { ExamGenerationJob } from "./runtime.ts";
+import { ensureQRCache } from "../services/qr.ts";
 
 interface AppState {
   db: Database;
@@ -39,7 +24,7 @@ interface AppState {
   basePath: string;
   JOBS_DIR: string;
   processQueue: () => void;
-  genRandomNumber: (lang: "de" | "en", counter: number) => string;
+  genExamCode: (lang: Language, counter: number) => string;
   getDownloadableJobs: () => Promise<{ examId: string; jobId: string }[]>;
   parseLogFileForSubtaskInfo: (logContent: string) => any[];
 }
@@ -52,7 +37,7 @@ export function configureExamManagerRouter({
   basePath,
   JOBS_DIR,
   processQueue,
-  genRandomNumber,
+  genExamCode,
   getDownloadableJobs,
   parseLogFileForSubtaskInfo,
 }: AppState): Router {
@@ -287,25 +272,15 @@ export function configureExamManagerRouter({
     })
     .post("/generate-exam", async (ctx) => {
       try {
-        const exam: Exam = await ctx.request.body.json();
+        const exam: Exam = Object.assign(
+          new Exam(),
+          await ctx.request.body.json(),
+        );
         const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
+        exam.fillPagesAndPoints();
+        await ensureQRCache(1, exam.pageCount!);
         await fs.copy(basePath, tempDir, { overwrite: true });
-        const tasksPath = `${tempDir}/aufgaben.tex`;
-        await renderMetaExam(exam, tempDir);
-        await renderMetaStudent(
-          {
-            vollername: "Max Musterlösung",
-            zeigeloesung: "yes",
-            sprache: "de",
-          },
-          tempDir,
-        );
-        await generateTasksLatex(
-          exam,
-          tempDir,
-          tasksPath,
-          { solution: true },
-        );
+        await generateSolution(tempDir, exam);
 
         const { pdfBytes: examPDF, logContent } = await compileExam(tempDir);
 
@@ -352,7 +327,7 @@ export function configureExamManagerRouter({
       await Deno.mkdir(uploadDir, { recursive: true });
       await Deno.writeFile(filePath, data);
       console.log("File saved to:", filePath);
-      const fileTrackerEntry: any = {
+      const fileTrackerEntry: Document = {
         name: file.name,
         refs: [],
         timeToLive: 7,
@@ -378,13 +353,17 @@ export function configureExamManagerRouter({
     .post("/generate-exams", async (ctx) => {
       try {
         const formData = await ctx.request.body.formData();
-        const examJson: Exam = JSON.parse(formData.get("exam")!.toString());
+        const examJson = JSON.parse(formData.get("exam")!.toString());
+        const exam: Exam = Object.assign(
+          new Exam(),
+          examJson,
+        );
         const startSeatNumber = parseInt(
           formData.get("startSeatNumber")?.toString() || "1",
           10,
         );
         const file = formData.get("list") as File;
-        if (!file || !examJson || file.size == 0 || !examJson._id) {
+        if (!file || !exam || file.size == 0 || !exam._id) {
           ctx.response.status = 400;
           ctx.response.body = {
             message: "Missing file, file content, exam data or exam id",
@@ -392,7 +371,7 @@ export function configureExamManagerRouter({
           return;
         }
 
-        const examId = examJson._id;
+        const examId = exam._id;
 
         for (const [jobId, existingJob] of jobs.entries()) {
           if (existingJob.examId === examId) {
@@ -441,10 +420,11 @@ export function configureExamManagerRouter({
           dir: jobDir,
         });
 
+        exam.fillPagesAndPoints();
         await fs.copy(basePath, jobTemplatePath, { overwrite: true });
-        await renderMetaExam(examJson, jobTemplatePath);
+        await renderMetaExam(exam, jobTemplatePath);
         await generateTasksLatex(
-          examJson,
+          exam,
           jobTemplatePath,
           `${jobTemplatePath}/aufgaben.tex`,
           { solution: false },
@@ -465,6 +445,10 @@ export function configureExamManagerRouter({
             range: 5,
           })
           .filter((student: any) => student.firstName && student.lastName);
+        const qrCachePromise = ensureQRCache(
+          studentData.length,
+          exam.pageCount!,
+        );
 
         const totalTasks = studentData.length + 3;
 
@@ -477,24 +461,38 @@ export function configureExamManagerRouter({
           jobDir,
           createdAt: new Date(),
           studentData,
-          randomNumbers: [],
+          examCodes: [],
           studentResults: [],
         };
 
-        studentData.forEach((student: any, index: number) => {
+        let placeholderStudentID = 1000000;
+        studentData.forEach((studentLine: any, index: number) => {
           const seatNumber = index + startSeatNumber;
-          const deRandomNumber = genRandomNumber("de", seatNumber);
-          const enRandomNumber = genRandomNumber("en", seatNumber);
+          const deExamCode = genExamCode("DE", seatNumber);
+          const enExamCode = genExamCode("EN", seatNumber);
 
-          newJob.randomNumbers.push({ de: deRandomNumber, en: enRandomNumber });
+          const student = new Student(
+            `${studentLine.firstName} ${studentLine.lastName}`,
+            studentLine.studentId != ""
+              ? studentLine.studentId
+              : placeholderStudentID++,
+            {
+              DE: deExamCode,
+              EN: enExamCode,
+            },
+            seatNumber,
+          );
+
+          newJob.examCodes.push({ de: deExamCode, en: enExamCode });
           taskQueue.push({
             type: "student",
             jobId,
+            exam,
             student,
             jobTemplatePath,
             outputDir: tempOutputDir,
-            deRandomNumber,
-            enRandomNumber,
+            deRandomNumber: deExamCode,
+            enRandomNumber: enExamCode,
             seatNumber,
           });
         });
@@ -523,16 +521,10 @@ export function configureExamManagerRouter({
         });
 
         await fs.copy(basePath, solutionJobTemplatePath, { overwrite: true });
-        await renderMetaExam(examJson, solutionJobTemplatePath);
-        await generateTasksLatex(
-          examJson,
-          solutionJobTemplatePath,
-          `${solutionJobTemplatePath}/aufgaben.tex`,
-          { solution: true },
-        );
 
         taskQueue.push({
           type: "solution",
+          exam,
           jobId,
           jobTemplatePath: solutionJobTemplatePath,
           outputDir: tempOutputDir,
@@ -540,6 +532,7 @@ export function configureExamManagerRouter({
 
         jobs.set(jobId, newJob);
 
+        await qrCachePromise;
         workers.forEach(() => processQueue());
 
         ctx.response.status = 202;

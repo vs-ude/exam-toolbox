@@ -1,0 +1,235 @@
+
+%----- Math stuff -------------------------------------------------------
+\usepackage{mathcomp}
+\usepackage{icomma}
+\usepackage{amsmath,amssymb,amsfonts,bbm}
+\usepackage{amsthm}   % AMS-Theoremumgebung
+\usepackage{stmaryrd}	% Symbole, u. A. \lightning
+\usepackage{units}
+\usepackage{sistyle} % für physikalische Einheiten z. B. \SI{1000}{m/s^2}
+
+%----- Aufzählung, Reihe ------------------------------------------------
+\newcommand{\folge}[2][k]{\mbox{\ensuremath{#2_1, \ldots, #2_{#1}}}}
+%------------------------------------------------------------------------
+
+%----- Zusätzliche Mathematische Funktionen -----------------------------
+\newcommand*\abs[1]{\left|#1\right|} % abs{-x}
+\newcommand*\ueber[2]{\left({#1\atop#2}\right)} % \ueber{n}{k}
+%------------------------------------------------------------------------
+
+%----- Befehl \textfrac{z}{n} - für schräge Brüche in Textpassagen ------
+\newcommand*{\textfrac}[2]{\ensuremath{\kern.1em
+\raise.5ex\hbox{\the\scriptfont0 #1}\kern-.1em
+/\kern-.15em\lower.25ex\hbox{\the\scriptfont0 #2}}}
+%------------------------------------------------------------------------
+
+%----- efrag - für Brüche mit (aufrecht gesetzten) Einheiten ------------
+\newcommand{\efrac}[2]{\frac{\mathrm{#1}}{\mathrm{#2}}}
+%------------------------------------------------------------------------
+
+%----- Mathematische Symbole --------------------------------------------
+% Entspricht-Symbol
+%\newcommand{\entspricht}{\mathrel{\widehat{=}}}
+\newcommand{\entspricht}{\stackrel{\scriptscriptstyle\wedge}{=}}
+% Langer Pfeil rechts mit optionalem Argument oben
+\newcommand{\rto}[1][~]{\ensuremath{\xrightarrow{\;#1\;}}}
+% Äquivalenzpfeile
+\newcommand{\same}{\ensuremath{\Leftrightarrow}}
+\newcommand{\qsame}{\quad\same\quad}
+\newcommand{\lsame}{\ensuremath{\Longleftrightarrow}}
+\newcommand{\qlsame}{\quad\lsame\quad}
+\newcommand{\dsame}{\ensuremath{:\Leftrightarrow}}
+\newcommand{\qdsame}{\quad\dsame\quad}
+\newcommand{\ldsame}{\ensuremath{:\Longleftrightarrow}}
+\newcommand{\qldsame}{\quad\ldsame\quad}
+\newcommand{\samedef}{\ensuremath{\us {\text{def}} \Leftrightarrow}}
+\newcommand{\qsamedef}{\quad\samedef\quad}
+\newcommand{\lsamedef}{\ensuremath{\us {\text{def}} \Longleftrightarrow}}
+\newcommand{\qlsamedef}{\quad\lsamedef\quad}
+\newcommand{\lto}{\longrightarrow}
+% Folgepfeil
+\newcommand{\qTo}{\quad\To\quad}
+\newcommand{\sTo}{\ \To\ }
+\newcommand{\To}{\ensuremath{\Rightarrow}}
+% Logisches Und und Oder
+\newcommand{\sand}{\ensuremath{\; \land \;}}
+\newcommand{\sor}{\ensuremath{\; \lor \;}}
+\renewcommand{\*}{\ensuremath{\cdot}}
+\newcommand{\od}{\vee}
+\newcommand{\n}{\neg}
+\newcommand{\un}{\wedge}
+% einige Negationen
+\newcommand{\nin}{\not\in}
+% Bei Integral, Summe,... die Grenzen über bzw. unter das Zeichen
+\newcommand{\I}{\int\limits}
+\newcommand{\Sum}{\sum\limits}
+\newcommand{\Prod}{\prod\limits}
+\newcommand{\Min}{\min\limits}
+\newcommand{\Max}{\max\limits}
+\newcommand{\Lim}{\lim\limits}
+\newcommand{\Inf}{\inf\limits}
+\newcommand{\Sup}{\sup\limits}
+\newcommand{\Liminf}{\liminf\limits}
+\newcommand{\Limsup}{\limsup\limits}
+\renewcommand{\Cup}{\bigcup\limits}
+\renewcommand{\Cap}{\bigcap\limits}
+\newcommand{\Otimes}{\bigotimes\limits}
+\newcommand{\Oplus}{\bigoplus\limits}
+\newcommand{\isqm}{\ensuremath{\stackrel{\mathrm{?}}{=}}}
+\renewcommand{\Re}{\text{Re}}
+\renewcommand{\Im}{\text{Im}}
+\newcommand{\const}{\text{const.}}
+\newcommand{\Epot}{E_{\text{pot}}}
+\newcommand{\Ekin}{E_{\text{kin}}}
+%------------------------------------------------------------------------
+
+%----- Logik-Symbole ----------------------------------------------------
+\newcommand{\band}{\ensuremath{\wedge}}
+\newcommand{\bAnd}{\ensuremath{\bigwedge\limits}}
+\newcommand{\bor}{\ensuremath{\vee}}
+\newcommand{\bOr}{\ensuremath{\bigvee\limits}}
+\newcommand{\xor}{\ensuremath{\oplus}}
+\newcommand{\Xor}{\ensuremath{\bigoplus\limits}}
+%------------------------------------------------------------------------
+
+%----- Mengensymbole ----------------------------------------------------
+\newcommand{\N}{\ensuremath{\mathbbm{N}}}  % natürliche Zahlen
+\newcommand{\Z}{\ensuremath{\mathbbm{Z}}}  % ganze Zahlen
+\newcommand{\Q}{\ensuremath{\mathbbm{Q}}}  % rationale Zahlen
+\newcommand{\R}{\ensuremath{\mathbbm{R}}}  % reelle Zahlen
+\newcommand{\C}{\ensuremath{\mathbbm{C}}}  % komplexe Zahlen
+\newcommand{\qH}{\ensuremath{\mathbbm{H}}} % Quaternionen
+\newcommand{\B}{\ensuremath{\mathbbm{B}}}  % Binärzahlen
+%------------------------------------------------------------------------
+
+%----- alternative griechische Kleinbuchstaben verwenden ----------------
+\newcommand*\defaultepsilon{\epsilon}
+\newcommand*\defaulttheta{\theta}
+\newcommand*\defaultphi{\phi}
+\renewcommand*\epsilon{\varepsilon}
+\renewcommand*\theta{\vartheta}
+\renewcommand*\phi{\varphi}
+\newcommand*\lamda{\lambda}
+%------------------------------------------------------------------------
+
+%----- Caligraphische Zeichen und Frakturbuchstaben ---------------------
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cG}{\mathcal{G}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\cI}{\mathcal{I}}
+\newcommand{\cJ}{\mathcal{J}}
+\newcommand{\cK}{\mathcal{K}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cM}{\mathcal{M}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cO}{\mathcal{O}}
+\newcommand{\cP}{\mathcal{P}\,}
+\newcommand{\cQ}{\mathcal{Q}}
+\newcommand{\cR}{\mathcal{R}}
+\newcommand{\cS}{\mathcal{S}}
+\newcommand{\cT}{\mathcal{T}}
+\newcommand{\cU}{\mathcal{U}}
+\newcommand{\cV}{\mathcal{V}}
+\newcommand{\cW}{\mathcal{W}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cY}{\mathcal{Y}}
+\newcommand{\cZ}{\mathcal{Z}}
+% Fraktur-Buchstaben
+\newcommand{\fA}{\ensuremath{\mathfrak A}}
+\newcommand{\fB}{\ensuremath{\mathfrak B}}
+\newcommand{\fC}{\ensuremath{\mathfrak C}}
+\newcommand{\fD}{\ensuremath{\mathfrak D}}
+\newcommand{\fE}{\ensuremath{\mathfrak E}}
+\newcommand{\fF}{\ensuremath{\mathfrak F}}
+\newcommand{\fG}{\ensuremath{\mathfrak G}}
+\newcommand{\fH}{\ensuremath{\mathfrak H}}
+\newcommand{\fI}{\ensuremath{\mathfrak I}}
+\newcommand{\fJ}{\ensuremath{\mathfrak J}}
+\newcommand{\fK}{\ensuremath{\mathfrak K}}
+\newcommand{\fL}{\ensuremath{\mathfrak L}}
+\newcommand{\fM}{\ensuremath{\mathfrak M}}
+\newcommand{\fN}{\ensuremath{\mathfrak N}}
+\newcommand{\fO}{\ensuremath{\mathfrak O}}
+\newcommand{\fP}{\ensuremath{\mathfrak P}}
+\newcommand{\fQ}{\ensuremath{\mathfrak Q}}
+\newcommand{\fR}{\ensuremath{\mathfrak R}}
+\newcommand{\fS}{\ensuremath{\mathfrak S}}
+\newcommand{\fT}{\ensuremath{\mathfrak T}}
+\newcommand{\fU}{\ensuremath{\mathfrak U}}
+\newcommand{\fV}{\ensuremath{\mathfrak V}}
+\newcommand{\fW}{\ensuremath{\mathfrak W}}
+\newcommand{\fX}{\ensuremath{\mathfrak X}}
+\newcommand{\fY}{\ensuremath{\mathfrak Y}}
+\newcommand{\fZ}{\ensuremath{\mathfrak Z}}
+%------------------------------------------------------------------------
+
+%----- Arcus Cotangens, Logarithmus -------------------------------------
+\newcommand{\arsin}{\operatorname{arsin}}
+\newcommand{\arcos}{\operatorname{arcos}}
+\newcommand{\arsinh}{\operatorname{arsinh}}
+\newcommand{\arcosh}{\operatorname{arcosh}}
+\newcommand{\artanh}{\operatorname{arctanh}}
+\newcommand{\arcot}{\operatorname{arcot}}
+\newcommand{\arcoth}{\operatorname{arcoth}}
+\newcommand{\Log}{\operatorname{Log}}
+\renewcommand{\exp}{\operatorname{e}}
+%------------------------------------------------------------------------
+
+%----- Bezeichnungen ----------------------------------------------------
+\newcommand{\Mat}{\operatorname{Mat}} % Matrizen
+\newcommand{\Hom}{\operatorname{Hom}} % Homomorphismus
+\newcommand{\grad}{\operatorname{grad}} % Grad
+\newcommand{\Grad}{\operatorname{Grad}} % Grad eines Polynoms
+\newcommand{\Rang}{\operatorname{Rang}} % Rang einer Matrix
+\newcommand{\Pot}{\operatorname{Pot}}   % Potenzmenge
+\newcommand{\id}{\operatorname{id}}     % Identit"at
+\newcommand{\ord}{\operatorname{ord}}   % Ordnung eines Elements
+\newcommand{\Def}{\operatorname{Def}}   % Definitionsbereich
+\newcommand{\Bild}{\operatorname{Bild}} % Bildbereich
+\newcommand{\Feld}{\operatorname{Feld}} % Feld von einer Relation
+\newcommand{\Kern}{\operatorname{Kern}} % Kern eines Homomorphismes
+\newcommand{\Det}{\operatorname{Det}}   % Determinante
+\newcommand{\Rad}{\operatorname{Rad}}   % Radikal
+\newcommand{\kgV}{\operatorname{kgV}}   % Kleinster gemeinsame Vielfache
+\newcommand{\ggT}{\operatorname{ggT}}   % Größter gemeinsame Teiler
+\newcommand{\Spur}{\operatorname{Spur}} % Spur
+\newcommand{\Char}{\operatorname{char}} % Charakteristik
+\newcommand{\diverg}{\operatorname{div}}% Divergenz
+\newcommand{\rot}{\operatorname{rot}}   % Rotation
+\newcommand*{\diff}[1]{\mathrm{d}#1}    % Differentialoperator
+%------------------------------------------------------------------------
+
+%----- häufige Abkürzungen ----------------------------------------------
+\newcommand{\oBdA}{o.\,B.\,d.\,A.\ }
+\newcommand{\zB}{z.\,B.\ }
+\newcommand{\zT}{z.\,T.\ }
+\newcommand{\insbes}{insbes.\ }
+\renewcommand{\dh}{d.\,h.\ }
+%------------------------------------------------------------------------
+
+%----- Physikalische Einheiten ------------------------------------------
+\newcommand*{\micro}{\ensuremath{\mbox{\textmu}}}
+\newcommand*{\mikro}{\ensuremath{\mbox{\textmu}}}
+\newcommand*{\microsec}{\ensureupmath{\micro s}}
+\newcommand{\Ohm}{\mathrm{\Omega}}
+\newcommand{\Celsius}{\degC}
+\SIdecimalsign{,}
+\SIthousandsep{\,}
+\SIproductsign{\cdot}
+\SIgroupfourtrue
+\SIobeyboldtrue
+% siehe Paketdokumentation zu SIstyle
+%------------------------------------------------------------------------
+
+%----- Astronomische Symbole --------------------------------------------
+\usepackage{wasysym}
+% siehe "The comprehensive LaTeX Symbol List"
+%------------------------------------------------------------------------
+
+%----- Boolean expressions ----------------------------------------------
+\usepackage{boolexpr}

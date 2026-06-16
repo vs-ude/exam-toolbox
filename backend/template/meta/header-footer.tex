@@ -1,0 +1,35 @@
+\pagestyle{scrheadings}
+\clearpairofpagestyles
+\addtolength{\topmargin}{1.05cm}
+\addtolength{\headheight}{0.8mm}
+\addtolength{\footheight}{0.8mm}
+\addtolength{\headsep}{-2em}
+\setlength{\footskip}{32pt}
+\addtolength{\textheight}{1.28cm}
+
+%----- Header ---------------------------------------
+\chead{
+\color{darkgray2}
+\arrayrulecolor{darkgray1}
+\setlength{\arrayrulewidth}{1pt}
+
+\begin{tabularx}{\textwidth}{|r|X|r|}
+\cellcolor{lightgray1} \rotatebox[origin=c]{180}{\textcolor{black}{\matrikelnummer}\hspace{2mm}} &
+\cellcolor{lightgray1} \textcolor{black}{\veranstaltung} &
+\cellcolor{lightgray1} \semester \\
+\hline
+
+\cellcolor{lightgray2} \rotatebox[origin=c]{180}{\textcolor{black}{\#\randomexamnumber}} &
+\cellcolor{lightgray2} \pruefer &
+\cellcolor{lightgray2} \seite \ \thepage/\pageCount \\
+\hline
+\end{tabularx}
+}
+
+%----- Footer ---------------------------------------
+\cfoot{
+ % \begin{tabular}{cc}
+ \includegraphics[height=1.5cm]{\qrcachepath/\randomexamnumber_\thepage.png} \printPos{pageQr}
+ % \includegraphics[height=1.5cm]{\qrcachepath/\randomexamnumber_\thepage.png} \printPos{pageQr} & \#\randomexamnumber
+ % \end{tabular}
+}

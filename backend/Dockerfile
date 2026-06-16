@@ -18,7 +18,8 @@ FROM denoland/deno:latest
 RUN apt-get update \
     && apt-get install -qy -o=Dpkg::Use-Pty=0 --no-install-recommends \
     libfontconfig libgraphite2-3 libharfbuzz0b libicu76 zlib1g libharfbuzz-icu0 libssl3 ca-certificates \
-    ghostscript \
+    ghostscript imagemagick \
+    zbar-tools qrencode \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/cargo/bin/tectonic /usr/bin/

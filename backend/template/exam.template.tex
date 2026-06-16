@@ -1,0 +1,58 @@
+%%
+% Exam metadata
+%%
+\newcommand{\veranstaltung}{<#~ it.veranstaltung #>}
+\newcommand{\semester}{<#~ it.semester #>} % z.B. SS\ 2012
+\newcommand{\pruefer}{<#~ it.pruefer #>}
+\newcommand{\datum}{<#~ it.datum #>} % Format: YYYY-MM-DD
+\newcommand{\examduration}{<#~ it.duration #>} % In minutes
+\newcommand{\englishandgerman}{<#~ it.englishandgerman #>} % (CB) set to yes if a german and an english version are provided
+\newcommand{\examPoints}{<#~ it.points #>}
+\newcommand{\qrcachepath}{<#~ it.qrCachePath #>}
+\newcommand{\pageCount}{<#~ it.pageCount #>}
+\newcommand{\schmierblaetteranzahl}{<#~ it.schmierblaetteranzahl #>}
+\newcommand{\hasCustomLatexTask}{<#~ it.hasCustomLatexTask ? "yes" : "no" #>}
+
+% Include the variables for the individual exam
+\input{student.tex}
+
+% Setup
+\include{vs-exams.tex}
+
+\graphicspath{{img/}}
+
+\begin{document}
+
+\include{pages/title.tex}
+\include{pages/info-\sprache}
+
+\include{aufgaben.tex}
+
+\ifthenelse{\equal{\zeigeloesung}{yes}}{
+\chead{}
+<# if ((it.schmierblaetteranzahl & 1) == 1) { #>
+~
+\vspace{5cm}
+\begin{center}
+\LARGE
+Intentionally left blank.
+\end{center}
+\clearpage
+<# } #>
+\begin{center}
+~\\
+\vspace{8cm}
+\begin{color}{red}\normalfont
+\textbf{\LARGE MUSTERLÖSUNG}
+\end{color}
+\end{center}
+}{
+<# for (let i = 0; i < it.schmierblaetteranzahl; i++) { #>
+\input{pages/concept.tex}
+<# } #>
+\chead{}
+\input{pages/do-not-touch.tex}
+}
+
+\end{document}
+\endinput

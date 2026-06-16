@@ -6,12 +6,29 @@ image: docker:25.0.5
 variables:
   DOCKER_TLS_CERTDIR: ""
 
-backend_unittests:
+backend_tests:
   image: denoland/deno:latest
   stage: test
-  script:
+  variables:
+    DENO_DIR: $CI_PROJECT_DIR/.deno_cache
+  cache:
+    - key:
+        files:
+          - backend/deno.lock
+      paths:
+        - .deno_cache/
+    - key:
+        files:
+          - .ci/backend_integration_packages.txt
+      paths:
+        - .apt-cache/lists/
+        - .apt-cache/archives/
+  before_script:
+    - bash .ci/prepare_backend_integration.sh .ci/backend_integration_packages.txt
     - cd backend
-    - deno test --allow-env --allow-read
+    - deno install
+  script:
+    - deno run test:integration
 
 # Cypress Tests
 cypress_e2e:

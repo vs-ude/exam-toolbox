@@ -1,8 +1,6 @@
 import { Router } from "@oak/oak";
 import { Database } from "@db/mongo";
-import { crypto } from "@std/crypto";
-import { encodeHex } from "@std/encoding";
-import { Exam, Task } from "./exam.ts";
+import { type Task } from "../types/exam.ts";
 import { emptyDir } from "@std/fs";
 
 interface AppState {

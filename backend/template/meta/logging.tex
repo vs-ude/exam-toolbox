@@ -1,0 +1,34 @@
+%----- Page Border Factor ----------------------------------
+\newcommand{\pageBorderFactor}{0.9235}
+\typeout{VSEXAM: {'Typ':'borderGeo', 'borderFactor': '\pageBorderFactor'}}%
+
+%----- Output escaping for logging
+{\catcode`\ =12\relax\gdef\viktorotherspace{ }}%
+\def\vcodes{%
+  \catcode`\ =12\relax
+}%
+
+\def\setescape{%
+  \let\ =\viktorotherspace%
+}
+\def\escapedStringTypeout#1{\escapeStringSec{#1}}%
+\newcommand\escapeStringSec[1]{%
+  \begingroup%
+    \bgroup\vcodes\setescape\typeout{#1}\egroup
+  \endgroup
+}%
+
+% Ausgabe der Ecken um Aufgaben
+\newdimen\DimX \newdimen\DimY
+\usepackage{xcolor,zref-savepos}
+\makeatletter
+\newcommand\printPos[1]{% IMPORTANT: end every line with a comment! otherwise spaces might leak!
+\zsavepos{pos#1\thesection\thesubsection\thepage}%
+\DimX=\zposx{pos#1\thesection\thesubsection\thepage}sp\relax \DimX=0.03515\DimX%
+\DimY=\zposy{pos#1\thesection\thesubsection\thepage}sp\relax \DimY=0.03515\DimY%
+\escapedStringTypeout{VSEXAM: {'Typ':'#1', 'X': '\strip@pt\DimX', 'Y':'\strip@pt\DimY'}}%
+}
+%\DimX=\textwidth\relax%
+\DimX=0.03515\hsize%
+\escapedStringTypeout{VSEXAM: {'Typ':'pageGeo', 'hsize': '\strip@pt\DimX'}}%
+\makeatother

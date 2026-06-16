@@ -1,6 +1,6 @@
 import { Router } from "@oak/oak";
 import { Database, ObjectId } from "@db/mongo";
-import { Tag } from "./tag.ts";
+import { Tag } from "../types/tag.ts";
 
 interface AppState {
   db: Database;

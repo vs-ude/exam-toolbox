@@ -1,42 +1,44 @@
 \escapedStringTypeout{VSEXAM: {'Typ':'MCStart', 'PunkteKorrekt': '<#~ it.pointsPerCorrect #>', 'AnzahlKorrekt':'<#~ it.numCorrect #>'}}
 
-<# let tableConf = "cp{14.3cm}"; let inc = 1; if (it.condensed) {tableConf="cp{6.5cm}cp{6.5cm}"; inc = 2;} #>
+<# let tableConf = "cX"; let inc = 1; if (it.condensed) {tableConf="cXcX"; inc = 2;} #>
 
-\begin{longtable}{<#~ tableConf #>}
+\begin{tabularx}{\textwidth}{<#~ tableConf #>}
 \blacktoprule
 
-\multicolumn{<# if (it.condensed) { #>4<# } else { #>2<# } #>}{p{14.3cm}}{
+\multicolumn{<# if (it.condensed) { #>4<# } else { #>2<# } #>}{p{\textwidth}}{
+\ifthenelse{\equal{\sprache}{de}}
 <# if (it.numCorrect == 1) { #>
-  \ifthenelse{\equal{\sprache}{de}}
-  {Single Response: Für die korrekt markierte Aussage erhalten Sie <#~ it.pointsPerCorrect #> Punkt(e).}
-  {Single response: You get <#~ it.pointsPerCorrect #> point(s) for marking the correct statement.}
+{Single Response: Für die korrekt markierte Aussage erhalten Sie <#~ it.pointsPerCorrect #> Punkt(e).}
+{Single response: You get <#~ it.pointsPerCorrect #> point(s) for marking the correct statement.}
 <# } else { #>
-  \ifthenelse{\equal{\sprache}{de}}
-  {Multiple Response: Es gibt \textbf{<#~ it.numCorrect #>} richtige Aussagen. Sie erhalten <#~ it.pointsPerCorrect #> Punkt(e) für jede markierte korrekte Aussage, jedoch 0 Punkte für die Teilaufgabe, falls eine falsche Aussage markiert wurde.}
-  {Multiple response: There are \textbf{<#~ it.numCorrect #>} correct statements. You get <#~ it.pointsPerCorrect#> point(s) for each correct statement, but 0 points for the question if you mark a wrong statement.}
+{Multiple Response: Es gibt \textbf{<#~ it.numCorrect #>} richtige Aussagen. Sie erhalten <#~ it.pointsPerCorrect #> Punkt(e) für jede markierte korrekte Aussage, jedoch 0 Punkte für die Teilaufgabe, falls eine falsche Aussage markiert wurde.}
+{Multiple response: There are \textbf{<#~ it.numCorrect #>} correct statements. You get <#~ it.pointsPerCorrect#> point(s) for each correct statement, but 0 points for the question if you mark a wrong statement.}
 <# } #>
 } \\
 
 <# let delim = "\\\\" /* Escaped LaTeX newline */ #>
 <# for (let i = 0; i < it.answerOptions.length; i++) { #>
+
 <# if (!it.condensed) { #>
 \addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLine', 'Antwort': '<#~ it.answerOptions[i].correct #>'}}
 <# delim = "\\\\" #>
-<# } else if (i & 1 == 0) /* Linter-friendly check if num is even */ { #>
+<# } else if ((i & 1) == 0) /* Linter-friendly check if num is even */ { #>
 \addlinespace \escapedStringTypeout{VSEXAM: {'Typ':'MCLineTwo', 'Antwort1': '<#~ it.answerOptions[i].correct #>', 'Antwort2': '<#~ it.answerOptions[i+1].correct #>'}}
 <# delim = "&" #>
 <# } else { #>
 <# delim = "\\\\" #>
 <# } #>
+
 <# if (it.solution) { #>
   <# if (it.answerOptions[i].correct == "w") { #>
-  \color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].DE #>}{<#~ it.answerOptions[i].EN #>} <#~ delim #>
+\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].DE #>}{<#~ it.answerOptions[i].EN #>} <#~ delim #>
   <# } else { #>
-  \color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].DE #>}{<#~ it.answerOptions[i].EN #>} <#~ delim #>
+\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].DE #>}{<#~ it.answerOptions[i].EN #>} <#~ delim #>
   <# } #>
 <# } else { #>
-  \emptyb & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].DE #>}{<#~ it.answerOptions[i].EN #>} <#~ delim #>
+\emptyb & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].DE #>}{<#~ it.answerOptions[i].EN #>} <#~ delim #>
+
 <# }} #>
 
 \blackbottomrule
-\end{longtable}
+\end{tabularx}
