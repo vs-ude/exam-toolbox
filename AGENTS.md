@@ -16,19 +16,31 @@ The rendering pipeline is LaTeX-based and supports bilingual output (DE/EN). Use
 - Merge generated PDFs and provide downloadable ZIP artifacts
 - Generate attendance CSV data alongside exam outputs
 - Restrict access to authenticated LDAP users with required role membership
+- Embed QR codes in generated exams (front-page exam QR and per-page QR codes with page-level cache pre-generation)
+- Scan and decode QR codes from exam images, with ImageMagick-based contrast pre-processing to improve reliability
 
 ## Planned/next product step
 
-The repository is positioned for a later workflow stage where scanned written exams can be ingested after the exam session and used to support semi-automated grading.
+The scan ingest pipeline is actively being built. Scanned written exams can already be decoded (QR detection + exam-code validation with checksum); the next step is wiring this into a full grading-support workflow.
 
 ## Repository structure
 
 - `frontend/`: Angular 18 application (UI for dashboard, exam builder, task pool, search, exam pool, mass-generation dialog)
 - `backend/`: Deno + Oak API, MongoDB integration, LaTeX generation pipeline, worker pool for mass generation
-- `backend/template/`: LaTeX template sources, style files, and helper assets/scripts used for exam rendering
+  - `src/api/`: Oak router configuration (separated from handler logic)
+  - `src/examManager/`: exam/task/tag/generation handlers
+  - `src/services/`: shared services – DB access, QR generation/scanning, image pre-processing, exam codes, ZIP
+  - `src/types/`: shared TypeScript types (exam, scan, student, tag, …)
+  - `src/config/`: runtime configuration constants
+- `backend/template/`: LaTeX template sources, split into:
+  - `meta/`: shared LaTeX macros (background, commands, header/footer, localisation, logging, symbols)
+  - `pages/`: individual page templates (title, info, concept, do-not-touch)
+  - `task_types/`: per-task-type Eta templates rendered by the backend before LaTeX compilation
+  - `cache/qr/`: pre-generated per-page QR code PNGs
 - `caddy/`: Caddy reverse proxy + authentication portal integration (LDAP via caddy-security), static frontend serving
 - `ldap/`: LDAP bootstrap/test data for local/dev environments
 - `periodical/`: cron-based cleanup container for old mass-generation job directories
+- `testdata/`: shared test fixtures (exam JSON, CSVs, images, sample scanned exam JPEGs)
 - `docker-compose.yml`: local orchestration for caddy, backend, mongo, ldap, mail sandbox, and periodic cleanup
 
 ## Architecture and runtime model
@@ -53,6 +65,11 @@ The repository is positioned for a later workflow stage where scanned written ex
   - track progress and expose job status/download endpoints
   - merge outputs and package ZIP deliverables
   - notify requester via SMTP (MailCrab in dev)
+- QR code services:
+  - generate front-page exam QR (encodes course, semester, date, language, page count, points, random code)
+  - pre-generate and cache per-page QR codes at startup
+  - decode/scan QR codes from uploaded exam images, with contrast pre-processing via ImageMagick
+- Exam code generation and checksum validation (`exam_code` service)
 
 ## Operational notes
 
@@ -65,5 +82,7 @@ The repository is positioned for a later workflow stage where scanned written ex
 
 - Frontend: Angular, Angular Material, RxJS, Cypress/Karma
 - Backend: Deno, Oak, MongoDB driver, worker threads
-- Document pipeline: LaTeX (tectonic), Ghostscript, ZIP archiving
+- Document pipeline: LaTeX (tectonic), Ghostscript, ZIP archiving, Eta templating
+- Image processing: ImageMagick (contrast adjustment for QR scanning)
+- CI: GitLab CI with Deno unit + integration test stages
 - Infrastructure: Docker Compose, Caddy, OpenLDAP, MongoDB, MailCrab

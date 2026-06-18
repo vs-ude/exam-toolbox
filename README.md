@@ -10,6 +10,9 @@ An internal web application for higher-education staff to author exam templates,
 - **File uploads** – attach images for picture-based tasks
 - **Mass generation** – upload an Excel participant list and generate per-student exam PDFs in parallel, with a downloadable ZIP artifact and an attendance CSV
 - **Email notification** – notifies the requester when a bulk job finishes
+- **QR codes** – embeds a front-page exam QR code (encoding course, semester, date, language, page count, points, and a random code) and per-page QR codes with a pre-generated cache
+- **QR scanning** – decodes QR codes from uploaded exam images; uses ImageMagick contrast pre-processing to improve scan reliability
+- **Exam codes** – generates and validates exam codes with a checksum algorithm
 - **Access control** – all routes protected by LDAP authentication; only members of the `researcher` group may use the application
 
 ## Technology stack
@@ -18,7 +21,8 @@ An internal web application for higher-education staff to author exam templates,
 |---|---|
 | Frontend | Angular 18, Angular Material, RxJS |
 | Backend | Deno, Oak, MongoDB |
-| Document pipeline | LaTeX (tectonic), Ghostscript, ZIP archiving |
+| Document pipeline | LaTeX (tectonic), Ghostscript, ZIP archiving, Eta templating |
+| Image processing | ImageMagick (contrast adjustment for QR scanning) |
 | Reverse proxy / auth | Caddy + caddy-security (LDAP/JWT) |
 | Database | MongoDB 6 |
 | Directory | OpenLDAP |
@@ -30,13 +34,22 @@ An internal web application for higher-education staff to author exam templates,
 
 ```
 exam-toolbox/
-├── backend/          # Deno/Oak API, LaTeX generation pipeline, worker pool
-│   ├── src/          # Route handlers, services, generation logic
-│   └── template/     # LaTeX template sources and style assets
-├── caddy/            # Caddy reverse proxy + caddy-security config
-├── frontend/         # Angular 18 application
-├── ldap/             # Bootstrap LDIF data for local/dev LDAP
-├── periodical/       # Cron container that removes stale job directories
+├── backend/              # Deno/Oak API, LaTeX generation pipeline, worker pool
+│   ├── src/
+│   │   ├── api/          # Oak router configuration (separated from handler logic)
+│   │   ├── config/       # Runtime configuration constants
+│   │   ├── examManager/  # Exam/task/tag/generation handlers
+│   │   ├── services/     # DB, QR generation/scanning, image preprocessing, ZIP
+│   │   └── types/        # Shared TypeScript types
+│   └── template/
+│       ├── meta/         # Shared LaTeX macros (background, header/footer, symbols, …)
+│       ├── pages/        # Individual page templates (title, info, concept, …)
+│       └── task_types/   # Per-task-type Eta templates
+├── caddy/                # Caddy reverse proxy + caddy-security config
+├── frontend/             # Angular 18 application
+├── ldap/                 # Bootstrap LDIF data for local/dev LDAP
+├── periodical/           # Cron container that removes stale job directories
+├── testdata/             # Shared test fixtures (exam JSON, CSVs, images, scan JPEGs)
 └── docker-compose.yml
 ```
 
