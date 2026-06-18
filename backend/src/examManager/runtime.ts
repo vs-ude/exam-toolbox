@@ -118,12 +118,10 @@ export function createExamManagerRuntime(
     job.studentResults.sort((a, b) => a.seatNumber - b.seatNumber);
     const sortedGermanPaths = job.studentResults.map((r) => r.pdfPathDE);
     const sortedEnglishPaths = job.studentResults.map((r) => r.pdfPathEN);
-
-    console.log(`Merging ${sortedGermanPaths.length} German PDFs...`);
-    await mergePdfs(sortedGermanPaths, `${finalOutputDir}/exam_merged_de.pdf`);
-
-    console.log(`Merging ${sortedEnglishPaths.length} English PDFs...`);
-    await mergePdfs(sortedEnglishPaths, `${finalOutputDir}/exam_merged_en.pdf`);
+    await mergePdfs(
+      sortedGermanPaths.concat(sortedEnglishPaths),
+      `${finalOutputDir}/exam_merged.pdf`,
+    );
   }
 
   function buildAttendanceCsv(job: ExamGenerationJob): string {
@@ -173,7 +171,11 @@ export function createExamManagerRuntime(
     finalOutputDir: string,
   ): Promise<string> {
     const zipFilePath = `${job.jobDir}/exams_output.zip`;
-    await createZipArchiveFromDirectory(finalOutputDir, zipFilePath);
+    await createZipArchiveFromDirectory(finalOutputDir, zipFilePath, [
+      "*.pdf",
+      "*.log",
+      "*.csv",
+    ]);
     return zipFilePath;
   }
 

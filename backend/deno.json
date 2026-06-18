@@ -15,7 +15,6 @@
     "@std/crypto": "jsr:@std/crypto@^1.0.5",
     "@std/encoding": "jsr:@std/encoding@^1.0.10",
     "@std/fs": "jsr:@std/fs@^1.0.22",
-    "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.8.20",
     "nodemailer": "npm:nodemailer@^8.0.1"
   }
 }
