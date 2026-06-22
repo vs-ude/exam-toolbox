@@ -26,9 +26,11 @@ backend_tests:
   before_script:
     - bash .ci/prepare_backend_integration.sh .ci/backend_integration_packages.txt
     - cd backend
-    - deno install
+    - deno install -q
   script:
-    - deno run test:integration
+    - deno check
+    - deno run cover
+  coverage: '/All files[^|]*|[^|]*\s+([\d\.]+)/'
 
 # Cypress Tests
 cypress_e2e:

@@ -1,7 +1,8 @@
 {
   "tasks": {
     "test": "deno test --allow-read --allow-env",
-    "test:integration": "DENO_INTEGRATION_TEST=1 deno test --allow-run --allow-write --allow-read --allow-env"
+    "test:integration": "DENO_INTEGRATION_TEST=1 deno test --allow-run --allow-write --allow-read --allow-env",
+    "cover": "DENO_INTEGRATION_TEST=1 deno test --coverage --parallel --allow-run --allow-write --allow-read --allow-env"
   },
   "compilerOptions": {
     "lib": ["ES2022", "deno.ns", "dom"]
