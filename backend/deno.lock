@@ -10,12 +10,14 @@
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/assert@^1.0.19": "1.0.19",
     "jsr:@std/bytes@1": "1.0.6",
+    "jsr:@std/cli@^1.0.30": "1.0.30",
     "jsr:@std/crypto@1": "1.1.0",
     "jsr:@std/crypto@^1.0.3": "1.1.0",
     "jsr:@std/crypto@^1.0.5": "1.1.0",
     "jsr:@std/encoding@1": "1.0.10",
     "jsr:@std/encoding@^1.0.10": "1.0.10",
     "jsr:@std/encoding@^1.0.5": "1.0.10",
+    "jsr:@std/fmt@^1.0.10": "1.0.10",
     "jsr:@std/fs@^1.0.22": "1.0.24",
     "jsr:@std/http@1": "1.1.1",
     "jsr:@std/internal@^1.0.12": "1.0.14",
@@ -23,6 +25,7 @@
     "jsr:@std/media-types@1": "1.1.0",
     "jsr:@std/path@1": "1.1.5",
     "jsr:@std/path@^1.1.5": "1.1.5",
+    "jsr:@std/yaml@^1.1.1": "1.1.1",
     "npm:nodemailer@^8.0.1": "8.0.1",
     "npm:path-to-regexp@^6.3.0": "6.3.0"
   },
@@ -79,6 +82,13 @@
     "@std/bytes@1.0.6": {
       "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
     },
+    "@std/cli@1.0.30": {
+      "integrity": "769446536522d0417d7127ebcabcafac1ab0ce6766d0eb3fca1d36326fe98d13",
+      "dependencies": [
+        "jsr:@std/fmt",
+        "jsr:@std/internal@^1.0.14"
+      ]
+    },
     "@std/crypto@1.0.5": {
       "integrity": "0dcfbb319fe0bba1bd3af904ceb4f948cde1b92979ec1614528380ed308a3b40"
     },
@@ -87,6 +97,9 @@
     },
     "@std/encoding@1.0.10": {
       "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
+    },
+    "@std/fmt@1.0.10": {
+      "integrity": "90dfba288802ac6de82fb31d0917eb9e4450b9925b954d5e51fc29ac07419db5"
     },
     "@std/fs@1.0.24": {
       "integrity": "f3061b45b81673a2bece689da041df32d174be064c89eb6397fb5718d3fb7877",
@@ -116,6 +129,9 @@
         "jsr:@std/internal@^1.0.14"
       ]
     },
+    "@std/yaml@1.1.1": {
+      "integrity": "a57665ecf3d17b926380593a56625d8a10cc7281802f1e993b5ebc94a48e71f8"
+    },
     "@zip-js/zip-js@2.8.20": {
       "integrity": "64bbc8b46777e1369dd258852c2244083a413a1e7cba3a7bf27a99cc88d3b860"
     }
@@ -135,9 +151,11 @@
       "jsr:@mirror/xlsx@~0.20.3",
       "jsr:@oak/oak@^17.2.0",
       "jsr:@std/assert@^1.0.19",
+      "jsr:@std/cli@^1.0.30",
       "jsr:@std/crypto@^1.0.5",
       "jsr:@std/encoding@^1.0.10",
       "jsr:@std/fs@^1.0.22",
+      "jsr:@std/yaml@^1.1.1",
       "npm:nodemailer@^8.0.1"
     ]
   }

@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { appConfig } from "../config/appConfig.ts";
 
 export interface SendEmailParams {
   to: string;
@@ -6,24 +7,16 @@ export interface SendEmailParams {
   html: string;
 }
 
-function getSmtpConfig() {
-  const host = Deno.env.get("SMTP_HOST") || "mailcrab";
-  const port = Number.parseInt(Deno.env.get("SMTP_PORT") || "1025", 10);
-  const from = Deno.env.get("SMTP_FROM") || "noreply@examtoolbox.local";
-
-  return { host, port, from };
-}
-
 /**
  * Sends an HTML email using SMTP.
- * Defaults are development-friendly (MailCrab) and can be overridden via env vars.
+ * Defaults are development-friendly (MailCrab) and can be overridden via config.yaml or env vars.
  */
 export async function sendEmail({
   to,
   subject,
   html,
 }: SendEmailParams): Promise<void> {
-  const { host, port, from } = getSmtpConfig();
+  const { host, port, from } = appConfig.smtp;
 
   const transporter = nodemailer.createTransport({
     host,

@@ -1,5 +1,5 @@
 import { Collection, Document, MongoClient, ObjectId } from "@db/mongo";
-import { DB_CONNSTRING } from "../config/db.ts";
+import { appConfig } from "../config/appConfig.ts";
 import { Exam, parseExam, parseTask, Task } from "../types/exam.ts";
 
 let db: ExamToolboxDatabase;
@@ -8,7 +8,7 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
   if (db) return db;
 
   const client = new MongoClient();
-  await client.connect(DB_CONNSTRING);
+  await client.connect(appConfig.db.connString);
   const dbConn = client.database(); // We assume a database name is provided in the connection string
   const collections: Collections = {} as Collections;
   collections.exams = dbConn.collection("exams");

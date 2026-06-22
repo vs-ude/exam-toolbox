@@ -1,7 +1,7 @@
-import { CACHE_DIR } from "./paths.ts";
+import { appConfig } from "./appConfig.ts";
 
 export const config = {
-  cachePath: `${CACHE_DIR}/qr`,
-  numStudentsPerLanguage: 100,
-  numPagesPerStudent: 26,
+  cachePath: `${appConfig.paths.cacheDir}/qr`,
+  minStudents: appConfig.qr.minStudents,
+  minPages: appConfig.qr.minPages,
 };

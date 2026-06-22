@@ -1,24 +1,20 @@
 import { Application } from "@oak/oak";
 
 import { configureExamManagerRouter } from "./src/api/examManager.ts";
-import { QRConfig, TEMPLATE_BASE_PATH } from "./src/config/mod.ts";
+import { appConfig, QRConfig } from "./src/config/mod.ts";
 import { createExamManagerRuntime } from "./src/examManager/mod.ts";
 import { getOrCreateDb } from "./src/services/db.ts";
 import { parseLogFileForSubtaskInfo } from "./src/services/mod.ts";
 import { preGeneratePageQRCache } from "./src/services/qr.ts";
 import { configureUserRouter } from "./src/api/user.ts";
 
-const basePath = TEMPLATE_BASE_PATH;
-const JOBS_DIR = "/app/jobs";
-const REQUIRED_GROUP = "researcher";
-const port = 3000;
 const db = await getOrCreateDb();
 
 // Create exam manager runtime (generation queue, workers, finalization, cleanup)
 const examRuntime = createExamManagerRuntime(
   {
-    basePath,
-    jobsDir: JOBS_DIR,
+    basePath: appConfig.paths.templateBase,
+    jobsDir: appConfig.paths.jobsDir,
     workerModulePath: "./worker.ts",
   },
   { db },
@@ -26,8 +22,8 @@ const examRuntime = createExamManagerRuntime(
 
 await Deno.mkdir(examRuntime.jobsDir, { recursive: true });
 preGeneratePageQRCache(
-  QRConfig.numStudentsPerLanguage,
-  QRConfig.numPagesPerStudent,
+  QRConfig.minStudents,
+  QRConfig.minPages,
 );
 
 // Create Oak application + routers
@@ -76,11 +72,11 @@ app.use(async (ctx, next) => {
       .filter((role) => role !== "")
     : [];
 
-  if (!userRoles.includes(REQUIRED_GROUP)) {
+  if (!userRoles.includes(appConfig.auth.requiredGroup)) {
     console.warn(
       `⛔ Access Denied: User ${
         userId || "Anonymous"
-      } lacks group '${REQUIRED_GROUP}'`,
+      } lacks group '${appConfig.auth.requiredGroup}'`,
     );
     ctx.response.status = 403;
     ctx.response.body = { error: "Access Denied: You do not have permission." };
@@ -100,4 +96,4 @@ for (const router of routers) {
 // Schedule periodic in-memory job cleanup and start server
 examRuntime.scheduleDailyCleanup();
 
-await app.listen({ port });
+await app.listen({ port: appConfig.server.port });

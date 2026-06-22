@@ -1,5 +1,5 @@
 import { Eta } from "@bgub/eta";
-import { TEMPLATE_BASE_PATH } from "../config/paths.ts";
+import { appConfig } from "../config/appConfig.ts";
 
 let cachedEta: Eta;
 
@@ -10,7 +10,7 @@ export function getEta(): Eta {
     autoEscape: false,
     rmWhitespace: false,
     tags: ["<#", "#>"],
-    views: TEMPLATE_BASE_PATH,
+    views: appConfig.paths.templateBase,
     defaultExtension: ".template.tex",
     cache: true,
   });

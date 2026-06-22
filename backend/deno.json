@@ -12,9 +12,11 @@
     "@mirror/xlsx": "jsr:@mirror/xlsx@^0.20.3",
     "@oak/oak": "jsr:@oak/oak@^17.2.0",
     "@std/assert": "jsr:@std/assert@^1.0.19",
+    "@std/cli": "jsr:@std/cli@^1.0.30",
     "@std/crypto": "jsr:@std/crypto@^1.0.5",
     "@std/encoding": "jsr:@std/encoding@^1.0.10",
     "@std/fs": "jsr:@std/fs@^1.0.22",
+    "@std/yaml": "jsr:@std/yaml@^1.1.1",
     "nodemailer": "npm:nodemailer@^8.0.1"
   }
 }

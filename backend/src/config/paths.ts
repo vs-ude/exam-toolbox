@@ -1,4 +1,4 @@
-export const TEMPLATE_BASE_PATH = Deno.env.get("TEMPLATE_BASE_PATH") ||
-  "/app/template";
+import { appConfig } from "./appConfig.ts";
 
-export const CACHE_DIR = Deno.env.get("CACHE_DIR") || "/app/cache";
+export const TEMPLATE_BASE_PATH = appConfig.paths.templateBase;
+export const CACHE_DIR = appConfig.paths.cacheDir;

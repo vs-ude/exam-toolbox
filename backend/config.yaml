@@ -1,0 +1,26 @@
+# exam-toolbox backend configuration
+# All values can be overridden by environment variables (see src/config/appConfig.ts).
+
+server:
+  domain: localhost
+  port: 3000
+
+auth:
+  requiredGroup: researcher
+
+db:
+  connstring: "mongodb://mongo:27017/examToolboxDB"
+
+paths:
+  templateBasePath: /app/template
+  cacheDir: /app/cache
+  jobsDir: /app/jobs
+
+smtp:
+  host: mailcrab
+  port: 1025
+  from: noreply@examtoolbox.local
+
+qr:
+  minStudents: 100
+  minPages: 26

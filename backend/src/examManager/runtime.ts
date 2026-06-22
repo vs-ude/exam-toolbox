@@ -1,3 +1,4 @@
+import { appConfig } from "../config/appConfig.ts";
 import { ExamToolboxDatabase } from "../services/db.ts";
 
 import {
@@ -207,7 +208,7 @@ export function createExamManagerRuntime(
     examName: string,
     semester?: string,
   ): void {
-    const domain = Deno.env.get("CADDY_DOMAIN") || "localhost";
+    const domain = appConfig.server.domain;
     const downloadUrl = `http://${domain}/api/jobs/${job.jobId}/download`;
 
     sendEmail({
