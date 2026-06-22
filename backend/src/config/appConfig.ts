@@ -50,7 +50,7 @@ function loadConfig(path: string = "../../config.yaml"): AppConfig {
     const raw = Deno.readTextFileSync(configPath);
     base = parse(raw) as AppConfig;
   } catch {
-    console.warn("No config file found, using built-in defaults.");
+    console.info("No config file found, using built-in defaults.");
   }
 
   // Environment variable overrides (fine-grained, container-friendly)
@@ -87,7 +87,6 @@ function loadConfig(path: string = "../../config.yaml"): AppConfig {
         : base.qr.minPages,
     },
   };
-  console.debug("appConfig", config);
   return config;
 }
 

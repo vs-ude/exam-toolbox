@@ -1,16 +1,15 @@
 import { Eta } from "@bgub/eta";
-import { appConfig } from "../config/appConfig.ts";
 
 let cachedEta: Eta;
 
-export function getEta(): Eta {
+export function getEta(path: string): Eta {
   if (cachedEta) return cachedEta;
 
   cachedEta = new Eta({
     autoEscape: false,
     rmWhitespace: false,
     tags: ["<#", "#>"],
-    views: appConfig.paths.templateBase,
+    views: path,
     defaultExtension: ".template.tex",
     cache: true,
   });

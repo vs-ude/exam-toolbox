@@ -14,6 +14,7 @@ import type {
   TaskGroup,
   Translation,
 } from "../types/exam.ts";
+import { appConfig } from "../config/mod.ts";
 import { LatexRenderError } from "./err.ts";
 
 let cachedTaskRenderer: TaskRenderer;
@@ -21,7 +22,7 @@ let cachedTaskRenderer: TaskRenderer;
 export function getTaskRenderer(): TaskRenderer {
   if (cachedTaskRenderer) return cachedTaskRenderer;
 
-  cachedTaskRenderer = new TaskRenderer(getEta());
+  cachedTaskRenderer = new TaskRenderer(getEta(appConfig.paths.templateBase));
   return cachedTaskRenderer;
 }
 

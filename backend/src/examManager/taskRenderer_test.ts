@@ -1,13 +1,13 @@
 import { assertEquals } from "@std/assert";
 import type { PictureTask, PropertyTask, TableTask } from "../types/exam.ts";
 
-Deno.env.set("TEMPLATE_BASE_PATH", "./template");
+const TEMPLATE_PATH = "./template";
 
 const { TaskRenderer } = await import("./taskRenderer.ts");
 const { getEta } = await import("../services/mod.ts");
 
 Deno.test("TaskRenderer.renderPictureTaskImpl renders picture task template", () => {
-  const eta = getEta();
+  const eta = getEta(TEMPLATE_PATH);
   const renderer = new TaskRenderer(eta);
 
   const task: PictureTask = {
@@ -64,7 +64,7 @@ Deno.test("TaskRenderer.renderPictureTaskImpl renders picture task template", ()
 });
 
 Deno.test("TaskRenderer.renderTableTask renders solution table task template", () => {
-  const eta = getEta();
+  const eta = getEta(TEMPLATE_PATH);
   const renderer = new TaskRenderer(eta);
 
   const task: TableTask = {
@@ -166,7 +166,7 @@ SE22%
 });
 
 Deno.test("TaskRenderer.renderTableTask renders question table task template", () => {
-  const eta = getEta();
+  const eta = getEta(TEMPLATE_PATH);
   const renderer = new TaskRenderer(eta);
 
   const task: TableTask = {
@@ -286,7 +286,7 @@ const propertyTask: PropertyTask = {
 };
 
 Deno.test("TaskRenderer.renderPropertyTask renders property task template for student version", () => {
-  const eta = getEta();
+  const eta = getEta(TEMPLATE_PATH);
   const renderer = new TaskRenderer(eta);
 
   const expected = `
@@ -328,7 +328,7 @@ Deno.test("TaskRenderer.renderPropertyTask renders property task template for st
 });
 
 Deno.test("TaskRenderer.renderPropertyTask renders property task template for solution", () => {
-  const eta = getEta();
+  const eta = getEta(TEMPLATE_PATH);
   const renderer = new TaskRenderer(eta);
 
   const expected = `
