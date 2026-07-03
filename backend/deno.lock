@@ -26,6 +26,7 @@
     "jsr:@std/path@1": "1.1.5",
     "jsr:@std/path@^1.1.5": "1.1.5",
     "jsr:@std/yaml@^1.1.1": "1.1.1",
+    "npm:ldapts@^8.1.8": "8.1.8",
     "npm:nodemailer@^8.0.1": "8.0.1",
     "npm:path-to-regexp@^6.3.0": "6.3.0"
   },
@@ -137,11 +138,20 @@
     }
   },
   "npm": {
+    "ldapts@8.1.8": {
+      "integrity": "sha512-Wpdvo+/0DREIynYf2he2efHtjptr5zD7dpesSkZWJqfQdMEgSTytEIsSZVuoDSiiE1+SpXf3emZ7ewxGBTo7Pw==",
+      "dependencies": [
+        "strict-event-emitter-types"
+      ]
+    },
     "nodemailer@8.0.1": {
       "integrity": "sha512-5kcldIXmaEjZcHR6F28IKGSgpmZHaF1IXLWFTG+Xh3S+Cce4MiakLtWY+PlBU69fLbRa8HlaGIrC/QolUpHkhg=="
     },
     "path-to-regexp@6.3.0": {
       "integrity": "sha512-Yhpw4T9C6hPpgPeA28us07OJeqZ5EzQTkbfwuhsUg0c237RomFoETJgmp2sa3F/41gfLE6G5cqcYwznmeEeOlQ=="
+    },
+    "strict-event-emitter-types@2.0.0": {
+      "integrity": "sha512-Nk/brWYpD85WlOgzw5h173aci0Teyv8YdIAEtV+N88nDB0dLlazZyJMIsN6eo1/AR61l+p6CJTG1JIyFaoNEEA=="
     }
   },
   "workspace": {
@@ -156,6 +166,7 @@
       "jsr:@std/encoding@^1.0.10",
       "jsr:@std/fs@^1.0.22",
       "jsr:@std/yaml@^1.1.1",
+      "npm:ldapts@^8.1.8",
       "npm:nodemailer@^8.0.1"
     ]
   }

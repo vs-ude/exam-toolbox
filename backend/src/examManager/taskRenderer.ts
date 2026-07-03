@@ -14,15 +14,16 @@ import type {
   TaskGroup,
   Translation,
 } from "../types/exam.ts";
-import { appConfig } from "../config/mod.ts";
+import { getConfig } from "../config/mod.ts";
 import { LatexRenderError } from "./err.ts";
 
+const config = getConfig();
 let cachedTaskRenderer: TaskRenderer;
 
 export function getTaskRenderer(): TaskRenderer {
   if (cachedTaskRenderer) return cachedTaskRenderer;
 
-  cachedTaskRenderer = new TaskRenderer(getEta(appConfig.paths.templateBase));
+  cachedTaskRenderer = new TaskRenderer(getEta(config.paths.templateBase));
   return cachedTaskRenderer;
 }
 

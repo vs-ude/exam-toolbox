@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { appConfig } from "../config/appConfig.ts";
+import { getConfig } from "../config/appConfig.ts";
 
 export interface SendEmailParams {
   to: string;
@@ -16,7 +16,7 @@ export async function sendEmail({
   subject,
   html,
 }: SendEmailParams): Promise<void> {
-  const { host, port, from } = appConfig.smtp;
+  const { host, port, from } = getConfig().smtp;
 
   const transporter = nodemailer.createTransport({
     host,

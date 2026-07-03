@@ -1,50 +1,150 @@
 version: 1
 
 ##
+# This is a common FreeIPA structure
 # Order is important! Users first, then groups
 ##
 
-dn: ou=users,{{ LDAP_BASE_DN }}
-objectclass: organizationalUnit
-objectclass: top
-ou: users
+## Base structure
+dn: ou=accounts,dc=university,dc=example
+objectClass: organizationalUnit
+objectClass: top
 
-dn: cn=Test Testersson,ou=users,{{ LDAP_BASE_DN }}
-cn: Test Testersson
-mail: test@example.com
-objectclass: inetOrgPerson
-objectclass: top
-givenname: Test
-sn: Testersson
-uid: test
-# This is a hash of "test"
-userpassword: {SSHA}J8g8rF8DW6VNWvZJgCGES6n5CLpWI/Oz
+dn: ou=users,ou=accounts,dc=university,dc=example
+objectClass: organizationalUnit
+objectClass: top
 
-# 3. Create the "Student User" (The Unauthorized User)
-dn: cn=Student User,ou=users,{{ LDAP_BASE_DN }}
-cn: Student User
-mail: student@example.com
-objectclass: inetOrgPerson
-objectclass: top
-givenname: Student
-sn: User
-uid: student
-# This is a hash of "test"
-userpassword: {SSHA}J8g8rF8DW6VNWvZJgCGES6n5CLpWI/Oz
+dn: ou=groups,ou=accounts,dc=university,dc=example
+objectClass: organizationalUnit
+objectClass: top
 
-dn: ou=groups,{{ LDAP_BASE_DN }}
-objectclass: organizationalUnit
-objectclass: top
-ou: groups
 
-dn: cn=researcher,ou=groups,{{ LDAP_BASE_DN }}
-cn: researcher
-objectclass: groupOfUniqueNames
-objectclass: top
-uniquemember: cn=Test Testersson,ou=users,{{ LDAP_BASE_DN }}
+##
+# Users (with personal groups)
+##
 
-dn: cn=noGroup,ou=groups,{{ LDAP_BASE_DN }}
-cn: noGroup
-objectclass: groupOfUniqueNames
-objectclass: top
-uniquemember: cn=Student User,ou=users,{{ LDAP_BASE_DN }}
+## User: test1 (teacher with access) ##
+dn: uid=test1,ou=users,ou=accounts,dc=university,dc=example
+objectClass: inetorgperson
+objectClass: posixaccount
+objectClass: top
+cn: user test1
+gidNumber: 1289000003
+homeDirectory: /home/department/test1
+sn: test1
+uid: test1
+uidNumber: 1289000003
+displayName: user test1
+givenName: user
+userPassword: testpass
+initials: ut1
+loginShell: /bin/bash
+mail: user.test1@university.example
+memberOf: cn=toolboxUsers,ou=groups,ou=accounts,dc=university,dc=example
+memberOf: cn=teachers,ou=groups,ou=accounts,dc=university,dc=example
+memberOf: cn=admins,ou=groups,ou=accounts,dc=university,dc=example
+ou: teachers
+
+dn: cn=test1,ou=groups,ou=accounts,dc=university,dc=example
+objectClass: posixgroup
+objectClass: top
+gidNumber: 1289000003
+cn: test1
+description: User private group for test1
+
+
+## User: test2 (teacher with access) ##
+dn: uid=test2,ou=users,ou=accounts,dc=university,dc=example
+objectClass: inetorgperson
+objectClass: posixaccount
+objectClass: top
+cn: user test2
+gidNumber: 1289000004
+homeDirectory: /home/department/test2
+sn: test2
+uid: test2
+uidNumber: 1289000004
+displayName: user test2
+givenName: user
+userPassword: testpass
+initials: ut2
+loginShell: /bin/bash
+mail: user.test2@university.example
+memberOf: cn=toolboxUsers,ou=groups,ou=accounts,dc=university,dc=example
+memberOf: cn=teachers,ou=groups,ou=accounts,dc=university,dc=example
+ou: teachers
+
+dn: cn=test2,ou=groups,ou=accounts,dc=university,dc=example
+objectClass: posixgroup
+objectClass: top
+gidNumber: 1289000004
+cn: test2
+description: User private group for test2
+
+
+## User: student1 (student with access) ##
+dn: uid=student1,ou=users,ou=accounts,dc=university,dc=example
+objectClass: inetorgperson
+objectClass: posixaccount
+objectClass: top
+cn: user student1
+gidNumber: 1289000005
+homeDirectory: /home/department/student1
+sn: student1
+uid: student1
+uidNumber: 1289000005
+displayName: user student1
+givenName: user
+userPassword: testpass
+initials: us2
+loginShell: /bin/bash
+mail: user.student1@stud.university.example
+memberOf: cn=toolboxUsers,ou=groups,ou=accounts,dc=university,dc=example
+memberOf: cn=students,ou=groups,ou=accounts,dc=university,dc=example
+ou: students
+
+dn: cn=student1,ou=groups,ou=accounts,dc=university,dc=example
+objectClass: posixgroup
+objectClass: top
+gidNumber: 1289000005
+cn: student1
+description: User private group for student1
+
+
+##
+# Functional groups
+##
+
+## All users with access to the tool ##
+dn: cn=toolboxUsers,ou=groups,ou=accounts,dc=university,dc=example
+objectClass: groupofnames
+objectClass: top
+cn: toolboxUsers
+member: uid=test1,ou=users,ou=accounts,dc=university,dc=example
+member: uid=test2,ou=users,ou=accounts,dc=university,dc=example
+member: uid=student1,ou=users,ou=accounts,dc=university,dc=example
+
+
+## Teachers ##
+dn: cn=teachers,ou=groups,ou=accounts,dc=university,dc=example
+objectClass: groupofnames
+objectClass: top
+cn: teachers
+member: uid=test1,ou=users,ou=accounts,dc=university,dc=example
+member: uid=test2,ou=users,ou=accounts,dc=university,dc=example
+
+
+## Students ##
+dn: cn=students,ou=groups,ou=accounts,dc=university,dc=example
+objectClass: groupofnames
+objectClass: top
+cn: students
+member: uid=student1,ou=users,ou=accounts,dc=university,dc=example
+
+
+## Admins (!= LDAP Admin) ##
+dn: cn=admins,ou=groups,ou=accounts,dc=university,dc=example
+objectClass: groupofnames
+objectClass: top
+cn: admins
+member: uid=test1,ou=users,ou=accounts,dc=university,dc=example

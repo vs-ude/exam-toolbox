@@ -1,7 +1,9 @@
-import { appConfig } from "./appConfig.ts";
+import { getConfig } from "./appConfig.ts";
 
-export const config = {
-  cachePath: `${appConfig.paths.cacheDir}/qr`,
-  minStudents: appConfig.qr.minStudents,
-  minPages: appConfig.qr.minPages,
+const config = getConfig();
+
+export const qrConfig = {
+  cachePath: `${config.paths.cacheDir}/qr`,
+  minStudents: config.qr.minStudents,
+  minPages: config.qr.minPages,
 };

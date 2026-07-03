@@ -6,9 +6,11 @@ import {
   LatexCompileError,
   LatexRenderError,
 } from "./err.ts";
-import { appConfig, QRConfig } from "../config/mod.ts";
+import { getConfig, QRConfig } from "../config/mod.ts";
 import { Student } from "../types/student.ts";
 import { generateExamQR } from "../services/qr.ts";
+
+const config = getConfig();
 
 type ExamMetaTemplateData = {
   veranstaltung: string;
@@ -130,7 +132,7 @@ export async function renderMetaStudent(
     ),
   };
   const metaOutputPath = `${workingDir}/student.tex`;
-  const rendered = getEta(appConfig.paths.templateBase).render("student", data);
+  const rendered = getEta(config.paths.templateBase).render("student", data);
 
   if (typeof rendered !== "string") {
     throw new Error("Failed to render student metadata template");
@@ -164,7 +166,7 @@ export async function renderMetaExam(
   };
 
   const metaOutputPath = `${workingDir}/exam.tex`;
-  const rendered = getEta(appConfig.paths.templateBase).render("exam", data);
+  const rendered = getEta(config.paths.templateBase).render("exam", data);
 
   if (typeof rendered !== "string") {
     throw new Error("Failed to render exam template");

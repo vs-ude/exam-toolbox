@@ -2,13 +2,30 @@ import { parse } from "@std/yaml";
 
 import { flags } from "./args.ts";
 
-interface AppConfig {
+interface AppConfig extends Record<string, unknown> {
   server: {
+    https: boolean;
     domain: string;
     port: number;
   };
   auth: {
-    requiredGroup: string;
+    ldap: {
+      url: string;
+      bindDn: string;
+      bindPassword: string;
+      searchBase: string;
+      searchFilter: string;
+      groupDnBase: string;
+      groups: {
+        required: string;
+        admin: string[];
+        full: string[];
+      };
+    };
+    jwt: {
+      secret: string;
+      lifetimeDays: number;
+    };
   };
   db: {
     connString: string;
@@ -29,40 +46,93 @@ interface AppConfig {
   };
 }
 
-function loadConfig(path: string = "../../config.yaml"): AppConfig {
-  // Resolve config file path relative to this file's location (backend root)
-  const configPath = new URL(path, import.meta.url);
-
-  let base: AppConfig = {
-    server: { port: 3000, domain: "localhost" },
-    auth: { requiredGroup: "researcher" },
-    db: { connString: "mongodb://mongo:27017/examToolboxDB" },
-    paths: {
-      templateBase: "/app/template",
-      cacheDir: "/app/cache",
-      jobsDir: "/app/jobs",
+export const DEFAULT_CONFIG = {
+  server: { port: 3000, domain: "localhost", https: false },
+  auth: {
+    ldap: {
+      url: "ldap://ldap:389",
+      bindDn: "cn=admin,dc=example,dc=org",
+      bindPassword: "admin",
+      searchBase: "dc=example,dc=org",
+      searchFilter: "(|(uid=%s)(mail=%s))",
+      groupDnBase: "cn=%s,ou=groups,dc=example,dc=org",
+      groups: {
+        required: "toolboxUsers",
+        admin: ["admins"],
+        full: ["teachers"],
+      },
     },
-    smtp: { host: "mailcrab", port: 1025, from: "noreply@examtoolbox.local" },
-    qr: { minStudents: 100, minPages: 26 },
-  };
+    jwt: {
+      secret: "change-me-in-production",
+      lifetimeDays: 7,
+    },
+  },
+  db: { connString: "mongodb://mongo:27017/examToolboxDB" },
+  paths: {
+    templateBase: "/app/template",
+    cacheDir: "/app/cache",
+    jobsDir: "/app/jobs",
+  },
+  smtp: { host: "mailcrab", port: 1025, from: "noreply@examtoolbox.local" },
+  qr: { minStudents: 100, minPages: 26 },
+};
 
+export function loadConfig(
+  loadedRaw: string,
+  env: typeof Deno.env.get,
+): AppConfig {
+  const base: AppConfig = structuredClone(DEFAULT_CONFIG);
+
+  let loaded: AppConfig | null | undefined;
   try {
-    const raw = Deno.readTextFileSync(configPath);
-    base = parse(raw) as AppConfig;
+    loaded = parse(loadedRaw) as AppConfig | null | undefined;
   } catch {
-    console.info("No config file found, using built-in defaults.");
+    throw new Error("Error parsing yaml.");
+  }
+  if (loaded != null) {
+    mergeObjects(
+      base,
+      loaded,
+    );
   }
 
   // Environment variable overrides (fine-grained, container-friendly)
-  const env = Deno.env.get.bind(Deno.env);
-
   const config = {
     server: {
+      https: env("SERVER_HTTPS")
+        ? env("SERVER_HTTPS") === "true"
+        : base.server.https,
       port: env("SERVER_PORT") ? Number(env("SERVER_PORT")) : base.server.port,
       domain: env("SERVER_DOMAIN") ?? base.server.domain,
     },
     auth: {
-      requiredGroup: env("AUTH_REQUIRED_GROUP") ?? base.auth.requiredGroup,
+      ldap: {
+        url: env("AUTH_LDAP_URL") ?? base.auth.ldap.url,
+        bindDn: env("AUTH_LDAP_BIND_DN") ?? base.auth.ldap.bindDn,
+        bindPassword: env("AUTH_LDAP_BIND_PASSWORD") ??
+          base.auth.ldap.bindPassword,
+        searchBase: env("AUTH_LDAP_SEARCH_BASE") ?? base.auth.ldap.searchBase,
+        searchFilter: env("AUTH_LDAP_SEARCH_FILTER") ??
+          base.auth.ldap.searchFilter,
+        groupDnBase: env("AUTH_LDAP_GROUP_DN_BASE") ??
+          base.auth.ldap.groupDnBase,
+        groups: {
+          required: env("AUTH_LDAP_GROUPS_REQUIRED") ??
+            base.auth.ldap.groups.required,
+          admin: env("AUTH_LDAP_GROUPS_ADMIN")
+            ? env("AUTH_LDAP_GROUPS_ADMIN")!.split(",")
+            : base.auth.ldap.groups.admin,
+          full: env("AUTH_LDAP_GROUPS_FULL")
+            ? env("AUTH_LDAP_GROUPS_FULL")!.split(",")
+            : base.auth.ldap.groups.full,
+        },
+      },
+      jwt: {
+        secret: env("AUTH_JWT_SECRET") ?? base.auth.jwt.secret,
+        lifetimeDays: env("AUTH_JWT_LIFETIME_DAYS")
+          ? Number(env("AUTH_JWT_LIFETIME_DAYS"))
+          : base.auth.jwt.lifetimeDays,
+      },
     },
     db: {
       connString: env("DB_CONNSTRING") ?? base.db.connString,
@@ -90,4 +160,46 @@ function loadConfig(path: string = "../../config.yaml"): AppConfig {
   return config;
 }
 
-export const appConfig = loadConfig(flags.conf);
+let appConfig: AppConfig;
+export function getConfig() {
+  if (appConfig) {
+    return appConfig;
+  }
+
+  if (!appConfig) {
+    const configPath = Deno.env.get("CONFIG") || flags.conf ||
+      "../../config.yaml";
+    let raw = "";
+    try {
+      raw = Deno.readTextFileSync(new URL(configPath, import.meta.url));
+    } catch {
+      console.info("No config file found, using built-in defaults.");
+    }
+    const env = Deno.env.get.bind(Deno.env);
+    appConfig = loadConfig(raw, env);
+  }
+  return appConfig;
+}
+
+/**
+ * Recursively traverses the given base object and merges it into the input object.
+ */
+export function mergeObjects(
+  base: Record<string, unknown>,
+  input: Record<string, unknown>,
+): Record<string, unknown> {
+  return Object.keys(input).reduce(
+    (acc: Record<string, unknown>, key: string) => {
+      if (typeof input[key] === "object" && input[key] !== null) {
+        acc[key] = mergeObjects(
+          (base[key] ?? {}) as Record<string, unknown>,
+          input[key] as Record<string, unknown>,
+        );
+      } else {
+        acc[key] = input[key];
+      }
+      return acc;
+    },
+    base,
+  );
+}

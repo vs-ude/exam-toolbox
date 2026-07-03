@@ -1,6 +1,7 @@
 import { Collection, Document, MongoClient, ObjectId } from "@db/mongo";
-import { appConfig } from "../config/appConfig.ts";
+import { getConfig } from "../config/appConfig.ts";
 import { Exam, parseExam, parseTask, Task } from "../types/exam.ts";
+import { Group, User } from "../types/user.ts";
 
 let db: ExamToolboxDatabase;
 
@@ -8,7 +9,7 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
   if (db) return db;
 
   const client = new MongoClient();
-  await client.connect(appConfig.db.connString);
+  await client.connect(getConfig().db.connString);
   const dbConn = client.database(); // We assume a database name is provided in the connection string
   const collections: Collections = {} as Collections;
   collections.exams = dbConn.collection("exams");
@@ -16,6 +17,8 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
   collections.tags = dbConn.collection("tags");
   collections.taskPool = dbConn.collection("taskPool");
   collections.fileTracker = dbConn.collection("fileTracker");
+  collections.users = dbConn.collection("users");
+  collections.groups = dbConn.collection("groups");
   db = new ExamToolboxDatabase(client, collections);
   return db;
 }
@@ -26,6 +29,8 @@ interface Collections {
   tags: Collection<Document>;
   taskPool: Collection<Document>;
   fileTracker: Collection<Document>;
+  users: Collection<Document>;
+  groups: Collection<Document>;
 }
 
 export class ExamToolboxDatabase {
@@ -37,6 +42,14 @@ export class ExamToolboxDatabase {
   ) {
     this.client = client;
     this.collections = collections;
+  }
+
+  // Test
+  test(): void {
+    const info = this.client.buildInfo;
+    if (info === undefined) {
+      throw new Error("Failed to connect to MongoDB");
+    }
   }
 
   // ── Exams ────────────────────────────────────────────────────────────────
@@ -213,6 +226,49 @@ export class ExamToolboxDatabase {
       { tagIds: mongoId },
       { $pull: { tagIds: mongoId } },
     );
+  }
+
+  // ── Users ─────────────────────────────────────────────────────────────────
+
+  async upsertUser(user: User): Promise<void> {
+    const now = new Date();
+    user.lastLoginAt = now;
+    await this.collections.users.updateOne(
+      { uid: user.uid },
+      {
+        $set: user,
+        $setOnInsert: { createdAt: now },
+      },
+      { upsert: true },
+    );
+  }
+
+  async getUsers(uids: string[]): Promise<User[]> {
+    const results = await this.collections.users.find({ uid: { $in: uids } })
+      .toArray();
+    const users: User[] = results.map((res) => {
+      delete res._id;
+      return res as User;
+    });
+    return users;
+  }
+
+  // ── Groups ────────────────────────────────────────────────────────────────
+
+  async upsertGroup(group: Group): Promise<void> {
+    await this.collections.groups.updateOne(
+      { name: group.name },
+      {
+        $set: group,
+      },
+      { upsert: true },
+    );
+  }
+
+  async getGroups(): Promise<Group[]> {
+    const results = await this.collections.groups.find().toArray();
+    const groups: Group[] = results.map((res) => res as Group);
+    return groups;
   }
 
   // ── QR Cache ─────────────────────────────────────────────────────────────

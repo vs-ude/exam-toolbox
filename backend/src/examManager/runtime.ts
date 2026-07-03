@@ -1,4 +1,4 @@
-import { appConfig } from "../config/appConfig.ts";
+import { getConfig } from "../config/appConfig.ts";
 import { ExamToolboxDatabase } from "../services/db.ts";
 
 import {
@@ -8,6 +8,8 @@ import {
   sendEmail,
 } from "../services/mod.ts";
 import { Language } from "../types/exam.ts";
+
+const appConfig = getConfig();
 
 // output from a successful student PDF generation
 export interface StudentResult {
