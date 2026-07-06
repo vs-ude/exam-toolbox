@@ -140,7 +140,10 @@
       </div>
 
       <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"
-        ><img src="{{ bilingual ? 'english.svg' : 'german.svg' }}"
+        ><img
+          [src]="
+            bilingual ? publicPath + 'english.svg' : publicPath + 'german.svg'
+          "
       /></span>
 
       <div class="duration_wrapper">

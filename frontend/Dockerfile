@@ -1,29 +1,19 @@
 # Use the official Node.js image
-FROM node:22 AS build
+FROM node:24
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN --mount=type=cache,target=/root/.npm npm install
 
 # Copy the rest of the application files
-COPY . .
+COPY --parents ["*.json", "src/", "./"]
 
-# Build the Angular app
-RUN npm run build --configuration=production
+EXPOSE 4200
 
-# Use a lightweight web server to serve the Angular app
-FROM nginx:alpine
-
-# Copy built files to Nginx
-COPY --from=build /usr/src/app/dist/frontend/browser /usr/share/nginx/html
-
-# Expose the port Nginx runs on
-EXPOSE 80
-
-# Command to run Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the frontend in development mode
+CMD ["npm", "start", "--", "--configuration", "devcontainer", "--host=0.0.0.0"]

@@ -26,9 +26,9 @@ import { LoadingService } from "../../services/loading.service";
 import {
   CdkDrag,
   CdkDragDrop,
+  CdkDragHandle,
   CdkDropList,
   moveItemInArray,
-  CdkDragHandle,
 } from "@angular/cdk/drag-drop";
 import { NewPageComponent } from "./tasks/new-page/new-page.component";
 import { UpdateTaskDialogComponent } from "../update-task-dialog/update-task-dialog.component";
@@ -37,12 +37,16 @@ import { NewPageDialogComponent } from "./new-page-dialog/new-page-dialog.compon
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { Tag } from "../../tag";
-import { AddTagDialogComponent, AddTagDialogData } from "../add-tag-dialog/add-tag-dialog.component";
+import {
+  AddTagDialogComponent,
+  AddTagDialogData,
+} from "../add-tag-dialog/add-tag-dialog.component";
 import { TagHelperService } from "../../services/tag-helper.service";
 import { DraggablePoolComponent } from "./draggable-pool/draggable-pool.component";
-import { Subject, debounceTime, Observable, take, forkJoin, retry } from "rxjs";
+import { debounceTime, forkJoin, Observable, retry, Subject, take } from "rxjs";
 import { AutosaveService } from "../../services/autosave.service";
 import { ConflictDialogComponent } from "../conflict-dialog/conflict-dialog.component";
+import { environment } from "../../../environments/environment";
 
 interface PDFTaskInfo {
   page: number;
@@ -103,6 +107,7 @@ export class CreateExamComponent {
 
   public currentGroupView = 0;
   public lightTheme: boolean = true;
+  public readonly publicPath = environment.publicPath;
 
   public previewPdfUrl: SafeResourceUrl | null = null;
 
@@ -128,8 +133,9 @@ export class CreateExamComponent {
   ) {
     this.autosaveTrigger$.pipe(debounceTime(2000)).subscribe(() => {
       // If we are in "Create Mode" (no ID or 'new'), pass undefined to service (it handles 'new_draft')
-      const idToSave =
-        this.exam._id && this.exam._id !== "new" ? this.exam._id : undefined;
+      const idToSave = this.exam._id && this.exam._id !== "new"
+        ? this.exam._id
+        : undefined;
       this.autosaveService.saveLocal(idToSave, this.exam);
     });
 
@@ -145,7 +151,8 @@ export class CreateExamComponent {
     });
   }
 
-  @ViewChild("nameInput") nameInput?: ElementRef;
+  @ViewChild("nameInput")
+  nameInput?: ElementRef;
 
   private triggerAutosave() {
     this.autosaveTrigger$.next();
@@ -257,14 +264,13 @@ export class CreateExamComponent {
     this.uploadExam();
   }
 
-
   private addNewTasksToPool() {
     for (let i = 0; i < this.exam.tasks.length; i++) {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const currentTaskId = this.exam.tasks[i].tasks[j].taskId;
         if (
           this.taskPool.find((task) => task.taskId === currentTaskId) ==
-          undefined
+            undefined
         ) {
           if (this.exam.tasks[i].tasks[j].type === "newPage") {
             continue;
@@ -312,8 +318,9 @@ export class CreateExamComponent {
           }
 
           const objectUrl = URL.createObjectURL(pdfBlob);
-          this.previewPdfUrl =
-            this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+          this.previewPdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+            objectUrl,
+          );
           this.previewTabNotification = true;
           this.snackBar.open("Preview has been updated!", "Dismiss", {
             duration: 3000,
@@ -321,11 +328,15 @@ export class CreateExamComponent {
         }
 
         const subtaskHeader = response.headers.get("X-Subtask-Info");
-        const subtaskInfo: PDFTaskInfo[] = subtaskHeader ? JSON.parse(subtaskHeader) : [];
+        const subtaskInfo: PDFTaskInfo[] = subtaskHeader
+          ? JSON.parse(subtaskHeader)
+          : [];
         this.PDFTasksInfo = subtaskInfo;
         console.log("Subtask Info from header:", subtaskInfo);
 
-        const errorIndex = subtaskInfo.findIndex((info) => info.logFileBoundaryError);
+        const errorIndex = subtaskInfo.findIndex((info) =>
+          info.logFileBoundaryError
+        );
         if (errorIndex !== -1) {
           console.warn(
             "Log file boundary errors detected, inserting new pages accordingly.",
@@ -353,7 +364,9 @@ export class CreateExamComponent {
     let taskIndex = -1;
     outer: for (let g = 0; g < this.exam.tasks.length; g++) {
       const group = this.exam.tasks[g];
-      if (group.tasks.length === 1 && group.tasks[0].type === "newPage") continue;
+      if (group.tasks.length === 1 && group.tasks[0].type === "newPage") {
+        continue;
+      }
       for (let i = 0; i < group.tasks.length; i++) {
         const task = group.tasks[i];
         if (task.type === "newPage" || task.type === "manualText") continue;
@@ -377,7 +390,11 @@ export class CreateExamComponent {
         return;
       }
       const newPageElement = this.taskBuilder.createTask("new_newPage");
-      this.exam.tasks[assignmentIndex].tasks.splice(taskIndex, 0, newPageElement);
+      this.exam.tasks[assignmentIndex].tasks.splice(
+        taskIndex,
+        0,
+        newPageElement,
+      );
       this.triggerAutosave();
     });
   }
@@ -486,8 +503,9 @@ export class CreateExamComponent {
     for (let i = 0; i < this.exam.tasks.length; i++) {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const task = this.exam.tasks[i].tasks[j];
-        const isPoolTask =
-          this.taskPool.find((poolTask) => poolTask.taskId === task.taskId) !=
+        const isPoolTask = this.taskPool.find((poolTask) =>
+          poolTask.taskId === task.taskId
+        ) !=
           undefined;
         const isModified = this.modifiedPoolTasks.has(task.taskId);
 
@@ -589,7 +607,6 @@ export class CreateExamComponent {
     this.triggerAutosave();
   }
 
-
   private importExam() {
     const lastURLPart = this.router.url.split("/").pop();
 
@@ -668,10 +685,10 @@ export class CreateExamComponent {
 
   private initializeExamData(response: Exam) {
     this.exam = response;
-    for (let taskGroup  of this.exam.tasks) {
+    for (let taskGroup of this.exam.tasks) {
       for (let task of taskGroup.tasks) {
-        this.tagHelper.importTagsToTask(task)
-        console.log("importing tags for task", task)
+        this.tagHelper.importTagsToTask(task);
+        console.log("importing tags for task", task);
       }
     }
     this.adjustTotalPoints();
@@ -680,18 +697,18 @@ export class CreateExamComponent {
   private importPoolTasks() {
     forkJoin({
       tasks: this.api.getTasksFromPool(),
-      tags: this.api.getAllTags()
+      tags: this.api.getAllTags(),
     }).subscribe({
       next: ({ tasks, tags }) => {
-        this.taskPool = tasks.map(task => ({
+        this.taskPool = tasks.map((task) => ({
           ...task,
-          tags: tags.filter(tag => task.tagIds.includes(tag._id!))
+          tags: tags.filter((tag) => task.tagIds.includes(tag._id!)),
         }));
         this.refreshPool$.next();
       },
       error: (error) => {
         console.error(error);
-      }
+      },
     });
   }
 
@@ -730,8 +747,9 @@ export class CreateExamComponent {
     let ignoredCount = 0;
     const tasks = this.exam.tasks[groupIndex].tasks;
     for (let i = 0; i < index; i++) {
-      if (tasks[i].type === "manualText" || tasks[i].type === "newPage")
+      if (tasks[i].type === "manualText" || tasks[i].type === "newPage") {
         ignoredCount++;
+      }
     }
 
     return this.mapTaskIndexToChar(index - ignoredCount);
@@ -777,11 +795,12 @@ export class CreateExamComponent {
 
   public onAddTag(index: number) {
     console.log("add tag for task with index ", index);
-    const dialogRef: MatDialogRef<AddTagDialogComponent, AddTagDialogData>  = this.dialog.open(AddTagDialogComponent, {
-      width: "50%",
-      height: "50%",
-      data: {},
-    });
+    const dialogRef: MatDialogRef<AddTagDialogComponent, AddTagDialogData> =
+      this.dialog.open(AddTagDialogComponent, {
+        width: "50%",
+        height: "50%",
+        data: {},
+      });
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) {
         return;
@@ -793,11 +812,11 @@ export class CreateExamComponent {
         name: result.name,
         color: result.color,
         textColor: result.textColor,
-      }
-      this.tasksWithModifiedTags.push({taskId: task.taskId, tagData: tag});
-      
+      };
+      this.tasksWithModifiedTags.push({ taskId: task.taskId, tagData: tag });
+
       if (result.exists) {
-        console.log("addTagToTask()")
+        console.log("addTagToTask()");
         this.tagHelper.addTagToTask(tag, task);
         return;
       }
@@ -813,9 +832,14 @@ export class CreateExamComponent {
         const pageNumber = this.getPDFPageNumber(index, this.currentGroupView);
 
         // Update the PDF URL to jump to the specific page
-        const baseUrl = this.sanitizer.sanitize(4, this.previewPdfUrl) as string;
-        const pageUrl = baseUrl + '#page=' + pageNumber;
-        this.previewPdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(pageUrl);
+        const baseUrl = this.sanitizer.sanitize(
+          4,
+          this.previewPdfUrl,
+        ) as string;
+        const pageUrl = baseUrl + "#page=" + pageNumber;
+        this.previewPdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          pageUrl,
+        );
 
         this.changeTab(this.exam.tasks.length); // switch to preview tab
       },
@@ -825,7 +849,10 @@ export class CreateExamComponent {
     });
   }
 
-  private getAbsoluteSubtaskIndex(groupIndex: number, taskIndex: number): number {
+  private getAbsoluteSubtaskIndex(
+    groupIndex: number,
+    taskIndex: number,
+  ): number {
     // Returns the 0-based position of the task at (groupIndex, taskIndex) in the
     // backend's flat AufgabenTeil array, by counting all real subtasks that appear
     // before it in LaTeX compilation order — mirroring generation.ts skip rules:
@@ -834,7 +861,9 @@ export class CreateExamComponent {
     let count = 0;
     for (let g = 0; g < groupIndex; g++) {
       const group = this.exam.tasks[g];
-      if (group.tasks.length === 1 && group.tasks[0].type === "newPage") continue;
+      if (group.tasks.length === 1 && group.tasks[0].type === "newPage") {
+        continue;
+      }
       for (const task of group.tasks) {
         if (task.type !== "newPage" && task.type !== "manualText") count++;
       }
@@ -848,13 +877,17 @@ export class CreateExamComponent {
     return count;
   }
 
-  private getPDFPageNumber(index: number, groupIndex = this.currentGroupView): number {
+  private getPDFPageNumber(
+    index: number,
+    groupIndex = this.currentGroupView,
+  ): number {
     const absoluteIndex = this.getAbsoluteSubtaskIndex(groupIndex, index);
     const info = this.PDFTasksInfo[absoluteIndex];
     if (!info) {
       const subtaskChar = this.calcTaskChar(index, groupIndex);
       throw new Error(
-        "Could not find PDF info for task " + (groupIndex + 1) + "." + subtaskChar,
+        "Could not find PDF info for task " + (groupIndex + 1) + "." +
+          subtaskChar,
       );
     }
     return info.page;

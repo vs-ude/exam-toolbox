@@ -1,34 +1,60 @@
 services:
-  # documentation (basic usage): ofhttps://hub.docker.com/_/caddy
-  # auto-generates crypto key (https://docs.authcrunch.com/docs/authenticate/auth-cookie)
-  # also possible to set a key manually, for better persistance (and possible other advantages). Not needed here for now.
   caddy:
     build:
-      context: .
-      dockerfile: ./caddy/Dockerfile
+      context: ./caddy/
+    command: caddy run --config /etc/caddy/Caddyfile --watch
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - caddy_data:/data # https://caddyserver.com/docs/conventions#data-directory
       - ./caddy/conf:/etc/caddy
+      - caddy_data:/data # https://caddyserver.com/docs/conventions#data-directory
+      - uploads:/app/uploads
     networks:
       - web
     depends_on:
       - backend
+      - frontend
     environment:
       DOMAIN: ${DOMAIN} # needs to be changed for production (with domain)
+    develop:
+      watch:
+        - path: ./caddy/
+          include:
+            - Dockerfile
+          action: rebuild
+        - path: ./frontend/
+          include:
+            - public/
+          target: /srv/public/
+          action: sync
+
+  frontend:
+    build:
+      context: ./frontend/
+    networks:
+      - web
+    develop:
+      watch:
+        - path: ./frontend/
+          include:
+            - src/
+          target: /app/
+          action: sync
+        - path: ./frontend/
+          include:
+            - "*.json"
+            - Dockerfile
+          action: rebuild
 
   backend:
     build:
       context: ./backend
-    # ports: # not exposed when caddy is used
-    #   - "3000:3000"
     volumes:
-      - ./backend/uploads:/app/uploads
       - ./backend/config.yaml:/app/config.yaml
       - backend_cache:/app/cache
       - backend_jobs:/app/jobs
+      - uploads:/app/uploads
     environment:
       DB_CONNSTRING: mongodb://mongo:27017/examToolboxDB
       AUTH_LDAP_URL: "ldap://ldap-host:389"
@@ -59,9 +85,14 @@ services:
           include:
             - "**/*.ts"
             - "server.ts"
-          action: sync
+            - config.yaml
+          action: sync+restart
           target: /app/
-        - path: backend/template/
+        - path: ./backend/
+          include:
+            - template/
+            - Dockerfile
+            - deno.*
           action: rebuild
 
   mailcrab:
@@ -73,15 +104,6 @@ services:
       - "1025:1025"
     networks:
       - web
-
-  # not needed when caddy hosts static frontend build files
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #   ports:
-  #     - "4200:80"
-  #   networks:
-  #     - web
 
   mongo:
     image: mongo:6.0
@@ -139,6 +161,7 @@ volumes:
   ldap_config:
   backend_jobs:
   backend_cache:
+  uploads:
 
 networks:
   web:

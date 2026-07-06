@@ -8,28 +8,24 @@
 }
 
 {$DOMAIN} {
-  route /vsLogo.svg {
-    root * /srv/app
+  route /public/* {
+    root * /srv/
     file_server
   }
 
   # TODO: We must ensure that only users with proper authorization are allowed to read files
-  route /public/* {
-    root * /srv/app
+  route /uploads/* {
+    root * /srv/
     file_server
   }
 
   @frontend {
-    not path /api/* /public/* /vsLogo.svg
+    not path /api/* /public/* /uploads/*
   }
 
   # frontend
   route @frontend {
-    root * /srv/app
-
-    # try_files ensures that an already authenticated user can use other routes on the website. In Angular every route is managed by index.html this is why it has to use index.html when the user uses routes (or even refreshes).
-    try_files {path} /index.html
-    file_server
+    reverse_proxy frontend:4200
   }
 
   # reverse-proxy api requests to backend (backend defined in docker-compose.yml)

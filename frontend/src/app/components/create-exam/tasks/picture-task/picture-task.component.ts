@@ -1,27 +1,39 @@
-import { BaseTaskComponent } from '../base-task/base-task.component';
-import { NgIf, NgStyle } from '@angular/common';
-import { Component, Output, EventEmitter } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { PictureTask, Task } from '../../../../exam';
-import { TaskAnimations } from '../task-animations';
-import { DragAndDropDirective } from '../drag-and-drop.directive';
-import { ApiService } from '../../../../services/api.service';
+import { BaseTaskComponent } from "../base-task/base-task.component";
+import { NgIf, NgStyle } from "@angular/common";
+import { Component, EventEmitter, Output } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { MatCardModule } from "@angular/material/card";
+import { MatButtonToggleModule } from "@angular/material/button-toggle";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatTooltipModule } from "@angular/material/tooltip";
+import { PictureTask, Task } from "../../../../exam";
+import { TaskAnimations } from "../task-animations";
+import { DragAndDropDirective } from "../drag-and-drop.directive";
+import { ApiService } from "../../../../services/api.service";
 import { TaskFooterComponent } from "../base-task/task-footer/task-footer.component";
+import { environment } from "../../../../../environments/environment";
 
 @Component({
-  selector: 'app-picture-task',
+  selector: "app-picture-task",
   standalone: true,
-  imports: [NgStyle, NgIf, FormsModule, MatCardModule, MatButtonToggleModule, MatIconModule, MatInputModule, MatTooltipModule, DragAndDropDirective, TaskFooterComponent],
-  templateUrl: './picture-task.component.html',
-  styleUrls: ['./picture-task.component.scss', '../task.scss'],
+  imports: [
+    NgStyle,
+    NgIf,
+    FormsModule,
+    MatCardModule,
+    MatButtonToggleModule,
+    MatIconModule,
+    MatInputModule,
+    MatTooltipModule,
+    DragAndDropDirective,
+    TaskFooterComponent,
+  ],
+  templateUrl: "./picture-task.component.html",
+  styleUrls: ["./picture-task.component.scss", "../task.scss"],
   animations: [
     TaskAnimations.inOutAnimation,
-    TaskAnimations.leftRightAnimation
+    TaskAnimations.leftRightAnimation,
   ],
 })
 export class PictureTaskComponent extends BaseTaskComponent {
@@ -29,7 +41,10 @@ export class PictureTaskComponent extends BaseTaskComponent {
     super();
   }
 
-  @Output() taskChangeEvent = new EventEmitter<Task>();
+  @Output()
+  taskChangeEvent = new EventEmitter<Task>();
+
+  public readonly publicPath = environment.publicPath;
 
   public task: PictureTask = {
     taskId: "",
@@ -77,7 +92,7 @@ export class PictureTaskComponent extends BaseTaskComponent {
   public fileBrowseHandler(event: Event, imageAffiliation: string) {
     let input = event.target as HTMLInputElement;
     const file = input.files![0];
-    this.handleNewPicture(file, imageAffiliation)
+    this.handleNewPicture(file, imageAffiliation);
   }
 
   public onFileDropped(file: File, imageAffiliation: string) {
@@ -89,7 +104,7 @@ export class PictureTaskComponent extends BaseTaskComponent {
   }
 
   private handleNewPicture(picture: File, imageAffiliation: string) {
-    this.uploadFile(picture, imageAffiliation)
+    this.uploadFile(picture, imageAffiliation);
     this.previewPicture(picture, imageAffiliation);
     this.taskChangeEvent.emit(this.task);
   }
@@ -100,8 +115,10 @@ export class PictureTaskComponent extends BaseTaskComponent {
         console.log("File uploaded successfully: ", response.url);
         this.saveBackendURL(response.url, imageAffiliation);
       },
-      error => { console.error("Error uploading file: ", error); }
-    )
+      (error) => {
+        console.error("Error uploading file: ", error);
+      },
+    );
   }
 
   private saveBackendURL(url: string, imageAffiliation: string) {
@@ -125,7 +142,7 @@ export class PictureTaskComponent extends BaseTaskComponent {
 
   private downloadFile(url: string, imageAffiliation: string) {
     this.api.downloadFile(url).subscribe(
-      response => {
+      (response) => {
         const newBlob = new Blob([response], { type: response.type });
 
         let reader = new FileReader();
@@ -133,14 +150,13 @@ export class PictureTaskComponent extends BaseTaskComponent {
         reader.onload = () => {
           const url = reader.result as string;
           this.setPictureFrontendUrl(url, imageAffiliation);
-        }
+        };
       },
-      error => { console.error("Error downloading file: ", error); }
-    )
-
+      (error) => {
+        console.error("Error downloading file: ", error);
+      },
+    );
   }
-
-
 
   private previewPicture(file: File, imageAffiliation: string) {
     let reader = new FileReader();
@@ -148,7 +164,7 @@ export class PictureTaskComponent extends BaseTaskComponent {
     reader.onload = () => {
       const url = reader.result as string;
       this.setPictureFrontendUrl(url, imageAffiliation);
-    }
+    };
   }
 
   private setPictureFrontendUrl(url: string, imageAffiliation: string) {
@@ -193,7 +209,4 @@ export class PictureTaskComponent extends BaseTaskComponent {
     this.pictureFileUrlSolutionEN = "";
     this.taskChangeEvent.emit(this.task);
   }
-
-
-
 }

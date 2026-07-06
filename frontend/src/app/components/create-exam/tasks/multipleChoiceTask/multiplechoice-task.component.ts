@@ -1,19 +1,26 @@
-import { NgFor, NgIf, NgStyle, NgClass } from '@angular/common';
-import { Component, Output, EventEmitter, AfterViewInit, OnInit, OnChanges, AfterViewChecked } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MultipleChoiceTask, Task } from '../../../../exam';
-import { BaseTaskComponent } from '../base-task/base-task.component';
-import { TaskAnimations } from '../task-animations';
-
-
+import { NgClass, NgFor, NgIf, NgStyle } from "@angular/common";
+import {
+  AfterViewChecked,
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  OnChanges,
+  OnInit,
+  Output,
+} from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { MatCardModule } from "@angular/material/card";
+import { MatButtonToggleModule } from "@angular/material/button-toggle";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatTooltipModule } from "@angular/material/tooltip";
+import { MultipleChoiceTask, Task } from "../../../../exam";
+import { BaseTaskComponent } from "../base-task/base-task.component";
+import { TaskAnimations } from "../task-animations";
+import { environment } from "../../../../../environments/environment";
 
 @Component({
-  selector: 'app-multiplechoiceTask',
+  selector: "app-multiplechoiceTask",
   standalone: true,
   imports: [
     FormsModule,
@@ -25,18 +32,21 @@ import { TaskAnimations } from '../task-animations';
     NgStyle,
     NgIf,
     MatTooltipModule,
-    NgClass
-],
-  templateUrl: './multiplechoice-task.component.html',
-  styleUrls: ['./multiplechoice-task.component.scss', '../task.scss'],
-  animations: [TaskAnimations.inOutAnimation, TaskAnimations.leftRightAnimation,]
+    NgClass,
+  ],
+  templateUrl: "./multiplechoice-task.component.html",
+  styleUrls: ["./multiplechoice-task.component.scss", "../task.scss"],
+  animations: [
+    TaskAnimations.inOutAnimation,
+    TaskAnimations.leftRightAnimation,
+  ],
 })
+export class MultiplechoiceTaskComponent extends BaseTaskComponent
+  implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
+  @Output()
+  taskChangeEvent = new EventEmitter<Task>();
 
-
-export class MultiplechoiceTaskComponent extends BaseTaskComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
-
-  @Output() taskChangeEvent = new EventEmitter<Task>();
-
+  public readonly publicPath = environment.publicPath;
 
   pointsPerOption = 1;
 
@@ -58,17 +68,16 @@ export class MultiplechoiceTaskComponent extends BaseTaskComponent implements On
     children: [],
   };
 
-
   ngOnInit(): void {
     if (this.preTask) {
       this.task = this.preTask as MultipleChoiceTask;
-      this.pointsPerOption = this.task.points / this.task.answerOptions.filter(option => option.correct).length;
+      this.pointsPerOption = this.task.points /
+        this.task.answerOptions.filter((option) => option.correct).length;
       return;
     }
     this.task.taskId = this.taskId;
     this.taskChangeEvent.emit(this.task);
   }
-
 
   addOption() {
     this.task.answerOptions.push({ DE: "", EN: "", correct: false });
@@ -76,7 +85,7 @@ export class MultiplechoiceTaskComponent extends BaseTaskComponent implements On
   }
 
   removeOption(index: number) {
-    if (this.task.answerOptions.length <= 1) { return; }
+    if (this.task.answerOptions.length <= 1) return;
     this.task.answerOptions.splice(index, 1);
     this.taskChangeEvent.emit(this.task);
   }
@@ -92,12 +101,14 @@ export class MultiplechoiceTaskComponent extends BaseTaskComponent implements On
   }
 
   public onOptionCorrectChange() {
-    this.task.points = this.pointsPerOption * this.task.answerOptions.filter(option => option.correct).length;
+    this.task.points = this.pointsPerOption *
+      this.task.answerOptions.filter((option) => option.correct).length;
     this.taskChangeEvent.emit(this.task);
   }
 
   public onPointsChange() {
-    this.task.points = this.pointsPerOption * this.task.answerOptions.filter(option => option.correct).length;
+    this.task.points = this.pointsPerOption *
+      this.task.answerOptions.filter((option) => option.correct).length;
     this.taskChangeEvent.emit(this.task);
   }
 }

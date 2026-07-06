@@ -1,31 +1,52 @@
-import { NgIf, NgStyle } from '@angular/common';
-import { AfterViewChecked, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { MatIcon } from '@angular/material/icon';
-import { Translation } from '../../../exam';
-import { TaskAnimations } from '../tasks/task-animations';
+import { NgIf, NgStyle } from "@angular/common";
+import {
+  AfterViewChecked,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from "@angular/core";
+import { MatIcon } from "@angular/material/icon";
+import { Translation } from "../../../exam";
+import { TaskAnimations } from "../tasks/task-animations";
+import { environment } from "../../../../environments/environment";
 
 @Component({
-  selector: 'app-task-group-title',
+  selector: "app-task-group-title",
   standalone: true,
   imports: [
     NgStyle,
     MatIcon,
     NgIf,
   ],
-  templateUrl: './task-group-title.component.html',
-  styleUrl: './task-group-title.component.scss',
-  animations: [TaskAnimations.inOutAnimation, TaskAnimations.leftRightAnimation],
+  templateUrl: "./task-group-title.component.html",
+  styleUrl: "./task-group-title.component.scss",
+  animations: [
+    TaskAnimations.inOutAnimation,
+    TaskAnimations.leftRightAnimation,
+  ],
 })
 export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
-  @Input() public assignmentNumber!: number;
-  @Input() public bilingual!: boolean;
-  @Input() public preTitle?: Translation;
-  @Output() titleChangedEvent = new EventEmitter<Translation>();
-  @ViewChild('titleFieldDE') titleFieldDE!: ElementRef;
-  @ViewChild('titleFieldEN') titleFieldEN?: ElementRef;
+  @Input()
+  public assignmentNumber!: number;
+  @Input()
+  public bilingual!: boolean;
+  @Input()
+  public preTitle?: Translation;
+  @Output()
+  titleChangedEvent = new EventEmitter<Translation>();
+  @ViewChild("titleFieldDE")
+  titleFieldDE!: ElementRef;
+  @ViewChild("titleFieldEN")
+  titleFieldEN?: ElementRef;
 
   description: Translation = { DE: "", EN: "" };
 
+  public readonly publicPath = environment.publicPath;
 
   languageChanged: boolean = false;
   isQuestionActive: boolean = false;
@@ -45,22 +66,21 @@ export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
     for (const propName in changes) {
       if (changes.hasOwnProperty(propName)) {
         switch (propName) {
-          case 'bilingual': {
+          case "bilingual": {
             this.languageChanged = true;
           }
         }
       }
     }
-
   }
 
   ngAfterViewChecked(): void {
-    if (!this.languageChanged) { return; }
+    if (!this.languageChanged) return;
     this.languageChanged = false;
 
     this.titleFieldDE.nativeElement.innerHTML = this.description.DE;
 
-    if (this.titleFieldEN == undefined) { return; }
+    if (this.titleFieldEN == undefined) return;
     this.titleFieldEN.nativeElement.innerHTML = this.description.EN;
   }
 
@@ -83,7 +103,6 @@ export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
     this.titleChangedEvent.emit(this.description);
   }
 
-
   public setQuestionFormat(format: string, event: MouseEvent) {
     event.preventDefault();
     document.execCommand(format);
@@ -91,11 +110,8 @@ export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
   }
 
   private updateButtonStates() {
-    this.isBold = document.queryCommandState('bold');
-    this.isItalic = document.queryCommandState('italic');
-    this.isUnderline = document.queryCommandState('underline');
+    this.isBold = document.queryCommandState("bold");
+    this.isItalic = document.queryCommandState("italic");
+    this.isUnderline = document.queryCommandState("underline");
   }
-
-
-
 }
