@@ -12,6 +12,8 @@ COPY --from=caddy_builder /usr/bin/caddy /usr/bin/caddy
 # copy static frontend files to custom caddy build
 COPY ./public/* /srv/public/
 
+ENV LOGLEVEL=warn
+
 # Mark where to put the Caddyfile
 VOLUME /etc/caddy/
 

@@ -2,7 +2,7 @@
   # detailed logs for caddy (can be disabled for production)
   log {
     output stdout
-    level debug
+    level {$LOGLEVEL}
     format console
   }
 }
