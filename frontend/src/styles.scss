@@ -1,4 +1,3 @@
-
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
 @use '@angular/material' as mat;
@@ -8,7 +7,7 @@
 // have to load a single css file for Angular Material in your app.
 // Be sure that you only ever include this mixin once!
 @include mat.core();
-@import "variables";
+@import 'variables';
 
 @font-face {
   font-family: 'Roboto';
@@ -19,56 +18,60 @@
 }
 
 // Define the theme object.
-$frontend-theme: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$azure-palette,
-    tertiary: mat.$blue-palette,
-  ),
-  density: (
-    scale: 0,
+$frontend-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    density: (
+      scale: 0,
+    ),
   )
-));
+);
 
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
 :root {
   @include mat.all-component-themes($frontend-theme);
-  @include mat.select-overrides((
-    enabled-trigger-text-color: var(--color-text),
-    placeholder-text-color: var(--color-dark-gray),
-    enabled-arrow-color: var(--color-dark-gray),
-  ));
-  @include mat.table-overrides((
-    background-color: var(--color-background),
-  ));
-  ;
+  @include mat.select-overrides(
+    (
+      enabled-trigger-text-color: var(--color-text),
+      placeholder-text-color: var(--color-dark-gray),
+      enabled-arrow-color: var(--color-dark-gray),
+    )
+  );
+  @include mat.table-overrides(
+    (
+      background-color: var(--color-background),
+    )
+  );
   --color-primary: #0d99ff;
   --color-secondary: #9747ff;
   --color-warn: #ff5c16;
   --color-dark-gray: #757575;
 }
 
-body.dark{
+body.dark {
   @include darken();
 }
 
-body.light{
+body.light {
   @include lighten();
 }
-
 
 body.inheritCursors * {
   cursor: inherit !important;
 }
 
 mat-dialog-container {
-   color: var(--color-text) !important;
+  color: var(--color-text) !important;
 }
 
 mat-dialog-content {
-    background-color: var(--color-background) !important;
+  background-color: var(--color-background) !important;
 }
 
 mat-dialog-actions {
@@ -80,8 +83,15 @@ mat-dialog-actions {
 // @include mat.typography-hierarchy($frontend-theme);
 
 // Comment out the line below if you want to use the deprecated `color` inputs.
- @include mat.color-variants-backwards-compatibility($frontend-theme);
+@include mat.color-variants-backwards-compatibility($frontend-theme);
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%;}
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: var(--color-background);}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background-color: var(--color-background);
+}

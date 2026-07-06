@@ -10,14 +10,14 @@ import { SearchComponent } from './components/search/search.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardComponent},
-  { path: 'about', component: AboutComponent},
-  { path: 'getting-started', component: GettingStartedComponent},
-  { path: 'create-exam/:id', component: CreateExamComponent},
-  { path: 'create-exam', component: CreateExamComponent},
-  { path: 'debug', component: DebugComponent},
-  { path: 'task-pool', component: TaskPoolComponent},
-  { path: 'exams-pool', component: ExamsPoolComponent},
-  { path: 'search/:text', component: SearchComponent},
-  { path: 'search', component: SearchComponent}
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'about', component: AboutComponent },
+  { path: 'getting-started', component: GettingStartedComponent },
+  { path: 'create-exam/:id', component: CreateExamComponent },
+  { path: 'create-exam', component: CreateExamComponent },
+  { path: 'debug', component: DebugComponent },
+  { path: 'task-pool', component: TaskPoolComponent },
+  { path: 'exams-pool', component: ExamsPoolComponent },
+  { path: 'search/:text', component: SearchComponent },
+  { path: 'search', component: SearchComponent },
 ];

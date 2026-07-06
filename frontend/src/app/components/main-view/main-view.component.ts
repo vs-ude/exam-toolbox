@@ -1,25 +1,32 @@
 import { Component, ElementRef, ViewChild, viewChild } from '@angular/core';
-import { MatSidenavModule } from '@angular/material/sidenav'
-import { MatListModule } from '@angular/material/list'
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
 import { RouterOutlet, RouterModule, Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button'
+import { MatButtonModule } from '@angular/material/button';
 import { ThemeToggleService } from '../../services/theme-toggle.service';
 import { MatIcon } from '@angular/material/icon';
 import { ApiService } from '../../services/api.service';
 import { NgIf } from '@angular/common';
 
-
 @Component({
   selector: 'app-main-view',
   standalone: true,
-  imports: [MatSidenavModule, MatListModule, RouterOutlet, MatButtonModule, RouterModule, MatIcon, NgIf],
+  imports: [
+    MatSidenavModule,
+    MatListModule,
+    RouterOutlet,
+    MatButtonModule,
+    RouterModule,
+    MatIcon,
+    NgIf,
+  ],
   templateUrl: './main-view.component.html',
-  styleUrl: './main-view.component.scss'
+  styleUrl: './main-view.component.scss',
 })
 export class MainViewComponent {
-  public username: string = ""
-  public initialLetter: string = ""
-  public isNavCollapsed: boolean = false
+  public username: string = '';
+  public initialLetter: string = '';
+  public isNavCollapsed: boolean = false;
   @ViewChild('sidenav') sidenav!: ElementRef;
   @ViewChild('content') content!: ElementRef;
 
@@ -27,20 +34,18 @@ export class MainViewComponent {
     private themeToggleService: ThemeToggleService,
     private api: ApiService,
     private router: Router,
-  ) { }
+  ) {}
 
   ngOnInit() {
-    this.api.getUser().subscribe(
-      user => {
-        this.username = user.id
-        this.initialLetter = user.id[0]
-      }
-    )
+    this.api.getUser().subscribe(user => {
+      this.username = user.id;
+      this.initialLetter = user.id[0];
+    });
   }
 
   onLogout() {
-    console.log("-- Logging out --")
-    window.location.href = '/auth/logout'
+    console.log('-- Logging out --');
+    window.location.href = '/auth/logout';
   }
 
   toggleTheme() {
@@ -48,19 +53,19 @@ export class MainViewComponent {
   }
 
   setUsername(name: string) {
-    this.username = name
-    this.initialLetter = name[0]
+    this.username = name;
+    this.initialLetter = name[0];
   }
 
   toggleNavCollapse() {
-    this.isNavCollapsed = !this.isNavCollapsed
+    this.isNavCollapsed = !this.isNavCollapsed;
     this.sidenav.nativeElement.style.width = this.isNavCollapsed ? '0' : '12%';
-    this.content.nativeElement.style.width = this.isNavCollapsed ? '100%' : '88%';
+    this.content.nativeElement.style.width = this.isNavCollapsed
+      ? '100%'
+      : '88%';
   }
 
-  onSearch(search: string){
-    this.router.navigate([`/search/${search}`])
+  onSearch(search: string) {
+    this.router.navigate([`/search/${search}`]);
   }
-
-
 }

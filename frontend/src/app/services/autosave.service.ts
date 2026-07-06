@@ -1,5 +1,5 @@
-import { Injectable } from "@angular/core";
-import { Exam } from "../exam";
+import { Injectable } from '@angular/core';
+import { Exam } from '../exam';
 
 // Wraps the exam data with a timestamp
 export interface AutosaveWrapper {
@@ -8,17 +8,17 @@ export interface AutosaveWrapper {
 }
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class AutosaveService {
-  private readonly STORAGE_PREFIX = "exam_autosave_";
-  private readonly NEW_DRAFT_KEY = "new_draft"; // Special key for exams without an ID yet (e.g. creating a new exam)
+  private readonly STORAGE_PREFIX = 'exam_autosave_';
+  private readonly NEW_DRAFT_KEY = 'new_draft'; // Special key for exams without an ID yet (e.g. creating a new exam)
 
   constructor() {}
 
   saveLocal(examId: string | undefined, exam: Exam): void {
     // If no ID is provided or ID is 'new' (e.g. creating a new exam), use the special 'new_draft' key.
-    const safeId = examId && examId !== "new" ? examId : this.NEW_DRAFT_KEY;
+    const safeId = examId && examId !== 'new' ? examId : this.NEW_DRAFT_KEY;
 
     const wrapper: AutosaveWrapper = {
       timestamp: Date.now(),
@@ -31,7 +31,7 @@ export class AutosaveService {
       // console.debug(`[Autosave] Saved draft for ${safeId} at ${new Date().toISOString()}`);
     } catch (e) {
       console.warn(
-        "[Autosave] Failed to write to local storage (Quota exceeded?)",
+        '[Autosave] Failed to write to local storage (Quota exceeded?)',
         e,
       );
     }
@@ -39,7 +39,7 @@ export class AutosaveService {
 
   // Retrieves the locally saved exam wrapper.
   loadLocal(examId: string | undefined): AutosaveWrapper | null {
-    const safeId = examId && examId !== "new" ? examId : this.NEW_DRAFT_KEY;
+    const safeId = examId && examId !== 'new' ? examId : this.NEW_DRAFT_KEY;
     const key = this.getStorageKey(safeId);
 
     const item = localStorage.getItem(key);
@@ -50,7 +50,7 @@ export class AutosaveService {
       return JSON.parse(item);
     } catch (e) {
       console.error(
-        "[Autosave] Corrupt data found in local storage, clearing it.",
+        '[Autosave] Corrupt data found in local storage, clearing it.',
         e,
       );
       this.clearLocal(safeId);
@@ -60,7 +60,7 @@ export class AutosaveService {
 
   // Clears the local save.
   clearLocal(examId: string | undefined): void {
-    const safeId = examId && examId !== "new" ? examId : this.NEW_DRAFT_KEY;
+    const safeId = examId && examId !== 'new' ? examId : this.NEW_DRAFT_KEY;
     const key = this.getStorageKey(safeId);
     localStorage.removeItem(key);
   }

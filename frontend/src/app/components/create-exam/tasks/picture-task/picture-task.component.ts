@@ -1,21 +1,21 @@
-import { BaseTaskComponent } from "../base-task/base-task.component";
-import { NgIf, NgStyle } from "@angular/common";
-import { Component, EventEmitter, Output } from "@angular/core";
-import { FormsModule } from "@angular/forms";
-import { MatCardModule } from "@angular/material/card";
-import { MatButtonToggleModule } from "@angular/material/button-toggle";
-import { MatIconModule } from "@angular/material/icon";
-import { MatInputModule } from "@angular/material/input";
-import { MatTooltipModule } from "@angular/material/tooltip";
-import { PictureTask, Task } from "../../../../exam";
-import { TaskAnimations } from "../task-animations";
-import { DragAndDropDirective } from "../drag-and-drop.directive";
-import { ApiService } from "../../../../services/api.service";
-import { TaskFooterComponent } from "../base-task/task-footer/task-footer.component";
-import { environment } from "../../../../../environments/environment";
+import { BaseTaskComponent } from '../base-task/base-task.component';
+import { NgIf, NgStyle } from '@angular/common';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { PictureTask, Task } from '../../../../exam';
+import { TaskAnimations } from '../task-animations';
+import { DragAndDropDirective } from '../drag-and-drop.directive';
+import { ApiService } from '../../../../services/api.service';
+import { TaskFooterComponent } from '../base-task/task-footer/task-footer.component';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
-  selector: "app-picture-task",
+  selector: 'app-picture-task',
   standalone: true,
   imports: [
     NgStyle,
@@ -29,8 +29,8 @@ import { environment } from "../../../../../environments/environment";
     DragAndDropDirective,
     TaskFooterComponent,
   ],
-  templateUrl: "./picture-task.component.html",
-  styleUrls: ["./picture-task.component.scss", "../task.scss"],
+  templateUrl: './picture-task.component.html',
+  styleUrls: ['./picture-task.component.scss', '../task.scss'],
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation,
@@ -47,41 +47,41 @@ export class PictureTaskComponent extends BaseTaskComponent {
   public readonly publicPath = environment.publicPath;
 
   public task: PictureTask = {
-    taskId: "",
-    type: "pictureTask",
-    question: { DE: "", EN: "" },
-    questionPicture: { urlDE: "", urlEN: "" },
-    solutionPicture: { urlDE: "", urlEN: "" },
+    taskId: '',
+    type: 'pictureTask',
+    question: { DE: '', EN: '' },
+    questionPicture: { urlDE: '', urlEN: '' },
+    solutionPicture: { urlDE: '', urlEN: '' },
     points: 2,
     tags: [],
     tagIds: [],
-    createdBy: "placeholder",
+    createdBy: 'placeholder',
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
     children: [],
   };
 
-  public pictureFileUrlQuestionDE: string = "";
-  public pictureFileUrlQuestionEN: string = "";
-  public pictureFileUrlSolutionDE: string = "";
-  public pictureFileUrlSolutionEN: string = "";
+  public pictureFileUrlQuestionDE: string = '';
+  public pictureFileUrlQuestionEN: string = '';
+  public pictureFileUrlSolutionDE: string = '';
+  public pictureFileUrlSolutionEN: string = '';
 
   ngOnInit(): void {
     if (this.preTask) {
       this.task = this.preTask as PictureTask;
 
       if (this.task.questionPicture.urlDE) {
-        this.downloadFile(this.task.questionPicture.urlDE, "questionDE");
+        this.downloadFile(this.task.questionPicture.urlDE, 'questionDE');
       }
       if (this.task.questionPicture.urlEN) {
-        this.downloadFile(this.task.questionPicture.urlEN, "questionEN");
+        this.downloadFile(this.task.questionPicture.urlEN, 'questionEN');
       }
       if (this.task.solutionPicture.urlDE) {
-        this.downloadFile(this.task.solutionPicture.urlDE, "solutionDE");
+        this.downloadFile(this.task.solutionPicture.urlDE, 'solutionDE');
       }
       if (this.task.solutionPicture.urlEN) {
-        this.downloadFile(this.task.solutionPicture.urlEN, "solutionEN");
+        this.downloadFile(this.task.solutionPicture.urlEN, 'solutionEN');
       }
       return;
     }
@@ -96,8 +96,8 @@ export class PictureTaskComponent extends BaseTaskComponent {
   }
 
   public onFileDropped(file: File, imageAffiliation: string) {
-    if (!file.type.startsWith("image/")) {
-      console.error("The selected file is not an image.");
+    if (!file.type.startsWith('image/')) {
+      console.error('The selected file is not an image.');
       return;
     }
     this.handleNewPicture(file, imageAffiliation);
@@ -112,27 +112,27 @@ export class PictureTaskComponent extends BaseTaskComponent {
   private uploadFile(file: File, imageAffiliation: string) {
     this.api.uploadFile(file).subscribe(
       (response: any) => {
-        console.log("File uploaded successfully: ", response.url);
+        console.log('File uploaded successfully: ', response.url);
         this.saveBackendURL(response.url, imageAffiliation);
       },
-      (error) => {
-        console.error("Error uploading file: ", error);
+      error => {
+        console.error('Error uploading file: ', error);
       },
     );
   }
 
   private saveBackendURL(url: string, imageAffiliation: string) {
     switch (imageAffiliation) {
-      case "questionDE":
+      case 'questionDE':
         this.task.questionPicture.urlDE = url;
         break;
-      case "questionEN":
+      case 'questionEN':
         this.task.questionPicture.urlEN = url;
         break;
-      case "solutionDE":
+      case 'solutionDE':
         this.task.solutionPicture.urlDE = url;
         break;
-      case "solutionEN":
+      case 'solutionEN':
         this.task.solutionPicture.urlEN = url;
         break;
       default:
@@ -142,7 +142,7 @@ export class PictureTaskComponent extends BaseTaskComponent {
 
   private downloadFile(url: string, imageAffiliation: string) {
     this.api.downloadFile(url).subscribe(
-      (response) => {
+      response => {
         const newBlob = new Blob([response], { type: response.type });
 
         let reader = new FileReader();
@@ -152,8 +152,8 @@ export class PictureTaskComponent extends BaseTaskComponent {
           this.setPictureFrontendUrl(url, imageAffiliation);
         };
       },
-      (error) => {
-        console.error("Error downloading file: ", error);
+      error => {
+        console.error('Error downloading file: ', error);
       },
     );
   }
@@ -169,16 +169,16 @@ export class PictureTaskComponent extends BaseTaskComponent {
 
   private setPictureFrontendUrl(url: string, imageAffiliation: string) {
     switch (imageAffiliation) {
-      case "questionDE":
+      case 'questionDE':
         this.pictureFileUrlQuestionDE = url;
         break;
-      case "questionEN":
+      case 'questionEN':
         this.pictureFileUrlQuestionEN = url;
         break;
-      case "solutionDE":
+      case 'solutionDE':
         this.pictureFileUrlSolutionDE = url;
         break;
-      case "solutionEN":
+      case 'solutionEN':
         this.pictureFileUrlSolutionEN = url;
         break;
       default:
@@ -187,26 +187,26 @@ export class PictureTaskComponent extends BaseTaskComponent {
   }
 
   public onRemovePreviewQuestionDE() {
-    this.task.questionPicture.urlDE = "";
-    this.pictureFileUrlQuestionDE = "";
+    this.task.questionPicture.urlDE = '';
+    this.pictureFileUrlQuestionDE = '';
     this.taskChangeEvent.emit(this.task);
   }
 
   public onRemovePreviewQuestionEN() {
-    this.task.questionPicture.urlEN = "";
-    this.pictureFileUrlQuestionEN = "";
+    this.task.questionPicture.urlEN = '';
+    this.pictureFileUrlQuestionEN = '';
     this.taskChangeEvent.emit(this.task);
   }
 
   public onRemovePreviewSolutionDE() {
-    this.task.solutionPicture.urlDE = "";
-    this.pictureFileUrlSolutionDE = "";
+    this.task.solutionPicture.urlDE = '';
+    this.pictureFileUrlSolutionDE = '';
     this.taskChangeEvent.emit(this.task);
   }
 
   public onRemovePreviewSolutionEN() {
-    this.task.solutionPicture.urlEN = "";
-    this.pictureFileUrlSolutionEN = "";
+    this.task.solutionPicture.urlEN = '';
+    this.pictureFileUrlSolutionEN = '';
     this.taskChangeEvent.emit(this.task);
   }
 }

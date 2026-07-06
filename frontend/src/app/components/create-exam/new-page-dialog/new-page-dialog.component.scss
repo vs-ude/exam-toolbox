@@ -1,44 +1,43 @@
 ::ng-deep .mat-mdc-dialog-container {
-    --mdc-dialog-container-color: var(--color-background);
+  --mdc-dialog-container-color: var(--color-background);
 }
 
 .title {
-    color: var(--color-text);
-    text-align: center;
-    justify-content: center;
+  color: var(--color-text);
+  text-align: center;
+  justify-content: center;
 }
 
 .dialog-content {
-    color: var(--color-text)
+  color: var(--color-text);
 }
 
 .taskName {
-    font-weight: 600;
-    margin: 10px 0;
-    font-size: 1.2em;
+  font-weight: 600;
+  margin: 10px 0;
+  font-size: 1.2em;
 }
 
-
 button {
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-    opacity: 0.9;
+  opacity: 0.9;
 }
 
 .manual-button {
-    background-color: #f44336;
-    color: white;
-    margin-right: 10px;
+  background-color: #f44336;
+  color: white;
+  margin-right: 10px;
 }
 
 .auto-button {
-    background-color: #4caf50;
-    color: white;
+  background-color: #4caf50;
+  color: white;
 }

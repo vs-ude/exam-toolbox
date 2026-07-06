@@ -1,13 +1,13 @@
-import { Injectable } from "@angular/core";
-import { HttpClient, HttpResponse } from "@angular/common/http";
-import { Observable, timeout } from "rxjs";
-import { Exam, Task } from "../exam";
-import { User } from "../user";
-import { Tag } from "../tag";
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable, timeout } from 'rxjs';
+import { Exam, Task } from '../exam';
+import { User } from '../user';
+import { Tag } from '../tag';
 
 export interface JobStatus {
   jobId: string;
-  status: "queued" | "processing" | "completed" | "failed";
+  status: 'queued' | 'processing' | 'completed' | 'failed';
   progress: {
     total: number;
     completed: number;
@@ -22,12 +22,12 @@ export interface DownloadableJob {
 }
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class ApiService {
-  private apiUrl = "/api";
+  private apiUrl = '/api';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   startMassExamGeneration(
     exam: Exam,
@@ -35,9 +35,9 @@ export class ApiService {
     startSeatNumber: number = 1,
   ): Observable<{ jobId: string }> {
     const formData = new FormData();
-    formData.append("exam", JSON.stringify(exam));
-    formData.append("list", list, list.name);
-    formData.append("startSeatNumber", startSeatNumber.toString());
+    formData.append('exam', JSON.stringify(exam));
+    formData.append('list', list, list.name);
+    formData.append('startSeatNumber', startSeatNumber.toString());
 
     return this.http.post<{ jobId: string }>(
       `${this.apiUrl}/generate-exams`,
@@ -55,8 +55,8 @@ export class ApiService {
 
   generateExam(exam?: Exam): Observable<HttpResponse<Blob>> {
     return this.http.post(`${this.apiUrl}/generate-exam`, exam, {
-      responseType: "blob",
-      observe: "response",
+      responseType: 'blob',
+      observe: 'response',
     });
   }
 
@@ -98,21 +98,21 @@ export class ApiService {
   generateAllExams(exam: Exam, list: File) {
     const formData = new FormData();
 
-    formData.append("exam", JSON.stringify(exam));
-    formData.append("list", list, list.name);
+    formData.append('exam', JSON.stringify(exam));
+    formData.append('list', list, list.name);
     return this.http
-      .post(`${this.apiUrl}/generate-exams`, formData, { responseType: "blob" })
+      .post(`${this.apiUrl}/generate-exams`, formData, { responseType: 'blob' })
       .pipe();
   }
   uploadFile(file: File) {
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append('image', file);
     return this.http.post(`${this.apiUrl}/upload`, formData);
   }
 
   downloadFile(fileUrl: string) {
     return this.http.get(`${this.apiUrl}/download`, {
-      responseType: "blob",
+      responseType: 'blob',
       params: { fileUrl },
     });
   }
@@ -129,7 +129,7 @@ export class ApiService {
 
   downloadMassExamResult(jobId: string): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/jobs/${jobId}/download`, {
-      responseType: "blob",
+      responseType: 'blob',
     });
   }
 
@@ -143,7 +143,7 @@ export class ApiService {
 
   downloadExam(jobId: string): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/jobs/${jobId}/download`, {
-      responseType: "blob",
+      responseType: 'blob',
     });
   }
 
@@ -218,5 +218,4 @@ export class ApiService {
   updateTag(tag: Tag) {
     return this.http.put(`${this.apiUrl}/tags/${tag._id}`, tag);
   }
-
 }

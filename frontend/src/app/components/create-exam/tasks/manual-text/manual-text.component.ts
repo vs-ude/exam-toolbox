@@ -1,18 +1,18 @@
-import { Component, EventEmitter, Output } from "@angular/core";
-import { TaskAnimations } from "../task-animations";
-import { BaseTaskComponent } from "../base-task/base-task.component";
-import { ManualText, Task } from "../../../../exam";
-import { NgIf, NgStyle } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { MatLabel } from "@angular/material/form-field";
-import { MatIconModule } from "@angular/material/icon";
-import { MatTooltip } from "@angular/material/tooltip";
-import { MathJaxParagraphComponent } from "../../../math-jax-paragraph/math-jax-paragraph.component";
-import { TaskFooterComponent } from "../base-task/task-footer/task-footer.component";
-import { environment } from "../../../../../environments/environment";
+import { Component, EventEmitter, Output } from '@angular/core';
+import { TaskAnimations } from '../task-animations';
+import { BaseTaskComponent } from '../base-task/base-task.component';
+import { ManualText, Task } from '../../../../exam';
+import { NgIf, NgStyle } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatLabel } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MathJaxParagraphComponent } from '../../../math-jax-paragraph/math-jax-paragraph.component';
+import { TaskFooterComponent } from '../base-task/task-footer/task-footer.component';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
-  selector: "app-manual-text",
+  selector: 'app-manual-text',
   standalone: true,
   imports: [
     NgIf,
@@ -24,11 +24,8 @@ import { environment } from "../../../../../environments/environment";
     MatTooltip,
     TaskFooterComponent,
   ],
-  templateUrl: "./manual-text.component.html",
-  styleUrls: [
-    "./manual-text.component.scss",
-    "../task.scss",
-  ],
+  templateUrl: './manual-text.component.html',
+  styleUrls: ['./manual-text.component.scss', '../task.scss'],
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation,
@@ -41,13 +38,13 @@ export class ManualTextComponent extends BaseTaskComponent {
   public readonly publicPath = environment.publicPath;
 
   public task: ManualText = {
-    taskId: "",
-    type: "manualText",
-    question: { DE: "", EN: "" },
+    taskId: '',
+    type: 'manualText',
+    question: { DE: '', EN: '' },
     points: 0,
     tags: [],
     tagIds: [],
-    createdBy: "placeholder",
+    createdBy: 'placeholder',
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],

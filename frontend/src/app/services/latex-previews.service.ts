@@ -4,17 +4,16 @@ export type LatexPreview = {
   name: string;
   latex: string;
   previewImageUrl: string;
-}
+};
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LatexPreviewsService {
-
   private previews: LatexPreview[] = [
     {
-      name: "complex-table",
-      previewImageUrl: "complexTable.jpg",
+      name: 'complex-table',
+      previewImageUrl: 'complexTable.jpg',
       latex: `\\begin{center}
 \\begin{tabular}{|l|l|l|l|l|l|}
 \\hline
@@ -32,11 +31,11 @@ export class LatexPreviewsService {
 \\scriptsize$L_{1}$ 2412 & \\scriptsize$L_{2}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$L_{3}$ \\lineloesung{~~~~~}{4242} & \\scriptsize$L_{4}$ ~~~2356 & \\scriptsize$L_{5}$ ~~~2471 & \\scriptsize$L_{6}$ \\lineloesung{~~~~~}{4242} \\\\
 \\hline
 \\end{tabular}
-\\end{center}`
+\\end{center}`,
     },
     {
-      name: "ISO/OSI",
-      previewImageUrl: "iso-osi.jpg",
+      name: 'ISO/OSI',
+      previewImageUrl: 'iso-osi.jpg',
       latex: `\\begin{center}
 ISO/OSI Layer:\\\\
 \\begin{tabular}{|c|}
@@ -51,11 +50,11 @@ ISO/OSI Layer:\\\\
 \\lineloesung{L1:~~~~~~~~~~}{Physical} \\\\
 \\hline
 \\end{tabular}
-\\end{center}`
-    }
+\\end{center}`,
+    },
   ];
 
-  constructor() { }
+  constructor() {}
 
   public getPreviews(): LatexPreview[] {
     return this.previews;

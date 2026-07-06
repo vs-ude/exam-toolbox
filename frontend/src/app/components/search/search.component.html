@@ -1,43 +1,53 @@
 <div class="view_container">
-    <div class="header">
-        <span>Search Results</span>
+  <div class="header">
+    <span>Search Results</span>
+  </div>
+
+  <div class="questionMatches-container" *ngIf="questionMatches.length > 0">
+    <div class="questionMatches-list">
+      @for (question of questionMatches; track $index) {
+        <app-task-pool-card [task]="question"></app-task-pool-card>
+      }
     </div>
+  </div>
 
-    <div class="questionMatches-container" *ngIf="questionMatches.length > 0">
-        <div class="questionMatches-list">
-            @for (question of questionMatches; track $index) {
-            <app-task-pool-card [task]="question" ></app-task-pool-card>
-            }
-        </div>
+  <div class="examMatches-container" *ngIf="examMatches.length > 0">
+    <div class="examMatches-list">
+      @for (exam of examMatches; track $index) {
+        <app-exam-card
+          [name]="exam.courseName"
+          (click)="onExamClick(exam)"
+        ></app-exam-card>
+      }
     </div>
+  </div>
 
-    <div class="examMatches-container" *ngIf="examMatches.length > 0">
-        <div class="examMatches-list">
-            @for (exam of examMatches; track $index) {
-            <app-exam-card [name]="exam.courseName" (click)="onExamClick(exam)"></app-exam-card>
-            }
-        </div>
-    </div>
-
-    <div class="tag-list-container" *ngIf="filteredTagsWithTasks.length > 0">
-        @for (tagRef of filteredTagsWithTasks; track $index){
-
-        <div class="tag-container">
-            <span class="tag"
-                [ngStyle]="{'backgroundColor': tagRef.tag.color, 'color': tagRef.tag.textColor}">{{tagRef.tag.name}}</span>
-            <div class="tag-usedByList">
-                <!-- 
+  <div class="tag-list-container" *ngIf="filteredTagsWithTasks.length > 0">
+    @for (tagRef of filteredTagsWithTasks; track $index) {
+      <div class="tag-container">
+        <span
+          class="tag"
+          [ngStyle]="{
+            backgroundColor: tagRef.tag.color,
+            color: tagRef.tag.textColor,
+          }"
+          >{{ tagRef.tag.name }}</span
+        >
+        <div class="tag-usedByList">
+          <!-- 
                 @for (exam$ of tagRef.exams; track $index) {
                 <app-exam-card *ngIf="(exam$ |async) as exam" [name]=" exam.courseName"
                     (click)="onExamClick(exam)"></app-exam-card>
                 }
                 -->
-                @for (task of tagRef.tasks; track $index) {
-                <app-task-pool-card (click)="onTaskClick(task)" [task]="task"></app-task-pool-card>
-                }
-            </div>
+          @for (task of tagRef.tasks; track $index) {
+            <app-task-pool-card
+              (click)="onTaskClick(task)"
+              [task]="task"
+            ></app-task-pool-card>
+          }
         </div>
-        }
-
-    </div>
+      </div>
+    }
+  </div>
 </div>

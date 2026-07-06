@@ -1,12 +1,15 @@
 <h2 mat-dialog-title class="title">Boundary error after generation</h2>
 
 <mat-dialog-content class="dialog-content">
-    We detected a boundary error at:
-    <div class="taskName">{{data.taskNumber}} - {{data.task.question.DE}}</div>
-    To resolve this issue, you need to add a 'NewPage' before the question. This can be done automatically or manually.
+  We detected a boundary error at:
+  <div class="taskName">
+    {{ data.taskNumber }} - {{ data.task.question.DE }}
+  </div>
+  To resolve this issue, you need to add a 'NewPage' before the question. This
+  can be done automatically or manually.
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button class="manual-button" [mat-dialog-close]="false">Manual</button>
-    <button class="auto-button" [mat-dialog-close]="true">Auto</button>
+  <button class="manual-button" [mat-dialog-close]="false">Manual</button>
+  <button class="auto-button" [mat-dialog-close]="true">Auto</button>
 </mat-dialog-actions>

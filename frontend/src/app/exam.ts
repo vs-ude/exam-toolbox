@@ -1,4 +1,4 @@
-import { Tag } from "./tag";
+import { Tag } from './tag';
 
 export class Exam {
   _id?: string = undefined;
@@ -65,7 +65,7 @@ export interface Question {
 }
 
 export interface MultipleChoiceTask extends BaseTask {
-  type: "multipleChoice";
+  type: 'multipleChoice';
   answerOptions: AnswerOptions[];
 }
 
@@ -76,12 +76,12 @@ export interface AnswerOptions {
 }
 
 export interface ShortAnswerTask extends BaseTask {
-  type: "shortAnswer";
+  type: 'shortAnswer';
   solution: Translation;
 }
 
 export interface PictureTask extends BaseTask {
-  type: "pictureTask";
+  type: 'pictureTask';
   questionPicture: Image;
   solutionPicture: Image;
 }
@@ -94,12 +94,12 @@ export interface Image {
 }
 
 export interface LatexTask extends BaseTask {
-  type: "latex";
+  type: 'latex';
   questionLatex: Translation;
 }
 
 export interface TableTask extends BaseTask {
-  type: "table";
+  type: 'table';
   tableHeadersQuestion: Translation[];
   tableDataQuestion: Translation[][];
   tableHeadersSolution: Translation[];
@@ -107,12 +107,12 @@ export interface TableTask extends BaseTask {
 }
 
 export interface ManualText extends BaseTask {
-  type: "manualText";
+  type: 'manualText';
   points: 0; // Manual texts do not have points
 }
 
 export interface NewPage extends BaseTask {
-  type: "newPage";
+  type: 'newPage';
   points: 0; // New pages do not have points
 }
 

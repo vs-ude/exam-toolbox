@@ -1,159 +1,152 @@
 .main {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
 }
 
 .sidenav {
-    background-color: var(--color-background);
-    width: 12%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: width 0.5s ease;
+  background-color: var(--color-background);
+  width: 12%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: width 0.5s ease;
 }
 
-.collapse-nav-btn{
-    border: none;
-    background-color: transparent;
-    padding: 5px;
-    border-radius: 5px;
-    cursor: pointer;
+.collapse-nav-btn {
+  border: none;
+  background-color: transparent;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .user-profile {
-    display: flex;
-    align-items: center;
-    width: 90%;
-    padding: 5%;
-    background-color: var(--color-background);
-    // border-bottom: 1px solid var(--border-color);
-    align-items: baseline;
+  display: flex;
+  align-items: center;
+  width: 90%;
+  padding: 5%;
+  background-color: var(--color-background);
+  // border-bottom: 1px solid var(--border-color);
+  align-items: baseline;
 }
 
 .dropdown-button {
-    margin-top: 5%;
-    display: flex;
-    align-items: left;
-    justify-content: left;
-    width: 100%;
-    background-color: transparent;
-    border: none;
-    padding: 0px;
-    cursor: pointer;
+  margin-top: 5%;
+  display: flex;
+  align-items: left;
+  justify-content: left;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  padding: 0px;
+  cursor: pointer;
 
-    :hover {
-        background-color: var(--border-color);
-    }
+  :hover {
+    background-color: var(--border-color);
+  }
 }
 
 .avatar {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background-color: var(--color-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    margin-right: 10px;
-    font-size: 12px;
-    line-height: 24px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-right: 10px;
+  font-size: 12px;
+  line-height: 24px;
 }
 
-
-
 .user-name {
-    font-size: 13px;
-    font-weight: 540;
-    color: var(--color-text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 540;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dropdown-icon {
-    margin-left: auto;
-    font-size: 16px;
-    color: var(--color-text);
-    cursor: pointer;
+  margin-left: auto;
+  font-size: 16px;
+  color: var(--color-text);
+  cursor: pointer;
 }
 
-
-.search-button{
-    border: none;
-    background-color: var(--color-bg-accent);
-    margin: 3% 5px 0 5px;
-    border-radius: 5px;
+.search-button {
+  border: none;
+  background-color: var(--color-bg-accent);
+  margin: 3% 5px 0 5px;
+  border-radius: 5px;
 }
 
 .search-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
 }
 
 .search-input {
-    width: 80%;
-    padding: 8px 12px;
-    font-size: 14px;
-    color: var(--color-text);
-    background-color: var(--color-bg-accent);
-    outline: none;
-    border: 0;
+  width: 80%;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--color-text);
+  background-color: var(--color-bg-accent);
+  outline: none;
+  border: 0;
 }
 ::placeholder {
-    color: var(--color-text-secondary);
+  color: var(--color-text-secondary);
 }
-
-
 
 .nav-item {
-    padding: 5% 0;
-    color: var(--color-text);
-    background-color: var(--color-background);
-    display: flex;
-    align-items: center;
-    justify-content: left;
-    width: 100%;
-    background-color: transparent;
-    border: none;
-    padding-left: 10px;
-    cursor: pointer;
+  padding: 5% 0;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  padding-left: 10px;
+  cursor: pointer;
 }
 .nav-item:hover {
-    background-color: var(--border-color);
+  background-color: var(--border-color);
 }
 
-.icon-container{
-    transform: scale(0.8);
-    margin-right: 10px;
-    color: var(--color-icon);
+.icon-container {
+  transform: scale(0.8);
+  margin-right: 10px;
+  color: var(--color-icon);
 }
-
-
 
 .separator-vertical {
-    width: 0%;
-    height: 100%;
-    border-left: solid 1px;
-    border-color: var(--border-color);
+  width: 0%;
+  height: 100%;
+  border-left: solid 1px;
+  border-color: var(--border-color);
 }
 
 .separator-horizontal {
-    width: 100%;
-    height: 0%;
-    border-top: solid 1px;
-    border-color: var(--border-color);
+  width: 100%;
+  height: 0%;
+  border-top: solid 1px;
+  border-color: var(--border-color);
 }
 
 .content {
-    background-color: var(--color-background);
-    width: 88%;
-    height: 100%;
-    transition: width 0.3s ease;
+  background-color: var(--color-background);
+  width: 88%;
+  height: 100%;
+  transition: width 0.3s ease;
 }

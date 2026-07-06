@@ -21,21 +21,20 @@ export interface AddTagDialogData {
   standalone: true,
   imports: [MatDialogModule, MatButtonModule, FormsModule, NgStyle],
   templateUrl: './add-tag-dialog.component.html',
-  styleUrl: './add-tag-dialog.component.scss'
+  styleUrl: './add-tag-dialog.component.scss',
 })
 export class AddTagDialogComponent {
   public tags: Tag[] = [];
 
-  public name: string = "Tag";
-  public color: string = "#81c784";
-  public textColor: string = "#ffffff";
+  public name: string = 'Tag';
+  public color: string = '#81c784';
+  public textColor: string = '#ffffff';
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: {},
     private api: ApiService,
-    private tagHelper: TagHelperService
-  ) { }
-
+    private tagHelper: TagHelperService,
+  ) {}
 
   ngOnInit() {
     this.api.getAllTags().subscribe(
@@ -43,12 +42,12 @@ export class AddTagDialogComponent {
         this.tags = tags;
       },
       err => {
-        console.error("error fetching tags", err);
-      }
-    )
+        console.error('error fetching tags', err);
+      },
+    );
   }
 
-  public onColorChange(bgColor: string){
+  public onColorChange(bgColor: string) {
     this.textColor = this.tagHelper.calcFontColor(bgColor);
   }
 }

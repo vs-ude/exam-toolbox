@@ -1,27 +1,26 @@
 .task_container {
-    border-radius: 10px;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    background-color: var(--color-bg-lifted);
-    user-select: none;
-    min-width: 100px;
-    max-width: 100%;
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-bg-lifted);
+  user-select: none;
+  min-width: 100px;
+  max-width: 100%;
 }
-
 
 .task_icon {
-    background-color: var(--color-primary);
-    padding: 4px 10px 4px 10px;
-    border-radius: 10px;
+  background-color: var(--color-primary);
+  padding: 4px 10px 4px 10px;
+  border-radius: 10px;
 }
 
-.task_name{
-    padding: 4px 10px 4px 10px;
-    font-size: smaller;
-    overflow: hidden;
-    max-height: 40px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    display: block;
+.task_name {
+  padding: 4px 10px 4px 10px;
+  font-size: smaller;
+  overflow: hidden;
+  max-height: 40px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
 }

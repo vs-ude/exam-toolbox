@@ -8,9 +8,8 @@ describe('LatexTaskComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LatexTaskComponent]
-    })
-    .compileComponents();
+      imports: [LatexTaskComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LatexTaskComponent);
     component = fixture.componentInstance;

@@ -1,164 +1,157 @@
 .task {
-    padding: 24px 4px 12px;
-    display: flex;
-    align-items: center;
-    flex: 1;
-    flex-direction: column;
-    min-height: 128px;
-    width: 15vw;
-    min-width: 164px;
-    border-radius: 8px;
-    border: 0;
-    background: var(--color-bg-accent);
-    text-align: center;
-    box-sizing: border-box;
-    transition: .1s ease-in;
+  padding: 24px 4px 12px;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  flex-direction: column;
+  min-height: 128px;
+  width: 15vw;
+  min-width: 164px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--color-bg-accent);
+  text-align: center;
+  box-sizing: border-box;
+  transition: 0.1s ease-in;
 }
 
 .task:hover {
-    transition: .1s ease-in;
+  transition: 0.1s ease-in;
 
-    .name {
-        color: #ffff
-    }
+  .name {
+    color: #ffff;
+  }
+  .description {
+    color: #ffffffcc;
+  }
+  .footer {
+    color: #ffffffcc;
+  }
 
-    ;
-
-    .description {
-        color: #ffffffcc
-    }
-
-    ;
-
-    .footer {
-        color: #ffffffcc
-    }
-
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .task:active {
-    filter: brightness(85%);
-    transition: .05 ease-in;
+  filter: brightness(85%);
+  transition: 0.05 ease-in;
 }
 
 .icon_container {
-    width: 32px;
-    height: 32px;
-    margin: 0 0 12 0;
-    background-color: var(--color-primary);
-    color: white;
-    box-sizing: border-box;
-    border-radius: 24px;
-    padding: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 12px;
-    animation: create_background-fadeIn .2s ease-in-out;
-    transition: .1s ease-in;
+  width: 32px;
+  height: 32px;
+  margin: 0 0 12 0;
+  background-color: var(--color-primary);
+  color: white;
+  box-sizing: border-box;
+  border-radius: 24px;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  animation: create_background-fadeIn 0.2s ease-in-out;
+  transition: 0.1s ease-in;
 }
 
 //------ Tags -----------------
 .tag_wrapper {
-    display: flex;
-    flex-direction: row;
-    gap: 4px;
-    max-width: 100%;
-    flex-wrap: wrap;
-    justify-content: center;
-    cursor: default;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  max-width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  cursor: default;
 }
 
 .task_tag {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-style: normal;
-    background: #ffe600;
-    color: var(--color-text);
-    border-radius: 16px;
-    padding: 2px 10px;
-    min-width: 0;
-    box-sizing: border-box;
-    text-align: center;
-    line-height: 1.4;
-    position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-style: normal;
+  background: #ffe600;
+  color: var(--color-text);
+  border-radius: 16px;
+  padding: 2px 10px;
+  min-width: 0;
+  box-sizing: border-box;
+  text-align: center;
+  line-height: 1.4;
+  position: relative;
 }
 
 .task_tag:hover {
-    filter: brightness(0.9);
+  filter: brightness(0.9);
 }
 
 .addTag_Button {
-    border: none;
-    background: none;
-    color: var(--color-text-secondary);
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 14px; // smaller icon
-    width: 24px;
-    height: 24px;
-    transition: .1s ease-in;
+  border: none;
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px; // smaller icon
+  width: 24px;
+  height: 24px;
+  transition: 0.1s ease-in;
 }
 
 .addTag_Button:hover {
-    color: var(--color-text);
-    background: var(--color-bg-lifted);
-    border-radius: 12px;
+  color: var(--color-text);
+  background: var(--color-bg-lifted);
+  border-radius: 12px;
 }
 
 .delete_icon {
-    position: absolute;
-    color: var(--color-text);
-    top: -10px;
-    right: -8px;
-    scale: 0.8;
+  position: absolute;
+  color: var(--color-text);
+  top: -10px;
+  right: -8px;
+  scale: 0.8;
 }
 
 .delete_icon:hover {
-    cursor: pointer;
-    color: red;
+  cursor: pointer;
+  color: red;
 }
-
 
 //------ Descriptions -----------------
 .description_shelf {
-    display: flex;
-    flex-direction: column;
-    font-size: 11px;
-    font-style: normal;
-    gap: 4px;
-    line-height: 16px;
-    transition: .1s ease-in;
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  font-style: normal;
+  gap: 4px;
+  line-height: 16px;
+  transition: 0.1s ease-in;
 }
 
 .name {
-    color: var(--color-text);
-    font-weight: 550;
-    transition: .1s ease-in;
-    text-overflow: ellipsis;
+  color: var(--color-text);
+  font-weight: 550;
+  transition: 0.1s ease-in;
+  text-overflow: ellipsis;
 }
 
 .description {
-    color: var(--color-text-secondary);
-    font-weight: 450;
-    transition: .1s ease-in;
+  color: var(--color-text-secondary);
+  font-weight: 450;
+  transition: 0.1s ease-in;
 }
 
 //------ Footer -----------------
 .footer {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-top: 12px;
-    color: var(--color-text-secondary);
-    font-size: 11px;
-    transition: .1s ease-in;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 12px;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  transition: 0.1s ease-in;
 }

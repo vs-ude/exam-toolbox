@@ -6,17 +6,17 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
-} from "@angular/core";
-import { Task } from "../../../../exam";
-import { Tag } from "../../../../tag";
-import { environment } from "../../../../../environments/environment";
+} from '@angular/core';
+import { Task } from '../../../../exam';
+import { Tag } from '../../../../tag';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
-  selector: "app-base-task",
+  selector: 'app-base-task',
   standalone: true,
   imports: [],
-  template: "",
-  styleUrl: "../task.scss",
+  template: '',
+  styleUrl: '../task.scss',
 })
 export abstract class BaseTaskComponent {
   @Input()
@@ -35,9 +35,9 @@ export abstract class BaseTaskComponent {
   newTagEvent = new EventEmitter<void>();
   @Output()
   previewEvent = new EventEmitter();
-  @ViewChild("questionFieldDE")
+  @ViewChild('questionFieldDE')
   questionFieldDE!: ElementRef;
-  @ViewChild("questionFieldEN")
+  @ViewChild('questionFieldEN')
   questionFieldEN?: ElementRef;
 
   abstract taskChangeEvent: EventEmitter<Task>;
@@ -64,7 +64,7 @@ export abstract class BaseTaskComponent {
     for (const propName in changes) {
       if (changes.hasOwnProperty(propName)) {
         switch (propName) {
-          case "bilingual": {
+          case 'bilingual': {
             this.languageChanged = true;
           }
         }
@@ -97,18 +97,18 @@ export abstract class BaseTaskComponent {
   }
 
   private updateButtonStates() {
-    this.isBold = document.queryCommandState("bold");
-    this.isItalic = document.queryCommandState("italic");
-    this.isUnderline = document.queryCommandState("underline");
+    this.isBold = document.queryCommandState('bold');
+    this.isItalic = document.queryCommandState('italic');
+    this.isUnderline = document.queryCommandState('underline');
   }
 
   public onDelete() {
-    this.deleteEvent.emit("delete");
+    this.deleteEvent.emit('delete');
   }
 
   public updateQuestion(event: Event, language: string) {
     const element = event.target as HTMLElement;
-    if (language === "DE") {
+    if (language === 'DE') {
       this.task.question.DE = element.innerHTML;
     } else {
       this.task.question.EN = element.innerHTML;
@@ -122,10 +122,10 @@ export abstract class BaseTaskComponent {
   }
 
   public onCreateNewTaskChange(state: boolean) {
-    console.log("Create New Task state changed to:", state);
+    console.log('Create New Task state changed to:', state);
     this.createNewTask = state;
     this.createNewTaskEvent.emit(this.createNewTask);
-    console.log("Emitted createNewTaskEvent with value:", this.createNewTask);
+    console.log('Emitted createNewTaskEvent with value:', this.createNewTask);
   }
 
   public onAddTag() {

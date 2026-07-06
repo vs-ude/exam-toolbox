@@ -8,9 +8,8 @@ describe('MathJaxParagraphComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MathJaxParagraphComponent]
-    })
-    .compileComponents();
+      imports: [MathJaxParagraphComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(MathJaxParagraphComponent);
     component = fixture.componentInstance;

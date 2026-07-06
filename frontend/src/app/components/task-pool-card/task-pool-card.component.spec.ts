@@ -8,9 +8,8 @@ describe('TaskPoolCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TaskPoolCardComponent]
-    })
-    .compileComponents();
+      imports: [TaskPoolCardComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(TaskPoolCardComponent);
     component = fixture.componentInstance;

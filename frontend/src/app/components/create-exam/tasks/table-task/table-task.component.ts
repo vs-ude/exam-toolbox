@@ -1,17 +1,17 @@
-import { Component, EventEmitter, Output } from "@angular/core";
-import { BaseTaskComponent } from "../base-task/base-task.component";
-import { TableTask, Task } from "../../../../exam";
-import { NgFor, NgIf, NgStyle } from "@angular/common";
-import { MatIconModule } from "@angular/material/icon";
-import { MatLabel } from "@angular/material/form-field";
-import { FormsModule } from "@angular/forms";
-import { TaskAnimations } from "../task-animations";
-import { MatTooltip } from "@angular/material/tooltip";
-import { TaskFooterComponent } from "../base-task/task-footer/task-footer.component";
-import { environment } from "../../../../../environments/environment";
+import { Component, EventEmitter, Output } from '@angular/core';
+import { BaseTaskComponent } from '../base-task/base-task.component';
+import { TableTask, Task } from '../../../../exam';
+import { NgFor, NgIf, NgStyle } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatLabel } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
+import { TaskAnimations } from '../task-animations';
+import { MatTooltip } from '@angular/material/tooltip';
+import { TaskFooterComponent } from '../base-task/task-footer/task-footer.component';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
-  selector: "app-table-task",
+  selector: 'app-table-task',
   standalone: true,
   imports: [
     NgIf,
@@ -23,11 +23,8 @@ import { environment } from "../../../../../environments/environment";
     MatTooltip,
     TaskFooterComponent,
   ],
-  templateUrl: "./table-task.component.html",
-  styleUrls: [
-    "./table-task.component.scss",
-    "../task.scss",
-  ],
+  templateUrl: './table-task.component.html',
+  styleUrls: ['./table-task.component.scss', '../task.scss'],
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation,
@@ -42,9 +39,9 @@ export class TableTaskComponent extends BaseTaskComponent {
   public hasHeader: boolean = false;
 
   public task: TableTask = {
-    taskId: "",
-    type: "table",
-    question: { "DE": "", "EN": "" },
+    taskId: '',
+    type: 'table',
+    question: { DE: '', EN: '' },
     tableHeadersQuestion: [],
     tableDataQuestion: [],
     tableDataSolution: [],
@@ -52,7 +49,7 @@ export class TableTaskComponent extends BaseTaskComponent {
     points: 0,
     tagIds: [],
     tags: [],
-    createdBy: "placeholder",
+    createdBy: 'placeholder',
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
@@ -77,21 +74,35 @@ export class TableTaskComponent extends BaseTaskComponent {
   addRow() {
     if (!this.task.tableDataQuestion.length) {
       this.task.tableDataQuestion = [
-        [{ DE: "", EN: "" }, { DE: "", EN: "" }],
-        [{ DE: "", EN: "" }, { DE: "", EN: "" }],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
       ];
       this.task.tableDataSolution = [
-        [{ DE: "", EN: "" }, { DE: "", EN: "" }],
-        [{ DE: "", EN: "" }, { DE: "", EN: "" }],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
       ];
     } else {
       const numberOfColumns = this.task.tableDataQuestion[0].length;
-      const newRow = Array(numberOfColumns).fill(0).map(() => ({
-        DE: "",
-        EN: "",
-      }));
+      const newRow = Array(numberOfColumns)
+        .fill(0)
+        .map(() => ({
+          DE: '',
+          EN: '',
+        }));
       this.task.tableDataQuestion.push(newRow);
-      this.task.tableDataSolution.push(newRow.map(() => ({ DE: "", EN: "" })));
+      this.task.tableDataSolution.push(newRow.map(() => ({ DE: '', EN: '' })));
     }
     this.updateTask();
   }
@@ -110,22 +121,34 @@ export class TableTaskComponent extends BaseTaskComponent {
   addColumn() {
     if (!this.task.tableDataQuestion.length) {
       this.task.tableDataQuestion = [
-        [{ DE: "", EN: "" }, { DE: "", EN: "" }],
-        [{ DE: "", EN: "" }, { DE: "", EN: "" }],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
       ];
       this.task.tableDataSolution = [
-        [{ DE: "", EN: "" }, { DE: "", EN: "" }],
-        [{ DE: "", EN: "" }, { DE: "", EN: "" }],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
       ];
     } else {
       for (let row of this.task.tableDataQuestion) {
-        row.push({ DE: "", EN: "" });
+        row.push({ DE: '', EN: '' });
       }
       for (let row of this.task.tableDataSolution) {
-        row.push({ DE: "", EN: "" });
+        row.push({ DE: '', EN: '' });
       }
-      this.task.tableHeadersQuestion.push({ DE: "", EN: "" });
-      this.task.tableHeadersSolution.push({ DE: "", EN: "" });
+      this.task.tableHeadersQuestion.push({ DE: '', EN: '' });
+      this.task.tableHeadersSolution.push({ DE: '', EN: '' });
     }
 
     this.updateTask();
@@ -152,7 +175,7 @@ export class TableTaskComponent extends BaseTaskComponent {
 
   blurOnEnter(event: Event) {
     const keyboardEvent = event as KeyboardEvent;
-    if (keyboardEvent.key === "Enter") {
+    if (keyboardEvent.key === 'Enter') {
       (keyboardEvent.target as HTMLInputElement).blur();
       keyboardEvent.preventDefault();
     }

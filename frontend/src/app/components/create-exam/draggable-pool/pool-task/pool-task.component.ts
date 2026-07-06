@@ -1,14 +1,14 @@
-import { CommonModule, DOCUMENT } from "@angular/common";
-import { Component, ElementRef, Inject, Input, Renderer2 } from "@angular/core";
-import { Task } from "../../../../exam";
-import { environment } from "../../../../../environments/environment";
+import { CommonModule, DOCUMENT } from '@angular/common';
+import { Component, ElementRef, Inject, Input, Renderer2 } from '@angular/core';
+import { Task } from '../../../../exam';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
-  selector: "app-pool-task",
+  selector: 'app-pool-task',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: "./pool-task.component.html",
-  styleUrl: "./pool-task.component.scss",
+  templateUrl: './pool-task.component.html',
+  styleUrl: './pool-task.component.scss',
 })
 export class PoolTaskComponent {
   @Input()
@@ -33,35 +33,35 @@ export class PoolTaskComponent {
   ) {}
 
   private createTooltipElement(): HTMLElement {
-    const el = this.renderer.createElement("div") as HTMLElement;
+    const el = this.renderer.createElement('div') as HTMLElement;
     // reuse existing CSS class for styling
-    this.renderer.addClass(el, "task_tooltip");
+    this.renderer.addClass(el, 'task_tooltip');
     // ensure it's fixed and above other elements
-    this.renderer.setStyle(el, "position", "fixed");
-    this.renderer.setStyle(el, "z-index", "2147483647");
-    this.renderer.setStyle(el, "left", "0px");
-    this.renderer.setStyle(el, "top", "0px");
-    this.renderer.setStyle(el, "max-width", "none");
+    this.renderer.setStyle(el, 'position', 'fixed');
+    this.renderer.setStyle(el, 'z-index', '2147483647');
+    this.renderer.setStyle(el, 'left', '0px');
+    this.renderer.setStyle(el, 'top', '0px');
+    this.renderer.setStyle(el, 'max-width', 'none');
     return el;
   }
 
   private renderTooltipContent(el: HTMLElement) {
     // question
-    const q = this.renderer.createElement("div");
-    this.renderer.addClass(q, "tooltip_question");
-    this.renderer.setProperty(q, "textContent", this.task.question.DE);
+    const q = this.renderer.createElement('div');
+    this.renderer.addClass(q, 'tooltip_question');
+    this.renderer.setProperty(q, 'textContent', this.task.question.DE);
     this.renderer.appendChild(el, q);
 
     // tags
     if (this.task.tags && this.task.tags.length) {
-      const tagContainer = this.renderer.createElement("div");
-      this.renderer.addClass(tagContainer, "tooltip_tags");
+      const tagContainer = this.renderer.createElement('div');
+      this.renderer.addClass(tagContainer, 'tooltip_tags');
       for (const tag of this.task.tags) {
-        const t = this.renderer.createElement("span");
-        this.renderer.addClass(t, "tooltip_tag");
-        this.renderer.setProperty(t, "textContent", tag.name);
-        this.renderer.setStyle(t, "background", tag.color);
-        this.renderer.setStyle(t, "color", tag.textColor);
+        const t = this.renderer.createElement('span');
+        this.renderer.addClass(t, 'tooltip_tag');
+        this.renderer.setProperty(t, 'textContent', tag.name);
+        this.renderer.setStyle(t, 'background', tag.color);
+        this.renderer.setStyle(t, 'color', tag.textColor);
         this.renderer.appendChild(tagContainer, t);
       }
       this.renderer.appendChild(el, tagContainer);
@@ -75,8 +75,9 @@ export class PoolTaskComponent {
       this.renderTooltipContent(this.tooltipEl);
       this.renderer.appendChild(this.document.body, this.tooltipEl);
 
-      const rect = (this.host.nativeElement as HTMLElement)
-        .getBoundingClientRect();
+      const rect = (
+        this.host.nativeElement as HTMLElement
+      ).getBoundingClientRect();
       const margin = 12;
       // desired width = host width, but clamp to viewport
       let width = Math.min(
@@ -96,14 +97,14 @@ export class PoolTaskComponent {
         top = Math.max(margin, rect.top - 8 - approxHeight);
       }
 
-      this.renderer.setStyle(this.tooltipEl, "left", `${Math.round(left)}px`);
-      this.renderer.setStyle(this.tooltipEl, "top", `${Math.round(top)}px`);
-      this.renderer.setStyle(this.tooltipEl, "width", `${Math.round(width)}px`);
+      this.renderer.setStyle(this.tooltipEl, 'left', `${Math.round(left)}px`);
+      this.renderer.setStyle(this.tooltipEl, 'top', `${Math.round(top)}px`);
+      this.renderer.setStyle(this.tooltipEl, 'width', `${Math.round(width)}px`);
 
       // trigger fade/slide-in animation by adding a visible class shortly after insert
       setTimeout(() => {
         if (this.tooltipEl) {
-          this.renderer.addClass(this.tooltipEl, "tooltip-visible");
+          this.renderer.addClass(this.tooltipEl, 'tooltip-visible');
         }
       }, 10);
 
@@ -120,7 +121,7 @@ export class PoolTaskComponent {
     }
     if (this.tooltipEl) {
       // remove visible class to animate out, then remove element after animation
-      this.renderer.removeClass(this.tooltipEl, "tooltip-visible");
+      this.renderer.removeClass(this.tooltipEl, 'tooltip-visible');
       setTimeout(() => {
         try {
           this.renderer.removeChild(this.document.body, this.tooltipEl!);

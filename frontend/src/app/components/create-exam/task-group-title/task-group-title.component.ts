@@ -1,4 +1,4 @@
-import { NgIf, NgStyle } from "@angular/common";
+import { NgIf, NgStyle } from '@angular/common';
 import {
   AfterViewChecked,
   Component,
@@ -9,22 +9,18 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
-} from "@angular/core";
-import { MatIcon } from "@angular/material/icon";
-import { Translation } from "../../../exam";
-import { TaskAnimations } from "../tasks/task-animations";
-import { environment } from "../../../../environments/environment";
+} from '@angular/core';
+import { MatIcon } from '@angular/material/icon';
+import { Translation } from '../../../exam';
+import { TaskAnimations } from '../tasks/task-animations';
+import { environment } from '../../../../environments/environment';
 
 @Component({
-  selector: "app-task-group-title",
+  selector: 'app-task-group-title',
   standalone: true,
-  imports: [
-    NgStyle,
-    MatIcon,
-    NgIf,
-  ],
-  templateUrl: "./task-group-title.component.html",
-  styleUrl: "./task-group-title.component.scss",
+  imports: [NgStyle, MatIcon, NgIf],
+  templateUrl: './task-group-title.component.html',
+  styleUrl: './task-group-title.component.scss',
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation,
@@ -39,12 +35,12 @@ export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
   public preTitle?: Translation;
   @Output()
   titleChangedEvent = new EventEmitter<Translation>();
-  @ViewChild("titleFieldDE")
+  @ViewChild('titleFieldDE')
   titleFieldDE!: ElementRef;
-  @ViewChild("titleFieldEN")
+  @ViewChild('titleFieldEN')
   titleFieldEN?: ElementRef;
 
-  description: Translation = { DE: "", EN: "" };
+  description: Translation = { DE: '', EN: '' };
 
   public readonly publicPath = environment.publicPath;
 
@@ -66,7 +62,7 @@ export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
     for (const propName in changes) {
       if (changes.hasOwnProperty(propName)) {
         switch (propName) {
-          case "bilingual": {
+          case 'bilingual': {
             this.languageChanged = true;
           }
         }
@@ -94,7 +90,7 @@ export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
 
   public updateTitle(event: Event, language: string) {
     const element = event.target as HTMLElement;
-    if (language === "DE") {
+    if (language === 'DE') {
       this.description.DE = element.innerHTML;
     } else {
       this.description.EN = element.innerHTML;
@@ -110,8 +106,8 @@ export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
   }
 
   private updateButtonStates() {
-    this.isBold = document.queryCommandState("bold");
-    this.isItalic = document.queryCommandState("italic");
-    this.isUnderline = document.queryCommandState("underline");
+    this.isBold = document.queryCommandState('bold');
+    this.isItalic = document.queryCommandState('italic');
+    this.isUnderline = document.queryCommandState('underline');
   }
 }

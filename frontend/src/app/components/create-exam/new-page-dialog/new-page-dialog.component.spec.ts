@@ -8,9 +8,8 @@ describe('NewPageDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NewPageDialogComponent]
-    })
-    .compileComponents();
+      imports: [NewPageDialogComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(NewPageDialogComponent);
     component = fixture.componentInstance;

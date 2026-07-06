@@ -6,12 +6,10 @@ import { MatIcon } from '@angular/material/icon';
   standalone: true,
   imports: [MatIcon],
   templateUrl: './exam-card.component.html',
-  styleUrl: './exam-card.component.scss'
+  styleUrl: './exam-card.component.scss',
 })
 export class ExamCardComponent {
-  @Input() name!: string ; 
+  @Input() name!: string;
 
-  public lastEdited = 2; 
-
-
+  public lastEdited = 2;
 }

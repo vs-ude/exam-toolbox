@@ -4,23 +4,23 @@ import {
   NgModule,
   OnInit,
   Output,
-} from "@angular/core";
-import { BaseTaskComponent } from "../base-task/base-task.component";
-import { LatexTask, Task } from "../../../../exam";
-import { NgIf, NgStyle } from "@angular/common";
-import { MatIconModule } from "@angular/material/icon";
-import { FormsModule } from "@angular/forms";
-import { MatLabel } from "@angular/material/form-field";
-import { TaskAnimations } from "../task-animations";
-import { MathJaxParagraphComponent } from "../../../math-jax-paragraph/math-jax-paragraph.component";
-import { MatTooltip } from "@angular/material/tooltip";
-import { MatDialog } from "@angular/material/dialog";
-import { PreviewDialogComponent } from "./preview-dialog/preview-dialog.component";
-import { TaskFooterComponent } from "../base-task/task-footer/task-footer.component";
-import { environment } from "../../../../../environments/environment";
+} from '@angular/core';
+import { BaseTaskComponent } from '../base-task/base-task.component';
+import { LatexTask, Task } from '../../../../exam';
+import { NgIf, NgStyle } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { FormsModule } from '@angular/forms';
+import { MatLabel } from '@angular/material/form-field';
+import { TaskAnimations } from '../task-animations';
+import { MathJaxParagraphComponent } from '../../../math-jax-paragraph/math-jax-paragraph.component';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
+import { PreviewDialogComponent } from './preview-dialog/preview-dialog.component';
+import { TaskFooterComponent } from '../base-task/task-footer/task-footer.component';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
-  selector: "app-latex-task",
+  selector: 'app-latex-task',
   standalone: true,
   imports: [
     NgIf,
@@ -32,11 +32,8 @@ import { environment } from "../../../../../environments/environment";
     MatTooltip,
     TaskFooterComponent,
   ],
-  templateUrl: "./latex-task.component.html",
-  styleUrls: [
-    "./latex-task.component.scss",
-    "../task.scss",
-  ],
+  templateUrl: './latex-task.component.html',
+  styleUrls: ['./latex-task.component.scss', '../task.scss'],
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation,
@@ -49,17 +46,17 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
   public readonly publicPath = environment.publicPath;
 
   public task: LatexTask = {
-    taskId: "",
-    type: "latex",
+    taskId: '',
+    type: 'latex',
     question: {
-      DE: "",
-      EN: "",
+      DE: '',
+      EN: '',
     },
-    questionLatex: { DE: "", EN: "" },
+    questionLatex: { DE: '', EN: '' },
     points: 0,
     tags: [],
     tagIds: [],
-    createdBy: "placeholder",
+    createdBy: 'placeholder',
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
@@ -80,12 +77,14 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
   }
 
   public onOpenPreview() {
-    const dialogRef = this.dialog.open(PreviewDialogComponent, {
-      width: "30%",
-      height: "60%",
-    }).afterClosed();
+    const dialogRef = this.dialog
+      .open(PreviewDialogComponent, {
+        width: '30%',
+        height: '60%',
+      })
+      .afterClosed();
 
-    dialogRef.subscribe((result) => {
+    dialogRef.subscribe(result => {
       if (!result) return;
       this.task.questionLatex.DE = result;
       this.taskChangeEvent.emit(this.task);
@@ -93,8 +92,10 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
   }
 
   public isValidMathString(mathString: string): boolean {
-    return mathString.length !== 0 &&
-      mathString.startsWith("\\(") &&
-      mathString.endsWith("\\)");
+    return (
+      mathString.length !== 0 &&
+      mathString.startsWith('\\(') &&
+      mathString.endsWith('\\)')
+    );
   }
 }

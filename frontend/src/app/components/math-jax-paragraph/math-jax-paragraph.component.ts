@@ -1,13 +1,12 @@
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { MathJaxService } from '../../services/math-jax.service';
 
-
 @Component({
   selector: 'app-math-jax-paragraph',
   standalone: true,
   imports: [],
   templateUrl: './math-jax-paragraph.component.html',
-  styleUrl: './math-jax-paragraph.component.scss'
+  styleUrl: './math-jax-paragraph.component.scss',
 })
 export class MathJaxParagraphComponent {
   @ViewChild('mathParagraph') paragraphElement: any;
@@ -20,7 +19,7 @@ export class MathJaxParagraphComponent {
     }
   }
 
-  constructor(private mathJaxService: MathJaxService) { }
+  constructor(private mathJaxService: MathJaxService) {}
 
   ngOnInit() {
     this.mathJaxService.getMathJaxLoadedPromise().then(() => {
@@ -33,5 +32,4 @@ export class MathJaxParagraphComponent {
       this.mathJaxService.render();
     });
   }
-
 }

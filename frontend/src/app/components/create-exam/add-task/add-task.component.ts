@@ -1,13 +1,13 @@
-import { NgStyle } from "@angular/common";
-import { Component, inject, Input } from "@angular/core";
-import { environment } from "../../../../environments/environment";
+import { NgStyle } from '@angular/common';
+import { Component, inject, Input } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 
 @Component({
-  selector: "app-AddTask",
+  selector: 'app-AddTask',
   standalone: true,
   imports: [NgStyle],
-  templateUrl: "./add-task.component.html",
-  styleUrl: "./add-task.component.scss",
+  templateUrl: './add-task.component.html',
+  styleUrl: './add-task.component.scss',
 })
 export class AddTaskComponent {
   @Input()
@@ -20,6 +20,5 @@ export class AddTaskComponent {
   public hovered = false;
   public readonly publicPath = environment.publicPath;
 
-  constructor() {
-  }
+  constructor() {}
 }

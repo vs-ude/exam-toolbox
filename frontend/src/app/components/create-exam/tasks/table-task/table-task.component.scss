@@ -1,182 +1,180 @@
 // Table container
 .table-task-container {
-    width: 100%;
-    overflow-x: auto;
-    margin: 1em 0;
-    display: flex;
-    align-items: flex-start;
+  width: 100%;
+  overflow-x: auto;
+  margin: 1em 0;
+  display: flex;
+  align-items: flex-start;
 }
 
 .editable-table {
-    border-collapse: collapse;
-    width: 100%; 
-    background: var(--color-background);
-    border-radius: 8px;
-    overflow: hidden;
-    table-layout: auto !important;
+  border-collapse: collapse;
+  width: 100%;
+  background: var(--color-background);
+  border-radius: 8px;
+  overflow: hidden;
+  table-layout: auto !important;
 }
 
 .editable-table th,
 .editable-table td {
-    border: 1px solid var(--border-color);
-    padding: 0.5em 0.75em;
-    text-align: left;
-    width: auto !important;
+  border: 1px solid var(--border-color);
+  padding: 0.5em 0.75em;
+  text-align: left;
+  width: auto !important;
 }
 
 .editable-table th {
-    background: var(--color-bg-accent);
-    font-weight: 600;
-    position: relative;
+  background: var(--color-bg-accent);
+  font-weight: 600;
+  position: relative;
 }
 
 .header-input-container {
-    display: flex;
-    align-items: center;
-    gap: 0.25em;
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
 }
 
 .header-input {
-    border: none;
-    background: transparent;
-    font-weight: 600;
-    font-size: 1.25em;
-    width: 100%;
-    padding: 0.2em 0.4em;
-    border-radius: 4px;
-    transition: background 0.2s;
-    color: var(--color-text);
-    text-overflow: ellipsis;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: 1.25em;
+  width: 100%;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  transition: background 0.2s;
+  color: var(--color-text);
+  text-overflow: ellipsis;
 }
 
 .header-input:focus {
-    background: var(--color-bg-lifted);
-    outline: 1.5px solid var(--color-primary);
+  background: var(--color-bg-lifted);
+  outline: 1.5px solid var(--color-primary);
 }
 
 .cell-input-container {
-    display: flex;
-    align-items: center;
-    width: auto;
+  display: flex;
+  align-items: center;
+  width: auto;
 }
 
 .cell-input {
-    border: none;
-    background: transparent;
-    font-size: 1em;
-    width: 100%;
-    padding: 0.2em 0.4em;
-    border-radius: 4px;
-    transition: background 0.2s;
-    min-width: 10ch;
-    text-overflow: ellipsis;
-    color: var(--color-text);
+  border: none;
+  background: transparent;
+  font-size: 1em;
+  width: 100%;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  transition: background 0.2s;
+  min-width: 10ch;
+  text-overflow: ellipsis;
+  color: var(--color-text);
 }
 
 .cell-input:focus {
-    background: var(--color-bg-lifted);
-    outline: 1.5px solid var(--color-primary);
+  background: var(--color-bg-lifted);
+  outline: 1.5px solid var(--color-primary);
 }
 
 .add-column-btn,
 .add-row-btn,
 .remove-row-btn,
 .remove-col-btn {
-    border: none;
-    background: transparent;
-    border-radius: 6px;
-    width: 28px; 
-    height: 28px; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    margin: 0 2px;
-    transition: background 0.2s;
-    color: var(--color-text);
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 2px;
+  transition: background 0.2s;
+  color: var(--color-text);
 }
 
 .add-row-btn {
-    width: auto;
+  width: auto;
 }
 
 .add-column-btn:hover,
 .add-row-btn:hover,
 .remove-row-btn:hover,
 .remove-col-btn:hover {
-    background: var(--color-bg-lifted);
+  background: var(--color-bg-lifted);
 }
 
 .remove-row-btn mat-icon,
 .remove-col-btn mat-icon {
-    color: #e57373;
+  color: #e57373;
 }
 
 .add-column-btn mat-icon,
 .add-row-btn mat-icon {
-    color: #81c784;
+  color: #81c784;
 }
 
 .header-row-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0.5em 0;
+  padding: 0.2em 0.6em;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: 400;
+  color: var(--color-icon);
+  box-shadow: none;
+  background: none;
+  label {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    margin: 0.5em 0;
-    padding: 0.2em 0.6em;
-    border-radius: 4px;
-    font-size: 0.8em;
-    font-weight: 400;
-    color: var(--color-icon);
-    box-shadow: none;
-    background: none;
-    label {
-        display: flex;
-        align-items: center;
-        gap: 0.3em;
-        cursor: pointer;
-    }
-    input[type="checkbox"] {
-        accent-color: #81c784;
-        width: 1em;
-        height: 1em;
-        margin-right: 0.3em;
-        border-radius: 3px;
-        border: 1.2px solid #b0b0b0;
-        cursor: pointer;
-    }
+    gap: 0.3em;
+    cursor: pointer;
+  }
+  input[type='checkbox'] {
+    accent-color: #81c784;
+    width: 1em;
+    height: 1em;
+    margin-right: 0.3em;
+    border-radius: 3px;
+    border: 1.2px solid #b0b0b0;
+    cursor: pointer;
+  }
 }
-
 
 @media (max-width: 600px) {
-    .editable-table {
-        width: 98%; 
-    }
+  .editable-table {
+    width: 98%;
+  }
 
-    .editable-table th,
-    .editable-table td {
-        padding: 0.25em 0.3em;
-    }
+  .editable-table th,
+  .editable-table td {
+    padding: 0.25em 0.3em;
+  }
 
-    .header-input,
-    .cell-input {
-        width: 100%; 
-        font-size: 0.95em;
-    }
+  .header-input,
+  .cell-input {
+    width: 100%;
+    font-size: 0.95em;
+  }
 }
-
 
 // other stuff
 
-.table-header{
-    font-size: smaller;
-    color: var(--color-dark-gray);
-    margin-top: 1em;
+.table-header {
+  font-size: smaller;
+  color: var(--color-dark-gray);
+  margin-top: 1em;
 }
 
 .bilingual-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-    padding: 0.5em;
-    border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  padding: 0.5em;
+  border: 1px solid var(--border-color);
 }

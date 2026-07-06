@@ -1,80 +1,76 @@
 .title {
-    color: var(--color-text);
+  color: var(--color-text);
 }
 
 .dialog_content {
-    color: var(--color-text);
+  color: var(--color-text);
 }
 
 .preview_list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .preview_item {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    background-color: var(--color-bg-accent);
-    transition: background-color 0.3s;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: var(--color-bg-accent);
+  transition: background-color 0.3s;
 }
 .preview_item:hover {
-    background-color: var(--color-bg-lifted);
-    cursor: pointer;
+  background-color: var(--color-bg-lifted);
+  cursor: pointer;
 }
 
 .preview_label {
-    font-weight: bold;
-    font-size: 16px;
-    color: var(--color-text);
+  font-weight: bold;
+  font-size: 16px;
+  color: var(--color-text);
 }
 
 .latex_preview_container {
-    margin-top: 5px;
-    padding: 5px;
-    background-color: #eaeaea;
-    border-radius: 3px;
+  margin-top: 5px;
+  padding: 5px;
+  background-color: #eaeaea;
+  border-radius: 3px;
 }
 
 img {
-    max-width: 100%;
-    height: auto;
+  max-width: 100%;
+  height: auto;
 }
 
-
 .cancel_button {
-    background-color: #f44336;
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 8px;
+  background-color: #f44336;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
 }
 
 .select_button {
-    background-color: #008CBA;
-    /* Blue */
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 8px;
+  background-color: #008cba;
+  /* Blue */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
 }
 
-
-
-
 ::ng-deep .mat-mdc-dialog-container {
-    --mdc-dialog-container-color: var(--color-background);
+  --mdc-dialog-container-color: var(--color-background);
 }

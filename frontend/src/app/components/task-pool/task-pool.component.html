@@ -1,176 +1,258 @@
 <div class="taskPool_container">
-    <div class="header">
-        <span>Task Pool</span>
+  <div class="header">
+    <span>Task Pool</span>
+  </div>
+
+  <!-- Bar for filtering  -->
+  <div class="viewBar_wrapper">
+    <div class="viewBar_left">
+      <button
+        class="tab_button"
+        [ngClass]="{ tab_select: filterState === 'all' }"
+        (click)="showAllTasks()"
+      >
+        AllTasks
+      </button>
+      <button
+        class="tab_button"
+        [ngClass]="{ tab_select: filterState === 'recentlyUsed' }"
+      >
+        Recently Used
+      </button>
+      <button
+        class="tab_button"
+        [ngClass]="{ tab_select: filterState === 'createdByMe' }"
+        (click)="showCreatedByMe()"
+      >
+        Created by me
+      </button>
     </div>
 
+    <div class="viewBar_right">
+      <div class="sortingOptions_wrapper" id="openSortingDropdown">
+        <span id="openSortingDropdown">Last viewed</span>
+        <div id="openSortingDropdown">
+          <mat-icon
+            id="openSortingDropdown"
+            aria-hidden="false"
+            fontIcon="arrow_drop_down"
+          ></mat-icon>
+        </div>
+        <!-- Dropdown -->
+        <div
+          class="dropdown triangle"
+          [ngClass]="{ hide_dropdown: !showDropdowns.sorting }"
+        >
+          <div class="dropdown_header">Sort by</div>
 
+          <div class="option_container">
+            <mat-icon
+              class="dropdown_icon_wrapper hide_icon"
+              aria-hidden="false"
+              fontIcon=""
+              style="font-size: small"
+              >done</mat-icon
+            >
+            <span>Alphabetical</span>
+          </div>
 
-    <!-- Bar for filtering  -->
-    <div class="viewBar_wrapper">
-        <div class="viewBar_left">
-            <button class="tab_button" [ngClass]="{'tab_select': filterState === 'all'}" (click)="showAllTasks()">
-                AllTasks
-            </button>
-            <button class="tab_button" [ngClass]="{'tab_select': filterState === 'recentlyUsed'}">Recently Used</button>
-            <button class="tab_button" [ngClass]="{'tab_select': filterState === 'createdByMe'}"
-                (click)="showCreatedByMe()">
-                Created by me
-            </button>
+          <div class="option_container">
+            <mat-icon
+              class="dropdown_icon_wrapper hide_icon"
+              aria-hidden="false"
+              fontIcon=""
+              style="font-size: small"
+              >done</mat-icon
+            >
+            <span>Created</span>
+          </div>
+
+          <div class="option_container">
+            <mat-icon
+              class="dropdown_icon_wrapper"
+              aria-hidden="false"
+              fontIcon=""
+              style="font-size: small"
+              >done</mat-icon
+            >
+            <span>Last Viewed</span>
+          </div>
+
+          <hr class="divider" />
+          <div class="dropdown_header">Order</div>
+
+          <div class="option_container">
+            <mat-icon
+              class="dropdown_icon_wrapper"
+              aria-hidden="false"
+              fontIcon=""
+              style="font-size: small"
+              >done</mat-icon
+            >
+            <span>A-Z</span>
+          </div>
+
+          <div class="option_container">
+            <mat-icon
+              class="dropdown_icon_wrapper hide_icon"
+              aria-hidden="false"
+              fontIcon=""
+              style="font-size: small"
+              >done</mat-icon
+            >
+            <span>Z-A</span>
+          </div>
         </div>
 
-        <div class="viewBar_right">
-            <div class="sortingOptions_wrapper" id="openSortingDropdown">
-                <span id="openSortingDropdown">Last viewed</span>
-                <div id="openSortingDropdown"><mat-icon id="openSortingDropdown" aria-hidden="false"
-                        fontIcon="arrow_drop_down"></mat-icon></div>
-                <!-- Dropdown -->
-                <div class="dropdown triangle" [ngClass]="{'hide_dropdown': !showDropdowns.sorting}">
-                    <div class="dropdown_header">Sort by</div>
+        <!-- Filter Options -->
+        <div class="filterOptions_wrapper" id="openFilterDropdown">
+          <span id="openFilterDropdown">All Tags</span>
+          <div id="openFilterDropdown">
+            <mat-icon
+              id="openFilterDropdown"
+              aria-hidden="false"
+              fontIcon="arrow_drop_down"
+            ></mat-icon>
+          </div>
 
-                    <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
-                        <span>Alphabetical</span>
-                    </div>
-
-                    <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
-                        <span>Created</span>
-                    </div>
-
-                    <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
-                        <span>Last Viewed</span>
-                    </div>
-
-                    <hr class="divider">
-                    <div class="dropdown_header">Order</div>
-
-                    <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
-                        <span>A-Z</span>
-                    </div>
-
-                    <div class="option_container">
-                        <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
-                            style="font-size: small;">done</mat-icon>
-                        <span>Z-A</span>
-                    </div>
-
-                </div>
-
-                <!-- Filter Options -->
-                <div class="filterOptions_wrapper" id="openFilterDropdown">
-                    <span id="openFilterDropdown">All Tags</span>
-                    <div id="openFilterDropdown"><mat-icon id="openFilterDropdown" aria-hidden="false"
-                            fontIcon="arrow_drop_down"></mat-icon></div>
-
-                    <!-- Dropdown -->
-                    <div class="dropdown triangle" [ngClass]="{'hide_dropdown': !showDropdowns.filter}">
-                        <div class="option_container">
-                            <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
-                                style="font-size: small;">done</mat-icon>
-                            <span>Easy</span>
-                        </div>
-
-                        <div class="option_container">
-                            <mat-icon class="dropdown_icon_wrapper hide_icon" aria-hidden="false" fontIcon=""
-                                style="font-size: small;">done</mat-icon>
-                            <span>Medium</span>
-                        </div>
-
-                        <div class="option_container">
-                            <mat-icon class="dropdown_icon_wrapper" aria-hidden="false" fontIcon=""
-                                style="font-size: small;">done</mat-icon>
-                            <span>Hard</span>
-                        </div>
-
-                    </div>
-                </div>
+          <!-- Dropdown -->
+          <div
+            class="dropdown triangle"
+            [ngClass]="{ hide_dropdown: !showDropdowns.filter }"
+          >
+            <div class="option_container">
+              <mat-icon
+                class="dropdown_icon_wrapper hide_icon"
+                aria-hidden="false"
+                fontIcon=""
+                style="font-size: small"
+                >done</mat-icon
+              >
+              <span>Easy</span>
             </div>
 
-            <!-- View Options -->
-            <div class="viewOptions_wrapper">
-                <div class="icon_wrapper view_active" id="viewOption grid" (click)="toggleViewMode('grid')"
-                    [ngClass]="{'view_active': viewMode === 'grid'}">
-                    <mat-icon aria-hidden="false" fontIcon="apps"></mat-icon>
-                </div>
-                <div class="icon_wrapper" id="viewOption list" (click)="toggleViewMode('list')"
-                    [ngClass]="{'view_active': viewMode === 'list'}">
-                    <mat-icon aria-hidden="false" fontIcon="view_headline"></mat-icon>
-                </div>
+            <div class="option_container">
+              <mat-icon
+                class="dropdown_icon_wrapper hide_icon"
+                aria-hidden="false"
+                fontIcon=""
+                style="font-size: small"
+                >done</mat-icon
+              >
+              <span>Medium</span>
             </div>
 
+            <div class="option_container">
+              <mat-icon
+                class="dropdown_icon_wrapper"
+                aria-hidden="false"
+                fontIcon=""
+                style="font-size: small"
+                >done</mat-icon
+              >
+              <span>Hard</span>
+            </div>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <div class="task_view_container" *ngIf="viewMode === 'grid'" @leftRightAnimation>
-        <div class="task_container">
-            <div class="task" *ngFor="let task of tasks; let i = index">
-                <app-task-pool-card [task]="task"></app-task-pool-card>
-            </div>
+      <!-- View Options -->
+      <div class="viewOptions_wrapper">
+        <div
+          class="icon_wrapper view_active"
+          id="viewOption grid"
+          (click)="toggleViewMode('grid')"
+          [ngClass]="{ view_active: viewMode === 'grid' }"
+        >
+          <mat-icon aria-hidden="false" fontIcon="apps"></mat-icon>
         </div>
+        <div
+          class="icon_wrapper"
+          id="viewOption list"
+          (click)="toggleViewMode('list')"
+          [ngClass]="{ view_active: viewMode === 'list' }"
+        >
+          <mat-icon aria-hidden="false" fontIcon="view_headline"></mat-icon>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="task_view_container" *ngIf="viewMode === 'list'">
-        <table mat-table [dataSource]="dataSource" matSort class="taskTable" *ngIf="viewMode === 'list'"
-            @leftRightAnimation>
-
-            <!-- Task ID Column -->
-            <ng-container matColumnDef="taskId">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Task ID </th>
-                <td mat-cell *matCellDef="let task"> {{task.taskId}} </td>
-            </ng-container>
-
-            <!-- Type Column -->
-            <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
-                <td mat-cell *matCellDef="let task"> {{task.type}} </td>
-            </ng-container>
-
-            <!-- Question Column -->
-            <ng-container matColumnDef="question">
-                <th mat-header-cell *matHeaderCellDef> Question </th>
-                <td mat-cell *matCellDef="let task"> {{task.question?.DE}} </td>
-            </ng-container>
-
-            <!-- Points Column -->
-            <ng-container matColumnDef="points">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Points </th>
-                <td mat-cell *matCellDef="let task"> {{task.points}} </td>
-            </ng-container>
-
-            <!-- Tags Column -->
-            <ng-container matColumnDef="tags">
-                <th mat-header-cell *matHeaderCellDef> Tags </th>
-                <td mat-cell *matCellDef="let task">
-                    <span *ngFor="let tag of task.tags" class="tag" [ngStyle]="{'backgroundColor': tag.color, 'color': tag.textColor}">
-                        {{tag.name}}
-                    </span>
-
-                </td>
-            </ng-container>
-
-            <!-- CreatedBy Column -->
-            <ng-container matColumnDef="createdBy">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> created by </th>
-                <td mat-cell *matCellDef="let task"> {{task.createdBy}} </td>
-            </ng-container>
-
-            <!-- LastUsed Column -->
-            <ng-container matColumnDef="lastUsed">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> last used </th>
-                <td mat-cell *matCellDef="let task"> {{stringifyDate(task.lastUsed)}} </td>
-            </ng-container>
-
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+  <div
+    class="task_view_container"
+    *ngIf="viewMode === 'grid'"
+    @leftRightAnimation
+  >
+    <div class="task_container">
+      <div class="task" *ngFor="let task of tasks; let i = index">
+        <app-task-pool-card [task]="task"></app-task-pool-card>
+      </div>
     </div>
+  </div>
 
+  <div class="task_view_container" *ngIf="viewMode === 'list'">
+    <table
+      mat-table
+      [dataSource]="dataSource"
+      matSort
+      class="taskTable"
+      *ngIf="viewMode === 'list'"
+      @leftRightAnimation
+    >
+      <!-- Task ID Column -->
+      <ng-container matColumnDef="taskId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Task ID</th>
+        <td mat-cell *matCellDef="let task">{{ task.taskId }}</td>
+      </ng-container>
 
+      <!-- Type Column -->
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+        <td mat-cell *matCellDef="let task">{{ task.type }}</td>
+      </ng-container>
+
+      <!-- Question Column -->
+      <ng-container matColumnDef="question">
+        <th mat-header-cell *matHeaderCellDef>Question</th>
+        <td mat-cell *matCellDef="let task">{{ task.question?.DE }}</td>
+      </ng-container>
+
+      <!-- Points Column -->
+      <ng-container matColumnDef="points">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Points</th>
+        <td mat-cell *matCellDef="let task">{{ task.points }}</td>
+      </ng-container>
+
+      <!-- Tags Column -->
+      <ng-container matColumnDef="tags">
+        <th mat-header-cell *matHeaderCellDef>Tags</th>
+        <td mat-cell *matCellDef="let task">
+          <span
+            *ngFor="let tag of task.tags"
+            class="tag"
+            [ngStyle]="{ backgroundColor: tag.color, color: tag.textColor }"
+          >
+            {{ tag.name }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- CreatedBy Column -->
+      <ng-container matColumnDef="createdBy">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>created by</th>
+        <td mat-cell *matCellDef="let task">{{ task.createdBy }}</td>
+      </ng-container>
+
+      <!-- LastUsed Column -->
+      <ng-container matColumnDef="lastUsed">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>last used</th>
+        <td mat-cell *matCellDef="let task">
+          {{ stringifyDate(task.lastUsed) }}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
 </div>

@@ -1,28 +1,48 @@
-
-<button class="task" (mouseover)="mouseHoveringCard=true" (mouseleave)="mouseHoveringCard=false"
-    [ngStyle]="{'backgroundColor': mouseHoveringCard ? taskColor : 'var(--color-bg-accent)' }">
-    <div class="icon_container" [ngStyle]="{'backgroundColor': mouseHoveringCard ? '#0000002a' : taskColor }">
-        <img src="{{ task.type + '.svg' }}" alt="Task Type Icon" class="task_icon">
-    </div>
-    <div class="description_shelf">
-        <span class="name">{{task.question.DE}}</span>
-        <span class="description"></span>
-    </div>
-    <div class="tag_wrapper">
-        @for (tag of task.tags; track $index;) {
-        <span class="task_tag" [ngStyle]="{'backgroundColor': tag.color, 'color': tag.textColor}"
-            (mouseover)="mouseHoveringTagIndex = $index" (mouseleave)="mouseHoveringTagIndex = -1">
-            {{tag.name}}
-            @if (mouseHoveringTagIndex === $index){
-                <span class="delete_icon" (click)="onDeleteTag($index)"><mat-icon>delete</mat-icon></span>
-            }
-        </span>
+<button
+  class="task"
+  (mouseover)="mouseHoveringCard = true"
+  (mouseleave)="mouseHoveringCard = false"
+  [ngStyle]="{
+    backgroundColor: mouseHoveringCard ? taskColor : 'var(--color-bg-accent)',
+  }"
+>
+  <div
+    class="icon_container"
+    [ngStyle]="{ backgroundColor: mouseHoveringCard ? '#0000002a' : taskColor }"
+  >
+    <img
+      src="{{ task.type + '.svg' }}"
+      alt="Task Type Icon"
+      class="task_icon"
+    />
+  </div>
+  <div class="description_shelf">
+    <span class="name">{{ task.question.DE }}</span>
+    <span class="description"></span>
+  </div>
+  <div class="tag_wrapper">
+    @for (tag of task.tags; track $index) {
+      <span
+        class="task_tag"
+        [ngStyle]="{ backgroundColor: tag.color, color: tag.textColor }"
+        (mouseover)="mouseHoveringTagIndex = $index"
+        (mouseleave)="mouseHoveringTagIndex = -1"
+      >
+        {{ tag.name }}
+        @if (mouseHoveringTagIndex === $index) {
+          <span class="delete_icon" (click)="onDeleteTag($index)"
+            ><mat-icon>delete</mat-icon></span
+          >
         }
-        <button class="addTag_Button" (click)="onAddTag()"><mat-icon>add</mat-icon></button>
-    </div>
+      </span>
+    }
+    <button class="addTag_Button" (click)="onAddTag()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
 
-    <div class="footer">
-        <span class="last_used">last used: 25.01.2025</span>
-        <span class="points">{{task.points}} pts.</span>
-    </div>
+  <div class="footer">
+    <span class="last_used">last used: 25.01.2025</span>
+    <span class="points">{{ task.points }} pts.</span>
+  </div>
 </button>

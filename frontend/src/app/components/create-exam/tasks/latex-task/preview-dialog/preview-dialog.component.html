@@ -1,20 +1,19 @@
 <h2 mat-dialog-title class="title">Select a template</h2>
 
 <mat-dialog-content class="dialog_content">
-    <div class="preview_list">
-        @for (preview of previews; track $index) {
-        <div class="preview_item" [mat-dialog-close]="preview.latex">
-            <span class="preview_label">{{ preview.name }}</span>
-            <div class="latex_preview_container">
-                <img src="{{ preview.previewImageUrl }}" alt="Preview">
-            </div>
+  <div class="preview_list">
+    @for (preview of previews; track $index) {
+      <div class="preview_item" [mat-dialog-close]="preview.latex">
+        <span class="preview_label">{{ preview.name }}</span>
+        <div class="latex_preview_container">
+          <img src="{{ preview.previewImageUrl }}" alt="Preview" />
         </div>
-        }
-    </div>
-
+      </div>
+    }
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button class="cancel_button" [mat-dialog-close]="false">Cancel</button>
-    <button class="select_button" [mat-dialog-close]="true">Select</button>
+  <button class="cancel_button" [mat-dialog-close]="false">Cancel</button>
+  <button class="select_button" [mat-dialog-close]="true">Select</button>
 </mat-dialog-actions>

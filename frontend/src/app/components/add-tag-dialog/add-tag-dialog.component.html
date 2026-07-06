@@ -1,36 +1,57 @@
 <h2 mat-dialog-title class="title">Create a new Tag</h2>
 <mat-dialog-content class="dialog-content">
+  <div class="tag" [ngStyle]="{ backgroundColor: color, color: textColor }">
+    {{ name }}
+  </div>
 
-    <div class="tag" [ngStyle]="{'backgroundColor': color, color: textColor}">{{name}}</div>
-
-
-    <div class="customization-container">
-        <input class="name-input" type="text" [(ngModel)]="name" placeholder="Tag Name" />
-        <div class="bgColorPicker">
-            <input type="color" class="color-picker" [(ngModel)]="color" [value]="color"
-                (input)="onColorChange(color)" />
-        </div>
-
+  <div class="customization-container">
+    <input
+      class="name-input"
+      type="text"
+      [(ngModel)]="name"
+      placeholder="Tag Name"
+    />
+    <div class="bgColorPicker">
+      <input
+        type="color"
+        class="color-picker"
+        [(ngModel)]="color"
+        [value]="color"
+        (input)="onColorChange(color)"
+      />
     </div>
+  </div>
 
-    <h3 class="existing-header"> or choose an existing one</h3>
-    <div class="existingTag-container">
-        @for (tag of tags; track tag._id)
-        {
-        <span [ngStyle]="{'backgroundColor': tag.color, 'color': tag.textColor}" [mat-dialog-close]="{
-                exists: true,
-                name: tag.name, 
-                color: tag.color, 
-                textColor: tag.textColor,
-                _id: tag._id}" class="existingTag">
-            {{tag.name}}
-        </span>
-        }
-
-    </div>
+  <h3 class="existing-header">or choose an existing one</h3>
+  <div class="existingTag-container">
+    @for (tag of tags; track tag._id) {
+      <span
+        [ngStyle]="{ backgroundColor: tag.color, color: tag.textColor }"
+        [mat-dialog-close]="{
+          exists: true,
+          name: tag.name,
+          color: tag.color,
+          textColor: tag.textColor,
+          _id: tag._id,
+        }"
+        class="existingTag"
+      >
+        {{ tag.name }}
+      </span>
+    }
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-    <button class="cancel-button" [mat-dialog-close]="false">Cancel</button>
-    <button class="create-button"
-        [mat-dialog-close]="{exists: false, name: name, color: color, textColor: textColor}">Create</button>
+  <button class="cancel-button" [mat-dialog-close]="false">Cancel</button>
+  <button
+    class="create-button"
+    [mat-dialog-close]="{
+      exists: false,
+      name: name,
+      color: color,
+      textColor: textColor,
+    }"
+  >
+    Create
+  </button>
 </mat-dialog-actions>

@@ -5,7 +5,6 @@ import { ApiService } from '../../services/api.service';
 import { Tag } from '../../tag';
 import { HttpResponse } from '@angular/common/http';
 
-
 const courseName = 'DEBUG EXAM';
 const examinerName = 'Dr. Jane Smith';
 const semester = 'Fall 2025';
@@ -18,16 +17,18 @@ const tasks: Task[] = [
     type: 'shortAnswer',
     question: {
       DE: 'Was ist Cloud?',
-      EN: 'What is Cloud?'
+      EN: 'What is Cloud?',
     },
     solution: {
       DE: '',
-      EN: ''
+      EN: '',
     },
     points: 4,
-    tagIds: ["tag1"],
-    tags: [{_id: "tag1", name: "Cloud", color: "#0000FF", textColor: "#FFFFFF"}],
-    createdBy: "Hans Wurst",
+    tagIds: ['tag1'],
+    tags: [
+      { _id: 'tag1', name: 'Cloud', color: '#0000FF', textColor: '#FFFFFF' },
+    ],
+    createdBy: 'Hans Wurst',
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
@@ -38,22 +39,21 @@ const tasks: Task[] = [
     type: 'shortAnswer',
     question: {
       DE: 'Was ist Web Mobile?',
-      EN: 'What is Web Mobile?'
+      EN: 'What is Web Mobile?',
     },
     solution: {
       DE: '',
-      EN: ''
+      EN: '',
     },
     points: 6,
     tagIds: [],
     tags: [],
-    createdBy: "placeholder",
+    createdBy: 'placeholder',
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
     children: [],
-
-  }
+  },
 ];
 
 const exam: Exam = new Exam(
@@ -62,7 +62,7 @@ const exam: Exam = new Exam(
   semester,
   date,
   examLengthMinutes,
-  [{ groupNumber: 1, groupTitle: { DE: "Titel", EN: "Title" }, tasks: tasks }]
+  [{ groupNumber: 1, groupTitle: { DE: 'Titel', EN: 'Title' }, tasks: tasks }],
 );
 
 @Component({
@@ -70,14 +70,12 @@ const exam: Exam = new Exam(
   standalone: true,
   imports: [],
   templateUrl: './debug.component.html',
-  styleUrl: './debug.component.scss'
+  styleUrl: './debug.component.scss',
 })
 export class DebugComponent {
-  selectedFile: File | null = null
+  selectedFile: File | null = null;
 
-  constructor(
-    private api: ApiService,
-  ) { }
+  constructor(private api: ApiService) {}
 
   onAddExam() {
     this.api.addExam(exam).subscribe(
@@ -86,35 +84,39 @@ export class DebugComponent {
       },
       error => {
         console.error('Error adding exam: ', error);
-      }
+      },
     );
   }
 
   onGenerateExam() {
     this.api.generateExam(exam).subscribe({
       next: (response: HttpResponse<Blob>) => {
-        const pdfBlob = response.body
-        if(pdfBlob){
-          saveAs(pdfBlob, `${exam.courseName}.pdf`)
+        const pdfBlob = response.body;
+        if (pdfBlob) {
+          saveAs(pdfBlob, `${exam.courseName}.pdf`);
         }
 
-        const subtaskHeader = response.headers.get('X-Subtask-Info')
-        const subtaskInfo = subtaskHeader ? JSON.parse(subtaskHeader) : []
-        console.log("Subtask Info from header:", subtaskInfo)
-        
-        const hasErrors = subtaskInfo.some((info: any) => info.logFileBoundaryError === true)
+        const subtaskHeader = response.headers.get('X-Subtask-Info');
+        const subtaskInfo = subtaskHeader ? JSON.parse(subtaskHeader) : [];
+        console.log('Subtask Info from header:', subtaskInfo);
+
+        const hasErrors = subtaskInfo.some(
+          (info: any) => info.logFileBoundaryError === true,
+        );
         if (hasErrors) {
-          alert("Warning: A layout error was detected! Check the console for details.")
+          alert(
+            'Warning: A layout error was detected! Check the console for details.',
+          );
         }
       },
-      error: (err) => {
-        console.error('Error generating exam preview: ', err)
-      }
-    })
+      error: err => {
+        console.error('Error generating exam preview: ', err);
+      },
+    });
   }
 
   onUpdateExam() {
-    let id: string = '67a77bdea72f7082a9a4283a' // An id of an Exam in your DB. Needs to be updated for testing if you don't have a Exam with this ID.
+    let id: string = '67a77bdea72f7082a9a4283a'; // An id of an Exam in your DB. Needs to be updated for testing if you don't have a Exam with this ID.
 
     this.api.updateExam(id, exam).subscribe(
       response => {
@@ -122,75 +124,73 @@ export class DebugComponent {
       },
       error => {
         console.error('Error updating exam: ', error);
-      }
-    )
+      },
+    );
   }
 
   onDeleteExams() {
     this.api.deleteExams().subscribe(
       res => {
-        console.log('Exams deleted successfully: ', res)
+        console.log('Exams deleted successfully: ', res);
       },
       err => {
-        console.error('Error deleting exams: ', err)
-      }
-    )
+        console.error('Error deleting exams: ', err);
+      },
+    );
   }
 
   onDeleteTaskPool() {
     this.api.deleteTaskPool().subscribe(
       res => {
-        console.log('Task-Pool deleted successfully: ', res)
+        console.log('Task-Pool deleted successfully: ', res);
       },
       err => {
-        console.error('Error deleting Task-Pool: ', err)
-      }
-    )
+        console.error('Error deleting Task-Pool: ', err);
+      },
+    );
   }
 
   onGenerateAllExams() {
     if (!this.selectedFile) {
-      return
+      return;
     }
     this.api.generateAllExams(exam, this.selectedFile).subscribe({
       next: (allExamsPDF: Blob) => {
-        saveAs(allExamsPDF, `${this.selectedFile?.name}.zip`)
+        saveAs(allExamsPDF, `${this.selectedFile?.name}.zip`);
       },
-      error: (err) => {
-        console.error('Error downloading exams as ZIP: ', err)
-      }
-    })
+      error: err => {
+        console.error('Error downloading exams as ZIP: ', err);
+      },
+    });
   }
 
   onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement
+    const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      const file: File = input.files[0]
-      this.selectedFile = file
-      console.log('Selected file:', file.name)
-      console.log('File: ', file)
-      console.log('Exam: ', exam)
+      const file: File = input.files[0];
+      this.selectedFile = file;
+      console.log('Selected file:', file.name);
+      console.log('File: ', file);
+      console.log('Exam: ', exam);
     }
   }
 
-
   onDeleteTaskFromPool() {
-
     this.api.getTasksFromPool().subscribe(
       res => {
         console.log('Tasks from pool: ', res);
         const poolTask = res[0].taskId;
         this.api.deleteTaskFromPool(poolTask).subscribe(
           res => {
-            console.log('Task deleted successfully: ', res)
+            console.log('Task deleted successfully: ', res);
           },
           err => {
-            console.error('Error deleting task from pool: ', err)
-          }
-        )
+            console.error('Error deleting task from pool: ', err);
+          },
+        );
       },
-      err => console.error('Error getting tasks from pool: ', err)
-    )
+      err => console.error('Error getting tasks from pool: ', err),
+    );
   }
 
   onCreateTask() {
@@ -200,31 +200,37 @@ export class DebugComponent {
       },
       error => {
         console.error('Error adding task to pool: ', error);
-      }
+      },
     );
   }
 
   onGetDownloadableList() {
     this.api.getDownloadableJobs().subscribe(downloadableJobs => {
-      console.log("Downloadable Jobs: ")
-      console.table(downloadableJobs)
-    })
+      console.log('Downloadable Jobs: ');
+      console.table(downloadableJobs);
+    });
   }
 
   onDeleteAllTags() {
     this.api.deleteAllTags().subscribe(
-      res => {console.log('All tags deleted successfully: ', res)},
-      err => {console.error('Error deleting all tags: ', err)}
-    )
+      res => {
+        console.log('All tags deleted successfully: ', res);
+      },
+      err => {
+        console.error('Error deleting all tags: ', err);
+      },
+    );
   }
 
   onGetAllTags() {
     this.api.getAllTags().subscribe(
       tags => {
-        console.log("All Tags: ")
-        console.table(tags)
+        console.log('All Tags: ');
+        console.table(tags);
       },
-      err => {console.error('Error getting all tags: ', err)}
-    )
+      err => {
+        console.error('Error getting all tags: ', err);
+      },
+    );
   }
 }

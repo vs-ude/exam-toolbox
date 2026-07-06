@@ -7,36 +7,30 @@ import { MatIcon } from '@angular/material/icon';
 @Component({
   selector: 'app-new-page',
   standalone: true,
-  imports: [
-    MatIcon
-  ],
+  imports: [MatIcon],
   templateUrl: './new-page.component.html',
-  styleUrls: [
-    './new-page.component.scss',
-    '../task.scss'
-  ],
+  styleUrls: ['./new-page.component.scss', '../task.scss'],
   animations: [
     TaskAnimations.inOutAnimation,
-    TaskAnimations.leftRightAnimation
+    TaskAnimations.leftRightAnimation,
   ],
 })
 export class NewPageComponent extends BaseTaskComponent {
-
   @Output() taskChangeEvent = new EventEmitter<Task>();
 
   public task: NewPage = {
-    taskId: "",
-    type: "newPage",
-    question: { DE: "", EN: "" },
+    taskId: '',
+    type: 'newPage',
+    question: { DE: '', EN: '' },
     points: 0,
     tags: [],
     tagIds: [],
-    createdBy: "placeholder",
+    createdBy: 'placeholder',
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
     children: [],
-  }
+  };
 
   override ngAfterViewInit(): void {
     return;
@@ -55,5 +49,4 @@ export class NewPageComponent extends BaseTaskComponent {
     this.task.taskId = this.taskId;
     this.taskChangeEvent.emit(this.task);
   }
-
 }

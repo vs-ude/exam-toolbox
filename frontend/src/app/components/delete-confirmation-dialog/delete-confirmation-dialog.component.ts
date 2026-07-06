@@ -1,20 +1,20 @@
-import { Component, Inject, OnDestroy, OnInit } from "@angular/core";
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
   MatDialogRef,
-} from "@angular/material/dialog";
-import { MatButtonModule } from "@angular/material/button";
-import { CommonModule } from "@angular/common";
-import { Theme, ThemeToggleService } from "../../services/theme-toggle.service";
-import { Subscription } from "rxjs";
+} from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
+import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
+import { Subscription } from 'rxjs';
 
 @Component({
-  selector: "app-delete-confirmation-dialog",
+  selector: 'app-delete-confirmation-dialog',
   standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule],
-  templateUrl: "./delete-confirmation-dialog.component.html",
-  styleUrl: "./delete-confirmation-dialog.component.scss",
+  templateUrl: './delete-confirmation-dialog.component.html',
+  styleUrl: './delete-confirmation-dialog.component.scss',
 })
 export class DeleteConfirmationDialogComponent implements OnInit, OnDestroy {
   isDarkTheme = false;

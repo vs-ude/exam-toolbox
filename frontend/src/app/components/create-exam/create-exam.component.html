@@ -215,10 +215,10 @@
         >
           {{
             exam.tasks.length < 5
-              ? "Assignment " + (i + 1)
+              ? 'Assignment ' + (i + 1)
               : i < 9
-                ? "A 0" + (i + 1)
-                : "A " + (i + 1)
+                ? 'A 0' + (i + 1)
+                : 'A ' + (i + 1)
           }}
           <div
             *ngIf="i === 0"

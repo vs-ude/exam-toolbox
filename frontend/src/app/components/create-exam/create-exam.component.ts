@@ -1,52 +1,52 @@
-import { Component, ElementRef, HostListener, ViewChild } from "@angular/core";
-import { MatIconModule } from "@angular/material/icon";
-import { MatTooltipModule } from "@angular/material/tooltip";
-import { NgFor, NgIf } from "@angular/common";
-import { Exam, Task } from "../../exam";
-import { AddTaskComponent } from "./add-task/add-task.component";
-import { MatSelectModule } from "@angular/material/select";
-import { FormsModule } from "@angular/forms";
-import { ApiService } from "../../services/api.service";
-import { MatTabsModule } from "@angular/material/tabs";
-import { MultiplechoiceTaskComponent } from "./tasks/multipleChoiceTask/multiplechoice-task.component";
-import { ShortAnswerTaskComponent } from "./tasks/short-answer-task/short-answer-task.component";
-import { MatCardModule } from "@angular/material/card";
-import { Router } from "@angular/router";
-import { TaskGroupTitleComponent } from "./task-group-title/task-group-title.component";
-import { PictureTaskComponent } from "./tasks/picture-task/picture-task.component";
-import { Theme, ThemeToggleService } from "../../services/theme-toggle.service";
-import { ColorProviderService } from "../../services/color-provider.service";
-import { LatexTaskComponent } from "./tasks/latex-task/latex-task.component";
-import { TableTaskComponent } from "./tasks/table-task/table-task.component";
-import { TaskBuilderService } from "../../services/task-builder.service";
-import { ManualTextComponent } from "./tasks/manual-text/manual-text.component";
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
-import { MassExamDialogComponent } from "../mass-exam-dialog/mass-exam-dialog.component";
-import { LoadingService } from "../../services/loading.service";
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { NgFor, NgIf } from '@angular/common';
+import { Exam, Task } from '../../exam';
+import { AddTaskComponent } from './add-task/add-task.component';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../services/api.service';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MultiplechoiceTaskComponent } from './tasks/multipleChoiceTask/multiplechoice-task.component';
+import { ShortAnswerTaskComponent } from './tasks/short-answer-task/short-answer-task.component';
+import { MatCardModule } from '@angular/material/card';
+import { Router } from '@angular/router';
+import { TaskGroupTitleComponent } from './task-group-title/task-group-title.component';
+import { PictureTaskComponent } from './tasks/picture-task/picture-task.component';
+import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
+import { ColorProviderService } from '../../services/color-provider.service';
+import { LatexTaskComponent } from './tasks/latex-task/latex-task.component';
+import { TableTaskComponent } from './tasks/table-task/table-task.component';
+import { TaskBuilderService } from '../../services/task-builder.service';
+import { ManualTextComponent } from './tasks/manual-text/manual-text.component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MassExamDialogComponent } from '../mass-exam-dialog/mass-exam-dialog.component';
+import { LoadingService } from '../../services/loading.service';
 import {
   CdkDrag,
   CdkDragDrop,
   CdkDragHandle,
   CdkDropList,
   moveItemInArray,
-} from "@angular/cdk/drag-drop";
-import { NewPageComponent } from "./tasks/new-page/new-page.component";
-import { UpdateTaskDialogComponent } from "../update-task-dialog/update-task-dialog.component";
-import { HttpResponse } from "@angular/common/http";
-import { NewPageDialogComponent } from "./new-page-dialog/new-page-dialog.component";
-import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
-import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
-import { Tag } from "../../tag";
+} from '@angular/cdk/drag-drop';
+import { NewPageComponent } from './tasks/new-page/new-page.component';
+import { UpdateTaskDialogComponent } from '../update-task-dialog/update-task-dialog.component';
+import { HttpResponse } from '@angular/common/http';
+import { NewPageDialogComponent } from './new-page-dialog/new-page-dialog.component';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Tag } from '../../tag';
 import {
   AddTagDialogComponent,
   AddTagDialogData,
-} from "../add-tag-dialog/add-tag-dialog.component";
-import { TagHelperService } from "../../services/tag-helper.service";
-import { DraggablePoolComponent } from "./draggable-pool/draggable-pool.component";
-import { debounceTime, forkJoin, Observable, retry, Subject, take } from "rxjs";
-import { AutosaveService } from "../../services/autosave.service";
-import { ConflictDialogComponent } from "../conflict-dialog/conflict-dialog.component";
-import { environment } from "../../../environments/environment";
+} from '../add-tag-dialog/add-tag-dialog.component';
+import { TagHelperService } from '../../services/tag-helper.service';
+import { DraggablePoolComponent } from './draggable-pool/draggable-pool.component';
+import { debounceTime, forkJoin, Observable, retry, Subject, take } from 'rxjs';
+import { AutosaveService } from '../../services/autosave.service';
+import { ConflictDialogComponent } from '../conflict-dialog/conflict-dialog.component';
+import { environment } from '../../../environments/environment';
 
 interface PDFTaskInfo {
   page: number;
@@ -54,7 +54,7 @@ interface PDFTaskInfo {
 }
 
 @Component({
-  selector: "app-create-exam",
+  selector: 'app-create-exam',
   standalone: true,
   imports: [
     MatIconModule,
@@ -80,8 +80,8 @@ interface PDFTaskInfo {
     MatSnackBarModule,
     DraggablePoolComponent,
   ],
-  templateUrl: "./create-exam.component.html",
-  styleUrl: "./create-exam.component.scss",
+  templateUrl: './create-exam.component.html',
+  styleUrl: './create-exam.component.scss',
 })
 export class CreateExamComponent {
   public inDropzone = false;
@@ -89,7 +89,7 @@ export class CreateExamComponent {
   public isUpdateMode = false;
 
   private bodyElement: HTMLElement = document.body;
-  public semesters = ["WS 23/24", "SS 24", "WS 24/25", "SS 25"];
+  public semesters = ['WS 23/24', 'SS 24', 'WS 24/25', 'SS 25'];
   private modifiedPoolTasks: Set<string> = new Set<string>();
   private newTasksToCreate: Set<string> = new Set<string>();
   private tasksWithModifiedTags: {
@@ -101,8 +101,8 @@ export class CreateExamComponent {
   public refreshPool$: Subject<void> = new Subject<void>();
   public totalPoints = 0;
   public bilingual = false;
-  public exam = new Exam("New Exam", "", "", "", 90, [
-    { groupNumber: 1, groupTitle: { DE: "", EN: "" }, tasks: [] },
+  public exam = new Exam('New Exam', '', '', '', 90, [
+    { groupNumber: 1, groupTitle: { DE: '', EN: '' }, tasks: [] },
   ]);
 
   public currentGroupView = 0;
@@ -133,9 +133,8 @@ export class CreateExamComponent {
   ) {
     this.autosaveTrigger$.pipe(debounceTime(2000)).subscribe(() => {
       // If we are in "Create Mode" (no ID or 'new'), pass undefined to service (it handles 'new_draft')
-      const idToSave = this.exam._id && this.exam._id !== "new"
-        ? this.exam._id
-        : undefined;
+      const idToSave =
+        this.exam._id && this.exam._id !== 'new' ? this.exam._id : undefined;
       this.autosaveService.saveLocal(idToSave, this.exam);
     });
 
@@ -151,18 +150,18 @@ export class CreateExamComponent {
     });
   }
 
-  @ViewChild("nameInput")
+  @ViewChild('nameInput')
   nameInput?: ElementRef;
 
   private triggerAutosave() {
     this.autosaveTrigger$.next();
   }
 
-  @HostListener("document:click", ["$event"])
+  @HostListener('document:click', ['$event'])
   unselectInputs(event: MouseEvent) {
     const elementId = (event.target as Element).id;
 
-    if (elementId === "examName") {
+    if (elementId === 'examName') {
       return;
     }
     this.isNameChange = false;
@@ -170,7 +169,7 @@ export class CreateExamComponent {
       return;
     }
     const newName = this.nameInput.nativeElement.value;
-    if (newName === "") {
+    if (newName === '') {
       return;
     }
     this.exam.courseName = newName;
@@ -178,11 +177,11 @@ export class CreateExamComponent {
   }
 
   onNameChange(event: any) {
-    if (event.key !== "Enter") {
+    if (event.key !== 'Enter') {
       return;
     }
     const newName = event.target.value;
-    if (newName !== "") {
+    if (newName !== '') {
       this.exam.courseName = event.target.value;
       this.triggerAutosave();
     }
@@ -190,18 +189,18 @@ export class CreateExamComponent {
   }
 
   dragStart(event: DragEvent) {
-    this.bodyElement.classList.add("inheritCursors");
-    this.bodyElement.style.cursor = "grabbing";
+    this.bodyElement.classList.add('inheritCursors');
+    this.bodyElement.style.cursor = 'grabbing';
   }
 
   drop(event: DragEvent) {
-    this.bodyElement.classList.remove("inheritCursors");
-    this.bodyElement.style.cursor = "unset";
+    this.bodyElement.classList.remove('inheritCursors');
+    this.bodyElement.style.cursor = 'unset';
     const element = event.target as Element;
     console.log(element.id);
 
     if (this.inDropzone) {
-      if (element.id.slice(0, 4) === "new_") {
+      if (element.id.slice(0, 4) === 'new_') {
         this.pushNewTask(element.id);
       } else {
         this.pushPoolTask(element.id);
@@ -222,21 +221,21 @@ export class CreateExamComponent {
 
   private pushNewTask(taskType: string) {
     let task = this.taskBuilder.createTask(taskType);
-    task.usedIn = [this.exam._id || "placeholder_id"];
+    task.usedIn = [this.exam._id || 'placeholder_id'];
     this.exam.tasks[this.currentGroupView].tasks.push(task);
     this.adjustTotalPoints();
   }
 
   private pushPoolTask(taskId: string) {
-    const task = this.taskPool.find((element) => element.taskId === taskId);
+    const task = this.taskPool.find(element => element.taskId === taskId);
     if (task == undefined) {
       console.warn("couldn't find task");
       return;
     }
 
     // update Task Metadata
-    if (!task.usedIn.includes(this.exam._id || "placeholder_id")) {
-      task.usedIn.push(this.exam._id || "placeholder_id");
+    if (!task.usedIn.includes(this.exam._id || 'placeholder_id')) {
+      task.usedIn.push(this.exam._id || 'placeholder_id');
     }
     task.lastUsed = new Date();
 
@@ -269,18 +268,17 @@ export class CreateExamComponent {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const currentTaskId = this.exam.tasks[i].tasks[j].taskId;
         if (
-          this.taskPool.find((task) => task.taskId === currentTaskId) ==
-            undefined
+          this.taskPool.find(task => task.taskId === currentTaskId) == undefined
         ) {
-          if (this.exam.tasks[i].tasks[j].type === "newPage") {
+          if (this.exam.tasks[i].tasks[j].type === 'newPage') {
             continue;
           }
           this.api.addTaskToPool(this.exam.tasks[i].tasks[j]).subscribe(
-            (response) => {
+            response => {
               console.log(`Task ${currentTaskId} added to pool`, response);
             },
-            (error) => {
-              console.error("Error adding task: ", error);
+            error => {
+              console.error('Error adding task: ', error);
             },
           );
         }
@@ -290,13 +288,13 @@ export class CreateExamComponent {
 
   private uploadExam() {
     this.api.addExam(this.exam).subscribe(
-      (response) => {
-        console.log("Exam added successfully: ", response);
+      response => {
+        console.log('Exam added successfully: ', response);
         this.autosaveService.clearLocal(undefined);
         this.router.navigate([`/create-exam/${response.insertedId}`]); // uses the id inserted by mongodb to navigate to a detailed view of this exam
       },
-      (error) => {
-        console.error("Error adding exam: ", error);
+      error => {
+        console.error('Error adding exam: ', error);
       },
     );
   }
@@ -318,28 +316,27 @@ export class CreateExamComponent {
           }
 
           const objectUrl = URL.createObjectURL(pdfBlob);
-          this.previewPdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-            objectUrl,
-          );
+          this.previewPdfUrl =
+            this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
           this.previewTabNotification = true;
-          this.snackBar.open("Preview has been updated!", "Dismiss", {
+          this.snackBar.open('Preview has been updated!', 'Dismiss', {
             duration: 3000,
           });
         }
 
-        const subtaskHeader = response.headers.get("X-Subtask-Info");
+        const subtaskHeader = response.headers.get('X-Subtask-Info');
         const subtaskInfo: PDFTaskInfo[] = subtaskHeader
           ? JSON.parse(subtaskHeader)
           : [];
         this.PDFTasksInfo = subtaskInfo;
-        console.log("Subtask Info from header:", subtaskInfo);
+        console.log('Subtask Info from header:', subtaskInfo);
 
-        const errorIndex = subtaskInfo.findIndex((info) =>
-          info.logFileBoundaryError
+        const errorIndex = subtaskInfo.findIndex(
+          info => info.logFileBoundaryError,
         );
         if (errorIndex !== -1) {
           console.warn(
-            "Log file boundary errors detected, inserting new pages accordingly.",
+            'Log file boundary errors detected, inserting new pages accordingly.',
           );
           this.insertNewPage(errorIndex);
         }
@@ -347,10 +344,10 @@ export class CreateExamComponent {
         this.loadingService.loadingOff();
         this.previewReady$.next();
       },
-      error: (err) => {
-        console.error("Error generating exam preview: ", err);
+      error: err => {
+        console.error('Error generating exam preview: ', err);
         this.loadingService.loadingOff();
-        alert("An error occurred while generating the exam preview");
+        alert('An error occurred while generating the exam preview');
       },
     });
   }
@@ -364,12 +361,12 @@ export class CreateExamComponent {
     let taskIndex = -1;
     outer: for (let g = 0; g < this.exam.tasks.length; g++) {
       const group = this.exam.tasks[g];
-      if (group.tasks.length === 1 && group.tasks[0].type === "newPage") {
+      if (group.tasks.length === 1 && group.tasks[0].type === 'newPage') {
         continue;
       }
       for (let i = 0; i < group.tasks.length; i++) {
         const task = group.tasks[i];
-        if (task.type === "newPage" || task.type === "manualText") continue;
+        if (task.type === 'newPage' || task.type === 'manualText') continue;
         if (count === absoluteIndex) {
           assignmentIndex = g;
           taskIndex = i;
@@ -385,11 +382,11 @@ export class CreateExamComponent {
       this.exam.tasks[assignmentIndex].tasks[taskIndex],
       `${assignmentIndex + 1}.${subtaskChar}`,
     );
-    result.subscribe((auto) => {
+    result.subscribe(auto => {
       if (!auto) {
         return;
       }
-      const newPageElement = this.taskBuilder.createTask("new_newPage");
+      const newPageElement = this.taskBuilder.createTask('new_newPage');
       this.exam.tasks[assignmentIndex].tasks.splice(
         taskIndex,
         0,
@@ -401,38 +398,38 @@ export class CreateExamComponent {
 
   private askForNewPageAutoInsert(task: Task, taskNumber: string) {
     const dialogRef = this.dialog.open(NewPageDialogComponent, {
-      width: "30%",
-      height: "30%",
+      width: '30%',
+      height: '30%',
       data: { taskNumber: taskNumber, task: task },
     });
     return dialogRef.afterClosed();
   }
 
   private checkIfValid() {
-    if (this.exam.courseName === "") {
-      alert("Please enter a name for the exam");
-      throw new Error("no exam name");
+    if (this.exam.courseName === '') {
+      alert('Please enter a name for the exam');
+      throw new Error('no exam name');
     }
 
-    if (this.exam.semester === "") {
-      alert("Please select a semester");
-      throw new Error("No semester selected");
+    if (this.exam.semester === '') {
+      alert('Please select a semester');
+      throw new Error('No semester selected');
     }
 
-    if (this.exam.examinerName === "") {
+    if (this.exam.examinerName === '') {
       alert("Please enter the examiner's name");
-      throw new Error("No examiner name");
+      throw new Error('No examiner name');
     }
 
-    if (this.exam.date === "") {
-      alert("Please enter the exam date");
-      throw new Error("no exam date set");
+    if (this.exam.date === '') {
+      alert('Please enter the exam date');
+      throw new Error('no exam date set');
     }
   }
 
   private adjustTotalPoints() {
     this.totalPoints = this.exam.tasks
-      .map((taskGroup) => taskGroup.tasks.flat())
+      .map(taskGroup => taskGroup.tasks.flat())
       .flat()
       .reduce((accumulator: number, task) => (accumulator += task.points), 0);
   }
@@ -453,7 +450,7 @@ export class CreateExamComponent {
 
   public isPoolTask(taskId: string): boolean {
     return (
-      this.taskPool.find((poolTask) => poolTask.taskId === taskId) != undefined
+      this.taskPool.find(poolTask => poolTask.taskId === taskId) != undefined
     );
   }
 
@@ -484,12 +481,12 @@ export class CreateExamComponent {
     this.updatePoolTasks();
     this.importPoolTasks();
     this.api.updateExam(this.exam._id, this.exam).subscribe(
-      (response) => {
-        console.log("Exam updated successfully: ", response);
+      response => {
+        console.log('Exam updated successfully: ', response);
         this.autosaveService.clearLocal(this.exam._id);
       },
-      (error) => {
-        console.error("Error updating exam: ", error);
+      error => {
+        console.error('Error updating exam: ', error);
       },
     );
   }
@@ -503,9 +500,8 @@ export class CreateExamComponent {
     for (let i = 0; i < this.exam.tasks.length; i++) {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const task = this.exam.tasks[i].tasks[j];
-        const isPoolTask = this.taskPool.find((poolTask) =>
-          poolTask.taskId === task.taskId
-        ) !=
+        const isPoolTask =
+          this.taskPool.find(poolTask => poolTask.taskId === task.taskId) !=
           undefined;
         const isModified = this.modifiedPoolTasks.has(task.taskId);
 
@@ -530,8 +526,8 @@ export class CreateExamComponent {
     }
 
     const dialogRef = this.dialog.open(UpdateTaskDialogComponent, {
-      width: "50%",
-      height: "50%",
+      width: '50%',
+      height: '50%',
       data: tasks,
     });
 
@@ -553,11 +549,11 @@ export class CreateExamComponent {
     const [i, j] = index;
     const task = this.exam.tasks[i].tasks[j];
     this.api.updateTaskInPool(task.taskId, task).subscribe(
-      (response) => {
+      response => {
         console.log(`Task ${task.taskId} updated in pool`, response);
         this.importPoolTasks(); // refresh pool tasks after updating task
       },
-      (error) => {
+      error => {
         console.error(`Error updating task ${task.taskId}: `, error);
       },
     );
@@ -569,16 +565,16 @@ export class CreateExamComponent {
     const newTask: Task = JSON.parse(JSON.stringify(oldTask));
     newTask.parent = oldTask.taskId;
     newTask.children = [];
-    newTask.taskId = oldTask.type + "-" + Date.now();
+    newTask.taskId = oldTask.type + '-' + Date.now();
     oldTask.children.push(newTask.taskId);
 
     // add new Task as child for the old Task
     this.api.addChildToTaskPoolTask(oldTask.taskId, newTask.taskId).subscribe(
-      (response) => {
-        console.log("new child was added to the old Task");
+      response => {
+        console.log('new child was added to the old Task');
       },
-      (error) => {
-        console.error("Error adding the child to the old Task", error);
+      error => {
+        console.error('Error adding the child to the old Task', error);
       },
     );
 
@@ -586,41 +582,41 @@ export class CreateExamComponent {
 
     // add new task to pool
     this.api.addTaskToPool(newTask).subscribe(
-      (response) => {
+      response => {
         console.log(`New Task ${newTask.taskId} added to pool`, response);
         this.importPoolTasks(); // refresh pool tasks after adding new task
       },
-      (error) => {
+      error => {
         console.error(`Error adding new task ${newTask.taskId}: `, error);
       },
     );
 
     // update Exam that now includes the new Task
     this.api.updateExam(this.exam._id, this.exam).subscribe(
-      (response) => {
-        console.log("Exam with new Task updated successfully: ", response);
+      response => {
+        console.log('Exam with new Task updated successfully: ', response);
       },
-      (error) => {
-        console.error("Error updating exam: ", error);
+      error => {
+        console.error('Error updating exam: ', error);
       },
     );
     this.triggerAutosave();
   }
 
   private importExam() {
-    const lastURLPart = this.router.url.split("/").pop();
+    const lastURLPart = this.router.url.split('/').pop();
 
-    if (lastURLPart === "create-exam" || lastURLPart == undefined) {
+    if (lastURLPart === 'create-exam' || lastURLPart == undefined) {
       this.isUpdateMode = false;
 
       const draft = this.autosaveService.loadLocal(undefined);
 
       if (draft) {
         const dialogRef = this.dialog.open(ConflictDialogComponent, {
-          width: "600px",
+          width: '600px',
           disableClose: true,
           data: {
-            dbExam: new Exam("New Exam", "", "", "", 90, []),
+            dbExam: new Exam('New Exam', '', '', '', 90, []),
             localWrapper: draft,
             isNewExam: true,
           },
@@ -630,7 +626,7 @@ export class CreateExamComponent {
           if (resume) {
             this.exam = draft.data;
             this.adjustTotalPoints();
-            this.snackBar.open("Resumed unsaved new exam.", "OK", {
+            this.snackBar.open('Resumed unsaved new exam.', 'OK', {
               duration: 3000,
             });
           } else {
@@ -645,7 +641,7 @@ export class CreateExamComponent {
     this.isUpdateMode = true;
 
     this.api.getExam(lastURLPart).subscribe(
-      (dbExam) => {
+      dbExam => {
         const localWrapper = this.autosaveService.loadLocal(dbExam._id);
         const dbTime = (dbExam as any).updatedAt
           ? new Date((dbExam as any).updatedAt).getTime()
@@ -653,7 +649,7 @@ export class CreateExamComponent {
 
         if (localWrapper && localWrapper.timestamp > dbTime) {
           const dialogRef = this.dialog.open(ConflictDialogComponent, {
-            width: "600px",
+            width: '600px',
             disableClose: true,
             data: { dbExam: dbExam, localWrapper: localWrapper },
           });
@@ -663,13 +659,13 @@ export class CreateExamComponent {
               this.exam = localWrapper.data;
               this.exam._id = dbExam._id;
               this.adjustTotalPoints();
-              this.snackBar.open("Unsaved changes restored.", "OK", {
+              this.snackBar.open('Unsaved changes restored.', 'OK', {
                 duration: 3000,
               });
             } else {
               this.initializeExamData(dbExam);
               this.autosaveService.clearLocal(dbExam._id);
-              this.snackBar.open("Discarded local draft.", "OK", {
+              this.snackBar.open('Discarded local draft.', 'OK', {
                 duration: 3000,
               });
             }
@@ -679,7 +675,7 @@ export class CreateExamComponent {
           this.initializeExamData(dbExam);
         }
       },
-      (error) => console.error(error),
+      error => console.error(error),
     );
   }
 
@@ -688,7 +684,7 @@ export class CreateExamComponent {
     for (let taskGroup of this.exam.tasks) {
       for (let task of taskGroup.tasks) {
         this.tagHelper.importTagsToTask(task);
-        console.log("importing tags for task", task);
+        console.log('importing tags for task', task);
       }
     }
     this.adjustTotalPoints();
@@ -700,13 +696,13 @@ export class CreateExamComponent {
       tags: this.api.getAllTags(),
     }).subscribe({
       next: ({ tasks, tags }) => {
-        this.taskPool = tasks.map((task) => ({
+        this.taskPool = tasks.map(task => ({
           ...task,
-          tags: tags.filter((tag) => task.tagIds.includes(tag._id!)),
+          tags: tags.filter(tag => task.tagIds.includes(tag._id!)),
         }));
         this.refreshPool$.next();
       },
-      error: (error) => {
+      error: error => {
         console.error(error);
       },
     });
@@ -715,7 +711,7 @@ export class CreateExamComponent {
   public addTab() {
     this.exam.tasks.push({
       groupNumber: this.exam.tasks.length + 1,
-      groupTitle: { DE: "", EN: "" },
+      groupTitle: { DE: '', EN: '' },
       tasks: [],
     });
     this.currentGroupView = this.exam.tasks.length - 1;
@@ -747,7 +743,7 @@ export class CreateExamComponent {
     let ignoredCount = 0;
     const tasks = this.exam.tasks[groupIndex].tasks;
     for (let i = 0; i < index; i++) {
-      if (tasks[i].type === "manualText" || tasks[i].type === "newPage") {
+      if (tasks[i].type === 'manualText' || tasks[i].type === 'newPage') {
         ignoredCount++;
       }
     }
@@ -763,8 +759,8 @@ export class CreateExamComponent {
     this.checkIfValid();
 
     this.dialog.open(MassExamDialogComponent, {
-      width: "50%",
-      height: "60%",
+      width: '50%',
+      height: '60%',
       data: { exam: this.exam },
     });
   }
@@ -794,14 +790,14 @@ export class CreateExamComponent {
   }
 
   public onAddTag(index: number) {
-    console.log("add tag for task with index ", index);
+    console.log('add tag for task with index ', index);
     const dialogRef: MatDialogRef<AddTagDialogComponent, AddTagDialogData> =
       this.dialog.open(AddTagDialogComponent, {
-        width: "50%",
-        height: "50%",
+        width: '50%',
+        height: '50%',
         data: {},
       });
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe(result => {
       if (!result) {
         return;
       }
@@ -816,7 +812,7 @@ export class CreateExamComponent {
       this.tasksWithModifiedTags.push({ taskId: task.taskId, tagData: tag });
 
       if (result.exists) {
-        console.log("addTagToTask()");
+        console.log('addTagToTask()');
         this.tagHelper.addTagToTask(tag, task);
         return;
       }
@@ -836,15 +832,14 @@ export class CreateExamComponent {
           4,
           this.previewPdfUrl,
         ) as string;
-        const pageUrl = baseUrl + "#page=" + pageNumber;
-        this.previewPdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          pageUrl,
-        );
+        const pageUrl = baseUrl + '#page=' + pageNumber;
+        this.previewPdfUrl =
+          this.sanitizer.bypassSecurityTrustResourceUrl(pageUrl);
 
         this.changeTab(this.exam.tasks.length); // switch to preview tab
       },
       error: () => {
-        console.error("Failed to generate preview");
+        console.error('Failed to generate preview');
       },
     });
   }
@@ -861,18 +856,18 @@ export class CreateExamComponent {
     let count = 0;
     for (let g = 0; g < groupIndex; g++) {
       const group = this.exam.tasks[g];
-      if (group.tasks.length === 1 && group.tasks[0].type === "newPage") {
+      if (group.tasks.length === 1 && group.tasks[0].type === 'newPage') {
         continue;
       }
       for (const task of group.tasks) {
-        if (task.type !== "newPage" && task.type !== "manualText") count++;
+        if (task.type !== 'newPage' && task.type !== 'manualText') count++;
       }
     }
     // Count real subtasks at positions [0, taskIndex) within the target group.
     // taskIndex = 0 → loop never runs → count unchanged → returns 0 for the first task.
     for (let i = 0; i < taskIndex; i++) {
       const task = this.exam.tasks[groupIndex].tasks[i];
-      if (task.type !== "newPage" && task.type !== "manualText") count++;
+      if (task.type !== 'newPage' && task.type !== 'manualText') count++;
     }
     return count;
   }
@@ -886,7 +881,9 @@ export class CreateExamComponent {
     if (!info) {
       const subtaskChar = this.calcTaskChar(index, groupIndex);
       throw new Error(
-        "Could not find PDF info for task " + (groupIndex + 1) + "." +
+        'Could not find PDF info for task ' +
+          (groupIndex + 1) +
+          '.' +
           subtaskChar,
       );
     }
