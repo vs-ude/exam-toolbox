@@ -1,4 +1,5 @@
 import { Client, Entry, NoSuchObjectError } from "ldapts";
+import { sign } from "@hono/hono/jwt";
 
 import { getConfig } from "../config/appConfig.ts";
 import { HttpError } from "../types/handler.ts";
@@ -19,105 +20,6 @@ export interface JwtPayload {
   groups: string[];
   iat: number;
   exp: number;
-}
-
-/**
- * Encodes a buffer as a base64 URL-safe string.
- */
-export function base64urlEncode(buf: ArrayBuffer | Uint8Array): string {
-  const raw = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
-  let str = "";
-  for (const b of raw) str += String.fromCharCode(b);
-  return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-/**
- * Decodes a base64 URL-safe string as a buffer.
- */
-export function base64urlDecode(str: string): Uint8Array<ArrayBuffer> {
-  const padded = str.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = (4 - (padded.length % 4)) % 4;
-  const b64 = padded + "=".repeat(pad);
-  const binary = atob(b64);
-  const bytes = new Uint8Array(binary.length) as Uint8Array<ArrayBuffer>;
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes;
-}
-
-let _signingKey: CryptoKey | null = null;
-
-/**
- * Returns the HMAC-SHA256 key for signing JWTs, caching it for performance.
- */
-async function getSigningKey(): Promise<CryptoKey> {
-  if (_signingKey) return _signingKey;
-  const enc = new TextEncoder();
-  _signingKey = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(config.jwt.secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign", "verify"],
-  );
-  return _signingKey;
-}
-
-/**
- * Signs a JWT with the given payload.
- * @param payload The payload to sign.
- * @returns The signed JWT.
- */
-async function signJwt(
-  payload: Omit<JwtPayload, "iat" | "exp">,
-): Promise<string> {
-  const now = Math.floor(Date.now() / 1000);
-  const fullPayload: JwtPayload = {
-    ...payload,
-    iat: now,
-    exp: now + config.jwt.lifetimeDays * 86400,
-  };
-  const header = base64urlEncode(
-    new TextEncoder().encode(JSON.stringify({ alg: "HS256", typ: "JWT" })),
-  );
-  const body = base64urlEncode(
-    new TextEncoder().encode(JSON.stringify(fullPayload)),
-  );
-  const sigInput = `${header}.${body}`;
-  const key = await getSigningKey();
-  const sig = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(sigInput),
-  );
-  return `${sigInput}.${base64urlEncode(sig)}`;
-}
-
-/**
- * Verifies the JWT and returns the payload if valid.
- * @param token The JWT to verify.
- * @returns The verified payload.
- */
-export async function verifyJwt(token: string): Promise<JwtPayload> {
-  const parts = token.split(".");
-  if (parts.length !== 3) throw new HttpError(401, "Invalid token format");
-
-  const [header, body, sig] = parts;
-  const key = await getSigningKey();
-  const valid = await crypto.subtle.verify(
-    "HMAC",
-    key,
-    base64urlDecode(sig),
-    new TextEncoder().encode(`${header}.${body}`),
-  );
-  if (!valid) throw new HttpError(401, "Invalid token signature");
-
-  const payload: JwtPayload = JSON.parse(
-    new TextDecoder().decode(base64urlDecode(body)),
-  );
-  if (Date.now() / 1000 > payload.exp) {
-    throw new HttpError(401, "Token expired");
-  }
-  return payload;
 }
 
 const SAFE_CHARS = /^[A-Za-z0-9._@-]+$/;
@@ -230,13 +132,31 @@ export async function authenticate(
     const db = await getOrCreateDb();
     await db.upsertUser(user);
 
-    // 6. Sign and return JWT
-    return await signJwt({
+    // Ensure the payload is in the format we expect in validation
+    const payload: JwtPayload = {
       sub: user.uid,
       email: user.email,
       name: user.name,
       groups: user.groups,
-    });
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) +
+        config.jwt.lifetimeDays * 24 * 60 * 60,
+    };
+
+    // 6. Sign and return JWT
+    return await sign(
+      {
+        ...payload,
+      },
+      config.jwt.secret,
+      "HS384",
+    );
+    // return await signJwt({
+    //   sub: user.uid,
+    //   email: user.email,
+    //   name: user.name,
+    //   groups: user.groups,
+    // });
   } finally {
     try {
       await client.unbind();
@@ -290,7 +210,7 @@ export async function setupConfiguredGroups(): Promise<void> {
   } finally {
     try {
       await client.unbind();
-    } catch (e) {
+    } catch (_) {
       // Ignore unbind errors
     }
   }

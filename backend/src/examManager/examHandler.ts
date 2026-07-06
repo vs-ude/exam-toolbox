@@ -1,11 +1,12 @@
 import { Document } from "@db/mongo";
 import { read, utils } from "@mirror/xlsx";
-import { RouterContext } from "@oak/oak";
+import { Context } from "@hono/hono";
 import { crypto } from "@std/crypto";
 import { encodeHex } from "@std/encoding";
 import * as fs from "@std/fs";
 
 import { ensureQRCache } from "../services/qr.ts";
+import { AppEnv } from "../types/context.ts";
 import { Exam } from "../types/exam.ts";
 import { HandlerResult, HttpError } from "../types/handler.ts";
 import { Student } from "../types/student.ts";
@@ -20,7 +21,7 @@ import { ExamManagerDeps } from "./main.ts";
 import { ExamGenerationJob } from "./runtime.ts";
 
 export async function getAllExams(
-  _ctx: RouterContext<string>,
+  _c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const examList = await deps.db.getAllExams();
@@ -28,19 +29,19 @@ export async function getAllExams(
 }
 
 export async function getRecentExams(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const userId = ctx.state.user.id;
+  const userId = c.get("jwtPayload").sub;
   const recentExams = await deps.db.getRecentExams(userId, 8);
   return { kind: "json", status: 200, body: recentExams };
 }
 
 export async function getExamById(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const examId = ctx.params.id;
+  const examId = c.req.param("id")!;
   const exam = await deps.db.getExamById(examId);
   if (!exam) {
     throw new HttpError(404, "Exam not found");
@@ -49,19 +50,19 @@ export async function getExamById(
 }
 
 export async function searchExams(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const searchText = ctx.params.searchText;
+  const searchText = c.req.param("searchText")!;
   const examList = await deps.db.searchExams(searchText);
   return { kind: "json", status: 200, body: examList };
 }
 
 export async function downloadFile(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   _deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const fileUrl = ctx.request.url.searchParams.get("fileUrl");
+  const fileUrl = c.req.query("fileUrl");
   if (!fileUrl) {
     throw new HttpError(400, "File URL is required");
   }
@@ -97,10 +98,10 @@ export async function downloadFile(
 }
 
 export function getJobStatus(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): HandlerResult {
-  const jobId = ctx.params.jobId;
+  const jobId = c.req.param("jobId")!;
   const job = deps.jobs.get(jobId);
   if (!job) {
     throw new HttpError(404, "Job not found");
@@ -120,15 +121,15 @@ export function getJobStatus(
 }
 
 export async function downloadJob(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const jobId = ctx.params.jobId;
+  const jobId = c.req.param("jobId")!;
   const job = deps.jobs.get(jobId);
   if (!job) {
     throw new HttpError(404, "Job not found");
   }
-  if (job.userEmail !== ctx.state.user.email) {
+  if (job.userEmail !== c.get("jwtPayload").email) {
     throw new HttpError(403, "Forbidden");
   }
   if (job.status !== "completed" || !job.zipPath) {
@@ -155,7 +156,7 @@ export async function downloadJob(
 }
 
 export async function getDownloadableJobs(
-  _ctx: RouterContext<string>,
+  _c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const downloadableJobs = await deps.getDownloadableJobs();
@@ -163,10 +164,10 @@ export async function getDownloadableJobs(
 }
 
 export function getActiveJob(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): HandlerResult {
-  const examId = ctx.params.examId;
+  const examId = c.req.param("examId")!;
   let activeJob = null;
 
   for (const job of deps.jobs.values()) {
@@ -194,11 +195,11 @@ export function getActiveJob(
 }
 
 export async function createExam(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const exam: Exam = await ctx.request.body.json();
-  exam.lastEditedBy = ctx.state.user.id;
+  const exam: Exam = await c.req.json();
+  exam.lastEditedBy = c.get("jwtPayload").sub;
   exam.updatedAt = new Date();
   const result = await deps.db.createExam(exam);
   return {
@@ -209,12 +210,12 @@ export async function createExam(
 }
 
 export async function generateExam(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const exam: Exam = Object.assign(
     new Exam(),
-    await ctx.request.body.json(),
+    await c.req.json(),
   );
   const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
   exam.fillPagesAndPoints();
@@ -240,10 +241,10 @@ export async function generateExam(
 }
 
 export async function uploadFile(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const formData = await ctx.request.body.formData();
+  const formData = await c.req.formData();
   console.log(formData);
   const file: File = formData.get("image") as File;
 
@@ -285,10 +286,10 @@ export async function uploadFile(
 }
 
 export async function generateExams(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const formData = await ctx.request.body.formData();
+  const formData = await c.req.formData();
   const examJson = JSON.parse(formData.get("exam")!.toString());
   const exam: Exam = Object.assign(new Exam(), examJson);
   const startSeatNumber = parseInt(
@@ -380,7 +381,7 @@ export async function generateExams(
   const newJob: ExamGenerationJob = {
     jobId,
     examId,
-    userEmail: ctx.state.user.email,
+    userEmail: c.get("jwtPayload").email,
     status: "processing",
     progress: { total: totalTasks, completed: 0, failed: 0 },
     jobDir,
@@ -468,16 +469,16 @@ export async function generateExams(
 }
 
 export async function updateExam(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const { examId, updatedExam } = await ctx.request.body.json();
+  const { examId, updatedExam } = await c.req.json();
   if (!examId || !updatedExam) {
     throw new HttpError(400, "Exam ID and updated data are required");
   }
   const updateData = { ...updatedExam };
   delete updateData._id;
-  updateData.lastEditedBy = ctx.state.user.id;
+  updateData.lastEditedBy = c.get("jwtPayload").sub;
   updateData.updatedAt = new Date();
 
   const result = await deps.db.updateExam(examId, updateData);
@@ -492,7 +493,7 @@ export async function updateExam(
 }
 
 export async function clearExams(
-  _ctx: RouterContext<string>,
+  _c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const result = await deps.db.clearExams();
@@ -507,10 +508,10 @@ export async function clearExams(
 }
 
 export async function deleteExam(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const id = ctx.params.examId;
+  const id = c.req.param("examId")!;
   if (!id) {
     throw new HttpError(400, "Exam ID is required");
   }
@@ -527,10 +528,10 @@ export async function deleteExam(
 }
 
 export async function cancelJob(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const jobId = ctx.params.jobId;
+  const jobId = c.req.param("jobId")!;
   const job = deps.jobs.get(jobId);
 
   if (!job) {

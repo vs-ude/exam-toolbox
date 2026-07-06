@@ -20,7 +20,7 @@ An internal web application for higher-education staff to author exam templates,
 | Layer | Technology |
 |---|---|
 | Frontend | Angular 18, Angular Material, RxJS |
-| Backend | Deno, Oak, MongoDB |
+| Backend | Deno, Hono, MongoDB |
 | Document pipeline | LaTeX (tectonic), Ghostscript, ZIP archiving, Eta templating |
 | Image processing | ImageMagick (contrast adjustment for QR scanning) |
 | Reverse proxy / auth | Caddy + caddy-security (LDAP/JWT) |
@@ -34,9 +34,9 @@ An internal web application for higher-education staff to author exam templates,
 
 ```
 exam-toolbox/
-├── backend/              # Deno/Oak API, LaTeX generation pipeline, worker pool
+├── backend/              # Deno/Hono API, LaTeX generation pipeline, worker pool
 │   ├── src/
-│   │   ├── api/          # Oak router configuration (separated from handler logic)
+│   │   ├── api/          # Hono router configuration (separated from handler logic)
 │   │   ├── config/       # Runtime configuration constants
 │   │   ├── examManager/  # Exam/task/tag/generation handlers
 │   │   ├── services/     # DB, QR generation/scanning, image preprocessing, ZIP

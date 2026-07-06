@@ -1,15 +1,16 @@
-import { Router } from "@oak/oak";
+import { Hono } from "@hono/hono";
 
 import { getOrCreateDb } from "../services/db.ts";
 import { testLDAPConnection } from "../services/auth.ts";
 import { HandlerResult } from "../types/handler.ts";
-import { handle, rc } from "./helpers.ts";
+import { AppEnv } from "../types/context.ts";
+import { handle } from "./helpers.ts";
 
-export function configureBaseRouter(): Router {
-  const router = new Router({ prefix: "/api" });
+export function configureBaseRouter(): Hono<AppEnv> {
+  const router = new Hono<AppEnv>();
 
-  router
-    .get("/health", (ctx) => handle(rc(ctx), () => healthCheck()));
+  router.get("/health", (c) => handle(c, () => healthCheck()));
+
   return router;
 }
 

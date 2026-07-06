@@ -26,8 +26,8 @@ The scan ingest pipeline is actively being built. Scanned written exams can alre
 ## Repository structure
 
 - `frontend/`: Angular 18 application (UI for dashboard, exam builder, task pool, search, exam pool, mass-generation dialog)
-- `backend/`: Deno + Oak API, MongoDB integration, LaTeX generation pipeline, worker pool for mass generation
-  - `src/api/`: Oak router configuration (separated from handler logic)
+- `backend/`: Deno + Hono API, MongoDB integration, LaTeX generation pipeline, worker pool for mass generation
+  - `src/api/`: Hono router configuration (separated from handler logic)
   - `src/examManager/`: exam/task/tag/generation handlers
   - `src/services/`: shared services – DB access, QR generation/scanning, image pre-processing, exam codes, ZIP
   - `src/types/`: shared TypeScript types (exam, scan, student, tag, …)
@@ -81,7 +81,7 @@ The scan ingest pipeline is actively being built. Scanned written exams can alre
 ## Primary technologies
 
 - Frontend: Angular, Angular Material, RxJS, Cypress/Karma
-- Backend: Deno, Oak, MongoDB driver, worker threads
+- Backend: Deno, Hono, MongoDB driver, worker threads
 - Document pipeline: LaTeX (tectonic), Ghostscript, ZIP archiving, Eta templating
 - Image processing: ImageMagick (contrast adjustment for QR scanning)
 - CI: GitLab CI with Deno unit + integration test stages

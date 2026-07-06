@@ -1,27 +1,29 @@
-import { Router, RouterContext } from "@oak/oak";
+import { Context, Hono } from "@hono/hono";
+import { deleteCookie, setCookie } from "@hono/hono/cookie";
 
 import { authenticate, syncLdapUsers } from "../services/auth.ts";
 import { HandlerResult, HttpError } from "../types/handler.ts";
-import { handle, rc } from "./helpers.ts";
+import { AppEnv } from "../types/context.ts";
+import { handle } from "./helpers.ts";
 import { getOrCreateDb } from "../services/db.ts";
 import { getConfig } from "../config/mod.ts";
 
 const config = getConfig();
 
-export function configureAuthRouter(): Router {
-  const router = new Router({ prefix: "/api/auth" });
+export function configureAuthRouter(): Hono<AppEnv> {
+  const router = new Hono<AppEnv>();
 
   router
-    .post("/login", (ctx) => handle(rc(ctx), () => login(rc(ctx))))
-    .post("/logout", (ctx) => handle(rc(ctx), () => logout(rc(ctx))))
-    .get("/entities", (ctx) => handle(rc(ctx), () => getUsersAndGroups()))
-    .get("/users", (ctx) => handle(rc(ctx), () => getUserObjects(rc(ctx))));
+    .post("/login", (c) => handle(c, () => login(c)))
+    .post("/logout", (c) => handle(c, () => logout(c)))
+    .get("/entities", (c) => handle(c, () => getUsersAndGroups()))
+    .get("/users", (c) => handle(c, () => getUserObjects(c)));
 
   return router;
 }
 
-async function login(ctx: RouterContext<string>): Promise<HandlerResult> {
-  const body = await ctx.request.body.json();
+async function login(c: Context<AppEnv>): Promise<HandlerResult> {
+  const body = await c.req.json();
   const { username, password } = body ?? {};
 
   if (typeof username !== "string" || typeof password !== "string") {
@@ -37,9 +39,9 @@ async function login(ctx: RouterContext<string>): Promise<HandlerResult> {
   }
 
   // Set token as HTTP-only cookie for browser clients
-  ctx.cookies.set("auth_token", token, {
+  setCookie(c, "auth_token", token, {
     httpOnly: !config.server.https,
-    sameSite: "lax",
+    sameSite: "Lax",
     maxAge: 60 * 60 * 24 * 30, // 30 days in seconds
   });
 
@@ -50,8 +52,8 @@ async function login(ctx: RouterContext<string>): Promise<HandlerResult> {
   };
 }
 
-function logout(ctx: RouterContext<string>): HandlerResult {
-  ctx.cookies.delete("auth_token");
+function logout(c: Context<AppEnv>): HandlerResult {
+  deleteCookie(c, "auth_token");
   return { kind: "json", status: 200, body: { message: "Logged out" } };
 }
 
@@ -74,9 +76,9 @@ async function getUsersAndGroups(): Promise<HandlerResult> {
  * Returns the complete user objects for the given uids.
  */
 async function getUserObjects(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
 ): Promise<HandlerResult> {
-  const uids = ctx.request.url.searchParams.getAll("uids");
+  const uids = c.req.queries("uids") ?? [];
   console.debug("uids", uids);
 
   if (uids.length < 1) {

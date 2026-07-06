@@ -1,140 +1,82 @@
-import { Router } from "@oak/oak";
+import { Hono } from "@hono/hono";
 
 import * as h from "../examManager/main.ts";
+import { AppEnv } from "../types/context.ts";
+import { handle } from "./helpers.ts";
 
-import { handle, rc } from "./helpers.ts";
-
-export function configureExamManagerRouter(deps: h.ExamManagerDeps): Router {
-  const router = new Router({ prefix: "/api" });
+export function configureExamManagerRouter(
+  deps: h.ExamManagerDeps,
+): Hono<AppEnv> {
+  const router = new Hono<AppEnv>();
 
   router
     // Exams
-    .get("/exams", (ctx) => handle(rc(ctx), () => h.getAllExams(rc(ctx), deps)))
-    .get(
-      "/exams/recent",
-      (ctx) => handle(rc(ctx), () => h.getRecentExams(rc(ctx), deps)),
-    )
+    .get("/exams", (c) => handle(c, () => h.getAllExams(c, deps)))
+    .get("/exams/recent", (c) => handle(c, () => h.getRecentExams(c, deps)))
     .get(
       "/exams/search/:searchText",
-      (ctx) => handle(rc(ctx), () => h.searchExams(rc(ctx), deps)),
+      (c) => handle(c, () => h.searchExams(c, deps)),
     )
-    .get(
-      "/exam/:id",
-      (ctx) => handle(rc(ctx), () => h.getExamById(rc(ctx), deps)),
-    )
-    .post("/exams", (ctx) => handle(rc(ctx), () => h.createExam(rc(ctx), deps)))
-    .put(
-      "/exams/update",
-      (ctx) => handle(rc(ctx), () => h.updateExam(rc(ctx), deps)),
-    )
-    .delete(
-      "/exams",
-      (ctx) => handle(rc(ctx), () => h.clearExams(rc(ctx), deps)),
-    )
-    .delete(
-      "/exams/:examId",
-      (ctx) => handle(rc(ctx), () => h.deleteExam(rc(ctx), deps)),
-    )
+    .get("/exam/:id", (c) => handle(c, () => h.getExamById(c, deps)))
+    .post("/exams", (c) => handle(c, () => h.createExam(c, deps)))
+    .put("/exams/update", (c) => handle(c, () => h.updateExam(c, deps)))
+    .delete("/exams", (c) => handle(c, () => h.clearExams(c, deps)))
+    .delete("/exams/:examId", (c) => handle(c, () => h.deleteExam(c, deps)))
     // File
-    .get(
-      "/download",
-      (ctx) => handle(rc(ctx), () => h.downloadFile(rc(ctx), deps)),
-    )
-    .post(
-      "/upload",
-      (ctx) => handle(rc(ctx), () => h.uploadFile(rc(ctx), deps)),
-    )
+    .get("/download", (c) => handle(c, () => h.downloadFile(c, deps)))
+    .post("/upload", (c) => handle(c, () => h.uploadFile(c, deps)))
     // Exam generation
-    .post(
-      "/generate-exam",
-      (ctx) => handle(rc(ctx), () => h.generateExam(rc(ctx), deps)),
-    )
-    .post(
-      "/generate-exams",
-      (ctx) => handle(rc(ctx), () => h.generateExams(rc(ctx), deps)),
-    )
+    .post("/generate-exam", (c) => handle(c, () => h.generateExam(c, deps)))
+    .post("/generate-exams", (c) => handle(c, () => h.generateExams(c, deps)))
     // Jobs
     .get(
       "/jobs/downloadable",
-      (ctx) => handle(rc(ctx), () => h.getDownloadableJobs(rc(ctx), deps)),
+      (c) => handle(c, () => h.getDownloadableJobs(c, deps)),
     )
-    .get(
-      "/jobs/:jobId/status",
-      (ctx) => handle(rc(ctx), () => h.getJobStatus(rc(ctx), deps)),
-    )
+    .get("/jobs/:jobId/status", (c) => handle(c, () => h.getJobStatus(c, deps)))
     .get(
       "/jobs/:jobId/download",
-      (ctx) => handle(rc(ctx), () => h.downloadJob(rc(ctx), deps)),
+      (c) => handle(c, () => h.downloadJob(c, deps)),
     )
-    .delete(
-      "/jobs/:jobId",
-      (ctx) => handle(rc(ctx), () => h.cancelJob(rc(ctx), deps)),
-    )
+    .delete("/jobs/:jobId", (c) => handle(c, () => h.cancelJob(c, deps)))
     .get(
       "/exams/:examId/active-job",
-      (ctx) => handle(rc(ctx), () => h.getActiveJob(rc(ctx), deps)),
+      (c) => handle(c, () => h.getActiveJob(c, deps)),
     )
     // Task pool
-    .get(
-      "/taskPool",
-      (ctx) => handle(rc(ctx), () => h.getAllTasks(rc(ctx), deps)),
-    )
+    .get("/taskPool", (c) => handle(c, () => h.getAllTasks(c, deps)))
     .get(
       "/taskPool/tags/:tagId",
-      (ctx) => handle(rc(ctx), () => h.getTasksByTag(rc(ctx), deps)),
+      (c) => handle(c, () => h.getTasksByTag(c, deps)),
     )
     .get(
       "/taskPool/type/:type",
-      (ctx) => handle(rc(ctx), () => h.getTasksByType(rc(ctx), deps)),
+      (c) => handle(c, () => h.getTasksByType(c, deps)),
     )
     .get(
       "/taskPool/search/:questionText",
-      (ctx) => handle(rc(ctx), () => h.searchTasks(rc(ctx), deps)),
+      (c) => handle(c, () => h.searchTasks(c, deps)),
     )
     .get(
       "/taskPool/user/:userId",
-      (ctx) => handle(rc(ctx), () => h.getTasksByUser(rc(ctx), deps)),
+      (c) => handle(c, () => h.getTasksByUser(c, deps)),
     )
-    .get(
-      "/taskPool/:taskId",
-      (ctx) => handle(rc(ctx), () => h.getTaskById(rc(ctx), deps)),
-    )
-    .post(
-      "/taskPool",
-      (ctx) => handle(rc(ctx), () => h.createTask(rc(ctx), deps)),
-    )
+    .get("/taskPool/:taskId", (c) => handle(c, () => h.getTaskById(c, deps)))
+    .post("/taskPool", (c) => handle(c, () => h.createTask(c, deps)))
     .put(
       "/taskPool/addChild/:taskId",
-      (ctx) => handle(rc(ctx), () => h.addChildTask(rc(ctx), deps)),
+      (c) => handle(c, () => h.addChildTask(c, deps)),
     )
-    .put(
-      "/taskPool/:taskId",
-      (ctx) => handle(rc(ctx), () => h.updateTask(rc(ctx), deps)),
-    )
-    .delete(
-      "/taskPool/:taskId",
-      (ctx) => handle(rc(ctx), () => h.deleteTask(rc(ctx), deps)),
-    )
-    .delete(
-      "/taskPool",
-      (ctx) => handle(rc(ctx), () => h.clearTaskPool(rc(ctx), deps)),
-    )
+    .put("/taskPool/:taskId", (c) => handle(c, () => h.updateTask(c, deps)))
+    .delete("/taskPool/:taskId", (c) => handle(c, () => h.deleteTask(c, deps)))
+    .delete("/taskPool", (c) => handle(c, () => h.clearTaskPool(c, deps)))
     // Tags
-    .get("/tags", (ctx) => handle(rc(ctx), () => h.getAllTags(rc(ctx), deps)))
-    .get(
-      "/tags/:id",
-      (ctx) => handle(rc(ctx), () => h.getTagById(rc(ctx), deps)),
-    )
-    .post("/tags", (ctx) => handle(rc(ctx), () => h.createTag(rc(ctx), deps)))
-    .put(
-      "/tags/:id",
-      (ctx) => handle(rc(ctx), () => h.updateTag(rc(ctx), deps)),
-    )
-    .delete("/tags", (ctx) => handle(rc(ctx), () => h.clearTags(rc(ctx), deps)))
-    .delete(
-      "/tags/:id",
-      (ctx) => handle(rc(ctx), () => h.deleteTag(rc(ctx), deps)),
-    );
+    .get("/tags", (c) => handle(c, () => h.getAllTags(c, deps)))
+    .get("/tags/:id", (c) => handle(c, () => h.getTagById(c, deps)))
+    .post("/tags", (c) => handle(c, () => h.createTag(c, deps)))
+    .put("/tags/:id", (c) => handle(c, () => h.updateTag(c, deps)))
+    .delete("/tags", (c) => handle(c, () => h.clearTags(c, deps)))
+    .delete("/tags/:id", (c) => handle(c, () => h.deleteTag(c, deps)));
 
   return router;
 }

@@ -1,23 +1,24 @@
 import { ObjectId } from "@db/mongo";
-import { RouterContext } from "@oak/oak";
+import { Context } from "@hono/hono";
 
 import { HandlerResult, HttpError } from "../types/handler.ts";
+import { AppEnv } from "../types/context.ts";
 import { Tag } from "../types/tag.ts";
 
 import { ExamManagerDeps } from "./main.ts";
 
 export async function getTagById(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const tagId = ctx.params.id;
+  const tagId = c.req.param("id")!;
   const tag = await deps.db.getTagById(tagId);
   if (!tag) throw new HttpError(404, "Tag not found");
   return { kind: "json", status: 200, body: tag };
 }
 
 export async function getAllTags(
-  _ctx: RouterContext<string>,
+  _c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const tagList = await deps.db.getAllTags();
@@ -25,11 +26,11 @@ export async function getAllTags(
 }
 
 export async function updateTag(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const tagId = ctx.params.id;
-  const { _id, ...updatedTag }: Tag = await ctx.request.body.json();
+  const tagId = c.req.param("id")!;
+  const { _id, ...updatedTag }: Tag = await c.req.json();
   const result = await deps.db.updateTag(tagId, updatedTag);
   if (result.matchedCount === 0) throw new HttpError(404, "Tag not found");
   return {
@@ -40,10 +41,10 @@ export async function updateTag(
 }
 
 export async function createTag(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const { _id, ...tag }: Tag = await ctx.request.body.json();
+  const { _id, ...tag }: Tag = await c.req.json();
   const result = await deps.db.createTag(tag);
   return {
     kind: "json",
@@ -53,7 +54,7 @@ export async function createTag(
 }
 
 export async function clearTags(
-  _ctx: RouterContext<string>,
+  _c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const result = await deps.db.clearTags();
@@ -68,10 +69,10 @@ export async function clearTags(
 }
 
 export async function deleteTag(
-  ctx: RouterContext<string>,
+  c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const tagId = ctx.params.id;
+  const tagId = c.req.param("id")!;
   if (!ObjectId.isValid(tagId)) throw new HttpError(400, "Invalid tag ID");
   const result = await deps.db.deleteTag(tagId);
   if (result === 0) throw new HttpError(404, "Tag not found");
