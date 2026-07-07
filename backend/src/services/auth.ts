@@ -95,40 +95,18 @@ export async function authenticate(
   const client = new Client({ url: config.ldap.url });
 
   try {
-    // 1. Bind as service account
-    await client.bind(config.ldap.bindDn, config.ldap.bindPassword);
-
-    // 2. Search for the user
-    const filter = config.ldap.searchFilter.replace(
-      /%s/g,
-      safeUsername,
-    );
-    const { searchEntries } = await client.search(config.ldap.searchBase, {
-      filter,
-      scope: "sub",
-      attributes: ["dn"].concat(LDAP_USER_FIELDS),
-    });
-
-    if (searchEntries.length === 0) {
-      throw new HttpError(401, "User not found");
-    }
-    const entry = searchEntries[0];
-
-    // 3. Check required group membership
-    if (!isInRequiredGroup(entry.memberOf as string | string[])) {
-      throw new HttpError(403, "User is not a member of the required group");
-    }
+    const entry = await getUserObject(client, safeUsername);
 
     const user = ldapEntityToUser(entry);
 
-    // 4. Re-bind as user to verify password
+    // Re-bind as user to verify password
     try {
       await client.bind(entry.dn, password);
     } catch {
       throw new HttpError(401, "Invalid credentials");
     }
 
-    // 5. Sync to DB
+    // Sync to DB
     const db = await getOrCreateDb();
     await db.upsertUser(user);
 
@@ -143,7 +121,7 @@ export async function authenticate(
         config.jwt.lifetimeDays * 24 * 60 * 60,
     };
 
-    // 6. Sign and return JWT
+    // Sign and return JWT
     return await sign(
       {
         ...payload,
@@ -164,6 +142,63 @@ export async function authenticate(
       // ignore unbind errors
     }
   }
+}
+
+/**
+ * Checks if a user exists in the LDAP directory using the given username.
+ * @param username The username to search for. Will be sanitized before searching.
+ * @returns `true` if the user exists, `false` otherwise.
+ */
+export async function checkUserExists(username: string): Promise<boolean> {
+  const safeUsername = sanitizeInput(username, "username");
+  const client = new Client({ url: config.ldap.url });
+  try {
+    await getUserObject(client, safeUsername);
+  } catch {
+    return false;
+  } finally {
+    try {
+      await client.unbind();
+    } catch {
+      // ignore unbind errors
+    }
+  }
+  return true;
+}
+
+/**
+ * Retrieves the user object from LDAP using the given safe username.
+ * @param safeUsername The safe username to search for.
+ * @returns The user object if found, otherwise throws an error.
+ */
+async function getUserObject(
+  client: Client,
+  safeUsername: string,
+): Promise<Entry> {
+  // 1. Bind as service account
+  await client.bind(config.ldap.bindDn, config.ldap.bindPassword);
+
+  // 2. Search for the user
+  const filter = config.ldap.searchFilter.replace(
+    /%s/g,
+    safeUsername,
+  );
+  const { searchEntries } = await client.search(config.ldap.searchBase, {
+    filter,
+    scope: "sub",
+    attributes: ["dn"].concat(LDAP_USER_FIELDS),
+  });
+
+  if (searchEntries.length === 0) {
+    throw new HttpError(401, "User not found");
+  }
+  const entry = searchEntries[0];
+
+  // 3. Check required group membership
+  if (!isInRequiredGroup(entry.memberOf as string | string[])) {
+    throw new HttpError(403, "User is not a member of the required group");
+  }
+  return entry;
 }
 
 /**

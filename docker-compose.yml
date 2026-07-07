@@ -70,11 +70,11 @@ services:
       SMTP_HOST: mailcrab
       SMTP_PORT: 1025
       SMTP_FROM: noreply@example.com
-      SERVER_DOMAIN: ${DOMAIN}
-      SERVER_HTTPS: true
+      SERVER_PUBLIC_URL: "https://${DOMAIN}"
       PATHS_CACHE_DIR: /app/cache
       PATHS_JOBS_DIR: /app/jobs
       CONFIG: /app/config.yaml
+      NODE_ENV: development
     depends_on:
       - mongo
       - mailcrab

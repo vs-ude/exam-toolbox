@@ -210,8 +210,8 @@ export function createExamManagerRuntime(
     examName: string,
     semester?: string,
   ): void {
-    const domain = appConfig.server.domain;
-    const downloadUrl = `http://${domain}/api/jobs/${job.jobId}/download`;
+    const downloadUrl =
+      `${appConfig.server.publicUrl}/api/jobs/${job.jobId}/download`;
 
     sendEmail({
       to: job.userEmail,

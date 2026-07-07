@@ -1,8 +1,17 @@
 {
   "tasks": {
-    "test": "deno test --allow-read --allow-env",
-    "test:integration": "DENO_INTEGRATION_TEST=1 deno test --allow-run --allow-write --allow-read --allow-env",
-    "cover": "DENO_INTEGRATION_TEST=1 deno test --coverage --parallel --allow-run --allow-write --allow-read --allow-env"
+    "test": {
+      "description": "Run unit tests",
+      "command": "deno test --allow-read --allow-env"
+    },
+    "test:integration": {
+      "description": "Run integration tests",
+      "command": "DENO_INTEGRATION_TEST=1 deno test --allow-run --allow-write --allow-read --allow-env"
+    },
+    "cover": {
+      "description": "Generate test coverage report",
+      "command": "DENO_INTEGRATION_TEST=1 deno test --coverage --parallel --allow-run --allow-write --allow-read --allow-env"
+    }
   },
   "compilerOptions": {
     "lib": ["ES2022", "deno.ns", "dom"]
@@ -11,6 +20,7 @@
     "@bgub/eta": "jsr:@bgub/eta@^4.6.0",
     "@db/mongo": "jsr:@db/mongo@^0.34.0",
     "@hono/hono": "jsr:@hono/hono@^4.12.27",
+    "@hono/zod-openapi": "jsr:@hono/zod-openapi@^1.4.0",
     "@mirror/xlsx": "jsr:@mirror/xlsx@^0.20.3",
     "@std/assert": "jsr:@std/assert@^1.0.19",
     "@std/cli": "jsr:@std/cli@^1.0.30",

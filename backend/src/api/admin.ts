@@ -1,22 +1,55 @@
-import { Context, Hono, Next } from "@hono/hono";
+import { Context, Next } from "@hono/hono";
+import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 
 import { HandlerResult } from "../types/handler.ts";
 import { AppEnv } from "../types/context.ts";
 import { getConfig } from "../config/mod.ts";
 import { getOrCreateDb } from "../services/db.ts";
-
 import { handle } from "./helpers.ts";
 
 const db = await getOrCreateDb();
 
-export function configureAdminRouter(): Hono<AppEnv> {
-  const router = new Hono<AppEnv>();
+// ── Route definitions ─────────────────────────────────────────────────────────
 
+const configRoute = createRoute({
+  method: "get",
+  path: "/config",
+  tags: ["Admin"],
+  summary: "Get server configuration",
+  description:
+    "Returns the current runtime configuration. Restricted to users in the admin group.",
+  security: [{ Bearer: [] }],
+  responses: {
+    200: {
+      content: {
+        "application/json": { schema: z.record(z.string(), z.unknown()) },
+      },
+      description: "Current server configuration",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+      description: "Not authorised (not an admin)",
+    },
+  },
+});
+
+// ── Router ────────────────────────────────────────────────────────────────────
+
+export function configureAdminRouter(): OpenAPIHono<AppEnv> {
+  const router = new OpenAPIHono<AppEnv>();
+
+  // Middleware must be registered before the openapi route
   router.use("/*", checkAdmin);
-  router.get("/config", (c) => handle(c, () => conf()));
+  router.openapi(configRoute, (c) => handle(c, () => conf()));
 
   return router;
 }
+
+// ── Handlers ──────────────────────────────────────────────────────────────────
 
 function conf(): HandlerResult {
   return { kind: "json", status: 200, body: getConfig() };

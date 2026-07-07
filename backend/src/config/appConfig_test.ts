@@ -18,10 +18,13 @@ Deno.test("mergeObjects: keys present only in base are preserved", () => {
 });
 
 Deno.test("mergeObjects: nested objects are merged recursively", () => {
-  const base = { server: { port: 3000, domain: "localhost", https: false } };
+  const base = { server: { port: 3000, publicUrl: "localhost" } };
   const result = mergeObjects(base, { server: { port: 9090 } });
   assertEquals((result.server as Record<string, unknown>).port, 9090);
-  assertEquals((result.server as Record<string, unknown>).domain, "localhost");
+  assertEquals(
+    (result.server as Record<string, unknown>).publicUrl,
+    "localhost",
+  );
 });
 
 Deno.test("mergeObjects: deeply nested scalars are overwritten", () => {
@@ -57,8 +60,7 @@ const noEnv = (_key: string) => undefined;
 Deno.test("loadConfig: empty YAML returns built-in defaults", () => {
   const cfg = loadConfig("", noEnv);
   assertEquals(cfg.server.port, DEFAULT_CONFIG.server.port);
-  assertEquals(cfg.server.domain, DEFAULT_CONFIG.server.domain);
-  assertEquals(cfg.server.https, DEFAULT_CONFIG.server.https);
+  assertEquals(cfg.server.publicUrl, DEFAULT_CONFIG.server.publicUrl);
   assertEquals(cfg.auth.ldap.url, DEFAULT_CONFIG.auth.ldap.url);
   assertEquals(cfg.auth.jwt.lifetimeDays, DEFAULT_CONFIG.auth.jwt.lifetimeDays);
   assertEquals(cfg.db.connString, DEFAULT_CONFIG.db.connString);
@@ -75,13 +77,13 @@ Deno.test("loadConfig: YAML scalar values override defaults", () => {
   const yaml = `
 server:
   port: 8080
-  domain: exam.example.com
+  publicUrl: exam.example.com
 `;
   const cfg = loadConfig(yaml, noEnv);
   assertEquals(cfg.server.port, 8080);
-  assertEquals(cfg.server.domain, "exam.example.com");
+  assertEquals(cfg.server.publicUrl, "exam.example.com");
   // untouched default
-  assertEquals(cfg.server.https, DEFAULT_CONFIG.server.https);
+  assertEquals(cfg.db.connString, DEFAULT_CONFIG.db.connString);
 });
 
 Deno.test("loadConfig: YAML nested values override defaults", () => {
@@ -108,22 +110,6 @@ Deno.test("loadConfig: SERVER_PORT env var overrides YAML/default", () => {
     (key) => key === "SERVER_PORT" ? "9000" : undefined,
   );
   assertEquals(cfg.server.port, 9000);
-});
-
-Deno.test("loadConfig: SERVER_HTTPS env var parses 'true' as boolean true", () => {
-  const cfg = loadConfig(
-    "",
-    (key) => key === "SERVER_HTTPS" ? "true" : undefined,
-  );
-  assertEquals(cfg.server.https, true);
-});
-
-Deno.test("loadConfig: SERVER_HTTPS env var parses non-'true' string as false", () => {
-  const cfg = loadConfig(
-    "",
-    (key) => key === "SERVER_HTTPS" ? "false" : undefined,
-  );
-  assertEquals(cfg.server.https, false);
 });
 
 Deno.test("loadConfig: AUTH_LDAP_GROUPS_ADMIN splits comma-separated list", () => {

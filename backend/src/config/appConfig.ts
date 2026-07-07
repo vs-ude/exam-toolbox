@@ -4,8 +4,7 @@ import { flags } from "./args.ts";
 
 interface AppConfig extends Record<string, unknown> {
   server: {
-    https: boolean;
-    domain: string;
+    publicUrl: string;
     port: number;
   };
   auth: {
@@ -47,7 +46,7 @@ interface AppConfig extends Record<string, unknown> {
 }
 
 export const DEFAULT_CONFIG = {
-  server: { port: 3000, domain: "localhost", https: false },
+  server: { port: 3000, publicUrl: "http://localhost:3000" },
   auth: {
     ldap: {
       url: "ldap://ldap:389",
@@ -99,11 +98,8 @@ export function loadConfig(
   // Environment variable overrides (fine-grained, container-friendly)
   const config = {
     server: {
-      https: env("SERVER_HTTPS")
-        ? env("SERVER_HTTPS") === "true"
-        : base.server.https,
       port: env("SERVER_PORT") ? Number(env("SERVER_PORT")) : base.server.port,
-      domain: env("SERVER_DOMAIN") ?? base.server.domain,
+      publicUrl: env("SERVER_PUBLIC_URL") ?? base.server.publicUrl,
     },
     auth: {
       ldap: {

@@ -1,13 +1,18 @@
-import { Context } from "@hono/hono";
+import { Context, Input } from "@hono/hono";
 import type { ContentfulStatusCode } from "@hono/hono/utils/http-status";
 
 import { AppEnv } from "../types/context.ts";
 import { HandlerResult, HttpError } from "../types/handler.ts";
 
-export async function handle(
-  c: Context<AppEnv>,
+export async function handle<
+  E extends AppEnv = AppEnv,
+  P extends string = string,
+  I extends Input = Input,
+>(
+  c: Context<E, P, I>,
   fn: () => HandlerResult | Promise<HandlerResult>,
-): Promise<Response> {
+  // deno-lint-ignore no-explicit-any
+): Promise<any> {
   try {
     const result = await fn();
     if (result.kind === "json") {
