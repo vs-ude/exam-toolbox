@@ -1,0 +1,43 @@
+info:
+  name: Validate
+  type: http
+  seq: 1
+  tags:
+    - Auth
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/auth/validate"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Authentication successful
+    request:
+      url: "{{baseUrl}}/api/auth/validate"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      body:
+        type: text
+        data: ""
+  - name: 401 Response
+    description: Authentication failed
+    request:
+      url: "{{baseUrl}}/api/auth/validate"
+      method: GET
+    response:
+      status: 401
+      statusText: Unauthorized
+      body:
+        type: text
+        data: ""
+
+docs: Validate the JWT token and do nothing else.

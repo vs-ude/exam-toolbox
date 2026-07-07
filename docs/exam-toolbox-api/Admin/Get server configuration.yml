@@ -8,13 +8,6 @@ info:
 http:
   method: GET
   url: "{{baseUrl}}/api/admin/config"
-  body:
-    type: json
-    data: |-
-      {
-        "username": "test1",
-        "password": "testpass"
-      }
   auth:
     type: bearer
     token: "{{token}}"

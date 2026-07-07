@@ -20,6 +20,22 @@ import {
 const config = getConfig();
 
 // ── Route definitions ─────────────────────────────────────────────────────────
+const validateRoute = createRoute({
+  method: "get",
+  path: "/validate",
+  tags: ["Auth"],
+  summary: "Validate",
+  description: "Validate the JWT token and do nothing else.",
+  security: [],
+  responses: {
+    200: {
+      description: "Authentication successful",
+    },
+    401: {
+      description: "Authentication failed",
+    },
+  },
+});
 
 const loginRoute = createRoute({
   method: "post",
@@ -125,6 +141,7 @@ const usersRoute = createRoute({
 export function configureAuthRouter(): OpenAPIHono<AppEnv> {
   const router = new OpenAPIHono<AppEnv>();
 
+  router.openapi(validateRoute, (c) => handle(c, () => success(c)));
   router.openapi(loginRoute, (c) => handle(c, () => login(c)));
   router.openapi(logoutRoute, (c) => handle(c, () => logout(c)));
   router.openapi(entitiesRoute, (c) => handle(c, () => getUsersAndGroups()));
@@ -134,6 +151,11 @@ export function configureAuthRouter(): OpenAPIHono<AppEnv> {
 }
 
 // ── Handlers ──────────────────────────────────────────────────────────────────
+
+// The actual validation is done by middleware
+function success(_: Context<AppEnv>): HandlerResult {
+  return { kind: "json", status: 200, body: null };
+}
 
 async function login(c: Context<AppEnv>): Promise<HandlerResult> {
   const body = await c.req.json();
