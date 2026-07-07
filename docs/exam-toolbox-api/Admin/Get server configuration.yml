@@ -33,14 +33,14 @@ examples:
       body:
         type: json
         data: "{}"
-  - name: 401 Response
+  - name: 403 Response
     description: Not authorised (not an admin)
     request:
       url: "{{baseUrl}}/api/admin/config"
       method: GET
     response:
-      status: 401
-      statusText: Unauthorized
+      status: 403
+      statusText: Forbidden
       headers:
         - name: Content-Type
           value: application/json

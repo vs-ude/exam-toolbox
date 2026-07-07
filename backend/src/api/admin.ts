@@ -26,7 +26,7 @@ const configRoute = createRoute({
       },
       description: "Current server configuration",
     },
-    401: {
+    403: {
       content: {
         "application/json": {
           schema: z.object({ message: z.string() }),
@@ -69,7 +69,7 @@ async function checkAdmin(
 
   const adminGroups = getConfig().auth.ldap.groups.admin;
   if (userFromDB.groups.filter((g) => adminGroups.includes(g)).length === 0) {
-    return ctx.json({ message: "Unauthorized" }, 401);
+    return ctx.json({ message: "Forbidden" }, 403);
   }
 
   await next();
