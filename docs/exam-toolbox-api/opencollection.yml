@@ -1,0 +1,33 @@
+opencollection: 1.0.0
+
+info:
+  name: exam-toolbox-api
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  auth:
+    type: bearer
+    token: "{{token}}"
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git
+    openapi:
+      - sourceUrl: https://localhost/api/doc
+        groupBy: tags
+        lastSyncDate: 2026-07-07T12:24:22.043Z
+        specHash: 3663697e5371a8e149885b47a516df00
+        autoCheck: false
+        autoCheckInterval: 5

@@ -1,0 +1,41 @@
+info:
+  name: Clear task pool
+  type: http
+  seq: 3
+  tags:
+    - Tasks
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/taskPool"
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: All tasks deleted
+    request:
+      url: "{{baseUrl}}/api/taskPool"
+      method: DELETE
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": "",
+            "deletedCount": 0
+          }
+
+docs: Removes all tasks from the pool. Intended for development/testing only.

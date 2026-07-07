@@ -1,0 +1,50 @@
+info:
+  name: Tasks by type
+  type: http
+  seq: 5
+  tags:
+    - Tasks
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/taskPool/type/:type"
+  params:
+    - name: type
+      value: multipleChoice
+      type: path
+      description: Task type discriminant
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Matching tasks
+    request:
+      url: "{{baseUrl}}/api/taskPool/type/:type"
+      method: GET
+      params:
+        - name: type
+          value: multipleChoice
+          type: path
+          description: Task type discriminant
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          [
+            {}
+          ]
+
+docs: Returns tasks of the specified type (e.g. multipleChoice, shortAnswer).

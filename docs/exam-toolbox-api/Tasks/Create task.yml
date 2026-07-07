@@ -1,0 +1,47 @@
+info:
+  name: Create task
+  type: http
+  seq: 2
+  tags:
+    - Tasks
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/taskPool"
+  body:
+    type: json
+    data: "{}"
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Created
+    request:
+      url: "{{baseUrl}}/api/taskPool"
+      method: POST
+      body:
+        type: json
+        data: "{}"
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": "",
+            "insertedId": ""
+          }
+
+docs: Adds a new task to the pool.

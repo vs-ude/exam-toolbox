@@ -1,0 +1,76 @@
+info:
+  name: Update task
+  type: http
+  seq: 9
+  tags:
+    - Tasks
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/taskPool/:taskId"
+  params:
+    - name: taskId
+      value: ""
+      type: path
+  body:
+    type: json
+    data: "{}"
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Updated
+    request:
+      url: "{{baseUrl}}/api/taskPool/:taskId"
+      method: PUT
+      params:
+        - name: taskId
+          value: ""
+          type: path
+      body:
+        type: json
+        data: "{}"
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+  - name: 404 Response
+    description: Not found
+    request:
+      url: "{{baseUrl}}/api/taskPool/:taskId"
+      method: PUT
+      params:
+        - name: taskId
+          value: ""
+          type: path
+      body:
+        type: json
+        data: "{}"
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }

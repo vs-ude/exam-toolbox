@@ -1,0 +1,81 @@
+info:
+  name: Resolve user objects
+  type: http
+  seq: 4
+  tags:
+    - Auth
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/auth/users"
+  params:
+    - name: uids
+      value: ""
+      type: query
+      description: One or more user UIDs to resolve
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Resolved user objects
+    request:
+      url: "{{baseUrl}}/api/auth/users"
+      method: GET
+      params:
+        - name: uids
+          value: ""
+          type: query
+          description: One or more user UIDs to resolve
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "users": [
+              {
+                "uid": "",
+                "name": "",
+                "email": "",
+                "groups": [],
+                "active": false,
+                "lastLoginAt": ""
+              }
+            ]
+          }
+  - name: 400 Response
+    description: No UIDs provided
+    request:
+      url: "{{baseUrl}}/api/auth/users"
+      method: GET
+      params:
+        - name: uids
+          value: ""
+          type: query
+          description: One or more user UIDs to resolve
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+
+docs: Returns full user objects for a list of UIDs supplied as repeated query params.

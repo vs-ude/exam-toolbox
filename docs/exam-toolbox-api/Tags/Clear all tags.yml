@@ -1,0 +1,41 @@
+info:
+  name: Clear all tags
+  type: http
+  seq: 3
+  tags:
+    - Tags
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/tags"
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: All tags deleted
+    request:
+      url: "{{baseUrl}}/api/tags"
+      method: DELETE
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": "",
+            "deletedCount": 0
+          }
+
+docs: Removes all tags. Intended for development/testing only.

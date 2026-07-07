@@ -1,0 +1,53 @@
+info:
+  name: Health check
+  type: http
+  seq: 1
+  tags:
+    - System
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/health"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: All dependencies are healthy
+    request:
+      url: "{{baseUrl}}/api/health"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "db": false,
+            "ldap": false
+          }
+  - name: 500 Response
+    description: One or more dependencies are unavailable
+    request:
+      url: "{{baseUrl}}/api/health"
+      method: GET
+    response:
+      status: 500
+      statusText: Internal Server Error
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: ""
+
+docs: Returns the operational status of backend dependencies (database and LDAP).
