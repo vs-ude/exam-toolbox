@@ -11,7 +11,7 @@
     [ngStyle]="{ backgroundColor: mouseHoveringCard ? '#0000002a' : taskColor }"
   >
     <img
-      src="{{ task.type + '.svg' }}"
+      [src]="publicPath + task.type + '.svg'"
       alt="Task Type Icon"
       class="task_icon"
     />
