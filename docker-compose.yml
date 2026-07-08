@@ -4,8 +4,8 @@ services:
       context: ./caddy/
     command: caddy run --config /etc/caddy/Caddyfile --watch
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - ./caddy/conf:/etc/caddy
       - caddy_data:/data # https://caddyserver.com/docs/conventions#data-directory
@@ -44,7 +44,7 @@ services:
           action: sync
         - path: ./frontend/
           include:
-            - "*.json"
+            - '*.json'
             - Dockerfile
           action: rebuild
 
@@ -58,19 +58,19 @@ services:
       - uploads:/app/uploads
     environment:
       DB_CONNSTRING: mongodb://mongo:27017/examToolboxDB
-      AUTH_LDAP_URL: "ldap://ldap-host:389"
-      AUTH_LDAP_BIND_DN: "cn=readonly,dc=university,dc=example"
-      AUTH_LDAP_BIND_PASSWORD: "readonly"
-      AUTH_LDAP_USER_SEARCH_BASE: "ou=users,ou=accounts,dc=university,dc=example"
-      AUTH_LDAP_GROUP_DN_BASE: "cn=%s,ou=groups,ou=accounts,dc=university,dc=example"
-      AUTH_LDAP_GROUPS_REQUIRED: "toolboxUsers"
-      AUTH_LDAP_GROUPS_ADMIN: "admins"
-      AUTH_LDAP_GROUPS_FULL: "teachers"
-      AUTH_JWT_SECRET: "ad06569335976252a1cea6ee4521f0c33e2fa93507e228a053dc8b75f3418312"
+      AUTH_LDAP_URL: 'ldap://ldap-host:389'
+      AUTH_LDAP_BIND_DN: 'cn=readonly,dc=university,dc=example'
+      AUTH_LDAP_BIND_PASSWORD: 'readonly'
+      AUTH_LDAP_USER_SEARCH_BASE: 'ou=users,ou=accounts,dc=university,dc=example'
+      AUTH_LDAP_GROUP_DN_BASE: 'cn=%s,ou=groups,ou=accounts,dc=university,dc=example'
+      AUTH_LDAP_GROUPS_REQUIRED: 'toolboxUsers'
+      AUTH_LDAP_GROUPS_ADMIN: 'admins'
+      AUTH_LDAP_GROUPS_FULL: 'teachers'
+      AUTH_JWT_SECRET: 'ad06569335976252a1cea6ee4521f0c33e2fa93507e228a053dc8b75f3418312'
       SMTP_HOST: mailcrab
       SMTP_PORT: 1025
       SMTP_FROM: noreply@example.com
-      SERVER_PUBLIC_URL: "https://${DOMAIN}"
+      SERVER_PUBLIC_URL: 'https://${DOMAIN}'
       PATHS_CACHE_DIR: /app/cache
       PATHS_JOBS_DIR: /app/jobs
       CONFIG: /app/config.yaml
@@ -84,8 +84,8 @@ services:
       watch:
         - path: ./backend/
           include:
-            - "**/*.ts"
-            - "server.ts"
+            - '**/*.ts'
+            - 'server.ts'
             - config.yaml
           action: sync+restart
           target: /app/
@@ -101,8 +101,8 @@ services:
     container_name: mailcrab
     restart: unless-stopped
     ports:
-      - "1080:1080"
-      - "1025:1025"
+      - '1080:1080'
+      - '1025:1025'
     networks:
       - web
 
@@ -110,7 +110,7 @@ services:
     image: mongo:6.0
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - mongodb_data:/data/db
     networks:
@@ -122,13 +122,12 @@ services:
     restart: unless-stopped
     networks:
       web:
-    environment:
+    environment: # LDAP Admin Login: cn=admin,dc=university,dc=example (default)
       OPENLDAP_DEBUG_LEVEL: 256 # See Table 7.1 at https://www.openldap.org/doc/admin24/runningslapd.html
-      LDAP_ORGANISATION: "University"
+      LDAP_ORGANISATION: 'University'
       LDAP_DOMAIN: university.example
       LDAP_BASE_DN: dc=university,dc=example
-      LDAP_ADMIN_PASSWORD: "admin" # LDAP Admin Login: cn=admin,dc=university,dc=example
-      LDAP_READONLY_USER: "True" # username: "readonly", pw: "readonly"
+      LDAP_READONLY_USER: 'True' # username: "readonly", pw: "readonly"
     volumes:
       # make users/config persistent
       - ldap_data:/var/lib/ldap
@@ -141,10 +140,10 @@ services:
     networks:
       web:
     ports:
-      - "6080:80"
+      - '6080:80'
     environment:
       PHPLDAPADMIN_LDAP_HOSTS: ldap-host
-      PHPLDAPADMIN_HTTPS: "false"
+      PHPLDAPADMIN_HTTPS: 'false'
     depends_on:
       - ldap-host
 

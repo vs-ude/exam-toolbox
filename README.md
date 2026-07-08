@@ -133,6 +133,17 @@ deno task test                   # unit tests
 deno task test:integration       # integration tests (requires additional binaries)
 ```
 
+### End-to-End Tests
+
+These are run with [Cypress](https://www.cypress.io/) on our GitLab Runner.
+The easiest way to run them locally is to set up [GitLab CI Local](https://github.com/firecow/gitlab-ci-local) and run `gitlab-ci-local cypress_e2e --mount-cache`.
+This requires Docker.
+
+You can then inspect the output in the `.gitlab-ci-local` directory.
+There are logs for all services (LDAP, DB, etc.) in the `outputs` folder,
+screenshots of failures in `artifacts/cypress_e2e/cypress/screenshots/`
+and logs from the frontend and backend in `artifacts/cypress_e2e/.logs/`.
+
 ## Dev accounts
 
 These accounts are bootstrapped via `ldap/10-testuser.ldif`.

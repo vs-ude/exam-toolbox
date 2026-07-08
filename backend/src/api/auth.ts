@@ -1,5 +1,4 @@
 import { Context } from '@hono/hono';
-import { deleteCookie, setCookie } from '@hono/hono/cookie';
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 
 import { authenticate, syncLdapUsers } from '../services/auth.ts';
@@ -7,7 +6,6 @@ import { HandlerResult, HttpError } from '../types/handler.ts';
 import { AppEnv } from '../types/context.ts';
 import { handle } from './helpers.ts';
 import { getOrCreateDb } from '../services/db.ts';
-import { getConfig } from '../config/mod.ts';
 import {
   ErrorSchema,
   GroupSchema,
@@ -16,8 +14,6 @@ import {
   MessageSchema,
   UserSchema,
 } from './schemas.ts';
-
-const config = getConfig();
 
 // ── Route definitions ─────────────────────────────────────────────────────────
 const validateRoute = createRoute({

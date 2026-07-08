@@ -50,42 +50,81 @@ backend_tests:
 # Cypress Tests
 cypress_e2e:
   stage: test
-  image: cypress/base:20.9.0
+  image:
+    name: cypress/included:15.18.1
+    entrypoint: ['']
   services:
-    - docker:25.0.5-dind
+    - name: osixia/openldap:1.5.0
+      alias: ldap-host
+      variables:
+        LDAP_ORGANISATION: 'University'
+        LDAP_DOMAIN: university.example
+        LDAP_BASE_DN: dc=university,dc=example
+        LDAP_READONLY_USER: 'True' # username: "readonly", pw: "readonly"
+    - name: mongo:6.0
+      alias: mongo
+    - name: marlonb/mailcrab:latest
+      alias: mailcrab
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    DB_CONNSTRING: mongodb://mongo:27017/examToolboxDB
+    AUTH_LDAP_URL: 'ldap://ldap-host:389'
+    AUTH_LDAP_BIND_DN: 'cn=readonly,dc=university,dc=example'
+    AUTH_LDAP_BIND_PASSWORD: 'readonly'
+    AUTH_LDAP_USER_SEARCH_BASE: 'ou=users,ou=accounts,dc=university,dc=example'
+    AUTH_LDAP_GROUP_DN_BASE: 'cn=%s,ou=groups,ou=accounts,dc=university,dc=example'
+    AUTH_LDAP_GROUPS_REQUIRED: 'toolboxUsers'
+    AUTH_LDAP_GROUPS_ADMIN: 'admins'
+    AUTH_LDAP_GROUPS_FULL: 'teachers'
+    AUTH_JWT_SECRET: 'ad06569335976252a1cea6ee4521f0c33e2fa93507e228a053dc8b75f3418312'
+    SMTP_HOST: mailcrab
+    SMTP_PORT: 1025
+    SMTP_FROM: noreply@example.com
+    SERVER_PUBLIC_URL: 'http://localhost'
+    PATHS_TEMPLATE_BASE_PATH: '${CI_PROJECT_DIR}/backend/template'
+    PATHS_CACHE_DIR: /tmp/cache
+    PATHS_JOBS_DIR: /tmp/jobs
+    DENO_DIR: $CI_PROJECT_DIR/.deno_cache
+  cache:
+    - key:
+        files:
+          - backend/deno.lock
+          - frontend/deno.lock
+      paths:
+        - .deno_cache/
+    - key: exam-toolbox-e2e-cache
+      paths:
+        - .npm_cache/
+    - key:
+        files:
+          - .ci/backend_integration_packages.txt
+          - .ci/e2e/packages.txt
+      paths:
+        - .apt-cache/lists/
+        - .apt-cache/archives/
   before_script:
-    # default from documentation: https://docs.docker.com/engine/install/debian/
-    - apt-get update
-    - apt-get install -y ca-certificates curl
-    - install -m 0755 -d /etc/apt/keyrings
-    - curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-    - chmod a+r /etc/apt/keyrings/docker.asc
-    - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-    - apt-get update
-    - apt-get install -y docker-ce-cli docker-compose-plugin
+    - bash .ci/prepare_backend_integration.sh .ci/backend_integration_packages.txt
+    - bash .ci/prepare_backend_integration.sh .ci/e2e/packages.txt
+    - npm config set cache ${CI_PROJECT_DIR}/.npm_cache && npm i --allow-scripts deno -g deno >/dev/null
+    - bash -c 'cd backend && deno install -q'
+    - bash -c 'cd frontend && deno install -q'
+    - mkdir -p /tmp/cache /tmp/jobs /tmp/uploads # For caddy
+    - ldapadd -f ldap/10-testuser.ldif -D cn=admin,dc=university,dc=example -w admin -H ldap://ldap-host:389 > /dev/null
   script:
-    - DOCKER_IP=$(getent hosts docker | awk '{print $1}')
-    - sed -i "s/127\.0\.0\.1.*localhost/$DOCKER_IP\tlocalhost/" /etc/hosts
-    - docker compose up -d --build
-    - cd frontend
-    - npm install
-    - echo "--- CONTAINER STATUS ---"
-    - docker compose ps
-    - echo "--- CADDY LOGS ---"
-    - docker compose logs caddy
-    - export NODE_TLS_REJECT_UNAUTHORIZED=0
-    - npx wait-on tcp:localhost:443 -t 60000
-    - npx cypress run --config baseUrl=https://localhost,video=false
-  after_script:
-    - docker compose down
+    - bash .ci/e2e/start.sh
+    - cypress run --config-file cypress/cypress.config.ts --quiet
+  # after_script:
+  #   - bash .ci/e2e/print_logs_on_fail.sh
+  artifacts:
+    when: always
+    paths:
+      - .logs/*.log
+      - cypress/screenshots/**/*.png
+    expire_in: 1 day
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-      when: always
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      when: always
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
       when: always
     - if: $CI_COMMIT_BRANCH == "dev"
       when: manual
       allow_failure: true
-    - when: never

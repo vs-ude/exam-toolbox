@@ -11,6 +11,14 @@
     "cover": {
       "description": "Generate test coverage report",
       "command": "DENO_INTEGRATION_TEST=1 deno test --coverage --parallel --allow-run --allow-write --allow-read --allow-env"
+    },
+    "start": {
+      "description": "Start the server",
+      "command": "deno run --allow-net --allow-env --allow-write --allow-read --allow-run --allow-import --allow-sys server.ts"
+    },
+    "start:watch": {
+      "description": "Start the server in watch/development mode",
+      "command": "deno run --allow-net --allow-env --allow-write --allow-read --allow-run --allow-import --allow-sys --watch server.ts"
     }
   },
   "compilerOptions": {

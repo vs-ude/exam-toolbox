@@ -7,11 +7,10 @@ Cypress.Commands.add('login', (role = 'admin') => {
     // Select the correct credentials based on the role requested
     const user = creds[role];
 
-    cy.get('input[type="text"]').type(user.username);
-    cy.contains('Proceed').click();
+    cy.get('input[name="username"]').type(user.username);
 
-    cy.get('input[type="password"]').type(user.password);
-    cy.contains('Authenticate').click();
+    cy.get('input[name="password"]').type(user.password);
+    cy.get('button[type="submit"]').click();
 
     cy.visit('/#/dashboard');
   });

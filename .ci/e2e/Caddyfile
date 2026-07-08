@@ -1,0 +1,38 @@
+{
+  # detailed logs for caddy (can be disabled for production)
+  log {
+    output file {$CI_PROJECT_DIR}/.logs/caddy.log
+    level debug
+    format json
+  }
+}
+
+:80 {
+  route /public/* {
+    root * {$CI_PROJECT_DIR}/public/
+    file_server
+  }
+
+  # This is not protected in e2e testing
+  route /uploads/* {
+    root * /tmp/uploads
+    file_server
+  }
+
+  @frontend {
+    not path /api/* /public/* /uploads/*
+  }
+
+  # frontend
+  route @frontend {
+    reverse_proxy localhost:4200
+  }
+
+  # reverse-proxy api requests to backend (backend defined in docker-compose.yml)
+  route /api/* {
+    reverse_proxy localhost:3000
+  }
+
+  # optional optimization: compresses communication to browser if possible
+  encode gzip zstd
+}

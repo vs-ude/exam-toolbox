@@ -45,4 +45,4 @@ EXPOSE 3000
 ENV MONGODB_URI=mongodb://mongo:27017/examToolboxDB
 
 # Run the server.ts script using Deno
-CMD ["deno", "run", "--allow-net", "--allow-env", "--allow-write", "--allow-read", "--allow-run", "--allow-import", "--allow-sys", "--watch", "server.ts"]
+CMD ["deno", "task", "start:watch"]
