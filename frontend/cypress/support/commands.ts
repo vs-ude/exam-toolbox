@@ -1,19 +1,19 @@
-Cypress.Commands.add("login", (role = "admin") => {
+Cypress.Commands.add('login', (role = 'admin') => {
   cy.clearCookies();
   cy.clearLocalStorage();
-  cy.visit("/");
+  cy.visit('/');
 
-  cy.fixture("credentials").then((creds) => {
+  cy.fixture('credentials').then(creds => {
     // Select the correct credentials based on the role requested
     const user = creds[role];
 
     cy.get('input[type="text"]').type(user.username);
-    cy.contains("Proceed").click();
+    cy.contains('Proceed').click();
 
     cy.get('input[type="password"]').type(user.password);
-    cy.contains("Authenticate").click();
+    cy.contains('Authenticate').click();
 
-    cy.visit("/#/dashboard");
+    cy.visit('/#/dashboard');
   });
 });
 
