@@ -55,10 +55,10 @@ export class ExamToolboxDatabase {
     return (await this.collections.exams.find().toArray()).map(parseExam);
   }
 
-  async getRecentExams(userId: string, limit: number): Promise<Exam[]> {
+  async getRecentExams(user: User, limit: number): Promise<Exam[]> {
     return (
       await this.collections.exams
-        .find({ lastEditedBy: userId })
+        .find({ lastEditedBy: user.sub })
         .sort({ updatedAt: -1 })
         .limit(limit)
         .toArray()
@@ -230,7 +230,7 @@ export class ExamToolboxDatabase {
     const now = new Date();
     user.lastLoginAt = now;
     await this.collections.users.updateOne(
-      { uid: user.uid },
+      { sub: user.sub },
       {
         $set: user,
         $setOnInsert: { createdAt: now },
@@ -241,7 +241,7 @@ export class ExamToolboxDatabase {
 
   async getUsers(uids: string[]): Promise<User[]> {
     const results = await this.collections.users
-      .find({ uid: { $in: uids } })
+      .find({ sub: { $in: uids } })
       .toArray();
     const users: User[] = results.map(res => {
       delete res._id;

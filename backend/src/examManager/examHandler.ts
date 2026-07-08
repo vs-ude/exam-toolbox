@@ -10,6 +10,7 @@ import { AppEnv } from '../types/context.ts';
 import { Exam } from '../types/exam.ts';
 import { HandlerResult, HttpError } from '../types/handler.ts';
 import { Student } from '../types/student.ts';
+import { User } from '../types/user.ts';
 
 import {
   compileExam,
@@ -32,8 +33,8 @@ export async function getRecentExams(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const userId = c.get('jwtPayload').sub;
-  const recentExams = await deps.db.getRecentExams(userId, 8);
+  const user = c.get('jwtPayload') as User;
+  const recentExams = await deps.db.getRecentExams(user, 8);
   return { kind: 'json', status: 200, body: recentExams };
 }
 

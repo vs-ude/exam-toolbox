@@ -1,5 +1,5 @@
 <div class="main">
-  <div class="sidenav" id="sidenav" #sidenav>
+  <div class="sidenav" id="sidenav" #sidenav *ngIf="!isLoginPage()">
     <button class="dropdown-button">
       <div class="user-profile">
         <div class="avatar">{{ initialLetter }}</div>
@@ -117,8 +117,11 @@
     </button>
   </div>
 
-  <div class="separator-vertical" *ngIf="!isNavCollapsed"></div>
-  <div class="content" #content>
+  <div
+    class="separator-vertical"
+    *ngIf="!isNavCollapsed && !isLoginPage()"
+  ></div>
+  <div class="content" #content [style.width]="isLoginPage() ? '100%' : ''">
     <router-outlet></router-outlet>
   </div>
 </div>

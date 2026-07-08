@@ -1,11 +1,12 @@
 import { Component, ElementRef, ViewChild, viewChild } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
-import { RouterOutlet, RouterModule, Router } from '@angular/router';
+import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { ThemeToggleService } from '../../services/theme-toggle.service';
 import { MatIcon } from '@angular/material/icon';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 import { NgIf } from '@angular/common';
 
 @Component({
@@ -27,25 +28,33 @@ export class MainViewComponent {
   public username: string = '';
   public initialLetter: string = '';
   public isNavCollapsed: boolean = false;
-  @ViewChild('sidenav') sidenav!: ElementRef;
-  @ViewChild('content') content!: ElementRef;
+  @ViewChild('sidenav')
+  sidenav!: ElementRef;
+  @ViewChild('content')
+  content!: ElementRef;
 
   constructor(
     private themeToggleService: ThemeToggleService,
     private api: ApiService,
+    private authService: AuthService,
     private router: Router,
   ) {}
 
   ngOnInit() {
     this.api.getUser().subscribe(user => {
-      this.username = user.id;
-      this.initialLetter = user.id[0];
+      this.username = user.name || user.sub;
+      this.initialLetter = this.username ? this.username[0].toUpperCase() : '';
     });
   }
 
+  isLoginPage(): boolean {
+    return this.router.url.includes('/login');
+  }
+
   onLogout() {
-    console.log('-- Logging out --');
-    window.location.href = '/auth/logout';
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/login']);
+    });
   }
 
   toggleTheme() {

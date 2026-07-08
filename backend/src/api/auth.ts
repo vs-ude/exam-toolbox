@@ -175,17 +175,13 @@ async function login(c: Context<AppEnv>): Promise<HandlerResult> {
     throw new HttpError(401, 'authentication unsuccessful');
   }
 
-  setCookie(c, 'auth_token', token, {
-    httpOnly: !config.server.publicUrl.startsWith('https://'),
-    sameSite: 'Lax',
-    maxAge: 60 * 60 * 24 * 30,
-  });
-
   return { kind: 'json', status: 200, body: { token } };
 }
 
-function logout(c: Context<AppEnv>): HandlerResult {
-  deleteCookie(c, 'auth_token');
+/**
+ * This is a no-op route since 'logging out' is done by clearing the auth_token on the client side.
+ */
+function logout(_: Context<AppEnv>): HandlerResult {
   return { kind: 'json', status: 200, body: { message: 'Logged out' } };
 }
 

@@ -103,7 +103,6 @@ app.use((c, next) => {
   return jwt({
     secret: config.auth.jwt.secret,
     alg: 'HS384',
-    cookie: 'auth_token',
   })(c, next);
 });
 

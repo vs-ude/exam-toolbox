@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Observable, timeout } from 'rxjs';
+import { filter, Observable, timeout } from 'rxjs';
 import { Exam, Task } from '../exam';
 import { User } from '../user';
 import { Tag } from '../tag';
+import { AuthService } from './auth.service';
 
 export interface JobStatus {
   jobId: string;
@@ -27,7 +28,10 @@ export interface DownloadableJob {
 export class ApiService {
   private apiUrl = '/api';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+  ) {}
 
   startMassExamGeneration(
     exam: Exam,
@@ -45,8 +49,10 @@ export class ApiService {
     );
   }
 
-  getUser() {
-    return this.http.get<User>(`/api/user`);
+  getUser(): Observable<User> {
+    return this.authService.currentUser$.pipe(
+      filter((user): user is User => user !== null),
+    );
   }
 
   // -------

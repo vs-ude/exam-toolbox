@@ -13,11 +13,7 @@ const LDAP_USER_FIELDS = ['uid', 'cn', 'sn', 'givenName', 'mail', 'memberOf'];
 /**
  * Represents the payload of a JWT.
  */
-export interface JwtPayload {
-  sub: string;
-  email: string;
-  name: string;
-  groups: string[];
+export interface JwtPayload extends Omit<User, 'active' | 'lastLoginAt'> {
   iat: number;
   exp: number;
 }
@@ -112,7 +108,7 @@ export async function authenticate(
 
     // Ensure the payload is in the format we expect in validation
     const payload: JwtPayload = {
-      sub: user.uid,
+      sub: user.sub,
       email: user.email,
       name: user.name,
       groups: user.groups,
@@ -278,7 +274,7 @@ export async function syncLdapUsers(): Promise<string[]> {
     for (const entry of searchEntries) {
       const user = ldapEntityToUser(entry);
       await db.upsertUser(user);
-      uids.push(user.uid);
+      uids.push(user.sub);
     }
 
     return uids;
@@ -322,7 +318,7 @@ function ldapEntityToUser(entry: Entry): User {
   const name = cn || `${givenName ?? ''} ${sn}`.trim() || uid;
 
   return {
-    uid,
+    sub: uid,
     name,
     email,
     groups: filterGroups(memberOf),

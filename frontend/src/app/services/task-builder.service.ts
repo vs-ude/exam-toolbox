@@ -7,11 +7,7 @@ import { User } from '../user';
   providedIn: 'root',
 })
 export class TaskBuilderService {
-  private user: User = {
-    id: 'placeholder_id',
-    email: 'placeholder_email',
-    roles: ['placeholder_role'],
-  };
+  private user: User = new User();
 
   constructor(apiService: ApiService) {
     apiService.getUser().subscribe(
