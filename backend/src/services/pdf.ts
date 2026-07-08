@@ -9,15 +9,15 @@ export async function mergePdfs(
   // -dNOPAUSE -dBATCH: process all files and exit
   // -sDEVICE=pdfwrite: write merged PDF output
   const args = [
-    "-q",
-    "-dNOPAUSE",
-    "-dBATCH",
-    "-sDEVICE=pdfwrite",
+    '-q',
+    '-dNOPAUSE',
+    '-dBATCH',
+    '-sDEVICE=pdfwrite',
     `-sOutputFile=${output}`,
     ...files,
   ];
 
-  const cmd = new Deno.Command("gs", { args });
+  const cmd = new Deno.Command('gs', { args });
   const { success, stderr } = await cmd.output();
 
   if (!success) {

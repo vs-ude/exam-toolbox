@@ -1,14 +1,14 @@
-import { Client, Entry, NoSuchObjectError } from "ldapts";
-import { sign } from "@hono/hono/jwt";
+import { Client, Entry, NoSuchObjectError } from 'ldapts';
+import { sign } from '@hono/hono/jwt';
 
-import { getConfig } from "../config/appConfig.ts";
-import { HttpError } from "../types/handler.ts";
-import { Rights, User } from "../types/user.ts";
+import { getConfig } from '../config/appConfig.ts';
+import { HttpError } from '../types/handler.ts';
+import { Rights, User } from '../types/user.ts';
 
-import { getOrCreateDb } from "./db.ts";
+import { getOrCreateDb } from './db.ts';
 
 const config = getConfig().auth;
-const LDAP_USER_FIELDS = ["uid", "cn", "sn", "givenName", "mail", "memberOf"];
+const LDAP_USER_FIELDS = ['uid', 'cn', 'sn', 'givenName', 'mail', 'memberOf'];
 
 /**
  * Represents the payload of a JWT.
@@ -51,12 +51,12 @@ export async function waitForLdapConnection(timeout: number) {
       await testLDAPConnection();
       return;
     } catch {
-      console.info("LDAP connection failed, retrying...");
+      console.info('LDAP connection failed, retrying...');
       count++;
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
-  throw new Error("Timed out while waiting for LDAP connection.");
+  throw new Error('Timed out while waiting for LDAP connection.');
 }
 
 /**
@@ -90,7 +90,7 @@ export async function authenticate(
   username: string,
   password: string,
 ): Promise<string> {
-  const safeUsername = sanitizeInput(username, "username");
+  const safeUsername = sanitizeInput(username, 'username');
 
   const client = new Client({ url: config.ldap.url });
 
@@ -103,7 +103,7 @@ export async function authenticate(
     try {
       await client.bind(entry.dn, password);
     } catch {
-      throw new HttpError(401, "Invalid credentials");
+      throw new HttpError(401, 'Invalid credentials');
     }
 
     // Sync to DB
@@ -117,8 +117,8 @@ export async function authenticate(
       name: user.name,
       groups: user.groups,
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) +
-        config.jwt.lifetimeDays * 24 * 60 * 60,
+      exp:
+        Math.floor(Date.now() / 1000) + config.jwt.lifetimeDays * 24 * 60 * 60,
     };
 
     // Sign and return JWT
@@ -127,7 +127,7 @@ export async function authenticate(
         ...payload,
       },
       config.jwt.secret,
-      "HS384",
+      'HS384',
     );
     // return await signJwt({
     //   sub: user.uid,
@@ -150,7 +150,7 @@ export async function authenticate(
  * @returns `true` if the user exists, `false` otherwise.
  */
 export async function checkUserExists(username: string): Promise<boolean> {
-  const safeUsername = sanitizeInput(username, "username");
+  const safeUsername = sanitizeInput(username, 'username');
   const client = new Client({ url: config.ldap.url });
   try {
     await getUserObject(client, safeUsername);
@@ -179,24 +179,21 @@ async function getUserObject(
   await client.bind(config.ldap.bindDn, config.ldap.bindPassword);
 
   // 2. Search for the user
-  const filter = config.ldap.searchFilter.replace(
-    /%s/g,
-    safeUsername,
-  );
+  const filter = config.ldap.searchFilter.replace(/%s/g, safeUsername);
   const { searchEntries } = await client.search(config.ldap.searchBase, {
     filter,
-    scope: "sub",
-    attributes: ["dn"].concat(LDAP_USER_FIELDS),
+    scope: 'sub',
+    attributes: ['dn'].concat(LDAP_USER_FIELDS),
   });
 
   if (searchEntries.length === 0) {
-    throw new HttpError(401, "User not found");
+    throw new HttpError(401, 'User not found');
   }
   const entry = searchEntries[0];
 
   // 3. Check required group membership
   if (!isInRequiredGroup(entry.memberOf as string | string[])) {
-    throw new HttpError(403, "User is not a member of the required group");
+    throw new HttpError(403, 'User is not a member of the required group');
   }
   return entry;
 }
@@ -207,7 +204,7 @@ async function getUserObject(
  * @throws If one of the configured groups is not found in LDAP.
  */
 export async function setupConfiguredGroups(): Promise<void> {
-  console.info("Setting up configured groups", config.ldap.groups);
+  console.info('Setting up configured groups', config.ldap.groups);
   const client = new Client({ url: config.ldap.url });
   await client.bind(config.ldap.bindDn, config.ldap.bindPassword);
 
@@ -215,9 +212,9 @@ export async function setupConfiguredGroups(): Promise<void> {
   async function checkAndUpsert(group: string, rights: undefined | Rights) {
     try {
       const { searchEntries } = await client.search(`${groupDn(group)}`, {
-        filter: "(objectClass=*)",
-        scope: "base",
-        attributes: [""],
+        filter: '(objectClass=*)',
+        scope: 'base',
+        attributes: [''],
       });
       if (searchEntries.length === 0) {
         throw new Error(`Group ${group} not found in LDAP`);
@@ -236,12 +233,16 @@ export async function setupConfiguredGroups(): Promise<void> {
 
   try {
     await checkAndUpsert(config.ldap.groups.required, undefined);
-    await Promise.all(config.ldap.groups.admin.map(async (group) => {
-      await checkAndUpsert(group, "admin");
-    }));
-    await Promise.all(config.ldap.groups.full.map(async (group) => {
-      await checkAndUpsert(group, "full");
-    }));
+    await Promise.all(
+      config.ldap.groups.admin.map(async group => {
+        await checkAndUpsert(group, 'admin');
+      }),
+    );
+    await Promise.all(
+      config.ldap.groups.full.map(async group => {
+        await checkAndUpsert(group, 'full');
+      }),
+    );
   } finally {
     try {
       await client.unbind();
@@ -267,7 +268,7 @@ export async function syncLdapUsers(): Promise<string[]> {
     // Search for all users that are members of the required group
     const { searchEntries } = await client.search(config.ldap.searchBase, {
       filter: `(memberOf=${groupDn(config.ldap.groups.required)})`,
-      scope: "sub",
+      scope: 'sub',
       attributes: LDAP_USER_FIELDS,
     });
 
@@ -298,21 +299,27 @@ export async function syncLdapUsers(): Promise<string[]> {
  */
 function ldapEntityToUser(entry: Entry): User {
   const uid = (Array.isArray(entry.uid) ? entry.uid[0] : entry.uid) as string;
-  const cn = (Array.isArray(entry.cn) ? entry.cn[0] : entry.cn ?? "") as string;
-  const sn = (Array.isArray(entry.sn) ? entry.sn[0] : entry.sn ?? "") as string;
-  const givenName =
-    (Array.isArray(entry.givenName)
+  const cn = (
+    Array.isArray(entry.cn) ? entry.cn[0] : (entry.cn ?? '')
+  ) as string;
+  const sn = (
+    Array.isArray(entry.sn) ? entry.sn[0] : (entry.sn ?? '')
+  ) as string;
+  const givenName = (
+    Array.isArray(entry.givenName)
       ? entry.givenName[0]
-      : entry.givenName ?? "") as string;
-  const email =
-    (Array.isArray(entry.mail) ? entry.mail[0] : entry.mail ?? "") as string;
+      : (entry.givenName ?? '')
+  ) as string;
+  const email = (
+    Array.isArray(entry.mail) ? entry.mail[0] : (entry.mail ?? '')
+  ) as string;
   const memberOf: string[] = entry.memberOf
-    ? (Array.isArray(entry.memberOf)
-      ? entry.memberOf
-      : [entry.memberOf]) as string[]
+    ? ((Array.isArray(entry.memberOf)
+        ? entry.memberOf
+        : [entry.memberOf]) as string[])
     : [];
 
-  const name = cn || `${givenName ?? ""} ${sn}`.trim() || uid;
+  const name = cn || `${givenName ?? ''} ${sn}`.trim() || uid;
 
   return {
     uid,
@@ -330,7 +337,7 @@ function ldapEntityToUser(entry: Entry): User {
  * @returns The full DN of the group.
  */
 function groupDn(name: string): string {
-  return config.ldap.groupDnBase.replace("%s", name);
+  return config.ldap.groupDnBase.replace('%s', name);
 }
 
 /**
@@ -340,10 +347,11 @@ function groupDn(name: string): string {
  * @returns The filtered list of group names (not DN!).
  */
 function filterGroups(groups: string[]): string[] {
-  const targets = [config.ldap.groups.required].concat(config.ldap.groups.admin)
+  const targets = [config.ldap.groups.required]
+    .concat(config.ldap.groups.admin)
     .concat(config.ldap.groups.full);
   let result: string[] = [];
-  targets.forEach((group) => {
+  targets.forEach(group => {
     if (groups.includes(groupDn(group))) {
       result = result.concat(group);
     }
@@ -357,14 +365,12 @@ function filterGroups(groups: string[]): string[] {
  * @param memberOf The user's group memberships as retrieved from the LDAP entry.
  * @returns `true` if the user is in the required group, `false` otherwise.
  */
-function isInRequiredGroup(
-  memberOf: string | string[],
-): boolean {
+function isInRequiredGroup(memberOf: string | string[]): boolean {
   let list: string[] = [];
-  if (typeof memberOf === "string") {
+  if (typeof memberOf === 'string') {
     list = [memberOf];
   } else if (Array.isArray(memberOf)) {
     list = memberOf as string[];
   }
-  return list.some((group) => group === groupDn(config.ldap.groups.required));
+  return list.some(group => group === groupDn(config.ldap.groups.required));
 }

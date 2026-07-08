@@ -1,37 +1,37 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals } from '@std/assert';
 import {
   Exam,
   type NewPage,
   type ShortAnswerTask,
   type TaskGroup,
-} from "./exam.ts";
+} from './exam.ts';
 
 function makeShortAnswerTask(taskId: string, points: number): ShortAnswerTask {
   return {
     taskId,
-    type: "shortAnswer",
-    question: { DE: "Frage", EN: "Question" },
+    type: 'shortAnswer',
+    question: { DE: 'Frage', EN: 'Question' },
     points,
     tagIds: [],
     tags: [],
-    createdBy: "tester",
+    createdBy: 'tester',
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
     children: [],
-    solution: { DE: "Lösung", EN: "Solution" },
+    solution: { DE: 'Lösung', EN: 'Solution' },
   };
 }
 
 function makeNewPageTask(taskId: string): NewPage {
   return {
     taskId,
-    type: "newPage",
-    question: { DE: "", EN: "" },
+    type: 'newPage',
+    question: { DE: '', EN: '' },
     points: 0,
     tagIds: [],
     tags: [],
-    createdBy: "tester",
+    createdBy: 'tester',
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
@@ -39,13 +39,13 @@ function makeNewPageTask(taskId: string): NewPage {
   };
 }
 
-Deno.test("Exam constructor sets placeholders and defaults", () => {
+Deno.test('Exam constructor sets placeholders and defaults', () => {
   const exam = new Exam();
 
-  assertEquals(exam.courseName, "placeholder");
-  assertEquals(exam.examinerName, "placeholder");
-  assertEquals(exam.semester, "placeholder");
-  assertEquals(exam.date, "placeholder");
+  assertEquals(exam.courseName, 'placeholder');
+  assertEquals(exam.examinerName, 'placeholder');
+  assertEquals(exam.semester, 'placeholder');
+  assertEquals(exam.date, 'placeholder');
   assertEquals(exam.examLengthMinutes, 0);
   assertEquals(exam.tasks, []);
   assertEquals(exam._id, undefined);
@@ -54,67 +54,84 @@ Deno.test("Exam constructor sets placeholders and defaults", () => {
   assertEquals(exam.conceptPages, undefined);
 });
 
-Deno.test("Exam.fillPagesAndPoints computes defaults when there are no tasks", () => {
-  const exam = new Exam();
+Deno.test(
+  'Exam.fillPagesAndPoints computes defaults when there are no tasks',
+  () => {
+    const exam = new Exam();
 
-  exam.fillPagesAndPoints();
+    exam.fillPagesAndPoints();
 
-  assertEquals(exam.points, 0);
-  // 0 (task headings) + 0 (newPage tasks) + 2 default concept pages + 3 fixed pages = 5
-  // then rounded up to even page count by adding one concept page.
-  assertEquals(exam.pageCount, 6);
-  assertEquals(exam.conceptPages, 3);
-});
+    assertEquals(exam.points, 0);
+    // 0 (task headings) + 0 (newPage tasks) + 2 default concept pages + 3 fixed pages = 5
+    // then rounded up to even page count by adding one concept page.
+    assertEquals(exam.pageCount, 6);
+    assertEquals(exam.conceptPages, 3);
+  },
+);
 
-Deno.test("Exam.fillPagesAndPoints sums task points and keeps an even page count", () => {
-  const tasks: TaskGroup[] = [
-    {
-      groupNumber: 1,
-      groupTitle: { DE: "Teil A", EN: "Part A" },
-      tasks: [makeShortAnswerTask("task-1", 5)],
-    },
-  ];
+Deno.test(
+  'Exam.fillPagesAndPoints sums task points and keeps an even page count',
+  () => {
+    const tasks: TaskGroup[] = [
+      {
+        groupNumber: 1,
+        groupTitle: { DE: 'Teil A', EN: 'Part A' },
+        tasks: [makeShortAnswerTask('task-1', 5)],
+      },
+    ];
 
-  const exam = new Exam("Course", "Examiner", "WS", "2026-01-01", 90, tasks);
-  exam.conceptPages = 2;
+    const exam = new Exam('Course', 'Examiner', 'WS', '2026-01-01', 90, tasks);
+    exam.conceptPages = 2;
 
-  exam.fillPagesAndPoints();
+    exam.fillPagesAndPoints();
 
-  assertEquals(exam.points, 5);
-  // 1 (task headings) + 0 (newPage task) + 2 concept pages + 3 fixed pages = 6
-  // then rounded up to even page count by adding one concept page.
-  assertEquals(exam.pageCount, 6);
-  assertEquals(exam.conceptPages, 2);
-});
+    assertEquals(exam.points, 5);
+    // 1 (task headings) + 0 (newPage task) + 2 concept pages + 3 fixed pages = 6
+    // then rounded up to even page count by adding one concept page.
+    assertEquals(exam.pageCount, 6);
+    assertEquals(exam.conceptPages, 2);
+  },
+);
 
-Deno.test("Exam.fillPagesAndPoints sums task points and evens up the page count", () => {
-  const tasks: TaskGroup[] = [
-    {
-      groupNumber: 1,
-      groupTitle: { DE: "Teil A", EN: "Part A" },
-      tasks: [makeShortAnswerTask("task-1", 5), makeNewPageTask("page-break")],
-    },
-    {
-      groupNumber: 2,
-      groupTitle: { DE: "Teil B", EN: "Part B" },
-      tasks: [makeShortAnswerTask("task-2", 3), makeNewPageTask("page-break")],
-    },
-  ];
+Deno.test(
+  'Exam.fillPagesAndPoints sums task points and evens up the page count',
+  () => {
+    const tasks: TaskGroup[] = [
+      {
+        groupNumber: 1,
+        groupTitle: { DE: 'Teil A', EN: 'Part A' },
+        tasks: [
+          makeShortAnswerTask('task-1', 5),
+          makeNewPageTask('page-break'),
+        ],
+      },
+      {
+        groupNumber: 2,
+        groupTitle: { DE: 'Teil B', EN: 'Part B' },
+        tasks: [
+          makeShortAnswerTask('task-2', 3),
+          makeNewPageTask('page-break'),
+        ],
+      },
+    ];
 
-  const exam = new Exam("Course", "Examiner", "WS", "2026-01-01", 90, tasks);
-  exam.conceptPages = 2;
+    const exam = new Exam('Course', 'Examiner', 'WS', '2026-01-01', 90, tasks);
+    exam.conceptPages = 2;
 
-  exam.fillPagesAndPoints();
+    exam.fillPagesAndPoints();
 
-  assertEquals(exam.points, 8);
-  // 2 (task headings) + 2 (newPage task) + 2 concept pages + 3 fixed pages = 9
-  // then rounded up to even page count by adding one concept page.
-  assertEquals(exam.pageCount, 10);
-  assertEquals(exam.conceptPages, 3);
-});
+    assertEquals(exam.points, 8);
+    // 2 (task headings) + 2 (newPage task) + 2 concept pages + 3 fixed pages = 9
+    // then rounded up to even page count by adding one concept page.
+    assertEquals(exam.pageCount, 10);
+    assertEquals(exam.conceptPages, 3);
+  },
+);
 
-Deno.test("Exam.fillPagesAndPoints works on an exam passed from JSON data", () => {
-  const examJson = `{
+Deno.test(
+  'Exam.fillPagesAndPoints works on an exam passed from JSON data',
+  () => {
+    const examJson = `{
       "_id": "69f9fbb4902f531ec6a95d7c",
       "courseName": "DEBUG EXAM",
       "examinerName": "Dr. Jane Smith",
@@ -160,16 +177,14 @@ Deno.test("Exam.fillPagesAndPoints works on an exam passed from JSON data", () =
       "lastEditedBy": "test",
       "updatedAt": "2026-06-10T12:14:03.798Z"
   }`;
-  const exam: Exam = Object.assign(
-    new Exam(),
-    JSON.parse(examJson),
-  );
+    const exam: Exam = Object.assign(new Exam(), JSON.parse(examJson));
 
-  exam.fillPagesAndPoints();
+    exam.fillPagesAndPoints();
 
-  assertEquals(exam.points, 1);
-  // 1 (first page) + 2 concept pages + 3 fixed pages = 6
-  // then rounded up to even page count by adding one concept page.
-  assertEquals(exam.pageCount, 6);
-  assertEquals(exam.conceptPages, 2);
-});
+    assertEquals(exam.points, 1);
+    // 1 (first page) + 2 concept pages + 3 fixed pages = 6
+    // then rounded up to even page count by adding one concept page.
+    assertEquals(exam.pageCount, 6);
+    assertEquals(exam.conceptPages, 2);
+  },
+);

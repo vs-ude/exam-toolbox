@@ -1,7 +1,7 @@
-import { ExamToolboxDatabase } from "../services/db.ts";
-import { Language } from "../types/exam.ts";
+import { ExamToolboxDatabase } from '../services/db.ts';
+import { Language } from '../types/exam.ts';
 
-import { ExamGenerationJob, GenerationTask } from "./runtime.ts";
+import { ExamGenerationJob, GenerationTask } from './runtime.ts';
 
 export interface ExamManagerDeps {
   db: ExamToolboxDatabase;
@@ -16,6 +16,6 @@ export interface ExamManagerDeps {
   parseLogFileForSubtaskInfo: (logContent: string) => unknown[];
 }
 
-export * from "./examHandler.ts";
-export * from "./tagHandler.ts";
-export * from "./taskPoolHandler.ts";
+export * from './examHandler.ts';
+export * from './tagHandler.ts';
+export * from './taskPoolHandler.ts';

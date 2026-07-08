@@ -1,42 +1,40 @@
-import { z } from "@hono/zod-openapi";
+import { z } from '@hono/zod-openapi';
 
-export const ErrorSchema = z
-  .object({ message: z.string() })
-  .openapi("Error");
+export const ErrorSchema = z.object({ message: z.string() }).openapi('Error');
 
 export const MessageSchema = z
   .object({ message: z.string() })
-  .openapi("Message");
+  .openapi('Message');
 
 export const InsertResultSchema = z
   .object({ message: z.string(), insertedId: z.string() })
-  .openapi("InsertResult");
+  .openapi('InsertResult');
 
 export const DeleteResultSchema = z
   .object({ message: z.string(), deletedCount: z.number() })
-  .openapi("DeleteResult");
+  .openapi('DeleteResult');
 
 export const HealthSchema = z
   .object({ db: z.boolean(), ldap: z.boolean() })
-  .openapi("Health");
+  .openapi('Health');
 
 export const LoginBodySchema = z
   .object({
-    username: z.string().openapi({ example: "test1" }),
-    password: z.string().openapi({ example: "testpass" }),
+    username: z.string().openapi({ example: 'test1' }),
+    password: z.string().openapi({ example: 'testpass' }),
   })
-  .openapi("LoginBody");
+  .openapi('LoginBody');
 
 export const LoginResponseSchema = z
   .object({ token: z.string() })
-  .openapi("LoginResponse");
+  .openapi('LoginResponse');
 
 export const GroupSchema = z
   .object({
     name: z.string(),
-    rights: z.enum(["admin", "full", "limited"]),
+    rights: z.enum(['admin', 'full', 'limited']),
   })
-  .openapi("Group");
+  .openapi('Group');
 
 export const UserSchema = z
   .object({
@@ -47,25 +45,23 @@ export const UserSchema = z
     active: z.boolean().optional(),
     lastLoginAt: z.string().datetime().optional(),
   })
-  .openapi("User");
+  .openapi('User');
 
 export const TagSchema = z
   .object({
     _id: z.string().optional(),
     name: z.string(),
     color: z.string().openapi({
-      description: "CSS colour for the tag chip background",
+      description: 'CSS colour for the tag chip background',
     }),
     textColor: z.string().openapi({
-      description: "CSS colour for the tag chip text",
+      description: 'CSS colour for the tag chip text',
     }),
   })
-  .openapi("Tag");
+  .openapi('Tag');
 
 /** Loose schema for a polymorphic task pool entry. */
-export const TaskSchema = z
-  .record(z.string(), z.unknown())
-  .openapi("Task");
+export const TaskSchema = z.record(z.string(), z.unknown()).openapi('Task');
 
 /** Top-level exam fields. Tasks are left as unknown to keep the spec concise. */
 export const ExamSummarySchema = z
@@ -82,20 +78,20 @@ export const ExamSummarySchema = z
     lastEditedBy: z.string().optional(),
     updatedAt: z.string().datetime().optional(),
   })
-  .openapi("ExamSummary");
+  .openapi('ExamSummary');
 
 export const ExamSchema = ExamSummarySchema.extend({
   tasks: z.array(z.unknown()).openapi({
-    description: "Task groups making up the exam",
+    description: 'Task groups making up the exam',
   }),
-}).openapi("Exam");
+}).openapi('Exam');
 
 export const UpdateExamBodySchema = z
   .object({
     examId: z.string(),
     updatedExam: z.record(z.string(), z.unknown()),
   })
-  .openapi("UpdateExamBody");
+  .openapi('UpdateExamBody');
 
 const JobProgressSchema = z.object({
   total: z.number(),
@@ -107,28 +103,28 @@ export const JobStatusSchema = z
   .object({
     jobId: z.string(),
     status: z.enum([
-      "queued",
-      "processing",
-      "finalizing",
-      "completed",
-      "failed",
+      'queued',
+      'processing',
+      'finalizing',
+      'completed',
+      'failed',
     ]),
     progress: JobProgressSchema,
     downloadUrl: z.string().nullable(),
   })
-  .openapi("JobStatus");
+  .openapi('JobStatus');
 
 export const ActiveJobSchema = z
   .union([
     z.object({
       jobId: z.string(),
-      status: z.enum(["queued", "processing", "finalizing"]),
+      status: z.enum(['queued', 'processing', 'finalizing']),
       progress: JobProgressSchema,
     }),
     z.null(),
   ])
-  .openapi("ActiveJob");
+  .openapi('ActiveJob');
 
 export const DownloadableJobSchema = z
   .object({ examId: z.string(), jobId: z.string() })
-  .openapi("DownloadableJob");
+  .openapi('DownloadableJob');

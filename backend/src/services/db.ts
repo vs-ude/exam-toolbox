@@ -1,7 +1,7 @@
-import { Collection, Document, MongoClient, ObjectId } from "@db/mongo";
-import { getConfig } from "../config/appConfig.ts";
-import { Exam, parseExam, parseTask, Task } from "../types/exam.ts";
-import { Group, User } from "../types/user.ts";
+import { Collection, Document, MongoClient, ObjectId } from '@db/mongo';
+import { getConfig } from '../config/appConfig.ts';
+import { Exam, parseExam, parseTask, Task } from '../types/exam.ts';
+import { Group, User } from '../types/user.ts';
 
 let db: ExamToolboxDatabase;
 
@@ -12,13 +12,13 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
   await client.connect(getConfig().db.connString);
   const dbConn = client.database(); // We assume a database name is provided in the connection string
   const collections: Collections = {} as Collections;
-  collections.exams = dbConn.collection("exams");
-  collections.qrCodes = dbConn.collection("qrCodes");
-  collections.tags = dbConn.collection("tags");
-  collections.taskPool = dbConn.collection("taskPool");
-  collections.fileTracker = dbConn.collection("fileTracker");
-  collections.users = dbConn.collection("users");
-  collections.groups = dbConn.collection("groups");
+  collections.exams = dbConn.collection('exams');
+  collections.qrCodes = dbConn.collection('qrCodes');
+  collections.tags = dbConn.collection('tags');
+  collections.taskPool = dbConn.collection('taskPool');
+  collections.fileTracker = dbConn.collection('fileTracker');
+  collections.users = dbConn.collection('users');
+  collections.groups = dbConn.collection('groups');
   db = new ExamToolboxDatabase(client, collections);
   return db;
 }
@@ -36,10 +36,7 @@ interface Collections {
 export class ExamToolboxDatabase {
   private client: MongoClient;
   private collections: Collections = {} as Collections;
-  constructor(
-    client: MongoClient,
-    collections: Collections,
-  ) {
+  constructor(client: MongoClient, collections: Collections) {
     this.client = client;
     this.collections = collections;
   }
@@ -48,7 +45,7 @@ export class ExamToolboxDatabase {
   test(): void {
     const info = this.client.buildInfo;
     if (info === undefined) {
-      throw new Error("Failed to connect to MongoDB");
+      throw new Error('Failed to connect to MongoDB');
     }
   }
 
@@ -59,11 +56,13 @@ export class ExamToolboxDatabase {
   }
 
   async getRecentExams(userId: string, limit: number): Promise<Exam[]> {
-    return (await this.collections.exams
-      .find({ lastEditedBy: userId })
-      .sort({ updatedAt: -1 })
-      .limit(limit)
-      .toArray()).map(parseExam);
+    return (
+      await this.collections.exams
+        .find({ lastEditedBy: userId })
+        .sort({ updatedAt: -1 })
+        .limit(limit)
+        .toArray()
+    ).map(parseExam);
   }
 
   async getExamById(id: string): Promise<Exam | undefined> {
@@ -72,24 +71,23 @@ export class ExamToolboxDatabase {
   }
 
   async searchExams(text: string): Promise<Exam[]> {
-    return (await this.collections.exams
-      .find({
-        $or: [
-          { courseName: { $regex: text, $options: "i" } },
-          { semester: { $regex: text, $options: "i" } },
-        ],
-      })
-      .toArray()).map(parseExam);
+    return (
+      await this.collections.exams
+        .find({
+          $or: [
+            { courseName: { $regex: text, $options: 'i' } },
+            { semester: { $regex: text, $options: 'i' } },
+          ],
+        })
+        .toArray()
+    ).map(parseExam);
   }
 
   createExam(exam: Exam): Promise<ObjectId> {
     return this.collections.exams.insertOne(exam);
   }
 
-  updateExam(
-    id: string,
-    data: Exam,
-  ): Promise<{ matchedCount: number }> {
+  updateExam(id: string, data: Exam): Promise<{ matchedCount: number }> {
     return this.collections.exams.updateOne(
       { _id: new ObjectId(id) },
       { $set: data },
@@ -135,10 +133,7 @@ export class ExamToolboxDatabase {
     return this.collections.tags.insertOne(tag);
   }
 
-  updateTag(
-    id: string,
-    data: Document,
-  ): Promise<{ matchedCount: number }> {
+  updateTag(id: string, data: Document): Promise<{ matchedCount: number }> {
     return this.collections.tags.updateOne(
       { _id: new ObjectId(id) },
       { $set: data },
@@ -171,34 +166,35 @@ export class ExamToolboxDatabase {
   }
 
   async searchTasks(text: string): Promise<Task[]> {
-    return (await this.collections.taskPool
-      .find({
-        $or: [
-          { "question.DE": { $regex: text, $options: "i" } },
-          { "question.EN": { $regex: text, $options: "i" } },
-        ],
-      })
-      .toArray()).map(parseTask);
+    return (
+      await this.collections.taskPool
+        .find({
+          $or: [
+            { 'question.DE': { $regex: text, $options: 'i' } },
+            { 'question.EN': { $regex: text, $options: 'i' } },
+          ],
+        })
+        .toArray()
+    ).map(parseTask);
   }
 
   async getTasksByUser(userId: string): Promise<Task[]> {
-    return (await this.collections.taskPool.find({ createdBy: userId })
-      .toArray()).map(parseTask);
+    return (
+      await this.collections.taskPool.find({ createdBy: userId }).toArray()
+    ).map(parseTask);
   }
 
   async getTasksByTag(tagId: string): Promise<Task[]> {
-    return (await this.collections.taskPool.find({ tagIds: tagId }).toArray())
-      .map(parseTask);
+    return (
+      await this.collections.taskPool.find({ tagIds: tagId }).toArray()
+    ).map(parseTask);
   }
 
   createTask(task: Task): Promise<unknown> {
     return this.collections.taskPool.insertOne(task);
   }
 
-  updateTask(
-    taskId: string,
-    data: Task,
-  ): Promise<{ matchedCount: number }> {
+  updateTask(taskId: string, data: Task): Promise<{ matchedCount: number }> {
     return this.collections.taskPool.updateOne({ taskId }, { $set: data });
   }
 
@@ -244,9 +240,10 @@ export class ExamToolboxDatabase {
   }
 
   async getUsers(uids: string[]): Promise<User[]> {
-    const results = await this.collections.users.find({ uid: { $in: uids } })
+    const results = await this.collections.users
+      .find({ uid: { $in: uids } })
       .toArray();
-    const users: User[] = results.map((res) => {
+    const users: User[] = results.map(res => {
       delete res._id;
       return res as User;
     });
@@ -267,7 +264,7 @@ export class ExamToolboxDatabase {
 
   async getGroups(): Promise<Group[]> {
     const results = await this.collections.groups.find().toArray();
-    const groups: Group[] = results.map((res) => res as Group);
+    const groups: Group[] = results.map(res => res as Group);
     return groups;
   }
 

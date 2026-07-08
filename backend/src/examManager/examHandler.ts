@@ -1,121 +1,120 @@
-import { Document } from "@db/mongo";
-import { read, utils } from "@mirror/xlsx";
-import { Context } from "@hono/hono";
-import { crypto } from "@std/crypto";
-import { encodeHex } from "@std/encoding";
-import * as fs from "@std/fs";
+import { Document } from '@db/mongo';
+import { read, utils } from '@mirror/xlsx';
+import { Context } from '@hono/hono';
+import { crypto } from '@std/crypto';
+import { encodeHex } from '@std/encoding';
+import * as fs from '@std/fs';
 
-import { ensureQRCache } from "../services/qr.ts";
-import { AppEnv } from "../types/context.ts";
-import { Exam } from "../types/exam.ts";
-import { HandlerResult, HttpError } from "../types/handler.ts";
-import { Student } from "../types/student.ts";
+import { ensureQRCache } from '../services/qr.ts';
+import { AppEnv } from '../types/context.ts';
+import { Exam } from '../types/exam.ts';
+import { HandlerResult, HttpError } from '../types/handler.ts';
+import { Student } from '../types/student.ts';
 
 import {
   compileExam,
   generateSolution,
   generateTasksLatex,
   renderMetaExam,
-} from "./generation.ts";
-import { ExamManagerDeps } from "./main.ts";
-import { ExamGenerationJob } from "./runtime.ts";
+} from './generation.ts';
+import { ExamManagerDeps } from './main.ts';
+import { ExamGenerationJob } from './runtime.ts';
 
 export async function getAllExams(
   _c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const examList = await deps.db.getAllExams();
-  return { kind: "json", status: 200, body: examList };
+  return { kind: 'json', status: 200, body: examList };
 }
 
 export async function getRecentExams(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const userId = c.get("jwtPayload").sub;
+  const userId = c.get('jwtPayload').sub;
   const recentExams = await deps.db.getRecentExams(userId, 8);
-  return { kind: "json", status: 200, body: recentExams };
+  return { kind: 'json', status: 200, body: recentExams };
 }
 
 export async function getExamById(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const examId = c.req.param("id")!;
+  const examId = c.req.param('id')!;
   const exam = await deps.db.getExamById(examId);
   if (!exam) {
-    throw new HttpError(404, "Exam not found");
+    throw new HttpError(404, 'Exam not found');
   }
-  return { kind: "json", status: 200, body: exam };
+  return { kind: 'json', status: 200, body: exam };
 }
 
 export async function searchExams(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const searchText = c.req.param("searchText")!;
+  const searchText = c.req.param('searchText')!;
   const examList = await deps.db.searchExams(searchText);
-  return { kind: "json", status: 200, body: examList };
+  return { kind: 'json', status: 200, body: examList };
 }
 
 export async function downloadFile(
   c: Context<AppEnv>,
   _deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const fileUrl = c.req.query("fileUrl");
+  const fileUrl = c.req.query('fileUrl');
   if (!fileUrl) {
-    throw new HttpError(400, "File URL is required");
+    throw new HttpError(400, 'File URL is required');
   }
 
   let fileContent: Uint8Array;
   try {
     fileContent = await Deno.readFile(fileUrl);
   } catch (error: unknown) {
-    console.error("Error reading file:", error);
+    console.error('Error reading file:', error);
     const msg = error instanceof Error ? error.message : String(error);
     throw new Error(`Error reading file: ${msg}`);
   }
 
-  const fileName = fileUrl.split("/").pop() || "downloaded_file";
-  const fileExtension = fileName.split(".").pop()?.toLowerCase();
-  let contentType = "application/octet-stream";
+  const fileName = fileUrl.split('/').pop() || 'downloaded_file';
+  const fileExtension = fileName.split('.').pop()?.toLowerCase();
+  let contentType = 'application/octet-stream';
   switch (fileExtension) {
-    case "pdf":
-      contentType = "application/pdf";
+    case 'pdf':
+      contentType = 'application/pdf';
       break;
-    case "jpg":
-    case "jpeg":
-      contentType = "image/jpeg";
+    case 'jpg':
+    case 'jpeg':
+      contentType = 'image/jpeg';
       break;
-    case "png":
-      contentType = "image/png";
+    case 'png':
+      contentType = 'image/png';
       break;
     default:
-      contentType = "application/octet-stream";
+      contentType = 'application/octet-stream';
   }
 
-  return { kind: "binary", content: fileContent, contentType, fileName };
+  return { kind: 'binary', content: fileContent, contentType, fileName };
 }
 
 export function getJobStatus(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): HandlerResult {
-  const jobId = c.req.param("jobId")!;
+  const jobId = c.req.param('jobId')!;
   const job = deps.jobs.get(jobId);
   if (!job) {
-    throw new HttpError(404, "Job not found");
+    throw new HttpError(404, 'Job not found');
   }
   return {
-    kind: "json",
+    kind: 'json',
     status: 200,
     body: {
       jobId: job.jobId,
       status: job.status,
       progress: job.progress,
-      downloadUrl: job.status === "completed"
-        ? `/api/jobs/${jobId}/download`
-        : null,
+      downloadUrl:
+        job.status === 'completed' ? `/api/jobs/${jobId}/download` : null,
     },
   };
 }
@@ -124,19 +123,16 @@ export async function downloadJob(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const jobId = c.req.param("jobId")!;
+  const jobId = c.req.param('jobId')!;
   const job = deps.jobs.get(jobId);
   if (!job) {
-    throw new HttpError(404, "Job not found");
+    throw new HttpError(404, 'Job not found');
   }
-  if (job.userEmail !== c.get("jwtPayload").email) {
-    throw new HttpError(403, "Forbidden");
+  if (job.userEmail !== c.get('jwtPayload').email) {
+    throw new HttpError(403, 'Forbidden');
   }
-  if (job.status !== "completed" || !job.zipPath) {
-    throw new HttpError(
-      400,
-      "Job is not yet complete or the file is missing.",
-    );
+  if (job.status !== 'completed' || !job.zipPath) {
+    throw new HttpError(400, 'Job is not yet complete or the file is missing.');
   }
 
   let zipFileBytes: Uint8Array;
@@ -144,13 +140,13 @@ export async function downloadJob(
     zipFileBytes = await Deno.readFile(job.zipPath);
   } catch (error) {
     console.error(`Error sending zip file for job ${jobId}:`, error);
-    throw new Error("Error reading the generated file.");
+    throw new Error('Error reading the generated file.');
   }
 
   return {
-    kind: "binary",
+    kind: 'binary',
     content: zipFileBytes,
-    contentType: "application/zip",
+    contentType: 'application/zip',
     fileName: `exams_${jobId}.zip`,
   };
 }
@@ -160,20 +156,20 @@ export async function getDownloadableJobs(
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const downloadableJobs = await deps.getDownloadableJobs();
-  return { kind: "json", status: 200, body: downloadableJobs };
+  return { kind: 'json', status: 200, body: downloadableJobs };
 }
 
 export function getActiveJob(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): HandlerResult {
-  const examId = c.req.param("examId")!;
+  const examId = c.req.param('examId')!;
   let activeJob = null;
 
   for (const job of deps.jobs.values()) {
     if (
       job.examId === examId &&
-      ["queued", "processing", "finalizing"].includes(job.status)
+      ['queued', 'processing', 'finalizing'].includes(job.status)
     ) {
       activeJob = job;
       break;
@@ -182,7 +178,7 @@ export function getActiveJob(
 
   if (activeJob) {
     return {
-      kind: "json",
+      kind: 'json',
       status: 200,
       body: {
         jobId: activeJob.jobId,
@@ -191,7 +187,7 @@ export function getActiveJob(
       },
     };
   }
-  return { kind: "json", status: 200, body: null };
+  return { kind: 'json', status: 200, body: null };
 }
 
 export async function createExam(
@@ -199,13 +195,13 @@ export async function createExam(
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const exam: Exam = await c.req.json();
-  exam.lastEditedBy = c.get("jwtPayload").sub;
+  exam.lastEditedBy = c.get('jwtPayload').sub;
   exam.updatedAt = new Date();
   const result = await deps.db.createExam(exam);
   return {
-    kind: "json",
+    kind: 'json',
     status: 200,
-    body: { message: "Exam saved successfully! ", insertedId: result },
+    body: { message: 'Exam saved successfully! ', insertedId: result },
   };
 }
 
@@ -213,11 +209,8 @@ export async function generateExam(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const exam: Exam = Object.assign(
-    new Exam(),
-    await c.req.json(),
-  );
-  const tempDir = await Deno.makeTempDir({ prefix: "exam_gen_single_" });
+  const exam: Exam = Object.assign(new Exam(), await c.req.json());
+  const tempDir = await Deno.makeTempDir({ prefix: 'exam_gen_single_' });
   exam.fillPagesAndPoints();
   await ensureQRCache(1, exam.pageCount!);
   await fs.copy(deps.basePath, tempDir, { overwrite: true });
@@ -229,13 +222,13 @@ export async function generateExam(
   const subtaskInfoJson = JSON.stringify(subtaskInfo);
 
   return {
-    kind: "binary",
+    kind: 'binary',
     content: examPDF,
-    contentType: "application/pdf",
+    contentType: 'application/pdf',
     fileName: `${exam.courseName}.pdf`,
     extraHeaders: {
-      "X-Subtask-Info": subtaskInfoJson,
-      "Access-Control-Expose-Headers": "X-Subtask-Info",
+      'X-Subtask-Info': subtaskInfoJson,
+      'Access-Control-Expose-Headers': 'X-Subtask-Info',
     },
   };
 }
@@ -246,18 +239,18 @@ export async function uploadFile(
 ): Promise<HandlerResult> {
   const formData = await c.req.formData();
   console.log(formData);
-  const file: File = formData.get("image") as File;
+  const file: File = formData.get('image') as File;
 
   if (!file || file.size === 0) {
-    throw new HttpError(400, "No or empty file uploaded");
+    throw new HttpError(400, 'No or empty file uploaded');
   }
 
   const data = await file.bytes();
-  const fileHashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const fileHashBuffer = await crypto.subtle.digest('SHA-256', data);
   const fileHash = encodeHex(fileHashBuffer);
-  const ext = file.name?.split(".").pop();
+  const ext = file.name?.split('.').pop();
   const hashedFileName = ext ? `${fileHash}.${ext}` : fileHash;
-  const uploadDir = "./uploads";
+  const uploadDir = './uploads';
   const filePath = `${uploadDir}/${hashedFileName}`;
   await Deno.mkdir(uploadDir, { recursive: true });
   await Deno.writeFile(filePath, data);
@@ -269,17 +262,17 @@ export async function uploadFile(
   };
   try {
     await deps.db.createFileTrackerEntry(fileTrackerEntry);
-    console.log("File tracker entry created:", fileTrackerEntry);
+    console.log('File tracker entry created:', fileTrackerEntry);
   } catch (error) {
-    console.error("Error inserting file tracker entry:", error);
-    throw new Error("Error inserting file tracker entry");
+    console.error('Error inserting file tracker entry:', error);
+    throw new Error('Error inserting file tracker entry');
   }
 
   return {
-    kind: "json",
+    kind: 'json',
     status: 200,
     body: {
-      message: "File uploaded successfully",
+      message: 'File uploaded successfully',
       url: `./uploads/${hashedFileName}`,
     },
   };
@@ -290,17 +283,17 @@ export async function generateExams(
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const formData = await c.req.formData();
-  const examJson = JSON.parse(formData.get("exam")!.toString());
+  const examJson = JSON.parse(formData.get('exam')!.toString());
   const exam: Exam = Object.assign(new Exam(), examJson);
   const startSeatNumber = parseInt(
-    formData.get("startSeatNumber")?.toString() || "1",
+    formData.get('startSeatNumber')?.toString() || '1',
     10,
   );
-  const file = formData.get("list") as File;
+  const file = formData.get('list') as File;
   if (!file || !exam || file.size == 0 || !exam._id) {
     throw new HttpError(
       400,
-      "Missing file, file content, exam data or exam id",
+      'Missing file, file content, exam data or exam id',
     );
   }
 
@@ -308,28 +301,24 @@ export async function generateExams(
 
   for (const [jobId, existingJob] of deps.jobs.entries()) {
     if (existingJob.examId === examId) {
-      if (
-        ["processing", "queued", "finalizing"].includes(existingJob.status)
-      ) {
+      if (['processing', 'queued', 'finalizing'].includes(existingJob.status)) {
         console.log(
           `Blocked new job request for exam ${examId} because job ${existingJob.jobId} is already active.`,
         );
         throw new HttpError(
           409,
-          "A generation job for this exam is already in progress. Please wait for it to complete.",
+          'A generation job for this exam is already in progress. Please wait for it to complete.',
         );
       }
       console.log(
         `Found old, finished job ${existingJob.jobId} (status: ${existingJob.status}) for exam ${examId}. Replacing it.`,
       );
-      await Deno.remove(existingJob.jobDir, { recursive: true }).catch(
-        (err) => {
-          console.error(
-            `Error cleaning up old job directory ${existingJob.jobId}:`,
-            err,
-          );
-        },
-      );
+      await Deno.remove(existingJob.jobDir, { recursive: true }).catch(err => {
+        console.error(
+          `Error cleaning up old job directory ${existingJob.jobId}:`,
+          err,
+        );
+      });
       deps.jobs.delete(jobId);
       break;
     }
@@ -342,7 +331,7 @@ export async function generateExams(
   await Deno.mkdir(studentPdfDir, { recursive: true });
 
   const jobTemplatePath = await Deno.makeTempDir({
-    prefix: "exam_template_",
+    prefix: 'exam_template_',
     dir: jobDir,
   });
 
@@ -361,12 +350,12 @@ export async function generateExams(
   const studentData = utils
     .sheet_to_json(worksheet, {
       header: [
-        "examPlanId",
-        "examNumber",
-        "examTitle",
-        "lastName",
-        "firstName",
-        "studentId",
+        'examPlanId',
+        'examNumber',
+        'examTitle',
+        'lastName',
+        'firstName',
+        'studentId',
       ],
       range: 5,
     })
@@ -381,8 +370,8 @@ export async function generateExams(
   const newJob: ExamGenerationJob = {
     jobId,
     examId,
-    userEmail: c.get("jwtPayload").email,
-    status: "processing",
+    userEmail: c.get('jwtPayload').email,
+    status: 'processing',
     progress: { total: totalTasks, completed: 0, failed: 0 },
     jobDir,
     createdAt: new Date(),
@@ -395,13 +384,13 @@ export async function generateExams(
   studentData.forEach((studentLine: unknown, index: number) => {
     const studentLineData = studentLine as Record<string, unknown>;
     const seatNumber = index + startSeatNumber;
-    const deExamCode = deps.genExamCode("DE", seatNumber);
-    const enExamCode = deps.genExamCode("EN", seatNumber);
+    const deExamCode = deps.genExamCode('DE', seatNumber);
+    const enExamCode = deps.genExamCode('EN', seatNumber);
 
     const student = new Student(
       `${studentLineData.firstName} ${studentLineData.lastName}`,
       String(
-        studentLineData.studentId !== ""
+        studentLineData.studentId !== ''
           ? studentLineData.studentId
           : placeholderStudentID++,
       ),
@@ -414,7 +403,7 @@ export async function generateExams(
 
     newJob.examCodes.push({ de: deExamCode, en: enExamCode });
     deps.taskQueue.push({
-      type: "student",
+      type: 'student',
       jobId,
       exam,
       student,
@@ -427,29 +416,29 @@ export async function generateExams(
   });
 
   deps.taskQueue.push({
-    type: "log",
+    type: 'log',
     jobId,
     jobTemplatePath,
     outputDir: tempOutputDir,
-    lang: "de",
+    lang: 'de',
   });
   deps.taskQueue.push({
-    type: "log",
+    type: 'log',
     jobId,
     jobTemplatePath,
     outputDir: tempOutputDir,
-    lang: "en",
+    lang: 'en',
   });
 
   const solutionJobTemplatePath = await Deno.makeTempDir({
-    prefix: "exam_template_solution_",
+    prefix: 'exam_template_solution_',
     dir: jobDir,
   });
 
   await fs.copy(deps.basePath, solutionJobTemplatePath, { overwrite: true });
 
   deps.taskQueue.push({
-    type: "solution",
+    type: 'solution',
     exam,
     jobId,
     jobTemplatePath: solutionJobTemplatePath,
@@ -462,9 +451,9 @@ export async function generateExams(
   deps.workers.forEach(() => deps.processQueue());
 
   return {
-    kind: "json",
+    kind: 'json',
     status: 202,
-    body: { jobId, message: "Exam generation job has been started." },
+    body: { jobId, message: 'Exam generation job has been started.' },
   };
 }
 
@@ -474,21 +463,21 @@ export async function updateExam(
 ): Promise<HandlerResult> {
   const { examId, updatedExam } = await c.req.json();
   if (!examId || !updatedExam) {
-    throw new HttpError(400, "Exam ID and updated data are required");
+    throw new HttpError(400, 'Exam ID and updated data are required');
   }
   const updateData = { ...updatedExam };
   delete updateData._id;
-  updateData.lastEditedBy = c.get("jwtPayload").sub;
+  updateData.lastEditedBy = c.get('jwtPayload').sub;
   updateData.updatedAt = new Date();
 
   const result = await deps.db.updateExam(examId, updateData);
   if (result.matchedCount === 0) {
-    throw new HttpError(404, "Exam not found");
+    throw new HttpError(404, 'Exam not found');
   }
   return {
-    kind: "json",
+    kind: 'json',
     status: 200,
-    body: { message: "Exam updated successfully" },
+    body: { message: 'Exam updated successfully' },
   };
 }
 
@@ -498,7 +487,7 @@ export async function clearExams(
 ): Promise<HandlerResult> {
   const result = await deps.db.clearExams();
   return {
-    kind: "json",
+    kind: 'json',
     status: 200,
     body: {
       message: `${result} exams deleted successfully!`,
@@ -511,19 +500,19 @@ export async function deleteExam(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const id = c.req.param("examId")!;
+  const id = c.req.param('examId')!;
   if (!id) {
-    throw new HttpError(400, "Exam ID is required");
+    throw new HttpError(400, 'Exam ID is required');
   }
   const result = await deps.db.deleteExam(id);
   if (result === 0) {
-    throw new HttpError(404, "Exam not found");
+    throw new HttpError(404, 'Exam not found');
   }
   console.log(`Exam ${id} deleted.`);
   return {
-    kind: "json",
+    kind: 'json',
     status: 200,
-    body: { message: "Exam deleted successfully" },
+    body: { message: 'Exam deleted successfully' },
   };
 }
 
@@ -531,25 +520,25 @@ export async function cancelJob(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const jobId = c.req.param("jobId")!;
+  const jobId = c.req.param('jobId')!;
   const job = deps.jobs.get(jobId);
 
   if (!job) {
-    throw new HttpError(404, "Job not found");
+    throw new HttpError(404, 'Job not found');
   }
 
-  if (job.status === "processing" || job.status === "queued") {
+  if (job.status === 'processing' || job.status === 'queued') {
     console.log(`Cancellation requested for job: ${jobId}`);
-    job.status = "failed";
+    job.status = 'failed';
 
     // Mutate in-place to avoid reassigning the shared reference
     deps.taskQueue.splice(
       0,
       deps.taskQueue.length,
-      ...deps.taskQueue.filter((t) => t.jobId !== jobId),
+      ...deps.taskQueue.filter(t => t.jobId !== jobId),
     );
 
-    await Deno.remove(job.jobDir, { recursive: true }).catch((err) => {
+    await Deno.remove(job.jobDir, { recursive: true }).catch(err => {
       console.error(
         `Error during immediate cleanup for cancelled job ${jobId}:`,
         err,
@@ -557,7 +546,7 @@ export async function cancelJob(
     });
 
     return {
-      kind: "json",
+      kind: 'json',
       status: 200,
       body: { message: `Job ${jobId} has been cancelled.` },
     };

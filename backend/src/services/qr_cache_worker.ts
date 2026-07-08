@@ -1,7 +1,7 @@
-import { QRConfig } from "../config/mod.ts";
-import { type Language } from "../types/exam.ts";
-import { genExamCode } from "./exam_code.ts";
-import { generatePageQR } from "./qr.ts";
+import { QRConfig } from '../config/mod.ts';
+import { type Language } from '../types/exam.ts';
+import { genExamCode } from './exam_code.ts';
+import { generatePageQR } from './qr.ts';
 
 type WarmupMessage = {
   startStudentNumber?: number;
@@ -36,7 +36,7 @@ self.onmessage = async (e: MessageEvent<WarmupMessage>) => {
         }
       }
       for (let pageNumber = 1; pageNumber <= pagesPerStudent; pageNumber++) {
-        const examCode = "R4ND";
+        const examCode = 'R4ND';
         const path = `${QRConfig.cachePath}/${examCode}_${pageNumber}.png`;
 
         await generatePageQR(path, examCode, pageNumber);
@@ -44,10 +44,10 @@ self.onmessage = async (e: MessageEvent<WarmupMessage>) => {
       }
     }
 
-    self.postMessage({ status: "success", generatedCount });
+    self.postMessage({ status: 'success', generatedCount });
   } catch (error) {
     self.postMessage({
-      status: "error",
+      status: 'error',
       error: error instanceof Error ? error.message : String(error),
     });
   }

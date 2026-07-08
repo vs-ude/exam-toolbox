@@ -1,8 +1,8 @@
-import { Context, Input } from "@hono/hono";
-import type { ContentfulStatusCode } from "@hono/hono/utils/http-status";
+import { Context, Input } from '@hono/hono';
+import type { ContentfulStatusCode } from '@hono/hono/utils/http-status';
 
-import { AppEnv } from "../types/context.ts";
-import { HandlerResult, HttpError } from "../types/handler.ts";
+import { AppEnv } from '../types/context.ts';
+import { HandlerResult, HttpError } from '../types/handler.ts';
 
 export async function handle<
   E extends AppEnv = AppEnv,
@@ -15,15 +15,15 @@ export async function handle<
 ): Promise<any> {
   try {
     const result = await fn();
-    if (result.kind === "json") {
+    if (result.kind === 'json') {
       return c.json(
         result.body,
         (result.status ?? 200) as ContentfulStatusCode,
       );
     } else {
       const headers = new Headers({
-        "Content-Type": result.contentType,
-        "Content-Disposition": `attachment; filename="${result.fileName}"`,
+        'Content-Type': result.contentType,
+        'Content-Disposition': `attachment; filename="${result.fileName}"`,
       });
       if (result.extraHeaders) {
         for (const [k, v] of Object.entries(result.extraHeaders)) {
@@ -43,7 +43,7 @@ export async function handle<
       );
     }
     return c.json(
-      { message: "Internal server error", error: String(e) },
+      { message: 'Internal server error', error: String(e) },
       500 as ContentfulStatusCode,
     );
   }

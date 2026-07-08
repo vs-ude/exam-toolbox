@@ -1,4 +1,4 @@
-import { Translation } from "./exam.ts";
+import { Translation } from './exam.ts';
 
 export class Student {
   name: string;
@@ -12,9 +12,9 @@ export class Student {
     codes?: Translation,
     sequenceNumber?: number,
   ) {
-    this.name = name ?? "Paula Placeholder";
-    this.matriculation = matriculation ?? "1000000";
-    this.codes = codes ?? { DE: "R4ND", EN: "R4ND" };
+    this.name = name ?? 'Paula Placeholder';
+    this.matriculation = matriculation ?? '1000000';
+    this.codes = codes ?? { DE: 'R4ND', EN: 'R4ND' };
     this.sequenceNumber = sequenceNumber ?? 4242;
   }
 }

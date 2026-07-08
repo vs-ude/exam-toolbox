@@ -1,4 +1,4 @@
-import { JwtPayload } from "../services/auth.ts";
+import { JwtPayload } from '../services/auth.ts';
 
 export type AppEnv = {
   Variables: {

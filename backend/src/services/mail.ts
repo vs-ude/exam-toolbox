@@ -1,5 +1,5 @@
-import nodemailer from "nodemailer";
-import { getConfig } from "../config/appConfig.ts";
+import nodemailer from 'nodemailer';
+import { getConfig } from '../config/appConfig.ts';
 
 export interface SendEmailParams {
   to: string;
@@ -36,9 +36,9 @@ export async function sendEmail({
       html,
     });
 
-    console.log("Email sent:", info.messageId);
+    console.log('Email sent:', info.messageId);
   } catch (error) {
-    console.error("SMTP send error:", error);
+    console.error('SMTP send error:', error);
     throw error;
   }
 }

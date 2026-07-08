@@ -1,9 +1,9 @@
-import { EtaError } from "@bgub/eta";
+import { EtaError } from '@bgub/eta';
 
 export class LatexRenderError extends Error {
   constructor(msg: string, opt?: ErrorOptions) {
     super(msg, opt);
-    this.name = "LatexRenderError";
+    this.name = 'LatexRenderError';
     Object.setPrototypeOf(this, LatexRenderError.prototype);
   }
 
@@ -26,18 +26,18 @@ export class LatexRenderError extends Error {
 export class LatexCompileError extends Error {
   constructor(msg: string, contentPath?: string, opt?: ErrorOptions) {
     super(msg, opt);
-    this.name = "LatexCompileError";
+    this.name = 'LatexCompileError';
     Object.setPrototypeOf(this, LatexCompileError.prototype);
 
     if (contentPath) {
-      let content = "";
+      let content = '';
       try {
         content = Deno.readTextFileSync(contentPath);
         this.cause = this.parseErrorLog(msg, content);
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         this.cause = {
-          info: "Unable to read LaTeX content for marker lookup",
+          info: 'Unable to read LaTeX content for marker lookup',
           error: message,
         };
       }
@@ -47,17 +47,18 @@ export class LatexCompileError extends Error {
   parseErrorLog(msg: string, content: string): object {
     const errorLine = Number(msg.match(/aufgaben\.tex\:(\d+)\:/)?.[1]);
     if (!Number.isFinite(errorLine) || errorLine <= 0) {
-      return { info: "Unable to determine error line" };
+      return { info: 'Unable to determine error line' };
     }
 
     const lines = content.split(/\r?\n/);
-    const markerPrefix = "%% MARKER:";
+    const markerPrefix = '%% MARKER:';
     const startIndex = Math.min(lines.length - 1, errorLine - 1);
 
     for (let i = startIndex; i >= 0; i--) {
       const line = lines[i];
       const markerIndex = line.indexOf(markerPrefix);
-      if (markerIndex !== 0) { // Our marker is always at the start of a line
+      if (markerIndex !== 0) {
+        // Our marker is always at the start of a line
         continue;
       }
       const rawMarker = line.slice(markerIndex + markerPrefix.length).trim();
@@ -65,7 +66,7 @@ export class LatexCompileError extends Error {
     }
 
     return {
-      info: "Unable to locate marker before error line",
+      info: 'Unable to locate marker before error line',
       line: errorLine,
     };
   }
@@ -84,7 +85,7 @@ export class InvalidPageBreakError extends Error {
 
   constructor(msg: string, offenses?: string[]) {
     super(msg, undefined);
-    this.name = "InvalidPageBreakError";
+    this.name = 'InvalidPageBreakError';
     Object.setPrototypeOf(this, InvalidPageBreakError.prototype);
 
     if (offenses) {

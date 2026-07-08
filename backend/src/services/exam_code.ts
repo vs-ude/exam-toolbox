@@ -1,12 +1,12 @@
-import { Language } from "../types/exam.ts";
+import { Language } from '../types/exam.ts';
 
-const ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const MODULUS = ALPHABET.length;
 
 export class ExamCodeError extends Error {
   constructor(msg: string, opt?: ErrorOptions) {
     super(msg, opt);
-    this.name = "ExamCodeError";
+    this.name = 'ExamCodeError';
     Object.setPrototypeOf(this, ExamCodeError.prototype);
   }
 }
@@ -46,8 +46,8 @@ export function calcCheckDigit(value: string): string {
  * - en => prefix "2"
  */
 export function genExamCode(lang: Language, counter: number): string {
-  const paddedCount = counter.toString().padStart(4, "0");
-  const langPrefix = lang === "DE" ? "1" : "2";
+  const paddedCount = counter.toString().padStart(4, '0');
+  const langPrefix = lang === 'DE' ? '1' : '2';
 
   const body = parseInt(`${langPrefix}${paddedCount}`, 10)
     .toString(36)
@@ -97,7 +97,7 @@ export function parseExamCode(code: string): ParsedCode {
     throw new ExamCodeError(`Invalid counter: ${counter}`);
   }
 
-  if (langPrefix === "1") return { lang: "DE", counter };
-  if (langPrefix === "2") return { lang: "EN", counter };
+  if (langPrefix === '1') return { lang: 'DE', counter };
+  if (langPrefix === '2') return { lang: 'EN', counter };
   throw new ExamCodeError(`Invalid language prefix: ${langPrefix}`);
 }

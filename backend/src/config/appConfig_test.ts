@@ -1,54 +1,56 @@
-import { assertEquals, assertThrows } from "@std/assert";
-import { DEFAULT_CONFIG, loadConfig, mergeObjects } from "./appConfig.ts";
+import { assertEquals, assertThrows } from '@std/assert';
+import { DEFAULT_CONFIG, loadConfig, mergeObjects } from './appConfig.ts';
 
 // ---------------------------------------------------------------------------
 // mergeObjects
 // ---------------------------------------------------------------------------
 
-Deno.test("mergeObjects: scalar values from input overwrite base", () => {
-  const base = { a: 1, b: "hello" };
+Deno.test('mergeObjects: scalar values from input overwrite base', () => {
+  const base = { a: 1, b: 'hello' };
   const result = mergeObjects(base, { a: 99 });
   assertEquals(result.a, 99);
 });
 
-Deno.test("mergeObjects: keys present only in base are preserved", () => {
-  const base = { a: 1, b: "hello" };
+Deno.test('mergeObjects: keys present only in base are preserved', () => {
+  const base = { a: 1, b: 'hello' };
   const result = mergeObjects(base, { a: 2 });
-  assertEquals(result.b, "hello");
+  assertEquals(result.b, 'hello');
 });
 
-Deno.test("mergeObjects: nested objects are merged recursively", () => {
-  const base = { server: { port: 3000, publicUrl: "localhost" } };
+Deno.test('mergeObjects: nested objects are merged recursively', () => {
+  const base = { server: { port: 3000, publicUrl: 'localhost' } };
   const result = mergeObjects(base, { server: { port: 9090 } });
   assertEquals((result.server as Record<string, unknown>).port, 9090);
   assertEquals(
     (result.server as Record<string, unknown>).publicUrl,
-    "localhost",
+    'localhost',
   );
 });
 
-Deno.test("mergeObjects: deeply nested scalars are overwritten", () => {
-  const base = { auth: { ldap: { url: "ldap://old:389", bindDn: "cn=old" } } };
+Deno.test('mergeObjects: deeply nested scalars are overwritten', () => {
+  const base = { auth: { ldap: { url: 'ldap://old:389', bindDn: 'cn=old' } } };
   const result = mergeObjects(base, {
-    auth: { ldap: { url: "ldap://new:389" } },
+    auth: { ldap: { url: 'ldap://new:389' } },
   });
-  const ldap = (result.auth as Record<string, unknown>)
-    .ldap as Record<string, unknown>;
-  assertEquals(ldap.url, "ldap://new:389");
-  assertEquals(ldap.bindDn, "cn=old");
+  const ldap = (result.auth as Record<string, unknown>).ldap as Record<
+    string,
+    unknown
+  >;
+  assertEquals(ldap.url, 'ldap://new:389');
+  assertEquals(ldap.bindDn, 'cn=old');
 });
 
-Deno.test("mergeObjects: null input values overwrite base scalars", () => {
-  const base = { a: "value" };
+Deno.test('mergeObjects: null input values overwrite base scalars', () => {
+  const base = { a: 'value' };
   const result = mergeObjects(base, { a: null });
   assertEquals(result.a, null);
 });
 
-Deno.test("mergeObjects: empty input leaves base unchanged", () => {
-  const base = { x: 42, y: "hi" };
+Deno.test('mergeObjects: empty input leaves base unchanged', () => {
+  const base = { x: 42, y: 'hi' };
   const result = mergeObjects(base, {});
   assertEquals(result.x, 42);
-  assertEquals(result.y, "hi");
+  assertEquals(result.y, 'hi');
 });
 
 // ---------------------------------------------------------------------------
@@ -57,8 +59,8 @@ Deno.test("mergeObjects: empty input leaves base unchanged", () => {
 
 const noEnv = (_key: string) => undefined;
 
-Deno.test("loadConfig: empty YAML returns built-in defaults", () => {
-  const cfg = loadConfig("", noEnv);
+Deno.test('loadConfig: empty YAML returns built-in defaults', () => {
+  const cfg = loadConfig('', noEnv);
   assertEquals(cfg.server.port, DEFAULT_CONFIG.server.port);
   assertEquals(cfg.server.publicUrl, DEFAULT_CONFIG.server.publicUrl);
   assertEquals(cfg.auth.ldap.url, DEFAULT_CONFIG.auth.ldap.url);
@@ -73,7 +75,7 @@ Deno.test("loadConfig: empty YAML returns built-in defaults", () => {
 // loadConfig – YAML overrides defaults
 // ---------------------------------------------------------------------------
 
-Deno.test("loadConfig: YAML scalar values override defaults", () => {
+Deno.test('loadConfig: YAML scalar values override defaults', () => {
   const yaml = `
 server:
   port: 8080
@@ -81,12 +83,12 @@ server:
 `;
   const cfg = loadConfig(yaml, noEnv);
   assertEquals(cfg.server.port, 8080);
-  assertEquals(cfg.server.publicUrl, "exam.example.com");
+  assertEquals(cfg.server.publicUrl, 'exam.example.com');
   // untouched default
   assertEquals(cfg.db.connString, DEFAULT_CONFIG.db.connString);
 });
 
-Deno.test("loadConfig: YAML nested values override defaults", () => {
+Deno.test('loadConfig: YAML nested values override defaults', () => {
   const yaml = `
 auth:
   jwt:
@@ -94,85 +96,90 @@ auth:
     lifetimeDays: 30
 `;
   const cfg = loadConfig(yaml, noEnv);
-  assertEquals(cfg.auth.jwt.secret, "super-secret");
+  assertEquals(cfg.auth.jwt.secret, 'super-secret');
   assertEquals(cfg.auth.jwt.lifetimeDays, 30);
   // untouched nested default
-  assertEquals(cfg.auth.ldap.url, "ldap://ldap:389");
+  assertEquals(cfg.auth.ldap.url, 'ldap://ldap:389');
 });
 
 // ---------------------------------------------------------------------------
 // loadConfig – environment variable overrides
 // ---------------------------------------------------------------------------
 
-Deno.test("loadConfig: SERVER_PORT env var overrides YAML/default", () => {
-  const cfg = loadConfig(
-    "",
-    (key) => key === "SERVER_PORT" ? "9000" : undefined,
+Deno.test('loadConfig: SERVER_PORT env var overrides YAML/default', () => {
+  const cfg = loadConfig('', key =>
+    key === 'SERVER_PORT' ? '9000' : undefined,
   );
   assertEquals(cfg.server.port, 9000);
 });
 
-Deno.test("loadConfig: AUTH_LDAP_GROUPS_ADMIN splits comma-separated list", () => {
-  const cfg = loadConfig(
-    "",
-    (key) =>
-      key === "AUTH_LDAP_GROUPS_ADMIN" ? "admins,superusers,ops" : undefined,
+Deno.test(
+  'loadConfig: AUTH_LDAP_GROUPS_ADMIN splits comma-separated list',
+  () => {
+    const cfg = loadConfig('', key =>
+      key === 'AUTH_LDAP_GROUPS_ADMIN' ? 'admins,superusers,ops' : undefined,
+    );
+    assertEquals(cfg.auth.ldap.groups.admin, ['admins', 'superusers', 'ops']);
+  },
+);
+
+Deno.test(
+  'loadConfig: AUTH_LDAP_GROUPS_FULL splits comma-separated list',
+  () => {
+    const cfg = loadConfig('', key =>
+      key === 'AUTH_LDAP_GROUPS_FULL' ? 'teachers,staff' : undefined,
+    );
+    assertEquals(cfg.auth.ldap.groups.full, ['teachers', 'staff']);
+  },
+);
+
+Deno.test('loadConfig: DB_CONNSTRING env var overrides default', () => {
+  const cfg = loadConfig('', key =>
+    key === 'DB_CONNSTRING' ? 'mongodb://myhost:27017/mydb' : undefined,
   );
-  assertEquals(cfg.auth.ldap.groups.admin, ["admins", "superusers", "ops"]);
+  assertEquals(cfg.db.connString, 'mongodb://myhost:27017/mydb');
 });
 
-Deno.test("loadConfig: AUTH_LDAP_GROUPS_FULL splits comma-separated list", () => {
-  const cfg = loadConfig(
-    "",
-    (key) => key === "AUTH_LDAP_GROUPS_FULL" ? "teachers,staff" : undefined,
-  );
-  assertEquals(cfg.auth.ldap.groups.full, ["teachers", "staff"]);
-});
-
-Deno.test("loadConfig: DB_CONNSTRING env var overrides default", () => {
-  const cfg = loadConfig(
-    "",
-    (key) =>
-      key === "DB_CONNSTRING" ? "mongodb://myhost:27017/mydb" : undefined,
-  );
-  assertEquals(cfg.db.connString, "mongodb://myhost:27017/mydb");
-});
-
-Deno.test("loadConfig: SMTP_PORT env var is parsed as number", () => {
-  const cfg = loadConfig("", (key) => key === "SMTP_PORT" ? "587" : undefined);
+Deno.test('loadConfig: SMTP_PORT env var is parsed as number', () => {
+  const cfg = loadConfig('', key => (key === 'SMTP_PORT' ? '587' : undefined));
   assertEquals(cfg.smtp.port, 587);
 });
 
-Deno.test("loadConfig: QR_MIN_STUDENTS and QR_MIN_PAGES env vars are parsed as numbers", () => {
-  const cfg = loadConfig("", (key) => {
-    if (key === "QR_MIN_STUDENTS") return "50";
-    if (key === "QR_MIN_PAGES") return "10";
-    return undefined;
-  });
-  assertEquals(cfg.qr.minStudents, 50);
-  assertEquals(cfg.qr.minPages, 10);
-});
+Deno.test(
+  'loadConfig: QR_MIN_STUDENTS and QR_MIN_PAGES env vars are parsed as numbers',
+  () => {
+    const cfg = loadConfig('', key => {
+      if (key === 'QR_MIN_STUDENTS') return '50';
+      if (key === 'QR_MIN_PAGES') return '10';
+      return undefined;
+    });
+    assertEquals(cfg.qr.minStudents, 50);
+    assertEquals(cfg.qr.minPages, 10);
+  },
+);
 
-Deno.test("loadConfig: env var overrides take precedence over YAML values", () => {
-  const yaml = `
+Deno.test(
+  'loadConfig: env var overrides take precedence over YAML values',
+  () => {
+    const yaml = `
 server:
   port: 8080
 `;
-  const cfg = loadConfig(
-    yaml,
-    (key) => key === "SERVER_PORT" ? "9999" : undefined,
-  );
-  assertEquals(cfg.server.port, 9999);
-});
+    const cfg = loadConfig(yaml, key =>
+      key === 'SERVER_PORT' ? '9999' : undefined,
+    );
+    assertEquals(cfg.server.port, 9999);
+  },
+);
 
 // ---------------------------------------------------------------------------
 // loadConfig – error handling
 // ---------------------------------------------------------------------------
 
-Deno.test("loadConfig: invalid YAML throws a descriptive error", () => {
+Deno.test('loadConfig: invalid YAML throws a descriptive error', () => {
   assertThrows(
-    () => loadConfig("bad: [unclosed", noEnv),
+    () => loadConfig('bad: [unclosed', noEnv),
     Error,
-    "Error parsing yaml.",
+    'Error parsing yaml.',
   );
 });

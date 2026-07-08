@@ -11,10 +11,8 @@ export interface LogInfo {
  * - Subtask line:  `VSEXAM: {'Typ':'AufgabenTeil' ... 'Seite':'<n>' ... }`
  * - Boundary err:  `VSEXAM: {'Typ':'edgeStart' ... 'X': '0' ... }`
  */
-export function parseLogFileForSubtaskInfo(
-  logContent: string,
-): LogInfo[] {
-  const lines = logContent.split("\n");
+export function parseLogFileForSubtaskInfo(logContent: string): LogInfo[] {
+  const lines = logContent.split('\n');
   const pages: LogInfo[] = [];
 
   for (const line of lines) {

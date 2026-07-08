@@ -4,7 +4,22 @@ stages:
 image: docker:25.0.5
 
 variables:
-  DOCKER_TLS_CERTDIR: ""
+  DOCKER_TLS_CERTDIR: ''
+
+style:
+  image: alpine:latest
+  stage: test
+  variables:
+    APK_CACHE_DIR: $CI_PROJECT_DIR/.cache/apk
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - $APK_CACHE_DIR
+  before_script:
+    - mkdir -p $APK_CACHE_DIR
+    - apk add --cache-dir $APK_CACHE_DIR prettier >/dev/null 2>&1
+  script:
+    - prettier --check **/*.ts **/*.scss **/*.html
 
 backend_tests:
   image: denoland/deno:latest

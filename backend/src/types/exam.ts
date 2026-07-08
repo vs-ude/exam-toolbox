@@ -1,4 +1,4 @@
-import type { Tag } from "./tag.ts";
+import type { Tag } from './tag.ts';
 
 export class Exam {
   _id?: string = undefined;
@@ -23,10 +23,10 @@ export class Exam {
     tasks?: TaskGroup[],
     _id?: string,
   ) {
-    this.courseName = courseName ?? "placeholder";
-    this.examinerName = examinerName ?? "placeholder";
-    this.semester = semester ?? "placeholder";
-    this.date = date ?? "placeholder";
+    this.courseName = courseName ?? 'placeholder';
+    this.examinerName = examinerName ?? 'placeholder';
+    this.semester = semester ?? 'placeholder';
+    this.date = date ?? 'placeholder';
     this.examLengthMinutes = examLengthMinutes ?? 0;
     this.tasks = tasks ?? [];
   }
@@ -37,11 +37,13 @@ export class Exam {
   }
 
   private fillPages(this: Exam) {
-    this.pageCount = this.tasks.reduce( // 1 per task group + number of newPages
+    this.pageCount = this.tasks.reduce(
+      // 1 per task group + number of newPages
       (acc, group) =>
-        acc + 1 +
+        acc +
+        1 +
         (group.tasks.reduce(
-          (acc, task) => acc + (task.type === "newPage" ? 1 : 0),
+          (acc, task) => acc + (task.type === 'newPage' ? 1 : 0),
           0,
         ) ?? 0),
       0,
@@ -99,8 +101,8 @@ export interface BaseTask {
 export type Language = keyof Translation;
 
 export interface Dimension {
-  unit: "cm" | "mm" | "relative";
-  dimension: "width" | "height";
+  unit: 'cm' | 'mm' | 'relative';
+  dimension: 'width' | 'height';
   scalar: number;
 }
 
@@ -110,7 +112,7 @@ export interface Question {
 }
 
 export interface MultipleChoiceTask extends BaseTask {
-  type: "multipleChoice";
+  type: 'multipleChoice';
   numCorrect?: number;
   answerOptions: AnswerOptions[];
 }
@@ -122,7 +124,7 @@ export interface AnswerOptions {
 }
 
 export interface PropertyTask extends BaseTask {
-  type: "property";
+  type: 'property';
   header: Translation[];
   lines: PropertyLine[];
 }
@@ -133,13 +135,13 @@ export interface PropertyLine {
 }
 
 export interface ShortAnswerTask extends BaseTask {
-  type: "shortAnswer";
+  type: 'shortAnswer';
   noLines?: number;
   solution: Translation;
 }
 
 export interface PictureTask extends BaseTask {
-  type: "pictureTask";
+  type: 'pictureTask';
   questionPicture: Image;
   solutionPicture: Image;
   size?: Dimension;
@@ -153,12 +155,12 @@ export interface Image {
 }
 
 export interface LatexTask extends BaseTask {
-  type: "latex";
+  type: 'latex';
   questionLatex: Translation;
 }
 
 export interface TableTask extends BaseTask {
-  type: "table";
+  type: 'table';
   tableHeadersQuestion: Translation[];
   tableDataQuestion: Translation[][];
   tableHeadersSolution: Translation[];
@@ -166,60 +168,60 @@ export interface TableTask extends BaseTask {
 }
 
 export interface ManualText extends BaseTask {
-  type: "manualText";
+  type: 'manualText';
   points: 0; // Manual texts do not have points
 }
 
 export interface NewPage extends BaseTask {
-  type: "newPage";
+  type: 'newPage';
   points: 0; // New pages do not have points
 }
 
 const TASK_TYPES = [
-  "multipleChoice",
-  "property",
-  "shortAnswer",
-  "pictureTask",
-  "latex",
-  "table",
-  "manualText",
-  "newPage",
+  'multipleChoice',
+  'property',
+  'shortAnswer',
+  'pictureTask',
+  'latex',
+  'table',
+  'manualText',
+  'newPage',
 ] as const;
 
 type TaskType = (typeof TASK_TYPES)[number];
 
 /** Required fields per task type beyond {@link BaseTask}. */
 const TASK_TYPE_FIELDS: Record<TaskType, string[]> = {
-  multipleChoice: ["answerOptions"],
-  property: ["header", "lines"],
-  shortAnswer: ["solution"],
-  pictureTask: ["questionPicture", "solutionPicture"],
-  latex: ["questionLatex"],
+  multipleChoice: ['answerOptions'],
+  property: ['header', 'lines'],
+  shortAnswer: ['solution'],
+  pictureTask: ['questionPicture', 'solutionPicture'],
+  latex: ['questionLatex'],
   table: [
-    "tableHeadersQuestion",
-    "tableDataQuestion",
-    "tableHeadersSolution",
-    "tableDataSolution",
+    'tableHeadersQuestion',
+    'tableDataQuestion',
+    'tableHeadersSolution',
+    'tableDataSolution',
   ],
   manualText: [],
   newPage: [],
 };
 
 const BASE_TASK_FIELDS: (keyof BaseTask)[] = [
-  "taskId",
-  "type",
-  "question",
-  "points",
-  "createdBy",
+  'taskId',
+  'type',
+  'question',
+  'points',
+  'createdBy',
 ];
 
 const EXAM_FIELDS: (keyof Exam)[] = [
-  "courseName",
-  "examinerName",
-  "semester",
-  "date",
-  "examLengthMinutes",
-  "tasks",
+  'courseName',
+  'examinerName',
+  'semester',
+  'date',
+  'examLengthMinutes',
+  'tasks',
 ];
 
 /**
@@ -227,17 +229,15 @@ const EXAM_FIELDS: (keyof Exam)[] = [
  * all required fields are present. Throws if validation fails.
  */
 export function parseExam(raw: unknown): Exam {
-  if (typeof raw !== "object" || raw === null) {
-    throw new Error("Exam must be a non-null object");
+  if (typeof raw !== 'object' || raw === null) {
+    throw new Error('Exam must be a non-null object');
   }
 
   const obj = raw as Record<string, unknown>;
-  const missing = EXAM_FIELDS.filter((f) => !(f in obj));
+  const missing = EXAM_FIELDS.filter(f => !(f in obj));
 
   if (missing.length > 0) {
-    throw new Error(
-      `Exam is missing required fields: ${missing.join(", ")}.`,
-    );
+    throw new Error(`Exam is missing required fields: ${missing.join(', ')}.`);
   }
 
   return Object.assign(new Exam(), obj);
@@ -249,19 +249,19 @@ export function parseExam(raw: unknown): Exam {
  * fields are missing.
  */
 export function parseTask(raw: unknown): Task {
-  if (typeof raw !== "object" || raw === null) {
-    throw new Error("Task must be a non-null object");
+  if (typeof raw !== 'object' || raw === null) {
+    throw new Error('Task must be a non-null object');
   }
 
   const obj = raw as Record<string, unknown>;
-  if (!("type" in obj)) throw new Error("Task must have a type");
-  const type = obj["type"];
+  if (!('type' in obj)) throw new Error('Task must have a type');
+  const type = obj['type'];
 
   if (!TASK_TYPES.includes(type as TaskType)) {
     throw new Error(
-      `Unknown task type: ${JSON.stringify(type)}. Expected one of: ${
-        TASK_TYPES.join(", ")
-      }.`,
+      `Unknown task type: ${JSON.stringify(type)}. Expected one of: ${TASK_TYPES.join(
+        ', ',
+      )}.`,
     );
   }
 
@@ -277,9 +277,9 @@ export function parseTask(raw: unknown): Task {
 
   if (missing.length > 0) {
     throw new Error(
-      `Task of type "${taskType}" is missing required fields: ${
-        missing.join(", ")
-      }.`,
+      `Task of type "${taskType}" is missing required fields: ${missing.join(
+        ', ',
+      )}.`,
     );
   }
 

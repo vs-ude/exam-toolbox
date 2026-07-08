@@ -15,4 +15,4 @@ export type Group = {
   rights: Rights;
 };
 
-export type Rights = "admin" | "full" | "limited";
+export type Rights = 'admin' | 'full' | 'limited';
