@@ -1,14 +1,9 @@
-# Use the official Node.js image
-FROM node:24
+FROM denoland/deno:latest
 
-# Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
-
-# Install dependencies
-RUN --mount=type=cache,target=/root/.npm npm install
+RUN --mount=type=cache,target=/root/.deno deno install
 
 # Copy the rest of the application files
 COPY --parents ["*.json", "src/", "./"]
@@ -16,4 +11,4 @@ COPY --parents ["*.json", "src/", "./"]
 EXPOSE 4200
 
 # Start the frontend in development mode
-CMD ["npm", "start", "--", "--configuration", "devcontainer", "--host=0.0.0.0"]
+CMD ["deno", "run", "--allow-net", "ng", "serve", "--configuration", "devcontainer", "--host", "0.0.0.0"]
