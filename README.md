@@ -96,7 +96,8 @@ The first build compiles the frontend and backend images. Subsequent starts are 
 
 ### 3. Log in
 
-Use the auth portal at `/auth/` with one of the dev accounts below.
+You'll be redirected to the login page.
+Log in with one of the dev accounts below.
 
 ## Development
 
