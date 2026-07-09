@@ -10,7 +10,7 @@ FROM caddy:alpine
 COPY --from=caddy_builder /usr/bin/caddy /usr/bin/caddy
 
 # copy static frontend files to custom caddy build
-COPY ./public/* /srv/public/
+COPY --parents ./public /srv/
 
 ENV LOGLEVEL=warn
 

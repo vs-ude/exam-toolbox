@@ -16,7 +16,7 @@ services:
       - backend
       - frontend
     environment:
-      LOGLEVEL: warn # debug, info, warn
+      LOGLEVEL: info # debug, info, warn
     develop:
       watch:
         - path: ./caddy/

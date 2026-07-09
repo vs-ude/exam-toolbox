@@ -43,7 +43,7 @@ describe('User Permissions and Role-Based Access', () => {
     cy.contains(examName).should('not.exist');
 
     // Verify API Denial for saving
-    cy.visit('https://localhost/#/dashboard');
+    cy.visit('http://localhost/#/dashboard');
     cy.get('[data-cy="add-exam"]').click();
     cy.intercept('POST', '/api/exams').as('deniedSave');
 
@@ -60,7 +60,7 @@ describe('User Permissions and Role-Based Access', () => {
       .should('be.oneOf', [401, 403]);
 
     // Verify it does not appears in the Exam Pool
-    cy.visit('https://localhost/#/exams-pool');
+    cy.visit('http://localhost/#/exams-pool');
     cy.contains(examName).should('not.exist');
   });
 });

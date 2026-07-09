@@ -125,7 +125,7 @@ export class ExamsPoolComponent implements OnInit {
 
   onEdit(examId: string | undefined) {
     if (!examId) return;
-    this.router.navigate(['/create-exam', examId]);
+    this.router.navigate(['/edit-exam', examId]);
   }
 
   onDownload(event: MouseEvent, examId: string | undefined) {

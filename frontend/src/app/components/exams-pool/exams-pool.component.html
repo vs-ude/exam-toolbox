@@ -38,8 +38,7 @@
           <mat-icon
             id="openSortingDropdown"
             aria-hidden="false"
-            fontIcon="arrow_drop_down"
-          ></mat-icon>
+          >arrow_drop_down</mat-icon>
         </div>
         <div
           class="dropdown triangle"
@@ -52,8 +51,8 @@
               class="dropdown_icon_wrapper"
               [ngClass]="!filters.sortAlphabetically.active ? 'hide_icon' : ''"
               aria-hidden="false"
-              fontIcon="done"
-            ></mat-icon>
+              >done</mat-icon
+            >
             <span>Alphabetical</span>
           </div>
 
@@ -62,8 +61,8 @@
               class="dropdown_icon_wrapper"
               [ngClass]="!filters.sortSemester.active ? 'hide_icon' : ''"
               aria-hidden="false"
-              fontIcon="done"
-            ></mat-icon>
+              >done</mat-icon
+            >
             <span>Created</span>
           </div>
 
@@ -72,8 +71,8 @@
               class="dropdown_icon_wrapper"
               [ngClass]="!filters.sortLastViewed.active ? 'hide_icon' : ''"
               aria-hidden="false"
-              fontIcon="done"
-            ></mat-icon>
+              >done</mat-icon
+            >
             <span>Last Viewed</span>
           </div>
 
@@ -85,8 +84,8 @@
               class="dropdown_icon_wrapper"
               [ngClass]="filters.sortAscending.active ? 'hide_icon' : ''"
               aria-hidden="false"
-              fontIcon="done"
-            ></mat-icon>
+              >done</mat-icon
+            >
             <span>A-Z</span>
           </div>
 
@@ -95,8 +94,8 @@
               class="dropdown_icon_wrapper"
               [ngClass]="filters.sortAscending.active ? '' : 'hide_icon'"
               aria-hidden="false"
-              fontIcon="done"
-            ></mat-icon>
+              >done</mat-icon
+            >
             <span>Z-A</span>
           </div>
         </div>
@@ -109,8 +108,8 @@
           <mat-icon
             id="openFilterDropdown"
             aria-hidden="false"
-            fontIcon="arrow_drop_down"
-          ></mat-icon>
+            >arrow_drop_down</mat-icon
+          >
         </div>
 
         <div
@@ -121,8 +120,8 @@
             <mat-icon
               class="dropdown_icon_wrapper hide_icon"
               aria-hidden="false"
-              fontIcon="done"
-            ></mat-icon>
+              >done</mat-icon
+            >
             <span>Alphabetical</span>
           </div>
 
@@ -130,8 +129,8 @@
             <mat-icon
               class="dropdown_icon_wrapper hide_icon"
               aria-hidden="false"
-              fontIcon="done"
-            ></mat-icon>
+              >done</mat-icon
+            >
             <span>Created</span>
           </div>
 
@@ -139,8 +138,8 @@
             <mat-icon
               class="dropdown_icon_wrapper"
               aria-hidden="false"
-              fontIcon="done"
-            ></mat-icon>
+              >done</mat-icon
+            >
             <span>Last Viewed</span>
           </div>
         </div>
@@ -149,19 +148,15 @@
       <!-- View Options -->
       <div class="viewOptions_wrapper">
         <div
-          class="icon_wrapper"
           id="viewOption grid"
           (click)="toggleViewMode('grid')"
         >
           <div
-            class=""
             [ngClass]="viewMode === 'grid' ? 'viewOptions_select' : ''"
           >
             <mat-icon
-              class="icon_wrapper"
               aria-hidden="false"
-              fontIcon="apps"
-            ></mat-icon>
+            >view_cozy</mat-icon>
           </div>
         </div>
         <div
@@ -175,10 +170,8 @@
             [ngClass]="viewMode === 'list' ? 'viewOptions_select' : ''"
           >
             <mat-icon
-              class="icon_wrapper"
               aria-hidden="false"
-              fontIcon="view_headline"
-            ></mat-icon>
+            >view_headline</mat-icon>
           </div>
         </div>
       </div>
@@ -201,23 +194,23 @@
       @for (exam of filteredExams; track exam._id) {
         <div class="examBrowser_item" (click)="onEdit(exam._id)">
           @if (isDownloadable(exam._id)) {
-            <div
+            <button
               class="download-icon-wrapper"
               matTooltip="Download Generated Exam"
               (click)="onDownload($event, exam._id)"
             >
-              <mat-icon fontIcon="download"></mat-icon>
-            </div>
+              <mat-icon>download</mat-icon>
+            </button>
           }
 
-          <div
+          <button
             class="delete-icon-wrapper"
             matTooltip="Delete Exam"
             [matTooltipShowDelay]="500"
             (click)="onDeleteExam($event, exam._id)"
           >
-            <mat-icon fontIcon="delete"></mat-icon>
-          </div>
+            <mat-icon>delete</mat-icon>
+          </button>
 
           <app-exam-card [name]="exam.courseName" />
         </div>

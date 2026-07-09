@@ -1,13 +1,17 @@
-import { Component, ElementRef, ViewChild, viewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { ThemeToggleService } from '../../services/theme-toggle.service';
 import { MatIcon } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+
+import { ThemeToggleService } from '../../services/theme-toggle.service';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { NgIf } from '@angular/common';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-main-view',
@@ -20,6 +24,9 @@ import { NgIf } from '@angular/common';
     RouterModule,
     MatIcon,
     NgIf,
+    MatToolbarModule,
+    MatMenuModule,
+    MatTooltipModule,
   ],
   templateUrl: './main-view.component.html',
   styleUrl: './main-view.component.scss',
@@ -27,11 +34,8 @@ import { NgIf } from '@angular/common';
 export class MainViewComponent {
   public username: string = '';
   public initialLetter: string = '';
-  public isNavCollapsed: boolean = false;
-  @ViewChild('sidenav')
-  sidenav!: ElementRef;
-  @ViewChild('content')
-  content!: ElementRef;
+  public themeIcon: "dark_mode" | "light_mode" = "light_mode"
+  public sidebarCollapsed = false;
 
   constructor(
     private themeToggleService: ThemeToggleService,
@@ -45,6 +49,12 @@ export class MainViewComponent {
       this.username = user.name || user.sub;
       this.initialLetter = this.username ? this.username[0].toUpperCase() : '';
     });
+
+    this.themeToggleService.themeChanged$.subscribe(theme => {
+      this.themeIcon = theme === 'dark' ? 'dark_mode' : 'light_mode';
+    });
+
+    this.sidebarCollapsed = sessionStorage.getItem('sidebarCollapsed') === 'true';
   }
 
   isLoginPage(): boolean {
@@ -66,12 +76,9 @@ export class MainViewComponent {
     this.initialLetter = name[0];
   }
 
-  toggleNavCollapse() {
-    this.isNavCollapsed = !this.isNavCollapsed;
-    this.sidenav.nativeElement.style.width = this.isNavCollapsed ? '0' : '12%';
-    this.content.nativeElement.style.width = this.isNavCollapsed
-      ? '100%'
-      : '88%';
+  toggleSidebar() {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
+    sessionStorage.setItem('sidebarCollapsed', this.sidebarCollapsed.toString());
   }
 
   onSearch(search: string) {

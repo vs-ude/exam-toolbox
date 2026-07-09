@@ -26,7 +26,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "public/"
               }
             ],
             "styles": ["src/styles.scss"],
@@ -59,17 +60,6 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
-            },
-            "devcontainer": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.devcontainer.ts"
-                }
-              ]
             }
           },
           "defaultConfiguration": "production"

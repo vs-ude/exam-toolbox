@@ -84,6 +84,6 @@ export class DashboardComponent {
       console.warn('Selected exam has no ID');
       return;
     }
-    this.router.navigate([`/create-exam/${examId}`]);
+    this.router.navigate([`/edit-exam/${examId}`]);
   }
 }

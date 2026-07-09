@@ -15,8 +15,6 @@
   width: 100%;
   max-width: 400px;
   padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
 }
 
 mat-card-header {
@@ -38,27 +36,13 @@ mat-card-subtitle {
   color: var(--color-text-muted, #757575);
 }
 
-.full-width {
-  width: 100%;
-  margin-bottom: 16px;
+.mat-mdc-card-avatar {
+  height: 80px;
+  width: 80px;
 }
 
-.error-message {
-  display: flex;
-  align-items: center;
-  color: #f44336;
-  font-size: 14px;
-  margin-bottom: 16px;
-  padding: 8px 12px;
-  background-color: rgba(244, 67, 54, 0.1);
-  border-radius: 4px;
-
-  .error-icon {
-    margin-right: 8px;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-  }
+.full-width {
+  width: 100%;
 }
 
 .submit-button {

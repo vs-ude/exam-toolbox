@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { AuthService } from '../../services/auth.service';
 
@@ -32,6 +33,7 @@ export class LoginComponent {
   password = '';
   error = '';
   isLoading = false;
+  private _snackBar: MatSnackBar = inject(MatSnackBar);
 
   constructor(
     private authService: AuthService,
@@ -59,13 +61,15 @@ export class LoginComponent {
       },
       error: err => {
         this.isLoading = false;
+        let text = '';
         if (err.status === 401) {
-          this.error = 'Invalid username or password.';
+          text = 'Invalid username or password.';
         } else if (err.status === 403) {
-          this.error = 'You do not have permission to access this application.';
+          text = 'You do not have permission to access this application.';
         } else {
-          this.error = 'An unexpected error occurred. Please try again later.';
+          text = 'An unexpected error occurred. Please try again later.';
         }
+        this._snackBar.open(text, 'Close', { duration: 10000 });
       },
     });
   }

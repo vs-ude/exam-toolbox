@@ -4,10 +4,9 @@
     <div class="icon_wrapper footer_icon_delete">
       <mat-icon
         aria-hidden="false"
-        fontIcon="delete"
         matTooltip="Delete"
         (click)="onDelete()"
-      ></mat-icon>
+      >delete</mat-icon>
     </div>
 
     @for (tag of task.tags; track tag) {
@@ -22,10 +21,9 @@
     <div class="icon_wrapper footer_icon">
       <mat-icon
         aria-hidden="false"
-        fontIcon="add"
         matTooltip="add Tag"
         (click)="onAddTag()"
-      ></mat-icon>
+      >add</mat-icon>
     </div>
 
     @if (isModifiedPoolTask) {
@@ -45,10 +43,9 @@
       <div class="icon_wrapper footer_icon">
         <mat-icon
           aria-hidden="false"
-          fontIcon="preview"
           matTooltip="Goto Preview"
           (click)="onPreview()"
-        ></mat-icon>
+        >preview</mat-icon>
       </div>
     }
   </div>

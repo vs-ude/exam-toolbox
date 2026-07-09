@@ -1,7 +1,8 @@
-<div class="login-container">
+<div class="login-container" appearance="outlined">
   <mat-card class="login-card">
     <mat-card-header>
-      <mat-card-title>Exam Toolbox Login</mat-card-title>
+      <div mat-card-avatar class="exam-toolbox-logo"></div>
+      <mat-card-title>Exam Toolbox</mat-card-title>
       <mat-card-subtitle>Sign in with your LDAP credentials</mat-card-subtitle>
     </mat-card-header>
 
@@ -36,11 +37,6 @@
           />
           <mat-icon matSuffix>lock</mat-icon>
         </mat-form-field>
-
-        <div *ngIf="error" class="error-message">
-          <mat-icon class="error-icon">error</mat-icon>
-          <span>{{ error }}</span>
-        </div>
 
         <button
           mat-flat-button

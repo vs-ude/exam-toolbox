@@ -54,7 +54,7 @@
       'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
     }"
   >
-    <mat-icon aria-hidden="false" fontIcon="format_bold"></mat-icon>
+    <mat-icon aria-hidden="false">format_bold</mat-icon>
   </div>
 
   <div
@@ -64,7 +64,7 @@
       'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
     }"
   >
-    <mat-icon aria-hidden="false" fontIcon="format_italic"></mat-icon>
+    <mat-icon aria-hidden="false">format_italic</mat-icon>
   </div>
 
   <div
@@ -74,7 +74,7 @@
       'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
     }"
   >
-    <mat-icon aria-hidden="false" fontIcon="format_underline"></mat-icon>
+    <mat-icon aria-hidden="false">format_underlined</mat-icon>
   </div>
 </div>
 
@@ -136,9 +136,8 @@
     <div class="icon_wrapper delete_option_icon">
       <mat-icon
         aria-hidden="false"
-        fontIcon="close"
         (click)="removeOption(i)"
-      ></mat-icon>
+      >close</mat-icon>
     </div>
   </div>
 
@@ -147,10 +146,9 @@
     <div class="icon_wrapper add_option_icon">
       <mat-icon
         aria-hidden="false"
-        fontIcon="add_circle"
         matTooltip="add Option"
         (click)="addOption()"
-      ></mat-icon>
+      >add_circle</mat-icon>
     </div>
   </div>
 </div>
@@ -161,10 +159,9 @@
     <div class="icon_wrapper footer_icon_delete">
       <mat-icon
         aria-hidden="false"
-        fontIcon="delete"
         matTooltip="Delete"
         (click)="onDelete()"
-      ></mat-icon>
+      >delete</mat-icon>
     </div>
 
     @for (tag of task.tags; track tag) {
@@ -179,10 +176,9 @@
     <div class="icon_wrapper footer_icon">
       <mat-icon
         aria-hidden="false"
-        fontIcon="add"
         matTooltip="add Tag"
         (click)="onAddTag()"
-      ></mat-icon>
+      >add</mat-icon>
     </div>
 
     @if (isModifiedPoolTask) {
@@ -201,10 +197,9 @@
     <div class="icon_wrapper footer_icon">
       <mat-icon
         aria-hidden="false"
-        fontIcon="preview"
         matTooltip="Goto Preview"
         (click)="onPreview()"
-      ></mat-icon>
+      >preview</mat-icon>
     </div>
   </div>
 

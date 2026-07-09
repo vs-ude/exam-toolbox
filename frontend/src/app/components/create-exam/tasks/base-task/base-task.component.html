@@ -53,7 +53,7 @@
       'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
     }"
   >
-    <mat-icon aria-hidden="false" fontIcon="format_bold"></mat-icon>
+    <mat-icon aria-hidden="false">format_bold</mat-icon>
   </div>
 
   <div
@@ -63,7 +63,7 @@
       'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
     }"
   >
-    <mat-icon aria-hidden="false" fontIcon="format_italic"></mat-icon>
+    <mat-icon aria-hidden="false">format_italic</mat-icon>
   </div>
 
   <div
@@ -73,7 +73,7 @@
       'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
     }"
   >
-    <mat-icon aria-hidden="false" fontIcon="format_underline"></mat-icon>
+    <mat-icon aria-hidden="false">format_underlined</mat-icon>
   </div>
 </div>
 
@@ -83,18 +83,16 @@
     <div class="icon_wrapper footer_icon">
       <mat-icon
         aria-hidden="false"
-        fontIcon="content_copy"
         matTooltip="Copy"
-      ></mat-icon>
+      >content_copy</mat-icon>
     </div>
 
     <div class="icon_wrapper footer_icon_delete">
       <mat-icon
         aria-hidden="false"
-        fontIcon="delete"
         matTooltip="Delete"
         (click)="onDelete()"
-      ></mat-icon>
+      >delete</mat-icon>
     </div>
 
     @for (tag of task.tags; track tag) {
@@ -112,10 +110,9 @@
     <div class="icon_wrapper footer_icon">
       <mat-icon
         aria-hidden="false"
-        fontIcon="add"
         matTooltip="add Tag"
         (click)="onAddTag()"
-      ></mat-icon>
+      >add</mat-icon>
     </div>
 
     @if (isModifiedPoolTask) {

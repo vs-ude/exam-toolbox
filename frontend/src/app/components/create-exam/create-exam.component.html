@@ -106,37 +106,33 @@
       <div class="icon_wrapper bar_icon">
         <mat-icon
           aria-hidden="false"
-          fontIcon="remove_red_eye"
           matTooltip="Preview"
           (click)="onPreview()"
           data-cy="preview-btn"
-        ></mat-icon>
+        >remove_red_eye</mat-icon>
       </div>
       <div class="icon_wrapper bar_icon">
         <mat-icon
           *ngIf="!isUpdateMode"
           aria-hidden="false"
-          fontIcon="save"
           matTooltip="Save"
           (click)="onSave()"
           data-cy="save"
-        ></mat-icon>
+        >save</mat-icon>
         <mat-icon
           *ngIf="isUpdateMode"
           aria-hidden="false"
-          fontIcon="update"
           matTooltip="Update"
           (click)="onUpdate()"
-        ></mat-icon>
+        >save</mat-icon>
       </div>
 
       <div class="icon_wrapper bar_icon">
         <mat-icon
           aria-hidden="false"
-          fontIcon="download"
           matTooltip="Generate all Exams"
           (click)="onMassExam()"
-        ></mat-icon>
+        >download</mat-icon>
       </div>
 
       <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"
@@ -148,7 +144,7 @@
 
       <div class="duration_wrapper">
         <div class="icon_wrapper">
-          <mat-icon aria-hidden="false" fontIcon="access_time"></mat-icon>
+          <mat-icon aria-hidden="false">access_time</mat-icon>
         </div>
         <input
           class="duration_picker"
@@ -172,7 +168,7 @@
 
       <div class="examiner_wrapper">
         <div class="icon_wrapper">
-          <mat-icon aria-hidden="false" fontIcon="person"></mat-icon>
+          <mat-icon aria-hidden="false">person</mat-icon>
         </div>
         <input
           class="examiner_input"
@@ -184,7 +180,7 @@
 
       <div class="semester_wrapper">
         <div class="icon_wrapper">
-          <mat-icon aria-hidden="false" fontIcon="school"></mat-icon>
+          <mat-icon aria-hidden="false">school</mat-icon>
         </div>
         <mat-select
           class="selectSemester"
@@ -232,7 +228,7 @@
           matTooltip="add Group"
           [matTooltipShowDelay]="800"
         >
-          <mat-icon aria-hidden="false" fontIcon="add"></mat-icon>
+          <mat-icon aria-hidden="false">add</mat-icon>
         </button>
         <button
           class="tab preview-tab"

@@ -11,17 +11,57 @@
 
 @font-face {
   font-family: 'Roboto';
-  src: url('/fonts/roboto/Roboto-VariableFont_wdth,wght.woff2') format('woff2');
+  src: url('/public/fonts/Roboto-VariableFont.woff2')
+    format('woff2');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
-// Define the theme object.
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 100 700;
+  src: url('/public/fonts/MaterialSymbolsOutlined-Regular.ttf')
+    format('truetype');
+  font-display: swap;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  color: var(--color-icon);
+}
+
+// Define the theme objects.
 $frontend-theme: mat.define-theme(
   (
     color: (
       theme-type: light,
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    density: (
+      scale: 0,
+    ),
+  )
+);
+
+$frontend-dark-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: dark,
       primary: mat.$azure-palette,
       tertiary: mat.$blue-palette,
     ),
@@ -52,10 +92,16 @@ $frontend-theme: mat.define-theme(
   --color-secondary: #9747ff;
   --color-warn: #ff5c16;
   --color-dark-gray: #757575;
+  --color-background-active: var(--color-dark-gray);
+  --color-nav-active-bg: #{mat.get-theme-color($frontend-theme, primary, 90)};
+  --color-nav-active-fg: #{mat.get-theme-color($frontend-theme, primary, 10)};
 }
 
 body.dark {
+  @include mat.all-component-colors($frontend-dark-theme);
   @include darken();
+  --color-nav-active-bg: #{mat.get-theme-color($frontend-dark-theme, primary, 30)};
+  --color-nav-active-fg: #{mat.get-theme-color($frontend-dark-theme, primary, 90)};
 }
 
 body.light {
@@ -95,3 +141,23 @@ body {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
   background-color: var(--color-background);
 }
+
+.exam-toolbox-logo {
+  border-radius: 0 !important;
+  background-image: url('/public/logo.png');
+  background-size: cover;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.spacer-vertical {
+  flex: 1 1 auto;
+  margin-bottom: 100%;
+}
+
+.list_delete_icon {
+  @include mat.icon-overrides((
+  color: var(--color-warn)
+  ))}

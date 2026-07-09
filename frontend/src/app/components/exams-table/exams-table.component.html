@@ -48,9 +48,8 @@
           matTooltip="Download Generated Exam"
           [matTooltipShowDelay]="500"
           class="list_download_icon"
-          fontIcon="download"
           (click)="onDownload($event, exam._id)"
-        ></mat-icon>
+        >download</mat-icon>
       }
     </td>
   </ng-container>
@@ -63,9 +62,8 @@
         matTooltip="Delete Exam"
         [matTooltipShowDelay]="500"
         class="list_delete_icon"
-        fontIcon="delete"
         (click)="onDeleteExam($event, exam._id)"
-      ></mat-icon>
+      >delete</mat-icon>
     </td>
   </ng-container>
 

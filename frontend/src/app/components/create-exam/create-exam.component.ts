@@ -291,7 +291,7 @@ export class CreateExamComponent {
       response => {
         console.log('Exam added successfully: ', response);
         this.autosaveService.clearLocal(undefined);
-        this.router.navigate([`/create-exam/${response.insertedId}`]); // uses the id inserted by mongodb to navigate to a detailed view of this exam
+        this.router.navigate([`/edit-exam/${response.insertedId}`]); // uses the id inserted by mongodb to navigate to a detailed view of this exam
       },
       error => {
         console.error('Error adding exam: ', error);

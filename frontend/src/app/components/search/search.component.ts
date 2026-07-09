@@ -118,7 +118,7 @@ export class SearchComponent {
       console.warn(`Exam ${exam.courseName} ${exam.semester} has no ExamID`);
       return;
     }
-    this.router.navigate([`/create-exam/${exam._id}`]);
+    this.router.navigate([`/edit-exam/${exam._id}`]);
   }
 
   public onTaskClick(task: Task) {

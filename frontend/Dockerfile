@@ -11,4 +11,4 @@ COPY --parents ["*.json", "src/", "./"]
 EXPOSE 4200
 
 # Start the frontend in development mode
-CMD ["deno", "run", "--allow-net", "ng", "serve", "--configuration", "devcontainer", "--host", "0.0.0.0"]
+CMD ["deno", "run", "--allow-net", "ng", "serve", "--configuration", "development", "--host", "0.0.0.0"]
