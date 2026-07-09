@@ -62,39 +62,28 @@ exam-toolbox/
 
 - Docker and Docker Compose
 
-### 1. Configure environment variables
-
-The `docker-compose.yml` reads a few variables from the environment (or an `.env` file in the project root):
-
-| Variable | Default / notes |
-|---|---|
-| `DOMAIN` | Hostname/domain Caddy listens on. Defaults to `localhost` in `docker-compose.yml`. |
-| `LOGLEVEL` | Caddy log level (`debug`, `info`, `warn`). Defaults to `warn` in `docker-compose.yml`. |
-
-Create an `.env` file:
-
-```env
-DOMAIN=localhost
-LOGLEVEL=warn
-```
-
-### 2. Start all services
+### Start all services
 
 ```sh
 docker compose up --build
 ```
 
+> [!NOTE]
+> The default `docker-compose.yml` starts the backend in `development` mode.
+> It prints additional log output and returns more descriptive HTTP responses that way.
+> Disable it in production.
+
 The first build compiles the frontend and backend images. Subsequent starts are faster.
 
 | Service | Default address |
 |---|---|
-| Application | https://localhost |
-| API Specification (JSON) | https://localhost/api/doc *(Only in development mode)* |
+| Application | http://localhost |
+| API Specification (JSON) | http://localhost/api/doc *(Only in development mode)* |
 | phpLDAPadmin | http://localhost:6080 |
 | MailCrab (dev mail UI) | http://localhost:1080 |
 | MongoDB | localhost:27017 |
 
-### 3. Log in
+### Log in
 
 You'll be redirected to the login page.
 Log in with one of the dev accounts below.
@@ -111,10 +100,18 @@ Simply execute:
 docker compose watch
 ```
 
+Or, to have less noise (e.g. from LDAP/Mongo):
+```sh
+docker compose up --build --watch --attach backend caddy frontend
+```
+> [!NOTE]
+> This does not start the `ldap-admin` container. If you need the phpLDAPAdmin UI, include it in the command above.
+
 This will watch and:
-- Rebuild backend containers when `deno.json`, template, or Dockerfile changes.
-- Sync backend `.ts` files and restart the server automatically.
-- Re-compile the frontend using `ng serve` when source files are modified.
+- Rebuild containers when `deno.json`, `package.json`, template, or Dockerfile changes.
+- Sync backend `.ts`, `.scss` and `.html` files and restart the server automatically.
+- This works for both the backend and the frontend.
+- Caddy will reload its config when it's changed and Docker syncs changes in the `public/` directory into the container.
 
 ### Frontend (standalone)
 

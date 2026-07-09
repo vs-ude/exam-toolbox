@@ -16,7 +16,6 @@ services:
       - backend
       - frontend
     environment:
-      DOMAIN: ${DOMAIN} # needs to be changed for production (with domain)
       LOGLEVEL: warn # debug, info, warn
     develop:
       watch:
@@ -70,14 +69,16 @@ services:
       SMTP_HOST: mailcrab
       SMTP_PORT: 1025
       SMTP_FROM: noreply@example.com
-      SERVER_PUBLIC_URL: 'https://${DOMAIN}'
+      SERVER_PUBLIC_URL: 'http://${DOMAIN}'
       PATHS_CACHE_DIR: /app/cache
       PATHS_JOBS_DIR: /app/jobs
       CONFIG: /app/config.yaml
       NODE_ENV: development
     depends_on:
       - mongo
+      - ldap-host
       - mailcrab
+      - periodic-tasks
     networks:
       - web
     develop:

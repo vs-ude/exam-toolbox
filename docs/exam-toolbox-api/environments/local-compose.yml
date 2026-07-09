@@ -3,4 +3,4 @@ variables:
   - secret: true
     name: token
   - name: baseUrl
-    value: https://localhost
+    value: http://localhost
