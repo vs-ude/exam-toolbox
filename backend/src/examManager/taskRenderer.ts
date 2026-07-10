@@ -13,7 +13,7 @@ import type {
   TableTask,
   TaskGroup,
   Translation,
-} from '../types/exam.ts';
+} from '../types/mod.ts';
 import { getConfig } from '../config/mod.ts';
 import { LatexRenderError } from './err.ts';
 

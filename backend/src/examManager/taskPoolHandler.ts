@@ -1,7 +1,7 @@
 import { Context } from '@hono/hono';
 import { emptyDir } from '@std/fs';
 
-import { parseTask } from '../types/exam.ts';
+import { parseTask } from '../types/mod.ts';
 import { HandlerResult, HttpError } from '../types/handler.ts';
 import { AppEnv } from '../types/context.ts';
 

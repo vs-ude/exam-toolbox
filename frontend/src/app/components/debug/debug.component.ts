@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import { Exam, Task } from '../../exam';
+import { Exam } from '../../types/shared/exam';
+import { Task } from '../../types/shared/tasks';
 import { saveAs } from 'file-saver';
 import { ApiService } from '../../services/api.service';
-import { Tag } from '../../tag';
+import { Tag } from '../../types/shared/tag';
 import { HttpResponse } from '@angular/common/http';
 
 const courseName = 'DEBUG EXAM';

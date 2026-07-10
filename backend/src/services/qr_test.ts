@@ -1,6 +1,6 @@
 import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 import { generateExamQR, generatePageQR, parseQR, QRError } from './qr.ts';
-import { Exam } from '../types/exam.ts';
+import { Exam } from '../types/mod.ts';
 import { ExamPageQRData, ExamQRData } from '../types/scan.ts';
 import { skipIntegration } from '../config/test.ts';
 import { contrastAdjust } from './preprocess.ts';

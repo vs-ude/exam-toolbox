@@ -3,7 +3,7 @@ import { sign } from '@hono/hono/jwt';
 
 import { getConfig } from '../config/appConfig.ts';
 import { HttpError } from '../types/handler.ts';
-import { Rights, User } from '../types/user.ts';
+import { Rights, User } from '../types/mod.ts';
 
 import { getOrCreateDb } from './db.ts';
 

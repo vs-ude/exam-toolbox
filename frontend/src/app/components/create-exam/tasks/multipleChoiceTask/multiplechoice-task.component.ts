@@ -14,7 +14,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MultipleChoiceTask, Task } from '../../../../exam';
+import { MultipleChoiceTask, Task } from '../../../../types/shared/tasks';
 import { BaseTaskComponent } from '../base-task/base-task.component';
 import { TaskAnimations } from '../task-animations';
 import { environment } from '../../../../../environments/environment';

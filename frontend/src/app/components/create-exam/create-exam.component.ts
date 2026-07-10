@@ -2,7 +2,8 @@ import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgFor, NgIf } from '@angular/common';
-import { Exam, Task } from '../../exam';
+import { Exam } from '../../types/shared/exam';
+import { Task } from '../../types/shared/tasks';
 import { AddTaskComponent } from './add-task/add-task.component';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
@@ -36,7 +37,7 @@ import { HttpResponse } from '@angular/common/http';
 import { NewPageDialogComponent } from './new-page-dialog/new-page-dialog.component';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Tag } from '../../tag';
+import { Tag } from '../../types/shared/tag';
 import {
   AddTagDialogComponent,
   AddTagDialogData,

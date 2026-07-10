@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { Task } from '../../../exam';
+import { Task } from '../../../types/shared/tasks';
 
 @Component({
   selector: 'app-new-page-dialog',

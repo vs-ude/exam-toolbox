@@ -7,10 +7,8 @@ import * as fs from '@std/fs';
 
 import { ensureQRCache } from '../services/qr.ts';
 import { AppEnv } from '../types/context.ts';
-import { Exam } from '../types/exam.ts';
+import { Exam, Student, User } from '../types/mod.ts';
 import { HandlerResult, HttpError } from '../types/handler.ts';
-import { Student } from '../types/student.ts';
-import { User } from '../types/user.ts';
 
 import {
   compileExam,

@@ -10,7 +10,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
-import { Task } from '../../../../../exam';
+import { Task } from '../../../../../types/shared/tasks';
 
 @Component({
   selector: 'app-task-footer',

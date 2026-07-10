@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { TaskAnimations } from '../task-animations';
 import { BaseTaskComponent } from '../base-task/base-task.component';
-import { ManualText, Task } from '../../../../exam';
+import { ManualText, Task } from '../../../../types/shared/tasks';
 import { NgIf, NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatLabel } from '@angular/material/form-field';

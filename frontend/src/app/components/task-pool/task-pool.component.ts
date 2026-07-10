@@ -6,13 +6,13 @@ import {
   ViewChild,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { Task } from '../../exam';
+import { Task } from '../../types/shared/tasks';
 import { TaskPoolCardComponent } from '../task-pool-card/task-pool-card.component';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { ApiService } from '../../services/api.service';
-import { Tag } from '../../tag';
+import { Tag } from '../../types/shared/tag';
 import { forkJoin } from 'rxjs';
 
 @Component({

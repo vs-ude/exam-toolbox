@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { filter, Observable, timeout } from 'rxjs';
-import { Exam, Task } from '../exam';
-import { User } from '../user';
-import { Tag } from '../tag';
+import { Exam } from '../types/shared/exam';
+import { Task } from '../types/shared/tasks';
+import { User } from '../types/user';
+import { Tag } from '../types/shared/tag';
 import { AuthService } from './auth.service';
 
 export interface JobStatus {

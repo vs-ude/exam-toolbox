@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../../services/api.service';
-import { Tag } from '../../tag';
+import { Tag } from '../../types/shared/tag';
 import { TagHelperService } from '../../services/tag-helper.service';
 
 export interface AddTagDialogData {

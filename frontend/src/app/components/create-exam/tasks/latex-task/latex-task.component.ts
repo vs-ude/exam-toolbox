@@ -6,7 +6,7 @@ import {
   Output,
 } from '@angular/core';
 import { BaseTaskComponent } from '../base-task/base-task.component';
-import { LatexTask, Task } from '../../../../exam';
+import { LatexTask, Task } from '../../../../types/shared/tasks';
 import { NgIf, NgStyle } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';

@@ -3,7 +3,7 @@ import { Context } from '@hono/hono';
 
 import { HandlerResult, HttpError } from '../types/handler.ts';
 import { AppEnv } from '../types/context.ts';
-import { Tag } from '../types/tag.ts';
+import { Tag } from '../types/mod.ts';
 
 import { ExamManagerDeps } from './main.ts';
 

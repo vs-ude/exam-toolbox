@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { Task } from '../../exam';
+import { Task } from '../../types/shared/tasks';
 import { FormsModule } from '@angular/forms';
 
 @Component({

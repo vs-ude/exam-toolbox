@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Task } from '../exam';
+import { Task } from '../types/shared/tasks';
 import { ApiService } from './api.service';
-import { User } from '../user';
+import { User } from '../types/user';
 
 @Injectable({
   providedIn: 'root',

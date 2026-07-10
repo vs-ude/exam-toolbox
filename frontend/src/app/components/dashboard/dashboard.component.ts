@@ -5,7 +5,7 @@ import { ExamCardComponent } from '../exam-card/exam-card.component';
 import { NgClass, NgFor } from '@angular/common';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
-import { Exam } from '../../exam';
+import { Exam } from '../../types/shared/exam';
 import { ExamsTableComponent } from '../exams-table/exams-table.component';
 
 @Component({

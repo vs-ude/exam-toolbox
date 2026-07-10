@@ -1,4 +1,4 @@
-import type { Language } from './exam.ts';
+import type { Language } from './shared/base.ts';
 
 export class ExamQRData {
   courseName: string;

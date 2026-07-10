@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Exam } from '../exam';
+import { Exam } from '../types/shared/exam';
 
 // Wraps the exam data with a timestamp
 export interface AutosaveWrapper {

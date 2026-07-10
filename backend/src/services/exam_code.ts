@@ -1,4 +1,4 @@
-import { Language } from '../types/exam.ts';
+import { Language } from '../types/mod.ts';
 
 const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const MODULUS = ALPHABET.length;

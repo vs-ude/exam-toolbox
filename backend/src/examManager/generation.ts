@@ -1,4 +1,4 @@
-import { type Exam, Language, TaskGroup } from '../types/exam.ts';
+import { type Exam, Language, TaskGroup } from '../types/mod.ts';
 import { getTaskRenderer, type RenderOptions } from './taskRenderer.ts';
 import { escapeLatex, getEta } from '../services/mod.ts';
 import {
@@ -7,7 +7,7 @@ import {
   LatexRenderError,
 } from './err.ts';
 import { getConfig, QRConfig } from '../config/mod.ts';
-import { Student } from '../types/student.ts';
+import { Student } from '../types/mod.ts';
 import { generateExamQR } from '../services/qr.ts';
 
 const config = getConfig();

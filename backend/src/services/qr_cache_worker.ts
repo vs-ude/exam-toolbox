@@ -1,5 +1,5 @@
 import { QRConfig } from '../config/mod.ts';
-import { type Language } from '../types/exam.ts';
+import { type Language } from '../types/mod.ts';
 import { genExamCode } from './exam_code.ts';
 import { generatePageQR } from './qr.ts';
 

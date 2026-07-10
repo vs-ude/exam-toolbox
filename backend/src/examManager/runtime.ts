@@ -7,7 +7,7 @@ import {
   mergePdfs,
   sendEmail,
 } from '../services/mod.ts';
-import { Language } from '../types/exam.ts';
+import { Language } from '../types/mod.ts';
 
 const appConfig = getConfig();
 

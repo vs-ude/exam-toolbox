@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import type { PictureTask, PropertyTask, TableTask } from '../types/exam.ts';
+import type { PictureTask, PropertyTask, TableTask } from '../types/mod.ts';
 
 const TEMPLATE_PATH = './template';
 

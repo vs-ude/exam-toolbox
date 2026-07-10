@@ -92,6 +92,9 @@ Log in with one of the dev accounts below.
 
 Local development is container-first and leverages Docker Compose's `develop.watch` capabilities. Running in watch mode automatically synchronizes frontend and backend files, hot-reloading changes in real time.
 
+> [!NOTE]
+> The backend and frontend share some types in their `types/shared` directories. There are scripts in `tools/` to check and copy these. The backend files are taken as base, changes in the frontend files will be overwritten!
+
 ### Starting with watch mode
 
 Simply execute:

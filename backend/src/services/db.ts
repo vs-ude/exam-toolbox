@@ -1,7 +1,6 @@
 import { Collection, Document, MongoClient, ObjectId } from '@db/mongo';
 import { getConfig } from '../config/appConfig.ts';
-import { Exam, parseExam, parseTask, Task } from '../types/exam.ts';
-import { Group, User } from '../types/user.ts';
+import { Exam, parseExam, parseTask, Task, Group, User } from '../types/mod.ts';
 
 let db: ExamToolboxDatabase;
 

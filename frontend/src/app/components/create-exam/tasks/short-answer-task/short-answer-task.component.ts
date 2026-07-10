@@ -7,7 +7,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { ShortAnswerTask, Task } from '../../../../exam';
+import { ShortAnswerTask, Task } from '../../../../types/shared/tasks';
 import { NgIf, NgStyle } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';

@@ -1,5 +1,5 @@
 import { Component, Input, input } from '@angular/core';
-import { Task } from '../../exam';
+import { Task } from '../../types/shared/tasks';
 import { MatIconModule } from '@angular/material/icon';
 import { ColorProviderService } from '../../services/color-provider.service';
 import { NgFor, NgStyle } from '@angular/common';
@@ -8,7 +8,7 @@ import {
   AddTagDialogComponent,
   AddTagDialogData,
 } from '../add-tag-dialog/add-tag-dialog.component';
-import { Tag } from '../../tag';
+import { Tag } from '../../types/shared/tag';
 import { ApiService } from '../../services/api.service';
 import { TagHelperService } from '../../services/tag-helper.service';
 import { environment } from '../../../environments/environment';

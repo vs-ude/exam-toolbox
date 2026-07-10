@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { BaseTaskComponent } from '../base-task/base-task.component';
-import { TableTask, Task } from '../../../../exam';
+import { TableTask, Task } from '../../../../types/shared/tasks';
 import { NgFor, NgIf, NgStyle } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatLabel } from '@angular/material/form-field';

@@ -7,7 +7,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { PictureTask, Task } from '../../../../exam';
+import { PictureTask, Task } from '../../../../types/shared/tasks';
 import { TaskAnimations } from '../task-animations';
 import { DragAndDropDirective } from '../drag-and-drop.directive';
 import { ApiService } from '../../../../services/api.service';

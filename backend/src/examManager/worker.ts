@@ -6,7 +6,7 @@ import {
   renderMetaStudent,
 } from './generation.ts';
 import { generateExamQR } from '../services/qr.ts';
-import { Student } from '../types/student.ts';
+import { Student } from '../types/mod.ts';
 
 // this worker receives a task, generates a single artifact (like a student pdf or a solution), and sends back the result
 self.onmessage = async (e: MessageEvent) => {

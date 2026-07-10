@@ -1,5 +1,5 @@
 import { ExamToolboxDatabase } from '../services/db.ts';
-import { Language } from '../types/exam.ts';
+import { Language } from '../types/mod.ts';
 
 import { ExamGenerationJob, GenerationTask } from './runtime.ts';
 

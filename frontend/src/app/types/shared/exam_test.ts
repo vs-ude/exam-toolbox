@@ -1,10 +1,6 @@
 import { assertEquals } from '@std/assert';
-import {
-  Exam,
-  type NewPage,
-  type ShortAnswerTask,
-  type TaskGroup,
-} from './exam.ts';
+import { Exam } from './exam';
+import { type NewPage, type ShortAnswerTask, type TaskGroup } from './tasks';
 
 function makeShortAnswerTask(taskId: string, points: number): ShortAnswerTask {
   return {

@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ExamCardComponent } from '../exam-card/exam-card.component';
-import { Exam } from '../../exam';
+import { Exam } from '../../types/shared/exam';
 import { ApiService, DownloadableJob } from '../../services/api.service';
 import { saveAs } from 'file-saver';
 import { LoadingService } from '../../services/loading.service';

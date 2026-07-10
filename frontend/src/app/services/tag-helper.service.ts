@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Tag } from '../tag';
-import { Exam, Task } from '../exam';
+import { Tag } from '../types/shared/tag';
+import { Exam } from '../types/shared/exam';
+import { Task } from '../types/shared/tasks';
 import { ApiService } from './api.service';
 
 @Injectable({

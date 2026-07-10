@@ -7,8 +7,8 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { Task } from '../../../../exam';
-import { Tag } from '../../../../tag';
+import { Task } from '../../../../types/shared/tasks';
+import { Tag } from '../../../../types/shared/tag';
 import { environment } from '../../../../../environments/environment';
 
 @Component({

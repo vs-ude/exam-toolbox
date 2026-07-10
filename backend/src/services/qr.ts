@@ -1,6 +1,6 @@
 import { QRConfig } from '../config/mod.ts';
 
-import { type Exam, type Language } from '../types/exam.ts';
+import { type Exam, type Language } from '../types/mod.ts';
 import { ExamPageQRData, ExamQRData as ExamQRData } from '../types/scan.ts';
 import { getOrCreateDb, QRCacheDocument } from './db.ts';
 import { parseExamCode } from './exam_code.ts';

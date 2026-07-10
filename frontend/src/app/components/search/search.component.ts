@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
-import { Tag } from '../../tag';
+import { Tag } from '../../types/shared/tag';
 import { RouterModule } from '@angular/router';
 import { ExamCardComponent } from '../exam-card/exam-card.component';
 import { TaskPoolCardComponent } from '../task-pool-card/task-pool-card.component'; // Import RouterModule
 import { AsyncPipe, JsonPipe, NgIf, NgStyle } from '@angular/common';
-import { Exam, Task } from '../../exam';
+import { Exam } from '../../types/shared/exam';
+import { Task } from '../../types/shared/tasks';
 
 @Component({
   selector: 'app-search',
