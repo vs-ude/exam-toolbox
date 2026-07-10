@@ -81,18 +81,13 @@
 <div class="form-footer">
   <div class="footer-actions">
     <div class="icon_wrapper footer_icon">
-      <mat-icon
-        aria-hidden="false"
-        matTooltip="Copy"
-      >content_copy</mat-icon>
+      <mat-icon aria-hidden="false" matTooltip="Copy">content_copy</mat-icon>
     </div>
 
     <div class="icon_wrapper footer_icon_delete">
-      <mat-icon
-        aria-hidden="false"
-        matTooltip="Delete"
-        (click)="onDelete()"
-      >delete</mat-icon>
+      <mat-icon aria-hidden="false" matTooltip="Delete" (click)="onDelete()"
+        >delete</mat-icon
+      >
     </div>
 
     @for (tag of task.tags; track tag) {
@@ -108,11 +103,9 @@
     }
 
     <div class="icon_wrapper footer_icon">
-      <mat-icon
-        aria-hidden="false"
-        matTooltip="add Tag"
-        (click)="onAddTag()"
-      >add</mat-icon>
+      <mat-icon aria-hidden="false" matTooltip="add Tag" (click)="onAddTag()"
+        >add</mat-icon
+      >
     </div>
 
     @if (isModifiedPoolTask) {

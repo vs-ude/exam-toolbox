@@ -1,6 +1,6 @@
 <div class="main">
   <mat-toolbar *ngIf="!isLoginPage()" class="app-toolbar">
-    <img src="public/logo.png" id="header-logo" aria-hidden="false"/>
+    <img src="public/logo.png" id="header-logo" aria-hidden="false" />
     <span class="app-title">Exam Toolbox</span>
     <span class="spacer"></span>
     <button
@@ -27,7 +27,13 @@
     *ngIf="!isLoginPage()"
     autosize
   >
-    <mat-drawer #drawer class="main-drawer" [class.collapsed]="sidebarCollapsed" mode="side" [opened]="true">
+    <mat-drawer
+      #drawer
+      class="main-drawer"
+      [class.collapsed]="sidebarCollapsed"
+      mode="side"
+      [opened]="true"
+    >
       <mat-action-list>
         <button
           mat-list-item
@@ -52,7 +58,9 @@
           matTooltipPosition="right"
           aria-label="Create New Exam"
         >
-          <mat-icon matListItemIcon aria-hidden="false">note_stack_add</mat-icon>
+          <mat-icon matListItemIcon aria-hidden="false"
+            >note_stack_add</mat-icon
+          >
           <span matListItemTitle class="nav-label">Create New Exam</span>
         </button>
         <a
@@ -83,48 +91,59 @@
         </button>
 
         <div id="bottom-buttons">
-        <button mat-list-item (click)="toggleTheme()" class="nav-item"
-          [matTooltip]="sidebarCollapsed ? 'Theme' : ''"
-          matTooltipPosition="right"
-          aria-label="Toggle Theme"
-        >
-          <mat-icon matListItemIcon aria-hidden="false"
-            >{{ themeIcon }}</mat-icon
+          <button
+            mat-list-item
+            (click)="toggleTheme()"
+            class="nav-item"
+            [matTooltip]="sidebarCollapsed ? 'Theme' : ''"
+            matTooltipPosition="right"
+            aria-label="Toggle Theme"
           >
-          <span matListItemTitle class="nav-label">Theme</span>
-        </button>
+            <mat-icon matListItemIcon aria-hidden="false">{{
+              themeIcon
+            }}</mat-icon>
+            <span matListItemTitle class="nav-label">Theme</span>
+          </button>
 
-        <button mat-list-item routerLink="/getting-started" class="nav-item"
-          routerLinkActive="active-button"
-          [matTooltip]="sidebarCollapsed ? 'Getting Started' : ''"
-          matTooltipPosition="right"
-          aria-label="Getting Started"
-        >
-          <mat-icon matListItemIcon aria-hidden="false">help</mat-icon>
-          <span matListItemTitle class="nav-label">Getting Started</span>
-        </button>
+          <button
+            mat-list-item
+            routerLink="/getting-started"
+            class="nav-item"
+            routerLinkActive="active-button"
+            [matTooltip]="sidebarCollapsed ? 'Getting Started' : ''"
+            matTooltipPosition="right"
+            aria-label="Getting Started"
+          >
+            <mat-icon matListItemIcon aria-hidden="false">help</mat-icon>
+            <span matListItemTitle class="nav-label">Getting Started</span>
+          </button>
 
-        <button mat-list-item routerLink="/about" class="nav-item"
-          routerLinkActive="active-button"
-          [matTooltip]="sidebarCollapsed ? 'About' : ''"
-          matTooltipPosition="right"
-          aria-label="About"
-        >
-          <mat-icon matListItemIcon aria-hidden="false">info</mat-icon>
-          <span matListItemTitle class="nav-label">About</span>
-        </button>
+          <button
+            mat-list-item
+            routerLink="/about"
+            class="nav-item"
+            routerLinkActive="active-button"
+            [matTooltip]="sidebarCollapsed ? 'About' : ''"
+            matTooltipPosition="right"
+            aria-label="About"
+          >
+            <mat-icon matListItemIcon aria-hidden="false">info</mat-icon>
+            <span matListItemTitle class="nav-label">About</span>
+          </button>
 
-        <button
-          mat-list-item
-          class="drawer-toggle"
-          [matTooltip]="sidebarCollapsed ? 'Show sidebar' : ''"
-          matTooltipPosition="right"
-          aria-label="Toggle Left Sidebar"
-          (click)="toggleSidebar()"
-        >
-          <mat-icon matListItemIcon aria-hidden="false">{{ sidebarCollapsed ? 'left_panel_open' : 'left_panel_close' }}</mat-icon>
-          <span matListItemTitle class="nav-label">Hide Sidebar</span>
-        </button>
+          <button
+            mat-list-item
+            class="drawer-toggle"
+            [matTooltip]="sidebarCollapsed ? 'Show sidebar' : ''"
+            matTooltipPosition="right"
+            aria-label="Toggle Left Sidebar"
+            (click)="toggleSidebar()"
+          >
+            <mat-icon matListItemIcon aria-hidden="false">{{
+              sidebarCollapsed ? 'left_panel_open' : 'left_panel_close'
+            }}</mat-icon>
+            <span matListItemTitle class="nav-label">Hide Sidebar</span>
+          </button>
         </div>
       </mat-action-list>
     </mat-drawer>

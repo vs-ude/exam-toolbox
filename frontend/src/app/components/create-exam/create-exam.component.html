@@ -109,7 +109,8 @@
           matTooltip="Preview"
           (click)="onPreview()"
           data-cy="preview-btn"
-        >remove_red_eye</mat-icon>
+          >remove_red_eye</mat-icon
+        >
       </div>
       <div class="icon_wrapper bar_icon">
         <mat-icon
@@ -118,13 +119,15 @@
           matTooltip="Save"
           (click)="onSave()"
           data-cy="save"
-        >save</mat-icon>
+          >save</mat-icon
+        >
         <mat-icon
           *ngIf="isUpdateMode"
           aria-hidden="false"
           matTooltip="Update"
           (click)="onUpdate()"
-        >save</mat-icon>
+          >save</mat-icon
+        >
       </div>
 
       <div class="icon_wrapper bar_icon">
@@ -132,7 +135,8 @@
           aria-hidden="false"
           matTooltip="Generate all Exams"
           (click)="onMassExam()"
-        >download</mat-icon>
+          >download</mat-icon
+        >
       </div>
 
       <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"

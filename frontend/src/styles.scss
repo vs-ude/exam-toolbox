@@ -11,8 +11,7 @@
 
 @font-face {
   font-family: 'Roboto';
-  src: url('/public/fonts/Roboto-VariableFont.woff2')
-    format('woff2');
+  src: url('/public/fonts/Roboto-VariableFont.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -40,7 +39,11 @@
   word-wrap: normal;
   direction: ltr;
   -webkit-font-smoothing: antialiased;
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
   color: var(--color-icon);
 }
 
@@ -100,8 +103,16 @@ $frontend-dark-theme: mat.define-theme(
 body.dark {
   @include mat.all-component-colors($frontend-dark-theme);
   @include darken();
-  --color-nav-active-bg: #{mat.get-theme-color($frontend-dark-theme, primary, 30)};
-  --color-nav-active-fg: #{mat.get-theme-color($frontend-dark-theme, primary, 90)};
+  --color-nav-active-bg: #{mat.get-theme-color(
+      $frontend-dark-theme,
+      primary,
+      30
+    )};
+  --color-nav-active-fg: #{mat.get-theme-color(
+      $frontend-dark-theme,
+      primary,
+      90
+    )};
 }
 
 body.light {
@@ -158,6 +169,9 @@ body {
 }
 
 .list_delete_icon {
-  @include mat.icon-overrides((
-  color: var(--color-warn)
-  ))}
+  @include mat.icon-overrides(
+    (
+      color: var(--color-warn),
+    )
+  );
+}

@@ -34,7 +34,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class MainViewComponent {
   public username: string = '';
   public initialLetter: string = '';
-  public themeIcon: "dark_mode" | "light_mode" = "light_mode"
+  public themeIcon: 'dark_mode' | 'light_mode' = 'light_mode';
   public sidebarCollapsed = false;
 
   constructor(
@@ -54,7 +54,8 @@ export class MainViewComponent {
       this.themeIcon = theme === 'dark' ? 'dark_mode' : 'light_mode';
     });
 
-    this.sidebarCollapsed = sessionStorage.getItem('sidebarCollapsed') === 'true';
+    this.sidebarCollapsed =
+      sessionStorage.getItem('sidebarCollapsed') === 'true';
   }
 
   isLoginPage(): boolean {
@@ -78,7 +79,10 @@ export class MainViewComponent {
 
   toggleSidebar() {
     this.sidebarCollapsed = !this.sidebarCollapsed;
-    sessionStorage.setItem('sidebarCollapsed', this.sidebarCollapsed.toString());
+    sessionStorage.setItem(
+      'sidebarCollapsed',
+      this.sidebarCollapsed.toString(),
+    );
   }
 
   onSearch(search: string) {

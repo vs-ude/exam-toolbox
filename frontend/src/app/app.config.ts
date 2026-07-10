@@ -1,4 +1,9 @@
-import { ApplicationConfig, ENVIRONMENT_INITIALIZER, inject, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  ENVIRONMENT_INITIALIZER,
+  inject,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
 import { ApiService } from './services/api.service';
 
@@ -18,7 +23,10 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     {
       provide: ENVIRONMENT_INITIALIZER,
-      useValue: () => inject(MatIconRegistry).setDefaultFontSetClass('material-symbols-outlined'),
+      useValue: () =>
+        inject(MatIconRegistry).setDefaultFontSetClass(
+          'material-symbols-outlined',
+        ),
       multi: true,
     },
     provideNativeDateAdapter(),
