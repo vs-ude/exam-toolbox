@@ -24,7 +24,6 @@ export class TaskBuilderService {
     switch (taskType) {
       case 'new_multipleChoice':
         return {
-          taskId: 'multipleChoice-' + Date.now(),
           type: 'multipleChoice',
           question: { DE: '', EN: '' },
           answerOptions: [{ DE: '', EN: '', correct: true }],
@@ -39,7 +38,6 @@ export class TaskBuilderService {
         };
       case 'new_shortAnswer':
         return {
-          taskId: 'shortAnswer-' + Date.now(),
           type: 'shortAnswer',
           question: { DE: '', EN: '' },
           solution: { DE: '', EN: '' },
@@ -54,7 +52,6 @@ export class TaskBuilderService {
         };
       case 'new_picture':
         return {
-          taskId: 'picture-' + Date.now(),
           type: 'pictureTask',
           question: { DE: '', EN: '' },
           questionPicture: { urlDE: '', urlEN: '' },
@@ -70,7 +67,6 @@ export class TaskBuilderService {
         };
       case 'new_latex':
         return {
-          taskId: 'latex-' + Date.now(),
           type: 'latex',
           question: {
             DE: '',
@@ -88,7 +84,6 @@ export class TaskBuilderService {
         };
       case 'new_table':
         return {
-          taskId: 'table-' + Date.now(),
           type: 'table',
           question: { DE: '', EN: '' },
           tableHeadersQuestion: [
@@ -130,7 +125,6 @@ export class TaskBuilderService {
         };
       case 'new_manualText':
         return {
-          taskId: 'manualText-' + Date.now(),
           type: 'manualText',
           question: { DE: '', EN: '' },
           points: 0,
@@ -144,7 +138,6 @@ export class TaskBuilderService {
         };
       case 'new_newPage':
         return {
-          taskId: 'newPage-' + Date.now(),
           type: 'newPage',
           question: { DE: '', EN: '' },
           points: 0,

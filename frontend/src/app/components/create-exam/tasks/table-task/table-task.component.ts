@@ -39,7 +39,6 @@ export class TableTaskComponent extends BaseTaskComponent {
   public hasHeader: boolean = false;
 
   public task: TableTask = {
-    taskId: '',
     type: 'table',
     question: { DE: '', EN: '' },
     tableHeadersQuestion: [],
@@ -63,7 +62,6 @@ export class TableTaskComponent extends BaseTaskComponent {
       //this.hasHeader = !!this.task.tableHeadersQuestion && this.task.tableHeadersQuestion.length > 0;
       return;
     }
-    this.task.taskId = this.taskId;
     this.taskChangeEvent.emit(this.task);
   }
 

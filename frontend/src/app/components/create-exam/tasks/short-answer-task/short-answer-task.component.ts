@@ -51,7 +51,6 @@ export class ShortAnswerTaskComponent
   public readonly publicPath = environment.publicPath;
 
   public task: ShortAnswerTask = {
-    taskId: '',
     type: 'shortAnswer',
     question: { DE: '', EN: '' },
     solution: { DE: '', EN: '' },
@@ -70,7 +69,6 @@ export class ShortAnswerTaskComponent
       this.task = this.preTask as ShortAnswerTask;
       return;
     }
-    this.task.taskId = this.taskId;
     this.taskChangeEvent.emit(this.task);
   }
 }

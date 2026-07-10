@@ -13,7 +13,7 @@ Deno.test(
     const renderer = new TaskRenderer(eta);
 
     const task: PictureTask = {
-      taskId: 'task-1',
+      _id: 'task-1',
       type: 'pictureTask',
       question: { DE: 'Q', EN: 'Q' },
       points: 5,
@@ -77,7 +77,7 @@ Deno.test(
     const renderer = new TaskRenderer(eta);
 
     const task: TableTask = {
-      taskId: 'task-table-1',
+      _id: 'task-table-1',
       type: 'table',
       question: { DE: 'Q', EN: 'Q' },
       points: 5,
@@ -182,7 +182,7 @@ Deno.test(
     const renderer = new TaskRenderer(eta);
 
     const task: TableTask = {
-      taskId: 'task-table-1',
+      _id: 'task-table-1',
       type: 'table',
       question: { DE: 'Q', EN: 'Q' },
       points: 5,
@@ -272,7 +272,7 @@ QE21%
 );
 
 const propertyTask: PropertyTask = {
-  taskId: 'task-prop-1',
+  _id: 'task-prop-1',
   type: 'property',
   question: {
     DE: 'Welche Eigenschaften treffen zu?',

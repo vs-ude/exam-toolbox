@@ -1,4 +1,4 @@
-import { Translation } from './exam';
+import { Translation } from './base';
 
 export class Student {
   name: string;

@@ -38,7 +38,6 @@ export class ManualTextComponent extends BaseTaskComponent {
   public readonly publicPath = environment.publicPath;
 
   public task: ManualText = {
-    taskId: '',
     type: 'manualText',
     question: { DE: '', EN: '' },
     points: 0,
@@ -56,7 +55,6 @@ export class ManualTextComponent extends BaseTaskComponent {
       this.task = this.preTask as ManualText;
       return;
     }
-    this.task.taskId = this.taskId;
     this.taskChangeEvent.emit(this.task);
   }
 }

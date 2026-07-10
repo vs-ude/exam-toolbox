@@ -83,7 +83,7 @@ export async function createTask(
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const task = parseTask(await c.req.json());
-  await deps.db.createTask(task);
+  const insertedId = await deps.db.createTask(task);
   if (task.type === 'pictureTask') {
     const fileURLs = [
       task.questionPicture.urlDE,
@@ -94,7 +94,7 @@ export async function createTask(
     for (const fileURL of fileURLs) {
       const fileName = fileURL.split('/').pop() ?? '';
       try {
-        await deps.db.addFileRef(fileName, task.taskId);
+        await deps.db.addFileRef(fileName, String(insertedId));
       } catch (error) {
         console.error('Error fetching file tracker entry:', error);
       }
@@ -103,7 +103,7 @@ export async function createTask(
   return {
     kind: 'json',
     status: 200,
-    body: { message: 'Task added to pool' },
+    body: { _id: String(insertedId) },
   };
 }
 

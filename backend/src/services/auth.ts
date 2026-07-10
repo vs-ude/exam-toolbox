@@ -343,9 +343,7 @@ function groupDn(name: string): string {
  * @returns The filtered list of group names (not DN!).
  */
 function filterGroups(groups: string[]): string[] {
-  const targets = [config.ldap.groups.required]
-    .concat(config.ldap.groups.admin)
-    .concat(config.ldap.groups.full);
+  const targets = config.ldap.groups.admin.concat(config.ldap.groups.full);
   let result: string[] = [];
   targets.forEach(group => {
     if (groups.includes(groupDn(group))) {

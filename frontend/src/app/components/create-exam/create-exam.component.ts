@@ -94,7 +94,7 @@ export class CreateExamComponent {
   private modifiedPoolTasks: Set<string> = new Set<string>();
   private newTasksToCreate: Set<string> = new Set<string>();
   private tasksWithModifiedTags: {
-    taskId: string;
+    taskId: string | undefined;
     tagData: Tag;
   }[] = [];
 
@@ -228,7 +228,7 @@ export class CreateExamComponent {
   }
 
   private pushPoolTask(taskId: string) {
-    const task = this.taskPool.find(element => element.taskId === taskId);
+    const task = this.taskPool.find(element => element._id === taskId);
     if (task == undefined) {
       console.warn("couldn't find task");
       return;
@@ -267,16 +267,15 @@ export class CreateExamComponent {
   private addNewTasksToPool() {
     for (let i = 0; i < this.exam.tasks.length; i++) {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
-        const currentTaskId = this.exam.tasks[i].tasks[j].taskId;
-        if (
-          this.taskPool.find(task => task.taskId === currentTaskId) == undefined
-        ) {
-          if (this.exam.tasks[i].tasks[j].type === 'newPage') {
+        const task = this.exam.tasks[i].tasks[j];
+        if (!task._id) {
+          if (task.type === 'newPage') {
             continue;
           }
-          this.api.addTaskToPool(this.exam.tasks[i].tasks[j]).subscribe(
+          this.api.addTaskToPool(task).subscribe(
             response => {
-              console.log(`Task ${currentTaskId} added to pool`, response);
+              task._id = response._id;
+              console.log(`Task added to pool with id ${response._id}`);
             },
             error => {
               console.error('Error adding task: ', error);
@@ -438,37 +437,36 @@ export class CreateExamComponent {
   onTaskChange(task: Task, index: number) {
     this.exam.tasks[this.currentGroupView].tasks[index] = task;
     this.adjustTotalPoints();
-    this.trackChangeInPoolTasks(task.taskId);
+    this.trackChangeInPoolTasks(task._id);
     console.log(task);
     this.triggerAutosave();
   }
 
-  private trackChangeInPoolTasks(taskId: string) {
-    if (this.isPoolTask(taskId)) {
-      this.modifiedPoolTasks.add(taskId);
+  private trackChangeInPoolTasks(id: string | undefined) {
+    if (id && this.isPoolTask(id)) {
+      this.modifiedPoolTasks.add(id);
     }
   }
 
-  public isPoolTask(taskId: string): boolean {
-    return (
-      this.taskPool.find(poolTask => poolTask.taskId === taskId) != undefined
-    );
+  public isPoolTask(id: string | undefined): boolean {
+    return !!id && this.taskPool.some(poolTask => poolTask._id === id);
   }
 
-  public isModifiedPoolTask(taskId: string): boolean {
-    if (!this.isPoolTask(taskId)) {
+  public isModifiedPoolTask(id: string | undefined): boolean {
+    if (!this.isPoolTask(id)) {
       return false;
     }
-    return this.modifiedPoolTasks.has(taskId);
+    return this.modifiedPoolTasks.has(id!);
   }
 
   public onCreateNewTaskChange(newTask: boolean, index: number) {
-    const taskId = this.exam.tasks[this.currentGroupView].tasks[index].taskId;
+    const id = this.exam.tasks[this.currentGroupView].tasks[index]._id;
+    if (!id) return;
     if (newTask) {
-      this.newTasksToCreate.add(taskId);
+      this.newTasksToCreate.add(id);
       return;
     }
-    this.newTasksToCreate.delete(taskId);
+    this.newTasksToCreate.delete(id);
   }
 
   onTitleChange(taskGroupTitle: { DE: string; EN: string }) {
@@ -501,10 +499,8 @@ export class CreateExamComponent {
     for (let i = 0; i < this.exam.tasks.length; i++) {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const task = this.exam.tasks[i].tasks[j];
-        const isPoolTask =
-          this.taskPool.find(poolTask => poolTask.taskId === task.taskId) !=
-          undefined;
-        const isModified = this.modifiedPoolTasks.has(task.taskId);
+        const isPoolTask = this.isPoolTask(task._id);
+        const isModified = !!task._id && this.modifiedPoolTasks.has(task._id);
 
         if (!isPoolTask || !isModified) continue;
 
@@ -522,7 +518,7 @@ export class CreateExamComponent {
       tasks.push({
         assignmentNumber: `${i + 1}.${this.mapTaskIndexToChar(j)}`,
         task: task,
-        newTask: this.newTasksToCreate.has(task.taskId),
+        newTask: !!task._id && this.newTasksToCreate.has(task._id),
       });
     }
 
@@ -549,13 +545,14 @@ export class CreateExamComponent {
   updateTask(index: [number, number]) {
     const [i, j] = index;
     const task = this.exam.tasks[i].tasks[j];
-    this.api.updateTaskInPool(task.taskId, task).subscribe(
+    if (!task._id) return;
+    this.api.updateTaskInPool(task._id, task).subscribe(
       response => {
-        console.log(`Task ${task.taskId} updated in pool`, response);
+        console.log(`Task ${task._id} updated in pool`, response);
         this.importPoolTasks(); // refresh pool tasks after updating task
       },
       error => {
-        console.error(`Error updating task ${task.taskId}: `, error);
+        console.error(`Error updating task ${task._id}: `, error);
       },
     );
   }
@@ -564,31 +561,30 @@ export class CreateExamComponent {
     const [i, j] = index;
     const oldTask = this.exam.tasks[i].tasks[j];
     const newTask: Task = JSON.parse(JSON.stringify(oldTask));
-    newTask.parent = oldTask.taskId;
+    newTask.parent = oldTask._id;
     newTask.children = [];
-    newTask.taskId = oldTask.type + '-' + Date.now();
-    oldTask.children.push(newTask.taskId);
-
-    // add new Task as child for the old Task
-    this.api.addChildToTaskPoolTask(oldTask.taskId, newTask.taskId).subscribe(
-      response => {
-        console.log('new child was added to the old Task');
-      },
-      error => {
-        console.error('Error adding the child to the old Task', error);
-      },
-    );
+    newTask._id = undefined;
 
     this.exam.tasks[i].tasks[j] = newTask;
 
-    // add new task to pool
+    // add new task to pool; on success wire up parent-child links
     this.api.addTaskToPool(newTask).subscribe(
       response => {
-        console.log(`New Task ${newTask.taskId} added to pool`, response);
+        newTask._id = response._id;
+        oldTask.children.push(response._id);
+        console.log(`New Task ${response._id} added to pool`);
+        // register the new task as a child of the old one
+        if (oldTask._id) {
+          this.api.addChildToTaskPoolTask(oldTask._id, response._id).subscribe(
+            () => console.log('new child was added to the old Task'),
+            error =>
+              console.error('Error adding the child to the old Task', error),
+          );
+        }
         this.importPoolTasks(); // refresh pool tasks after adding new task
       },
       error => {
-        console.error(`Error adding new task ${newTask.taskId}: `, error);
+        console.error(`Error adding new task: `, error);
       },
     );
 
@@ -810,7 +806,7 @@ export class CreateExamComponent {
         color: result.color,
         textColor: result.textColor,
       };
-      this.tasksWithModifiedTags.push({ taskId: task.taskId, tagData: tag });
+      this.tasksWithModifiedTags.push({ taskId: task._id, tagData: tag });
 
       if (result.exists) {
         console.log('addTagToTask()');

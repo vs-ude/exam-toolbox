@@ -30,7 +30,8 @@
   },
   "imports": {
     "@bgub/eta": "jsr:@bgub/eta@^4.6.0",
-    "@db/mongo": "jsr:@db/mongo@^0.34.0",
+    "@diister/mongodbee": "jsr:@diister/mongodbee@^0.22.4",
+    "@diister/mongodbee/schema": "jsr:@diister/mongodbee@^0.22.4/schema",
     "@hono/hono": "jsr:@hono/hono@^4.12.27",
     "@hono/zod-openapi": "jsr:@hono/zod-openapi@^1.4.0",
     "@mirror/xlsx": "jsr:@mirror/xlsx@^0.20.3",

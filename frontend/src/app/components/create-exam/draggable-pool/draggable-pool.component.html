@@ -54,7 +54,7 @@
       [task]="task"
       [color]="colorProvider.getTaskColor(task.type)"
       [iconName]="task.type + '.svg'"
-      id="{{ task.taskId }}"
+      id="{{ task._id }}"
       draggable="true"
       (dragstart)="dragStart.emit($event)"
       (dragend)="drop.emit($event)"

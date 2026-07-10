@@ -53,7 +53,6 @@ export class MultiplechoiceTaskComponent
   pointsPerOption = 1;
 
   public task: MultipleChoiceTask = {
-    taskId: '',
     type: 'multipleChoice',
     question: {
       DE: '',
@@ -78,7 +77,6 @@ export class MultiplechoiceTaskComponent
         this.task.answerOptions.filter(option => option.correct).length;
       return;
     }
-    this.task.taskId = this.taskId;
     this.taskChangeEvent.emit(this.task);
   }
 

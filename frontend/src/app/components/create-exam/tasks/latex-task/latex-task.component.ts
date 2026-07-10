@@ -46,7 +46,6 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
   public readonly publicPath = environment.publicPath;
 
   public task: LatexTask = {
-    taskId: '',
     type: 'latex',
     question: {
       DE: '',
@@ -72,7 +71,6 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
       this.task = this.preTask as LatexTask;
       return;
     }
-    this.task.taskId = this.taskId;
     this.taskChangeEvent.emit(this.task);
   }
 

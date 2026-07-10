@@ -1,4 +1,4 @@
-import { Translation } from './exam.ts';
+import { Translation } from './base.ts';
 
 export class Student {
   name: string;

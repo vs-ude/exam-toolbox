@@ -1,4 +1,3 @@
-import { Document } from '@db/mongo';
 import { read, utils } from '@mirror/xlsx';
 import { Context } from '@hono/hono';
 import { crypto } from '@std/crypto';
@@ -254,7 +253,7 @@ export async function uploadFile(
   await Deno.mkdir(uploadDir, { recursive: true });
   await Deno.writeFile(filePath, data);
 
-  const fileTrackerEntry: Document = {
+  const fileTrackerEntry: Record<string, unknown> = {
     name: file.name,
     refs: [],
     timeToLive: 7,

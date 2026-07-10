@@ -20,7 +20,7 @@ import { environment } from '../../../../../environments/environment';
 })
 export abstract class BaseTaskComponent {
   @Input()
-  public taskId!: string;
+  public taskId?: string;
   @Input()
   public preTask?: Task;
   @Input()

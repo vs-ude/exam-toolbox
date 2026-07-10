@@ -1,4 +1,4 @@
-import { Translation, Dimension, Question } from './base';
+import { Dimension, Question, Translation } from './base';
 import { Tag } from './tag';
 
 export interface TaskGroup {
@@ -19,7 +19,7 @@ export type Task =
   | NewPage;
 
 export interface BaseTask {
-  taskId: string;
+  _id?: string;
   type: TaskType;
   question: Question;
   points: number;
@@ -130,7 +130,6 @@ const TASK_TYPE_FIELDS: Record<TaskType, string[]> = {
 };
 
 const BASE_TASK_FIELDS: (keyof BaseTask)[] = [
-  'taskId',
   'type',
   'question',
   'points',

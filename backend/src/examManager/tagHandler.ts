@@ -1,4 +1,3 @@
-import { ObjectId } from '@db/mongo';
 import { Context } from '@hono/hono';
 
 import { HandlerResult, HttpError } from '../types/handler.ts';
@@ -73,7 +72,7 @@ export async function deleteTag(
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const tagId = c.req.param('id')!;
-  if (!ObjectId.isValid(tagId)) throw new HttpError(400, 'Invalid tag ID');
+  if (!tagId) throw new HttpError(400, 'Invalid tag ID');
   const result = await deps.db.deleteTag(tagId);
   if (result === 0) throw new HttpError(404, 'Tag not found');
   await deps.db.removeTagFromTasks(tagId);

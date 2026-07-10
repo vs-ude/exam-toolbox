@@ -14,7 +14,7 @@ const examLengthMinutes = 120;
 
 const tasks: Task[] = [
   {
-    taskId: 'task1',
+    _id: 'task1',
     type: 'shortAnswer',
     question: {
       DE: 'Was ist Cloud?',
@@ -36,7 +36,7 @@ const tasks: Task[] = [
     children: [],
   },
   {
-    taskId: 'task2',
+    _id: 'task2',
     type: 'shortAnswer',
     question: {
       DE: 'Was ist Web Mobile?',
@@ -180,7 +180,7 @@ export class DebugComponent {
     this.api.getTasksFromPool().subscribe(
       res => {
         console.log('Tasks from pool: ', res);
-        const poolTask = res[0].taskId;
+        const poolTask = res[0]._id!;
         this.api.deleteTaskFromPool(poolTask).subscribe(
           res => {
             console.log('Task deleted successfully: ', res);

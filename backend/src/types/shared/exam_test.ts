@@ -2,9 +2,8 @@ import { assertEquals } from '@std/assert';
 import { Exam } from './exam.ts';
 import { type NewPage, type ShortAnswerTask, type TaskGroup } from './tasks.ts';
 
-function makeShortAnswerTask(taskId: string, points: number): ShortAnswerTask {
+function makeShortAnswerTask(_taskId: string, points: number): ShortAnswerTask {
   return {
-    taskId,
     type: 'shortAnswer',
     question: { DE: 'Frage', EN: 'Question' },
     points,
@@ -19,9 +18,8 @@ function makeShortAnswerTask(taskId: string, points: number): ShortAnswerTask {
   };
 }
 
-function makeNewPageTask(taskId: string): NewPage {
+function makeNewPageTask(_taskId: string): NewPage {
   return {
-    taskId,
     type: 'newPage',
     question: { DE: '', EN: '' },
     points: 0,
@@ -143,7 +141,7 @@ Deno.test(
               },
               "tasks": [
                   {
-                      "taskId": "multipleChoice-1780310344264",
+                      "_id": "multipleChoice-1780310344264",
                       "type": "multipleChoice",
                       "question": {
                           "DE": "",

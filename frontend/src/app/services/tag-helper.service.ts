@@ -25,14 +25,12 @@ export class TagHelperService {
   public removeTagIdFromTask(tag: Tag, task: Task) {
     task.tagIds = task.tagIds.filter(id => id != tag._id);
 
-    this.api.updateTaskInPool(task.taskId, task).subscribe(
-      res => {
-        console.log('Tag removed successfully!', res);
-      },
-      err => {
-        (console.error('Error removing Tag'), err);
-      },
-    );
+    if (task._id) {
+      this.api.updateTaskInPool(task._id, task).subscribe(
+        res => console.log('Tag removed successfully!', res),
+        err => console.error('Error removing Tag', err),
+      );
+    }
   }
 
   public addTagToTask(tag: Tag, task: Task) {
@@ -44,10 +42,12 @@ export class TagHelperService {
     task.tagIds.push(tag._id!);
     task.tags.push(tag);
 
-    this.api.updateTaskInPool(task.taskId, task).subscribe(
-      res => console.log('updated Task in pool'),
-      err => console.error('Error updating Task', err),
-    );
+    if (task._id) {
+      this.api.updateTaskInPool(task._id, task).subscribe(
+        res => console.log('updated Task in pool'),
+        err => console.error('Error updating Task', err),
+      );
+    }
   }
 
   public createTagAndAddToTask(tag: Tag, task: Task) {

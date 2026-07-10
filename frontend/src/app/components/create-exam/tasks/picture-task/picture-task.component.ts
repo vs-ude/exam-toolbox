@@ -47,7 +47,6 @@ export class PictureTaskComponent extends BaseTaskComponent {
   public readonly publicPath = environment.publicPath;
 
   public task: PictureTask = {
-    taskId: '',
     type: 'pictureTask',
     question: { DE: '', EN: '' },
     questionPicture: { urlDE: '', urlEN: '' },
@@ -85,7 +84,6 @@ export class PictureTaskComponent extends BaseTaskComponent {
       }
       return;
     }
-    this.task.taskId = this.taskId;
     this.taskChangeEvent.emit(this.task);
   }
 

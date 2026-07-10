@@ -159,7 +159,7 @@ export class ApiService {
   // -------
 
   addTaskToPool(task: Task) {
-    return this.http.post(`${this.apiUrl}/taskPool`, task);
+    return this.http.post<{ _id: string }>(`${this.apiUrl}/taskPool`, task);
   }
 
   getTaskWithIdFromPool(taskId: string): Observable<Task> {

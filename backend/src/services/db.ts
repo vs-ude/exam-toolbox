@@ -1,40 +1,145 @@
-import { Collection, Document, MongoClient, ObjectId } from '@db/mongo';
+// deno-lint-ignore-file no-explicit-any
+import { MongoClient, collection, dbId } from '@diister/mongodbee';
+import * as v from '@diister/mongodbee/schema';
 import { getConfig } from '../config/appConfig.ts';
-import { Exam, parseExam, parseTask, Task, Group, User } from '../types/mod.ts';
+import { Exam, parseExam, parseTask, Task } from '../types/mod.ts';
+import { Group, User } from '../types/mod.ts';
 
 let db: ExamToolboxDatabase;
 
 export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
   if (db) return db;
 
-  const client = new MongoClient();
-  await client.connect(getConfig().db.connString);
-  const dbConn = client.database(); // We assume a database name is provided in the connection string
-  const collections: Collections = {} as Collections;
-  collections.exams = dbConn.collection('exams');
-  collections.qrCodes = dbConn.collection('qrCodes');
-  collections.tags = dbConn.collection('tags');
-  collections.taskPool = dbConn.collection('taskPool');
-  collections.fileTracker = dbConn.collection('fileTracker');
-  collections.users = dbConn.collection('users');
-  collections.groups = dbConn.collection('groups');
-  db = new ExamToolboxDatabase(client, collections);
+  const connString = getConfig().db.connString;
+  const client = new MongoClient(connString);
+  await client.connect();
+
+  // Extract database name from the connection string path component
+  const dbName = new URL(connString).pathname.slice(1);
+  const mongoDb = client.db(dbName);
+
+  // ── Schemas ───────────────────────────────────────────────────────────────
+  // Schemas are intentionally loose (v.any() for nested structures) since
+  // application-level validation is handled by parseExam / parseTask.
+
+  const examSchema = {
+    _id: dbId('exam'),
+    courseName: v.string(),
+    examinerName: v.string(),
+    semester: v.string(),
+    date: v.string(),
+    examLengthMinutes: v.number(),
+    tasks: v.any(),
+    points: v.optional(v.number()),
+    pageCount: v.optional(v.number()),
+    conceptPages: v.optional(v.number()),
+    lastEditedBy: v.optional(v.string()),
+    updatedAt: v.optional(v.any()),
+  };
+
+  const taskSchema = {
+    _id: dbId('task'),
+    type: v.string(),
+    question: v.any(),
+    points: v.number(),
+    tagIds: v.array(v.string()),
+    tags: v.any(),
+    createdBy: v.string(),
+    createdAt: v.any(),
+    lastUsed: v.any(),
+    usedIn: v.array(v.string()),
+    parent: v.optional(v.string()),
+    children: v.array(v.string()),
+    numCorrect: v.optional(v.any()),
+    answerOptions: v.optional(v.any()),
+    header: v.optional(v.any()),
+    lines: v.optional(v.any()),
+    noLines: v.optional(v.any()),
+    solution: v.optional(v.any()),
+    questionPicture: v.optional(v.any()),
+    solutionPicture: v.optional(v.any()),
+    size: v.optional(v.any()),
+    questionLatex: v.optional(v.any()),
+    tableHeadersQuestion: v.optional(v.any()),
+    tableDataQuestion: v.optional(v.any()),
+    tableHeadersSolution: v.optional(v.any()),
+    tableDataSolution: v.optional(v.any()),
+  };
+
+  const tagSchema = {
+    _id: dbId('tag'),
+    name: v.string(),
+    color: v.optional(v.string()),
+    textColor: v.optional(v.string()),
+  };
+
+  const fileTrackerSchema = {
+    _id: dbId('file'),
+    name: v.string(),
+    refs: v.optional(v.array(v.string())),
+  };
+
+  const userSchema = {
+    _id: dbId('user'),
+    sub: v.string(),
+    uid: v.optional(v.string()),
+    cn: v.optional(v.string()),
+    mail: v.optional(v.string()),
+    lastLoginAt: v.optional(v.any()),
+    createdAt: v.optional(v.any()),
+  };
+
+  const groupSchema = {
+    _id: dbId('group'),
+    name: v.string(),
+    rights: v.optional(v.any()),
+  };
+
+  const qrCodeSchema = {
+    _id: dbId('qr'),
+    studentsPerLanguage: v.optional(v.number()),
+    pagesPerStudent: v.optional(v.number()),
+    lastUpdated: v.optional(v.string()),
+    pages: v.optional(v.any()),
+  };
+
+  const [exams, taskPool, tags, fileTracker, users, groups, qrCodes] =
+    await Promise.all([
+      collection(mongoDb, 'exams', examSchema),
+      collection(mongoDb, 'taskPool', taskSchema),
+      collection(mongoDb, 'tags', tagSchema),
+      collection(mongoDb, 'fileTracker', fileTrackerSchema),
+      collection(mongoDb, 'users', userSchema),
+      collection(mongoDb, 'groups', groupSchema),
+      collection(mongoDb, 'qrCodes', qrCodeSchema),
+    ]);
+
+  db = new ExamToolboxDatabase(client, {
+    exams: exams as any,
+    taskPool: taskPool as any,
+    tags: tags as any,
+    fileTracker: fileTracker as any,
+    users: users as any,
+    groups: groups as any,
+    qrCodes: qrCodes as any,
+  });
   return db;
 }
 
 interface Collections {
-  exams: Collection<Document>;
-  qrCodes: Collection<Document>;
-  tags: Collection<Document>;
-  taskPool: Collection<Document>;
-  fileTracker: Collection<Document>;
-  users: Collection<Document>;
-  groups: Collection<Document>;
+  exams: any;
+  taskPool: any;
+  tags: any;
+  fileTracker: any;
+  users: any;
+  groups: any;
+  qrCodes: any;
 }
 
 export class ExamToolboxDatabase {
   private client: MongoClient;
-  private collections: Collections = {} as Collections;
+  private collections: Collections;
+
   constructor(client: MongoClient, collections: Collections) {
     this.client = client;
     this.collections = collections;
@@ -42,8 +147,7 @@ export class ExamToolboxDatabase {
 
   // Test
   test(): void {
-    const info = this.client.buildInfo;
-    if (info === undefined) {
+    if (!this.client) {
       throw new Error('Failed to connect to MongoDB');
     }
   }
@@ -51,21 +155,19 @@ export class ExamToolboxDatabase {
   // ── Exams ────────────────────────────────────────────────────────────────
 
   async getAllExams(): Promise<Exam[]> {
-    return (await this.collections.exams.find().toArray()).map(parseExam);
+    return (await this.collections.exams.find({}).toArray()).map(parseExam);
   }
 
   async getRecentExams(user: User, limit: number): Promise<Exam[]> {
     return (
       await this.collections.exams
-        .find({ lastEditedBy: user.sub })
-        .sort({ updatedAt: -1 })
-        .limit(limit)
+        .find({ lastEditedBy: user.sub }, { sort: { updatedAt: -1 }, limit })
         .toArray()
     ).map(parseExam);
   }
 
   async getExamById(id: string): Promise<Exam | undefined> {
-    const doc = await this.collections.exams.findOne({ _id: new ObjectId(id) });
+    const doc = await this.collections.exams.findOne({ _id: id });
     return doc ? parseExam(doc) : undefined;
   }
 
@@ -82,28 +184,28 @@ export class ExamToolboxDatabase {
     ).map(parseExam);
   }
 
-  createExam(exam: Exam): Promise<ObjectId> {
-    return this.collections.exams.insertOne(exam);
+  async createExam(exam: Exam): Promise<string> {
+    const id = await this.collections.exams.insertOne(exam);
+    return String(id);
   }
 
   updateExam(id: string, data: Exam): Promise<{ matchedCount: number }> {
-    return this.collections.exams.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: data },
-    );
+    return this.collections.exams.updateOne({ _id: id }, { $set: data });
   }
 
-  deleteExam(id: string): Promise<number> {
-    return this.collections.exams.deleteOne({ _id: new ObjectId(id) });
+  async deleteExam(id: string): Promise<number> {
+    const result = await this.collections.exams.deleteOne({ _id: id });
+    return result.deletedCount;
   }
 
-  clearExams(): Promise<number> {
-    return this.collections.exams.deleteMany({});
+  async clearExams(): Promise<number> {
+    const result = await this.collections.exams.deleteMany({});
+    return result.deletedCount;
   }
 
   // ── FileTracker ──────────────────────────────────────────────────────────
 
-  async createFileTrackerEntry(entry: Document): Promise<void> {
+  async createFileTrackerEntry(entry: Record<string, unknown>): Promise<void> {
     await this.collections.fileTracker.insertOne(entry);
   }
 
@@ -120,41 +222,44 @@ export class ExamToolboxDatabase {
 
   // ── Tags ─────────────────────────────────────────────────────────────────
 
-  getAllTags(): Promise<Document[]> {
-    return this.collections.tags.find().sort({ name: 1 }).toArray();
+  getAllTags(): Promise<Record<string, unknown>[]> {
+    return this.collections.tags.find({}, { sort: { name: 1 } }).toArray();
   }
 
-  getTagById(id: string): Promise<Document | undefined> {
-    return this.collections.tags.findOne({ _id: new ObjectId(id) });
+  getTagById(id: string): Promise<Record<string, unknown> | null> {
+    return this.collections.tags.findOne({ _id: id });
   }
 
-  createTag(tag: Document): Promise<ObjectId> {
-    return this.collections.tags.insertOne(tag);
+  async createTag(tag: Record<string, unknown>): Promise<string> {
+    const id = await this.collections.tags.insertOne(tag);
+    return String(id);
   }
 
-  updateTag(id: string, data: Document): Promise<{ matchedCount: number }> {
-    return this.collections.tags.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: data },
-    );
+  updateTag(
+    id: string,
+    data: Record<string, unknown>,
+  ): Promise<{ matchedCount: number }> {
+    return this.collections.tags.updateOne({ _id: id }, { $set: data });
   }
 
-  deleteTag(id: string): Promise<number> {
-    return this.collections.tags.deleteOne({ _id: new ObjectId(id) });
+  async deleteTag(id: string): Promise<number> {
+    const result = await this.collections.tags.deleteOne({ _id: id });
+    return result.deletedCount;
   }
 
-  clearTags(): Promise<number> {
-    return this.collections.tags.deleteMany({});
+  async clearTags(): Promise<number> {
+    const result = await this.collections.tags.deleteMany({});
+    return result.deletedCount;
   }
 
   // ── TaskPool ─────────────────────────────────────────────────────────────
 
   async getAllTasks(): Promise<Task[]> {
-    return (await this.collections.taskPool.find().toArray()).map(parseTask);
+    return (await this.collections.taskPool.find({}).toArray()).map(parseTask);
   }
 
   async getTaskById(taskId: string): Promise<Task | undefined> {
-    const doc = await this.collections.taskPool.findOne({ taskId });
+    const doc = await this.collections.taskPool.findOne({ _id: taskId });
     return doc ? parseTask(doc) : undefined;
   }
 
@@ -189,12 +294,13 @@ export class ExamToolboxDatabase {
     ).map(parseTask);
   }
 
-  createTask(task: Task): Promise<unknown> {
-    return this.collections.taskPool.insertOne(task);
+  async createTask(task: Task): Promise<string> {
+    const id = await this.collections.taskPool.insertOne(task);
+    return String(id);
   }
 
   updateTask(taskId: string, data: Task): Promise<{ matchedCount: number }> {
-    return this.collections.taskPool.updateOne({ taskId }, { $set: data });
+    return this.collections.taskPool.updateOne({ _id: taskId }, { $set: data });
   }
 
   addChildTask(
@@ -202,24 +308,25 @@ export class ExamToolboxDatabase {
     childTaskId: string,
   ): Promise<{ matchedCount: number }> {
     return this.collections.taskPool.updateOne(
-      { taskId },
+      { _id: taskId },
       { $addToSet: { children: childTaskId } },
     );
   }
 
-  deleteTask(taskId: string): Promise<number> {
-    return this.collections.taskPool.deleteOne({ taskId });
+  async deleteTask(taskId: string): Promise<number> {
+    const result = await this.collections.taskPool.deleteOne({ _id: taskId });
+    return result.deletedCount;
   }
 
-  clearTaskPool(): Promise<number> {
-    return this.collections.taskPool.deleteMany({});
+  async clearTaskPool(): Promise<number> {
+    const result = await this.collections.taskPool.deleteMany({});
+    return result.deletedCount;
   }
 
   async removeTagFromTasks(tagId: string): Promise<void> {
-    const mongoId = new ObjectId(tagId);
     await this.collections.taskPool.updateMany(
-      { tagIds: mongoId },
-      { $pull: { tagIds: mongoId } },
+      { tagIds: tagId },
+      { $pull: { tagIds: tagId } },
     );
   }
 
@@ -242,11 +349,11 @@ export class ExamToolboxDatabase {
     const results = await this.collections.users
       .find({ sub: { $in: uids } })
       .toArray();
-    const users: User[] = results.map(res => {
-      delete res._id;
-      return res as User;
+    return results.map((res: any) => {
+      const { _id, ...rest } = res;
+      void _id;
+      return rest as User;
     });
-    return users;
   }
 
   // ── Groups ────────────────────────────────────────────────────────────────
@@ -254,23 +361,22 @@ export class ExamToolboxDatabase {
   async upsertGroup(group: Group): Promise<void> {
     await this.collections.groups.updateOne(
       { name: group.name },
-      {
-        $set: group,
-      },
+      { $set: group },
       { upsert: true },
     );
   }
 
   async getGroups(): Promise<Group[]> {
-    const results = await this.collections.groups.find().toArray();
-    const groups: Group[] = results.map(res => res as Group);
-    return groups;
+    const results = await this.collections.groups.find({}).toArray();
+    return results as unknown as Group[];
   }
 
   // ── QR Cache ─────────────────────────────────────────────────────────────
 
   async getQRCache(): Promise<QRCacheDocument> {
-    return (await this.collections.qrCodes.findOne()) as QRCacheDocument;
+    return (await this.collections.qrCodes.findOne(
+      {},
+    )) as unknown as QRCacheDocument;
   }
 
   async setQRCache(updated: QRCacheDocument): Promise<void> {

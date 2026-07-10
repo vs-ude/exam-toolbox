@@ -19,7 +19,6 @@ export class NewPageComponent extends BaseTaskComponent {
   @Output() taskChangeEvent = new EventEmitter<Task>();
 
   public task: NewPage = {
-    taskId: '',
     type: 'newPage',
     question: { DE: '', EN: '' },
     points: 0,
@@ -46,7 +45,6 @@ export class NewPageComponent extends BaseTaskComponent {
       this.task = this.preTask as NewPage;
       return;
     }
-    this.task.taskId = this.taskId;
     this.taskChangeEvent.emit(this.task);
   }
 }
