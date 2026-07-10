@@ -1,11 +1,11 @@
 import { Context } from '@hono/hono';
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 
-import { authenticate, syncLdapUsers } from '../services/auth.ts';
+import { authenticate } from '../services/auth.ts';
 import { HandlerResult, HttpError } from '../types/handler.ts';
 import { AppEnv } from '../types/context.ts';
 import { handle } from './helpers.ts';
-import { getOrCreateDb } from '../services/db.ts';
+import { getOrCreateDb } from '../services/mod.ts';
 import {
   ErrorSchema,
   GroupSchema,
@@ -13,6 +13,7 @@ import {
   LoginResponseSchema,
   MessageSchema,
   UserSchema,
+  UserStubSchema,
 } from './schemas.ts';
 
 // ── Route definitions ─────────────────────────────────────────────────────────
@@ -91,7 +92,7 @@ const entitiesRoute = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            uids: z.array(z.string()),
+            users: z.array(UserStubSchema),
             groups: z.array(GroupSchema),
           }),
         },
@@ -182,10 +183,10 @@ function logout(_: Context<AppEnv>): HandlerResult {
 }
 
 async function getUsersAndGroups(): Promise<HandlerResult> {
-  const uids = await syncLdapUsers();
   const db = await getOrCreateDb();
+  const users = await db.getAllUserStubs();
   const groups = await db.getGroups();
-  return { kind: 'json', status: 200, body: { uids, groups } };
+  return { kind: 'json', status: 200, body: { uids: users, groups } };
 }
 
 async function getUserObjects(c: Context<AppEnv>): Promise<HandlerResult> {

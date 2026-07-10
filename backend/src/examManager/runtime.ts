@@ -1,5 +1,5 @@
 import { getConfig } from '../config/appConfig.ts';
-import { ExamToolboxDatabase } from '../services/db.ts';
+import { ExamToolboxDatabase } from '../services/mod.ts';
 
 import {
   createZipArchiveFromDirectory,

@@ -1,9 +1,15 @@
 // deno-lint-ignore-file no-explicit-any
-import { MongoClient, collection, dbId } from '@diister/mongodbee';
+import {
+  MongoClient,
+  collection,
+  dbId,
+  newId,
+  withIndex,
+} from '@diister/mongodbee';
 import * as v from '@diister/mongodbee/schema';
-import { getConfig } from '../config/appConfig.ts';
-import { Exam, parseExam, parseTask, Task } from '../types/mod.ts';
-import { Group, User } from '../types/mod.ts';
+import { getConfig } from '../../config/appConfig.ts';
+import { Exam, parseExam, parseTask, Task } from '../../types/mod.ts';
+import { Group, User, UserStub } from '../../types/mod.ts';
 
 let db: ExamToolboxDatabase;
 
@@ -81,17 +87,18 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
 
   const userSchema = {
     _id: dbId('user'),
-    sub: v.string(),
-    uid: v.optional(v.string()),
-    cn: v.optional(v.string()),
-    mail: v.optional(v.string()),
-    lastLoginAt: v.optional(v.any()),
-    createdAt: v.optional(v.any()),
+    sub: withIndex(v.string(), { unique: true }),
+    name: v.string(),
+    email: v.pipe(v.string(), v.email()),
+    active: v.boolean(),
+    groups: v.array(v.string()),
+    lastLoginAt: v.optional(v.date()),
+    createdAt: v.date(),
   };
 
   const groupSchema = {
     _id: dbId('group'),
-    name: v.string(),
+    name: withIndex(v.string(), { unique: true }),
     rights: v.optional(v.any()),
   };
 
@@ -334,15 +341,46 @@ export class ExamToolboxDatabase {
 
   async upsertUser(user: User): Promise<void> {
     const now = new Date();
-    user.lastLoginAt = now;
     await this.collections.users.updateOne(
       { sub: user.sub },
       {
         $set: user,
-        $setOnInsert: { createdAt: now },
+        $setOnInsert: { _id: `user:${newId()}`, createdAt: now },
       },
       { upsert: true },
     );
+  }
+
+  async updateUserLogin(user: User): Promise<void> {
+    const now = new Date();
+    await this.collections.users.updateOne(
+      { sub: user.sub },
+      { $set: { lastLoginAt: now } },
+    );
+  }
+
+  /**
+   * Deactivates all users except those specified in the `uids` array.
+   */
+  async deactivateOtherUids(uids: string[]): Promise<void> {
+    await this.collections.users.updateMany(
+      { sub: { $nin: uids } },
+      { $set: { active: false } },
+    );
+  }
+
+  async getUserById(id: string): Promise<User | undefined> {
+    const result = await this.collections.users.findOne({ sub: id });
+    return result as User | undefined;
+  }
+
+  async getAllUserStubs(): Promise<UserStub[]> {
+    const results = await this.collections.users.find({}).toArray();
+    return results.map((res: any) => {
+      const { _id, ...rest } = res;
+      void _id;
+      return rest as UserStub;
+    });
   }
 
   async getUsers(uids: string[]): Promise<User[]> {
@@ -361,7 +399,7 @@ export class ExamToolboxDatabase {
   async upsertGroup(group: Group): Promise<void> {
     await this.collections.groups.updateOne(
       { name: group.name },
-      { $set: group },
+      { $set: group, $setOnInsert: { _id: `group:${newId()}` } },
       { upsert: true },
     );
   }

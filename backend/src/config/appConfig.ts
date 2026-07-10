@@ -2,7 +2,7 @@ import { parse } from '@std/yaml';
 
 import { flags } from './args.ts';
 
-interface AppConfig extends Record<string, unknown> {
+export interface AppConfig extends Record<string, unknown> {
   server: {
     publicUrl: string;
     port: number;

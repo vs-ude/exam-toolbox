@@ -38,7 +38,7 @@ export const GroupSchema = z
 
 export const UserSchema = z
   .object({
-    uid: z.string(),
+    sub: z.string(),
     name: z.string(),
     email: z.string().email(),
     groups: z.array(z.string()),
@@ -46,6 +46,13 @@ export const UserSchema = z
     lastLoginAt: z.string().datetime().optional(),
   })
   .openapi('User');
+
+export const UserStubSchema = z
+  .object({
+    sub: z.string(),
+    name: z.string(),
+  })
+  .openapi('UserStub');
 
 export const TagSchema = z
   .object({

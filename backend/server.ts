@@ -5,6 +5,8 @@ import {
 } from '@hono/zod-openapi';
 import { cors } from '@hono/hono/cors';
 import { jwt } from '@hono/hono/jwt';
+import { Context, Next } from '@hono/hono';
+import { createMiddleware } from '@hono/hono/factory';
 
 import {
   configureAdminRouter,
@@ -16,15 +18,16 @@ import { getConfig, QRConfig } from './src/config/mod.ts';
 import { AppEnv } from './src/types/context.ts';
 import { createExamManagerRuntime } from './src/examManager/mod.ts';
 import {
-  checkUserExists,
+  checkUserExistsAndActive,
+  scheduleLdapUserSync,
   setupConfiguredGroups,
+  syncLdapUsers,
   waitForLdapConnection,
 } from './src/services/auth.ts';
-import { getOrCreateDb } from './src/services/db.ts';
+import { getOrCreateDb } from './src/services/mod.ts';
 import { parseLogFileForSubtaskInfo } from './src/services/mod.ts';
 import { preGeneratePageQRCache } from './src/services/qr.ts';
-import { Context, Next } from '@hono/hono';
-import { createMiddleware } from '@hono/hono/factory';
+import { HTTPException } from '@hono/hono/http-exception';
 
 const config = getConfig();
 console.debug('Config loaded', config);
@@ -32,6 +35,7 @@ const db = await getOrCreateDb();
 try {
   await waitForLdapConnection(10);
   await setupConfiguredGroups();
+  await syncLdapUsers();
 } catch (e) {
   console.error('Failed during LDAP setup:', e);
   Deno.exit(1);
@@ -107,16 +111,17 @@ app.use((c, next) => {
 });
 
 // Authentication middleware: reject if the user is no longer active even though the JWT is valid
-// TODO we should probably find a way to not call LDAP on each request and still be safe
 app.use(
   createMiddleware(async (c: Context<AppEnv>, next: Next): Promise<void> => {
     const jwtPayload = c.get('jwtPayload');
-    if (jwtPayload === undefined || (await checkUserExists(jwtPayload.sub))) {
+    if (
+      jwtPayload === undefined ||
+      (await checkUserExistsAndActive(jwtPayload.sub))
+    ) {
       await next();
       return;
     } else {
-      c.json({ error: 'User inactive' }, 403);
-      return;
+      throw new HTTPException(403, { message: 'User is inactive' });
     }
   }),
 );
@@ -170,5 +175,6 @@ if (Deno.env.get('NODE_ENV') === 'development') {
 
 // Schedule periodic in-memory job cleanup and start server
 examRuntime.scheduleDailyCleanup();
+scheduleLdapUserSync();
 
 Deno.serve({ port: config.server.port }, app.fetch);

@@ -3,9 +3,11 @@ import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 
 import { HandlerResult } from '../types/handler.ts';
 import { AppEnv } from '../types/context.ts';
-import { getConfig } from '../config/mod.ts';
-import { getOrCreateDb } from '../services/db.ts';
+import { getConfig, type AppConfig } from '../config/mod.ts';
+import { getOrCreateDb } from '../services/mod.ts';
 import { handle } from './helpers.ts';
+import { syncLdapUsers } from '../services/auth.ts';
+import { HTTPException } from '@hono/hono/http-exception';
 
 const db = await getOrCreateDb();
 
@@ -37,6 +39,32 @@ const configRoute = createRoute({
   },
 });
 
+const syncUsersRoute = createRoute({
+  method: 'post',
+  path: '/syncUsers',
+  tags: ['Admin'],
+  summary: 'Sync LDAP users',
+  description:
+    'Syncs LDAP users with the local database. Restricted to users in the admin group.',
+  security: [{ Bearer: [] }],
+  responses: {
+    200: {
+      content: {
+        'application/json': { schema: z.array(z.string()) },
+      },
+      description: 'LDAP users synced successfully',
+    },
+    403: {
+      content: {
+        'application/json': {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+      description: 'Not authorised (not an admin)',
+    },
+  },
+});
+
 // ── Router ────────────────────────────────────────────────────────────────────
 
 export function configureAdminRouter(): OpenAPIHono<AppEnv> {
@@ -45,6 +73,7 @@ export function configureAdminRouter(): OpenAPIHono<AppEnv> {
   // Middleware must be registered before the openapi route
   router.use('/*', checkAdmin);
   router.openapi(configRoute, c => handle(c, () => conf()));
+  router.openapi(syncUsersRoute, c => handle(c, () => syncUsers(c)));
 
   return router;
 }
@@ -52,7 +81,16 @@ export function configureAdminRouter(): OpenAPIHono<AppEnv> {
 // ── Handlers ──────────────────────────────────────────────────────────────────
 
 function conf(): HandlerResult {
-  return { kind: 'json', status: 200, body: getConfig() };
+  // deep copy config
+  const config = JSON.parse(JSON.stringify(getConfig())) as AppConfig;
+  config.auth.ldap.bindPassword = '<redacted>';
+  config.auth.jwt.secret = '<redacted>';
+  return { kind: 'json', status: 200, body: config };
+}
+
+async function syncUsers(_: Context<AppEnv>): Promise<HandlerResult> {
+  const users = await syncLdapUsers();
+  return { kind: 'json', status: 200, body: users };
 }
 
 /**
@@ -69,8 +107,8 @@ async function checkAdmin(
 
   const adminGroups = getConfig().auth.ldap.groups.admin;
   if (userFromDB.groups.filter(g => adminGroups.includes(g)).length === 0) {
-    return ctx.json({ message: 'Forbidden' }, 403);
+    throw new HTTPException(403, { message: 'Forbidden' });
   }
 
-  await next();
+  return await next();
 }

@@ -5,7 +5,7 @@ import { getConfig } from '../config/appConfig.ts';
 import { HttpError } from '../types/handler.ts';
 import { Rights, User } from '../types/mod.ts';
 
-import { getOrCreateDb } from './db.ts';
+import { getOrCreateDb } from './db/db.ts';
 
 const config = getConfig().auth;
 const LDAP_USER_FIELDS = ['uid', 'cn', 'sn', 'givenName', 'mail', 'memberOf'];
@@ -65,7 +65,6 @@ export async function testLDAPConnection() {
     await client.bind(config.ldap.bindDn, config.ldap.bindPassword);
   } catch (error) {
     console.warn(`Unable to bind to LDAP server ${config.ldap.url}`);
-    console.warn(error);
     throw error;
   } finally {
     try {
@@ -105,6 +104,7 @@ export async function authenticate(
     // Sync to DB
     const db = await getOrCreateDb();
     await db.upsertUser(user);
+    await db.updateUserLogin(user);
 
     // Ensure the payload is in the format we expect in validation
     const payload: JwtPayload = {
@@ -141,23 +141,15 @@ export async function authenticate(
 }
 
 /**
- * Checks if a user exists in the LDAP directory using the given username.
- * @param username The username to search for. Will be sanitized before searching.
- * @returns `true` if the user exists, `false` otherwise.
+ * Checks if a user exists in the DB and is marked as active.
+ * @param uid The user ID (sub) to search for.
+ * @returns `true` if the user exists and is active, `false` otherwise.
  */
-export async function checkUserExists(username: string): Promise<boolean> {
-  const safeUsername = sanitizeInput(username, 'username');
-  const client = new Client({ url: config.ldap.url });
-  try {
-    await getUserObject(client, safeUsername);
-  } catch {
+export async function checkUserExistsAndActive(uid: string): Promise<boolean> {
+  const db = await getOrCreateDb();
+  const user = await db.getUserById(uid);
+  if (!user || !user.active) {
     return false;
-  } finally {
-    try {
-      await client.unbind();
-    } catch {
-      // ignore unbind errors
-    }
   }
   return true;
 }
@@ -277,6 +269,9 @@ export async function syncLdapUsers(): Promise<string[]> {
       uids.push(user.sub);
     }
 
+    // Deactivate all users that no longer have access.
+    await db.deactivateOtherUids(uids);
+
     return uids;
   } finally {
     try {
@@ -367,4 +362,26 @@ function isInRequiredGroup(memberOf: string | string[]): boolean {
     list = memberOf as string[];
   }
   return list.some(group => group === groupDn(config.ldap.groups.required));
+}
+
+export function scheduleLdapUserSync() {
+  const now = new Date();
+  const nextRun = new Date();
+
+  // Schedule next run at the next 30-minute mark (:00 or :30)
+  const minutes = nextRun.getMinutes();
+  const minutesUntilNextRun = 30 - (minutes % 30);
+  nextRun.setMinutes(minutes + minutesUntilNextRun, 0, 0);
+
+  const delay = nextRun.getTime() - now.getTime();
+
+  console.info(
+    `Next LDAP user sync scheduled for ${nextRun.toLocaleString()} UTC-Time`,
+  );
+
+  setTimeout(() => {
+    console.info('Running LDAP user sync...');
+    syncLdapUsers();
+    scheduleLdapUserSync();
+  }, delay);
 }

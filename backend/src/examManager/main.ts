@@ -1,4 +1,4 @@
-import { ExamToolboxDatabase } from '../services/db.ts';
+import { ExamToolboxDatabase } from '../services/mod.ts';
 import { Language } from '../types/mod.ts';
 
 import { ExamGenerationJob, GenerationTask } from './runtime.ts';

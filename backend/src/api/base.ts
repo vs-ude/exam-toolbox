@@ -1,6 +1,6 @@
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 
-import { getOrCreateDb } from '../services/db.ts';
+import { getOrCreateDb } from '../services/mod.ts';
 import { testLDAPConnection } from '../services/auth.ts';
 import { HandlerResult } from '../types/handler.ts';
 import { AppEnv } from '../types/context.ts';
