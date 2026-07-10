@@ -7,6 +7,7 @@
       mat-stroked-button
       [mat-menu-trigger-for]="userMenu"
       class="user-menu-button"
+      data-cy="user-menu-button"
       aria-label="User menu"
     >
       <div class="avatar">{{ initialLetter }}</div>
@@ -14,7 +15,7 @@
       <mat-icon iconPositionEnd>more_vert</mat-icon>
     </button>
     <mat-menu #userMenu="matMenu" xPosition="after">
-      <button mat-menu-item (click)="onLogout()">
+      <button data-cy="logout-button" mat-menu-item (click)="onLogout()">
         <mat-icon aria-hidden="false">logout</mat-icon>
         <span>Logout</span>
       </button>
@@ -113,6 +114,7 @@
             [matTooltip]="sidebarCollapsed ? 'Getting Started' : ''"
             matTooltipPosition="right"
             aria-label="Getting Started"
+            data-cy="nav-getting-started"
           >
             <mat-icon matListItemIcon aria-hidden="false">help</mat-icon>
             <span matListItemTitle class="nav-label">Getting Started</span>
@@ -126,6 +128,7 @@
             [matTooltip]="sidebarCollapsed ? 'About' : ''"
             matTooltipPosition="right"
             aria-label="About"
+            data-cy="nav-about"
           >
             <mat-icon matListItemIcon aria-hidden="false">info</mat-icon>
             <span matListItemTitle class="nav-label">About</span>

@@ -24,6 +24,7 @@ default:
       paths:
         - .deno_cache/
     - key:
+        prefix: $CI_JOB_NAME
         files:
           - .ci/backend_integration_packages.txt
           - .ci/e2e/packages.txt

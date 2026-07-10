@@ -1,7 +1,7 @@
 describe('Exam Builder Drag and Drop and create pdf preview', () => {
   beforeEach(() => {
     cy.login('admin');
-    cy.get('[data-cy="add-exam"]').click();
+    cy.get('[data-cy="nav-create-exam"]').click();
     cy.url().should('include', '/create-exam');
   });
 

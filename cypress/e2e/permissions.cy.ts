@@ -3,7 +3,7 @@ describe('User Permissions and Role-Based Access', () => {
 
   it('Admin: Can create, save, and see the exam in the pool', () => {
     cy.login('admin');
-    cy.get('[data-cy="add-exam"]').click();
+    cy.get('[data-cy="nav-create-exam"]').click();
 
     // Fill exam metadata
     cy.get('[data-cy="exam-name-display"]').click();
@@ -22,7 +22,7 @@ describe('User Permissions and Role-Based Access', () => {
 
     // Verify it appears in the Exam Pool
     cy.visit('/dashboard');
-    cy.get('[data-cy="exams-pool"]').click();
+    cy.get('[data-cy="nav-exams-pool"]').click();
     cy.contains(examName).should('be.visible');
   });
 
@@ -34,7 +34,7 @@ describe('User Permissions and Role-Based Access', () => {
     cy.visit('/dashboard');
 
     // Verify API Denial for fetching exams
-    cy.get('[data-cy="exams-pool"]').click();
+    cy.get('[data-cy="nav-exams-pool"]').click();
 
     // Even if the UI tries to load, the student shouldn't see the admin's exam
     cy.wait('@getExams').then(interception => {
@@ -44,7 +44,7 @@ describe('User Permissions and Role-Based Access', () => {
 
     // Verify API Denial for saving
     cy.visit('http://localhost/#/dashboard');
-    cy.get('[data-cy="add-exam"]').click();
+    cy.get('[data-cy="nav-create-exam"]').click();
     cy.intercept('POST', '/api/exams').as('deniedSave');
 
     // Fill out only minimally required fields to click save

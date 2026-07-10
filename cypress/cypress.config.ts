@@ -5,5 +5,6 @@ export default defineConfig({
     baseUrl: 'http://localhost',
     supportFile: 'cypress/support/e2e.ts',
     video: false,
+    allowCypressEnv: false,
   },
 });
