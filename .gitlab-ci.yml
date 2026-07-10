@@ -47,7 +47,7 @@ style:
     - mkdir -p $APK_CACHE_DIR
     - apk add --cache-dir $APK_CACHE_DIR prettier >/dev/null 2>&1
   script:
-    - prettier --check **/*.ts **/*.scss **/*.html
+    - prettier --check {ts,html,scss,json,yaml,yml,md}
 
 backend_build:
   stage: build

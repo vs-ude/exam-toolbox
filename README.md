@@ -18,19 +18,19 @@ An internal web application for higher-education staff to author exam templates,
 
 ## Technology stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | Angular 18, Angular Material, RxJS, Prettier |
-| Backend | Deno, Hono, `@hono/zod-openapi` |
+| Layer             | Technology                                                   |
+| ----------------- | ------------------------------------------------------------ |
+| Frontend          | Angular 18, Angular Material, RxJS, Prettier                 |
+| Backend           | Deno, Hono, `@hono/zod-openapi`                              |
 | Document pipeline | LaTeX (tectonic), Ghostscript, ZIP archiving, Eta templating |
-| Image processing | ImageMagick (contrast adjustment for QR scanning) |
-| Reverse proxy | Caddy |
-| Authentication | Native Hono JWT & OpenLDAP client integration |
-| Database | MongoDB 6 |
-| Directory | OpenLDAP |
-| Dev mail sandbox | MailCrab |
-| Periodic cleanup | Deno cron container |
-| Orchestration | Docker Compose |
+| Image processing  | ImageMagick (contrast adjustment for QR scanning)            |
+| Reverse proxy     | Caddy                                                        |
+| Authentication    | Native Hono JWT & OpenLDAP client integration                |
+| Database          | MongoDB 6                                                    |
+| Directory         | OpenLDAP                                                     |
+| Dev mail sandbox  | MailCrab                                                     |
+| Periodic cleanup  | Deno cron container                                          |
+| Orchestration     | Docker Compose                                               |
 
 ## Repository layout
 
@@ -75,13 +75,13 @@ docker compose up --build
 
 The first build compiles the frontend and backend images. Subsequent starts are faster.
 
-| Service | Default address |
-|---|---|
-| Application | http://localhost |
-| API Specification (JSON) | http://localhost/api/doc *(Only in development mode)* |
-| phpLDAPadmin | http://localhost:6080 |
-| MailCrab (dev mail UI) | http://localhost:1080 |
-| MongoDB | localhost:27017 |
+| Service                  | Default address                                       |
+| ------------------------ | ----------------------------------------------------- |
+| Application              | http://localhost                                      |
+| API Specification (JSON) | http://localhost/api/doc _(Only in development mode)_ |
+| phpLDAPadmin             | http://localhost:6080                                 |
+| MailCrab (dev mail UI)   | http://localhost:1080                                 |
+| MongoDB                  | localhost:27017                                       |
 
 ### Log in
 
@@ -101,13 +101,16 @@ docker compose watch
 ```
 
 Or, to have less noise (e.g. from LDAP/Mongo):
+
 ```sh
 docker compose up --build --watch --attach backend caddy frontend
 ```
+
 > [!NOTE]
 > This does not start the `ldap-admin` container. If you need the phpLDAPAdmin UI, include it in the command above.
 
 This will watch and:
+
 - Rebuild containers when `deno.json`, `package.json`, template, or Dockerfile changes.
 - Sync backend `.ts`, `.scss` and `.html` files and restart the server automatically.
 - This works for both the backend and the frontend.
@@ -146,10 +149,10 @@ and logs from the frontend and backend in `artifacts/cypress_e2e/.logs/`.
 
 These accounts are bootstrapped via `ldap/10-testuser.ldif`.
 
-| Username | Password | LDAP groups (mapped roles) | Access |
-|---|---|---|---|
-| `test1` | `testpass` | `toolboxUsers`, `teachers`, `admins` | Admin configuration & full access |
-| `test2` | `testpass` | `toolboxUsers`, `teachers` | Teacher / full application access |
-| `student1` | `testpass` | `toolboxUsers`, `students` | Student / restricted access |
+| Username   | Password   | LDAP groups (mapped roles)           | Access                            |
+| ---------- | ---------- | ------------------------------------ | --------------------------------- |
+| `test1`    | `testpass` | `toolboxUsers`, `teachers`, `admins` | Admin configuration & full access |
+| `test2`    | `testpass` | `toolboxUsers`, `teachers`           | Teacher / full application access |
+| `student1` | `testpass` | `toolboxUsers`, `students`           | Student / restricted access       |
 
 LDAP admin account: **`cn=admin,dc=university,dc=example`** / password: `admin`.

@@ -2,30 +2,30 @@
 # All values can be overridden by environment variables (see src/config/appConfig.ts).
 
 server:
-  publicUrl: "http://localhost:3000"
+  publicUrl: 'http://localhost:3000'
   port: 3000
 
 auth:
   ldap:
-    url: "ldap://ldap-host:389"
-    bindDn: "cn=readonly,dc=toolboxUsers,dc=com"
-    bindPassword: "" # override via AUTH_LDAP_BIND_PASSWORD env var
-    searchBase: "ou=users,ou=accounts,dc=university,dc=example"
-    searchFilter: "(&(objectClass=inetOrgPerson)(|(uid=%s)(mail=%s)))"
-    groupDnBase: "cn=%s,ou=groups,ou=accounts,dc=university,dc=example"
+    url: 'ldap://ldap-host:389'
+    bindDn: 'cn=readonly,dc=toolboxUsers,dc=com'
+    bindPassword: '' # override via AUTH_LDAP_BIND_PASSWORD env var
+    searchBase: 'ou=users,ou=accounts,dc=university,dc=example'
+    searchFilter: '(&(objectClass=inetOrgPerson)(|(uid=%s)(mail=%s)))'
+    groupDnBase: 'cn=%s,ou=groups,ou=accounts,dc=university,dc=example'
     groups:
-      required: "toolboxUsers"
+      required: 'toolboxUsers'
       admin:
         - admins
       full:
         - teachers
 
   jwt:
-    secret: "" # override via JWT_SECRET env var — must be set in production
+    secret: '' # override via JWT_SECRET env var — must be set in production
     lifetimeDays: 30
 
 db:
-  connstring: "mongodb://mongo:27017/examToolboxDB"
+  connstring: 'mongodb://mongo:27017/examToolboxDB'
 
 paths:
   templateBasePath: /app/template
