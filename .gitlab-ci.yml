@@ -1,43 +1,72 @@
 stages:
+  - build
   - test
+  - e2e
 
-image: docker:25.0.5
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "dev"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 variables:
   DOCKER_TLS_CERTDIR: ''
+  DENO_DIR: $CI_PROJECT_DIR/.deno_cache
+
+default:
+  image: denoland/deno:latest
+  cache:
+    - key:
+        prefix: $CI_JOB_NAME
+        files:
+          - backend/deno.lock
+          - frontend/deno.lock
+      paths:
+        - .deno_cache/
+    - key:
+        files:
+          - .ci/backend_integration_packages.txt
+          - .ci/e2e/packages.txt
+      paths:
+        - .apt-cache/lists/
+        - .apt-cache/archives/
+    - key: exam-toolbox-e2e-cache
+      paths:
+        - .npm_cache/
 
 style:
   image: alpine:latest
-  stage: test
+  stage: .pre
   variables:
     APK_CACHE_DIR: $CI_PROJECT_DIR/.cache/apk
   cache:
-    key: $CI_COMMIT_REF_SLUG
-    paths:
-      - $APK_CACHE_DIR
+    - key: $CI_COMMIT_REF_SLUG
+      paths:
+        - $APK_CACHE_DIR
   before_script:
     - mkdir -p $APK_CACHE_DIR
     - apk add --cache-dir $APK_CACHE_DIR prettier >/dev/null 2>&1
   script:
     - prettier --check **/*.ts **/*.scss **/*.html
 
+backend_build:
+  stage: build
+  before_script:
+    - cd backend
+    - deno install -q
+  script:
+    - deno task build
+
+frontend_build:
+  stage: build
+  before_script:
+    - cd frontend
+    - deno install -q
+  script:
+    - deno task build:prod
+
 backend_tests:
-  image: denoland/deno:latest
   stage: test
-  variables:
-    DENO_DIR: $CI_PROJECT_DIR/.deno_cache
-  cache:
-    - key:
-        files:
-          - backend/deno.lock
-      paths:
-        - .deno_cache/
-    - key:
-        files:
-          - .ci/backend_integration_packages.txt
-      paths:
-        - .apt-cache/lists/
-        - .apt-cache/archives/
   before_script:
     - bash .ci/prepare_backend_integration.sh .ci/backend_integration_packages.txt
     - cd backend
@@ -47,9 +76,8 @@ backend_tests:
     - deno run cover
   coverage: '/All files[^|]*|[^|]*\s+([\d\.]+)/'
 
-# Cypress Tests
 cypress_e2e:
-  stage: test
+  stage: e2e
   image:
     name: cypress/included:15.18.1
     entrypoint: ['']
@@ -83,24 +111,6 @@ cypress_e2e:
     PATHS_TEMPLATE_BASE_PATH: '${CI_PROJECT_DIR}/backend/template'
     PATHS_CACHE_DIR: /tmp/cache
     PATHS_JOBS_DIR: /tmp/jobs
-    DENO_DIR: $CI_PROJECT_DIR/.deno_cache
-  cache:
-    - key:
-        files:
-          - backend/deno.lock
-          - frontend/deno.lock
-      paths:
-        - .deno_cache/
-    - key: exam-toolbox-e2e-cache
-      paths:
-        - .npm_cache/
-    - key:
-        files:
-          - .ci/backend_integration_packages.txt
-          - .ci/e2e/packages.txt
-      paths:
-        - .apt-cache/lists/
-        - .apt-cache/archives/
   before_script:
     - bash .ci/prepare_backend_integration.sh .ci/backend_integration_packages.txt
     - bash .ci/prepare_backend_integration.sh .ci/e2e/packages.txt
@@ -112,10 +122,8 @@ cypress_e2e:
   script:
     - bash .ci/e2e/start.sh
     - cypress run --config-file cypress/cypress.config.ts --quiet
-  # after_script:
-  #   - bash .ci/e2e/print_logs_on_fail.sh
   artifacts:
-    when: always
+    when: on_failure
     paths:
       - .logs/*.log
       - cypress/screenshots/**/*.png

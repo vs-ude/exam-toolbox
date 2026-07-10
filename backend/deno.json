@@ -19,6 +19,10 @@
     "start:watch": {
       "description": "Start the server in watch/development mode",
       "command": "deno run --allow-net --allow-env --allow-write --allow-read --allow-run --allow-import --allow-sys --watch server.ts"
+    },
+    "build": {
+      "description": "Build the server",
+      "command": "deno compile server.ts"
     }
   },
   "compilerOptions": {
