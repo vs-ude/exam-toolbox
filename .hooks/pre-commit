@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+
+FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
+[ -z "$FILES" ] && exit 0
+
+# Check if files are properly formatted
+export DENO_NO_PROMPT=1
+echo "$FILES" | xargs deno x prettier --ignore-unknown --check
+
+if [ $? -ne 0 ]; then
+  echo ">>> Formatting issues in staged files. Rejecting commit"
+  exit 1
+fi
+
