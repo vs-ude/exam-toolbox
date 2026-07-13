@@ -26,44 +26,44 @@ export class Exam {
     this.courseName = courseName ?? 'placeholder';
     this.examinerName = examinerName ?? 'placeholder';
     this.semester = semester ?? 'placeholder';
-    this.date = date ?? 'placeholder';
+    this.date = date ?? '1970-01-01';
     this.examLengthMinutes = examLengthMinutes ?? 0;
     this.tasks = tasks ?? [];
   }
 
   fillPagesAndPoints(this: Exam) {
-    this.fillPages();
-    this.fillPoints();
+    fillPages(this);
+    fillPoints(this);
   }
+}
 
-  private fillPages(this: Exam) {
-    this.pageCount = this.tasks.reduce(
-      // 1 per task group + number of newPages
-      (acc, group) =>
-        acc +
-        1 +
-        (group.tasks.reduce(
-          (acc, task) => acc + (task.type === 'newPage' ? 1 : 0),
-          0,
-        ) ?? 0),
-      0,
-    );
-    this.conceptPages = this.conceptPages ?? 2;
-    this.pageCount += this.conceptPages + 3; // + front + info + back
-    if (this.pageCount % 2 != 0) {
-      this.conceptPages += 1;
-      this.pageCount += 1;
-    }
+function fillPages(exam: Exam) {
+  exam.pageCount = exam.tasks.reduce(
+    // 1 per task group + number of newPages
+    (acc, group) =>
+      acc +
+      1 +
+      (group.tasks.reduce(
+        (acc, task) => acc + (task.type === 'newPage' ? 1 : 0),
+        0,
+      ) ?? 0),
+    0,
+  );
+  exam.conceptPages = exam.conceptPages ?? 2;
+  exam.pageCount += exam.conceptPages + 3; // + front + info + back
+  if (exam.pageCount % 2 != 0) {
+    exam.conceptPages += 1;
+    exam.pageCount += 1;
   }
+}
 
-  private fillPoints(this: Exam) {
-    this.points = this.tasks.reduce(
-      (acc, group) =>
-        acc +
-        (group.tasks.reduce((acc, task) => acc + (task.points ?? 0), 0) ?? 0),
-      0,
-    );
-  }
+function fillPoints(exam: Exam) {
+  exam.points = exam.tasks.reduce(
+    (acc, group) =>
+      acc +
+      (group.tasks.reduce((acc, task) => acc + (task.points ?? 0), 0) ?? 0),
+    0,
+  );
 }
 
 export const EXAM_FIELDS: (keyof Exam)[] = [

@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
 import { ExamCardComponent } from '../exam-card/exam-card.component';
 import { TaskPoolCardComponent } from '../task-pool-card/task-pool-card.component'; // Import RouterModule
 import { AsyncPipe, JsonPipe, NgIf, NgStyle } from '@angular/common';
-import { Exam } from '../../types/shared/exam';
+import { ExamStub } from '../../types/shared/stubs';
 import { Task } from '../../types/shared/tasks';
 
 @Component({
@@ -27,7 +27,7 @@ import { Task } from '../../types/shared/tasks';
 export class SearchComponent {
   public filteredTagsWithTasks: { tag: Tag; tasks: Task[] }[] = [];
   public questionMatches: Task[] = [];
-  public examMatches: Exam[] = [];
+  public examMatches: ExamStub[] = [];
 
   constructor(
     private router: Router,
@@ -114,7 +114,7 @@ export class SearchComponent {
     );
   }
 
-  public onExamClick(exam: Exam) {
+  public onExamClick(exam: ExamStub) {
     if (exam._id == undefined) {
       console.warn(`Exam ${exam.courseName} ${exam.semester} has no ExamID`);
       return;

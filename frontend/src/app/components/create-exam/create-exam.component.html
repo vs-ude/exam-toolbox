@@ -244,7 +244,9 @@
         </button>
       </div>
 
-      <ng-container *ngIf="!isPreviewTabActive">
+      <ng-container
+        *ngIf="!isPreviewTabActive && exam.tasks[currentGroupView]?.tasks"
+      >
         <div
           *ngIf="exam.tasks[currentGroupView].tasks.length === 0"
           class="empty_group_holder"

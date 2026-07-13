@@ -10,7 +10,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { Exam } from '../../types/shared/exam';
+import { ExamStub } from '../../types/shared/stubs';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { DownloadableJob } from '../../services/api.service';
@@ -25,7 +25,7 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './exams-table.component.scss',
 })
 export class ExamsTableComponent implements AfterViewInit, OnChanges {
-  @Input() exams: Exam[] = [];
+  @Input() exams: ExamStub[] = [];
   @Input() downloadableJobs: DownloadableJob[] = [];
   @Input() readOnly: boolean = false; //  don´t show download and delete buttons when true
   @Output() examSelectedEvent = new EventEmitter<string>();
@@ -54,7 +54,7 @@ export class ExamsTableComponent implements AfterViewInit, OnChanges {
     'updatedAt',
     'lastEditedBy',
   ];
-  public dataSource = new MatTableDataSource<Exam>(this.exams);
+  public dataSource = new MatTableDataSource<ExamStub>(this.exams);
   get displayedColumns(): string[] {
     return this.readOnly ? this.readOnlyColumns : this.allColumns;
   }

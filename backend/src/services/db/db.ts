@@ -8,7 +8,7 @@ import {
 } from '@diister/mongodbee';
 import * as v from '@diister/mongodbee/schema';
 import { getConfig } from '../../config/appConfig.ts';
-import { Exam, parseExam, parseTask, Task } from '../../types/mod.ts';
+import { Exam, ExamStub, parseExam, parseTask, Task } from '../../types/mod.ts';
 import { Group, User, UserStub } from '../../types/mod.ts';
 
 let db: ExamToolboxDatabase;
@@ -17,9 +17,32 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
   if (db) return db;
 
   const connString = getConfig().db.connString;
-  const client = new MongoClient(connString);
-  await client.connect();
+  async function initReplSet() {
+    const host = new URL(connString).hostname;
+    const mongoClient = new MongoClient(connString, {
+      replicaSet: 'rs0',
+      directConnection: true,
+    });
+    const adminDb = mongoClient.db('admin');
+    try {
+      const status = await adminDb.command({
+        replSetGetStatus: { replicaSet: 'rs0' },
+      });
+      if (status.ok) return;
+    } catch (_) {
+      await adminDb.command({
+        replSetInitiate: { _id: 'rs0', members: [{ _id: 0, host }] },
+      });
+    }
+  }
 
+  await initReplSet();
+  const client = new MongoClient(connString, {
+    replicaSet: 'rs0',
+    writeConcern: { w: 'majority' },
+  });
+
+  await client.connect();
   // Extract database name from the connection string path component
   const dbName = new URL(connString).pathname.slice(1);
   const mongoDb = client.db(dbName);
@@ -161,11 +184,18 @@ export class ExamToolboxDatabase {
 
   // ── Exams ────────────────────────────────────────────────────────────────
 
-  async getAllExams(): Promise<Exam[]> {
-    return (await this.collections.exams.find({}).toArray()).map(parseExam);
+  newExamId(): string {
+    return `exam:${newId()}`;
   }
 
-  async getRecentExams(user: User, limit: number): Promise<Exam[]> {
+  async getAllExams(limit: number = 20): Promise<ExamStub[]> {
+    const exams: Exam[] = await this.collections.exams
+      .find({}, { sort: { updatedAt: -1 }, limit })
+      .toArray();
+    return exams.map(exam => parseExam(exam) as ExamStub);
+  }
+
+  async getRecentExams(user: User, limit: number = 20): Promise<ExamStub[]> {
     return (
       await this.collections.exams
         .find({ lastEditedBy: user.sub }, { sort: { updatedAt: -1 }, limit })
@@ -178,7 +208,7 @@ export class ExamToolboxDatabase {
     return doc ? parseExam(doc) : undefined;
   }
 
-  async searchExams(text: string): Promise<Exam[]> {
+  async searchExams(text: string): Promise<ExamStub[]> {
     return (
       await this.collections.exams
         .find({
@@ -190,14 +220,45 @@ export class ExamToolboxDatabase {
         .toArray()
     ).map(parseExam);
   }
-
-  async createExam(exam: Exam): Promise<string> {
-    const id = await this.collections.exams.insertOne(exam);
-    return String(id);
+  /**
+   * Creates an exam. It creates or updates the tasks as needed using {@link upsertTasks}.
+   * @param exam The exam data to upsert.
+   * @param user The user performing the create.
+   * @returns The ID of the created exam.
+   */
+  async createExam(exam: Exam, user: User): Promise<string> {
+    const id = this.newExamId();
+    exam._id = id;
+    const allTasks = exam.tasks.flatMap((group: any) => group.tasks as Task[]);
+    await this.upsertTasks(allTasks, id, user);
+    exam.lastEditedBy = user.sub;
+    exam.updatedAt = new Date();
+    await this.collections.exams.insertOne({ ...exam });
+    return id;
   }
 
-  updateExam(id: string, data: Exam): Promise<{ matchedCount: number }> {
-    return this.collections.exams.updateOne({ _id: id }, { $set: data });
+  /**
+   * Updates an exam, throwing an error if the id is not found. It creates or updates the tasks as needed using {@link upsertTasks}.
+   * @param id The ID of the exam to update.
+   * @param data The exam data to upsert.
+   * @param user The user performing the update.
+   * @returns The ID of the updated exam.
+   * @throws {Error} If the exam with the given id is not found.
+   */
+  async updateExam(id: string, data: Exam, user: User): Promise<string> {
+    const existing = await this.collections.exams.findOne({ _id: id });
+    if (!existing) {
+      throw new Error(`Exam with id ${id} not found`);
+    }
+    data._id = id;
+    const allTasks = data.tasks.flatMap((group: any) => group.tasks as Task[]);
+    await this.upsertTasks(allTasks, id, user);
+    data.lastEditedBy = user.sub;
+    data.updatedAt = new Date();
+    const { _id: _examId, ...updateData } = data as any;
+    void _examId;
+    await this.collections.exams.updateOne({ _id: id }, { $set: updateData });
+    return id;
   }
 
   async deleteExam(id: string): Promise<number> {
@@ -301,6 +362,61 @@ export class ExamToolboxDatabase {
     ).map(parseTask);
   }
 
+  /**
+   * Updates the given tasks. If a task has no _id, it is inserted instead.
+   * It sets the createdAt and createdBy fields if necessary. It updates the lastUsed field.
+   * It updates the usedIn list if necessary.
+   * @param tasks The tasks to upsert.
+   * @param reference The exam reference to set in the usedIn field.
+   * @param user The user to set in the createdBy field.
+   */
+  private async upsertTasks(
+    tasks: Task[],
+    reference: string,
+    user: User,
+  ): Promise<void> {
+    const now = new Date();
+    for (const task of tasks) {
+      // newPage tasks are layout markers only – they live exclusively in the exam document
+      if (task.type === 'newPage') continue;
+
+      if (!task._id) {
+        // No ID → create a new task in the pool and wire it into the exam in-place
+        const id = `task:${newId()}`;
+        task._id = id;
+        task.createdBy = task.createdBy || user.sub;
+        (task as any).createdAt = (task as any).createdAt || now;
+        task.lastUsed = now;
+        task.usedIn = Array.isArray(task.usedIn) ? task.usedIn : [];
+        if (!task.usedIn.includes(reference)) task.usedIn.push(reference);
+        task.children = Array.isArray(task.children) ? task.children : [];
+        task.tagIds = Array.isArray(task.tagIds) ? task.tagIds : [];
+        await this.collections.taskPool.insertOne({ ...task });
+        // If this task was derived from an existing one, register it as a child
+        if (task.parent) {
+          await this.collections.taskPool.updateOne(
+            { _id: task.parent },
+            { $addToSet: { children: id } },
+          );
+        }
+      } else {
+        // Has ID → update the existing pool task in-place.
+        // usedIn is handled exclusively by $addToSet to avoid a path conflict
+        // and to preserve references to other exams the task appears in.
+        const { _id, usedIn: _usedIn, ...taskData } = task as any;
+        void _id;
+        void _usedIn;
+        await this.collections.taskPool.updateOne(
+          { _id: task._id },
+          {
+            $set: { ...taskData, lastUsed: now },
+            $addToSet: { usedIn: reference },
+          },
+        );
+      }
+    }
+  }
+
   async createTask(task: Task): Promise<string> {
     const id = await this.collections.taskPool.insertOne(task);
     return String(id);
@@ -375,7 +491,11 @@ export class ExamToolboxDatabase {
   }
 
   async getAllUserStubs(): Promise<UserStub[]> {
-    const results = await this.collections.users.find({}).toArray();
+    const results = await this.collections.users
+      .find({
+        active: true,
+      })
+      .toArray();
     return results.map((res: any) => {
       const { _id, ...rest } = res;
       void _id;

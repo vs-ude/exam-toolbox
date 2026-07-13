@@ -193,9 +193,7 @@ export async function createExam(
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const exam: Exam = await c.req.json();
-  exam.lastEditedBy = c.get('jwtPayload').sub;
-  exam.updatedAt = new Date();
-  const result = await deps.db.createExam(exam);
+  const result = await deps.db.createExam(exam, c.get('jwtPayload'));
   return {
     kind: 'json',
     status: 200,
@@ -455,27 +453,34 @@ export async function generateExams(
   };
 }
 
-export async function updateExam(
+export async function upsertExam(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const { examId, updatedExam } = await c.req.json();
-  if (!examId || !updatedExam) {
-    throw new HttpError(400, 'Exam ID and updated data are required');
+  const user = c.get('jwtPayload');
+  const examData = await c.req.json();
+  let action: 'created' | 'updated' = 'updated';
+  if (!examData) {
+    throw new HttpError(400, 'Exam data required');
   }
-  const updateData = { ...updatedExam };
-  delete updateData._id;
-  updateData.lastEditedBy = c.get('jwtPayload').sub;
-  updateData.updatedAt = new Date();
+  let examId = c.req.param('examId');
+  if (!examId) {
+    delete examData._id;
+    examId = await deps.db.createExam(examData, user);
+    action = 'created';
+  } else {
+    examData._id = examId;
 
-  const result = await deps.db.updateExam(examId, updateData);
-  if (result.matchedCount === 0) {
-    throw new HttpError(404, 'Exam not found');
+    try {
+      await deps.db.updateExam(examId, examData, user);
+    } catch (_) {
+      throw new HttpError(404, 'Exam not found');
+    }
   }
   return {
     kind: 'json',
     status: 200,
-    body: { message: 'Exam updated successfully' },
+    body: { insertedId: examId, message: `Exam ${action} successfully` },
   };
 }
 

@@ -12,7 +12,6 @@ import {
   LoginBodySchema,
   LoginResponseSchema,
   MessageSchema,
-  UserSchema,
   UserStubSchema,
 } from './schemas.ts';
 
@@ -69,7 +68,7 @@ const logoutRoute = createRoute({
   path: '/logout',
   tags: ['Auth'],
   summary: 'Logout',
-  description: 'Clears the authentication cookie.',
+  description: 'Noop.',
   security: [{ Bearer: [] }],
   responses: {
     200: {
@@ -84,8 +83,7 @@ const entitiesRoute = createRoute({
   path: '/entities',
   tags: ['Auth'],
   summary: 'List users and groups',
-  description:
-    'Synchronises LDAP users to the database and returns all user UIDs and configured groups.',
+  description: 'Returns stubs for all active users and configured groups.',
   security: [{ Bearer: [] }],
   responses: {
     200: {
@@ -102,37 +100,6 @@ const entitiesRoute = createRoute({
   },
 });
 
-const usersRoute = createRoute({
-  method: 'get',
-  path: '/users',
-  tags: ['Auth'],
-  summary: 'Resolve user objects',
-  description:
-    'Returns full user objects for a list of UIDs supplied as repeated query params.',
-  security: [{ Bearer: [] }],
-  request: {
-    query: z.object({
-      uids: z.union([z.string(), z.array(z.string())]).openapi({
-        description: 'One or more user UIDs to resolve',
-      }),
-    }),
-  },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: z.object({ users: z.array(UserSchema) }),
-        },
-      },
-      description: 'Resolved user objects',
-    },
-    400: {
-      content: { 'application/json': { schema: ErrorSchema } },
-      description: 'No UIDs provided',
-    },
-  },
-});
-
 // ── Router ────────────────────────────────────────────────────────────────────
 
 export function configureAuthRouter(): OpenAPIHono<AppEnv> {
@@ -142,7 +109,6 @@ export function configureAuthRouter(): OpenAPIHono<AppEnv> {
   router.openapi(loginRoute, c => handle(c, () => login(c)));
   router.openapi(logoutRoute, c => handle(c, () => logout(c)));
   router.openapi(entitiesRoute, c => handle(c, () => getUsersAndGroups()));
-  router.openapi(usersRoute, c => handle(c, () => getUserObjects(c)));
 
   return router;
 }
@@ -187,14 +153,4 @@ async function getUsersAndGroups(): Promise<HandlerResult> {
   const users = await db.getAllUserStubs();
   const groups = await db.getGroups();
   return { kind: 'json', status: 200, body: { uids: users, groups } };
-}
-
-async function getUserObjects(c: Context<AppEnv>): Promise<HandlerResult> {
-  const uids = c.req.queries('uids') ?? [];
-  if (uids.length < 1) {
-    throw new HttpError(400, 'uids must be a non-empty query parameter list');
-  }
-  const db = await getOrCreateDb();
-  const resolvedUsers = await db.getUsers(uids);
-  return { kind: 'json', status: 200, body: { users: resolvedUsers } };
 }

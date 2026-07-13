@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ExamCardComponent } from '../exam-card/exam-card.component';
-import { Exam } from '../../types/shared/exam';
+import { ExamStub } from '../../types/shared/stubs';
 import { ApiService, DownloadableJob } from '../../services/api.service';
 import { saveAs } from 'file-saver';
 import { LoadingService } from '../../services/loading.service';
@@ -14,7 +14,7 @@ import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog
 import { trigger, transition, style, animate } from '@angular/animations';
 import { ExamsTableComponent } from '../exams-table/exams-table.component';
 
-type FilterFn = (exams: Exam[]) => Exam[];
+type FilterFn = (exams: ExamStub[]) => ExamStub[];
 type ExamFilter = {
   active: boolean;
   filter: FilterFn;
@@ -53,8 +53,8 @@ type ExamFilter = {
   ],
 })
 export class ExamsPoolComponent implements OnInit {
-  public exams: Exam[] = [];
-  public filteredExams: Exam[] = [];
+  public exams: ExamStub[] = [];
+  public filteredExams: ExamStub[] = [];
   public downloadableJobs: DownloadableJob[] = [];
 
   private username: string = '';
@@ -260,41 +260,41 @@ export class ExamsPoolComponent implements OnInit {
   public filters = {
     filterRecentlyViewed: {
       active: true,
-      filter: (exams: Exam[]) => {
+      filter: (exams: ExamStub[]) => {
         console.log('recentlyViewed not implemented');
         return exams;
       },
     },
     filterMyExams: {
       active: false,
-      filter: (exams: Exam[]) =>
+      filter: (exams: ExamStub[]) =>
         exams.filter(exam => exam.examinerName === this.username),
     },
     filterRelevantExams: {
       active: false,
-      filter: (exams: Exam[]) =>
+      filter: (exams: ExamStub[]) =>
         exams.filter(exam => exam.date >= new Date().toISOString()),
     },
     sortAlphabetically: {
       active: true,
-      filter: (exams: Exam[]) =>
+      filter: (exams: ExamStub[]) =>
         [...exams].sort((a, b) => a.courseName.localeCompare(b.courseName)),
     },
     sortSemester: {
       active: false,
-      filter: (exams: Exam[]) =>
+      filter: (exams: ExamStub[]) =>
         [...exams].sort((a, b) => a.semester.localeCompare(b.semester)),
     },
     sortLastViewed: {
       active: false,
-      filter: (exams: Exam[]) => {
+      filter: (exams: ExamStub[]) => {
         console.log('lastViewed not implemented');
         return exams;
       },
     },
     sortAscending: {
       active: false,
-      filter: (exams: Exam[]) => exams.reverse(),
+      filter: (exams: ExamStub[]) => exams.reverse(),
     },
   };
 

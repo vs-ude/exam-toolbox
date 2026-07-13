@@ -102,9 +102,7 @@ export class CreateExamComponent {
   public refreshPool$: Subject<void> = new Subject<void>();
   public totalPoints = 0;
   public bilingual = false;
-  public exam = new Exam('New Exam', '', '', '', 90, [
-    { groupNumber: 1, groupTitle: { DE: '', EN: '' }, tasks: [] },
-  ]);
+  public exam = new Exam();
 
   public currentGroupView = 0;
   public lightTheme: boolean = true;
@@ -144,6 +142,9 @@ export class CreateExamComponent {
     this.semesters = this.getSemesters();
     if (!this.exam.semester) {
       this.exam.semester = this.semesters[0];
+    }
+    if (this.exam.tasks.length === 0) {
+      this.exam.tasks = [this.taskBuilder.createDefaultGroup()];
     }
 
     this.themeService.themeChanged$.subscribe((theme: Theme) => {
@@ -260,43 +261,17 @@ export class CreateExamComponent {
 
   onSave() {
     this.checkIfValid();
-    this.addNewTasksToPool();
-    this.uploadExam();
-  }
-
-  private addNewTasksToPool() {
-    for (let i = 0; i < this.exam.tasks.length; i++) {
-      for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
-        const task = this.exam.tasks[i].tasks[j];
-        if (!task._id) {
-          if (task.type === 'newPage') {
-            continue;
-          }
-          this.api.addTaskToPool(task).subscribe(
-            response => {
-              task._id = response._id;
-              console.log(`Task added to pool with id ${response._id}`);
-            },
-            error => {
-              console.error('Error adding task: ', error);
-            },
-          );
-        }
-      }
-    }
-  }
-
-  private uploadExam() {
-    this.api.addExam(this.exam).subscribe(
-      response => {
-        console.log('Exam added successfully: ', response);
+    this.api.addExam(this.exam).subscribe({
+      next: response => {
         this.autosaveService.clearLocal(undefined);
-        this.router.navigate([`/edit-exam/${response.insertedId}`]); // uses the id inserted by mongodb to navigate to a detailed view of this exam
+        this.router.navigate([`/edit-exam/${response.insertedId}`]);
       },
-      error => {
-        console.error('Error adding exam: ', error);
+
+      error: err => {
+        this.snackBar.open('Could not save exam!', 'OK');
+        console.error('Error adding exam: ', err);
       },
-    );
+    });
   }
 
   onPreview() {
@@ -476,51 +451,40 @@ export class CreateExamComponent {
 
   onUpdate() {
     this.checkIfValid();
-    this.addNewTasksToPool();
-    this.updatePoolTasks();
-    this.importPoolTasks();
-    this.api.updateExam(this.exam._id, this.exam).subscribe(
-      response => {
-        console.log('Exam updated successfully: ', response);
-        this.autosaveService.clearLocal(this.exam._id);
-      },
-      error => {
-        console.error('Error updating exam: ', error);
-      },
-    );
-  }
-
-  private updatePoolTasks() {
     if (this.modifiedPoolTasks.size === 0) {
+      this.submitUpdateExam();
       return;
     }
+    const modifiedIndices = this.getModifiedIndices();
+    this.askUserForTaskUpdate(modifiedIndices);
+  }
 
+  private getModifiedIndices(): [number, number][] {
     const modifiedIndices: [number, number][] = [];
     for (let i = 0; i < this.exam.tasks.length; i++) {
       for (let j = 0; j < this.exam.tasks[i].tasks.length; j++) {
         const task = this.exam.tasks[i].tasks[j];
-        const isPoolTask = this.isPoolTask(task._id);
-        const isModified = !!task._id && this.modifiedPoolTasks.has(task._id);
-
-        if (!isPoolTask || !isModified) continue;
-
-        modifiedIndices.push([i, j]);
+        if (
+          this.isPoolTask(task._id) &&
+          !!task._id &&
+          this.modifiedPoolTasks.has(task._id)
+        ) {
+          modifiedIndices.push([i, j]);
+        }
       }
     }
-
-    this.askUserForTaskUpdate(modifiedIndices);
+    return modifiedIndices;
   }
 
   private askUserForTaskUpdate(modifiedIndices: [number, number][]) {
-    const tasks = [];
-    for (const [i, j] of modifiedIndices) {
+    const tasks = modifiedIndices.map(([i, j]) => {
       const task = this.exam.tasks[i].tasks[j];
-      tasks.push({
+      return {
         assignmentNumber: `${i + 1}.${this.mapTaskIndexToChar(j)}`,
-        task: task,
+        task,
         newTask: !!task._id && this.newTasksToCreate.has(task._id),
-      });
-    }
+      };
+    });
 
     const dialogRef = this.dialog.open(UpdateTaskDialogComponent, {
       width: '50%',
@@ -528,76 +492,48 @@ export class CreateExamComponent {
       data: tasks,
     });
 
-    dialogRef.afterClosed().subscribe((results: string) => {
-      if (!results) {
-        return;
-      }
+    dialogRef.afterClosed().subscribe((results: boolean[]) => {
+      if (!results) return;
       for (let index = 0; index < results.length; index++) {
-        results[index]
-          ? this.createNewTask(modifiedIndices[index])
-          : this.updateTask(modifiedIndices[index]);
+        if (results[index]) {
+          // User chose to create a new task: detach from existing pool entry
+          this.prepareNewTask(modifiedIndices[index]);
+        }
+        // false = overwrite: task keeps its _id, backend will update it in-place
       }
-      this.modifiedPoolTasks.clear();
-      this.newTasksToCreate.clear();
+      this.submitUpdateExam();
     });
   }
 
-  updateTask(index: [number, number]) {
-    const [i, j] = index;
-    const task = this.exam.tasks[i].tasks[j];
-    if (!task._id) return;
-    this.api.updateTaskInPool(task._id, task).subscribe(
-      response => {
-        console.log(`Task ${task._id} updated in pool`, response);
-        this.importPoolTasks(); // refresh pool tasks after updating task
-      },
-      error => {
-        console.error(`Error updating task ${task._id}: `, error);
-      },
-    );
-  }
-
-  createNewTask(index: [number, number]) {
+  /** Detaches a task from its pool entry so the backend creates a new one. */
+  private prepareNewTask(index: [number, number]) {
     const [i, j] = index;
     const oldTask = this.exam.tasks[i].tasks[j];
     const newTask: Task = JSON.parse(JSON.stringify(oldTask));
     newTask.parent = oldTask._id;
     newTask.children = [];
-    newTask._id = undefined;
-
+    delete newTask._id;
     this.exam.tasks[i].tasks[j] = newTask;
+  }
 
-    // add new task to pool; on success wire up parent-child links
-    this.api.addTaskToPool(newTask).subscribe(
-      response => {
-        newTask._id = response._id;
-        oldTask.children.push(response._id);
-        console.log(`New Task ${response._id} added to pool`);
-        // register the new task as a child of the old one
-        if (oldTask._id) {
-          this.api.addChildToTaskPoolTask(oldTask._id, response._id).subscribe(
-            () => console.log('new child was added to the old Task'),
-            error =>
-              console.error('Error adding the child to the old Task', error),
-          );
-        }
-        this.importPoolTasks(); // refresh pool tasks after adding new task
+  private submitUpdateExam() {
+    this.api.updateExam(this.exam._id!, this.exam).subscribe({
+      next: () => {
+        this.autosaveService.clearLocal(this.exam._id);
+        this.modifiedPoolTasks.clear();
+        this.newTasksToCreate.clear();
+        // Re-fetch the exam so in-memory task IDs match what the backend assigned
+        this.api.getExam(this.exam._id!).subscribe({
+          next: updated => {
+            this.exam = updated;
+            this.importPoolTasks();
+          },
+          error: err =>
+            console.error('Error re-fetching exam after update:', err),
+        });
       },
-      error => {
-        console.error(`Error adding new task: `, error);
-      },
-    );
-
-    // update Exam that now includes the new Task
-    this.api.updateExam(this.exam._id, this.exam).subscribe(
-      response => {
-        console.log('Exam with new Task updated successfully: ', response);
-      },
-      error => {
-        console.error('Error updating exam: ', error);
-      },
-    );
-    this.triggerAutosave();
+      error: err => console.error('Error updating exam: ', err),
+    });
   }
 
   private importExam() {

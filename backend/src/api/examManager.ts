@@ -9,13 +9,12 @@ import {
   DownloadableJobSchema,
   ErrorSchema,
   ExamSchema,
-  ExamSummarySchema,
-  InsertResultSchema,
+  ExamStubSchema,
+  UpsertResultSchema,
   JobStatusSchema,
   MessageSchema,
   TagSchema,
   TaskSchema,
-  UpdateExamBodySchema,
 } from './schemas.ts';
 
 // All examManager routes require a Bearer JWT.
@@ -50,7 +49,7 @@ const getAllExamsRoute = createRoute({
   description: 'Returns metadata for every exam stored in the database.',
   responses: {
     200: {
-      content: { 'application/json': { schema: z.array(ExamSummarySchema) } },
+      content: { 'application/json': { schema: z.array(ExamStubSchema) } },
       description: 'Exam list',
     },
   },
@@ -66,7 +65,7 @@ const getRecentExamsRoute = createRoute({
     'Returns the 8 most recently edited exams for the authenticated user.',
   responses: {
     200: {
-      content: { 'application/json': { schema: z.array(ExamSummarySchema) } },
+      content: { 'application/json': { schema: z.array(ExamStubSchema) } },
       description: 'Recent exams',
     },
   },
@@ -88,7 +87,7 @@ const searchExamsRoute = createRoute({
   },
   responses: {
     200: {
-      content: { 'application/json': { schema: z.array(ExamSummarySchema) } },
+      content: { 'application/json': { schema: z.array(ExamStubSchema) } },
       description: 'Matching exams',
     },
   },
@@ -130,7 +129,7 @@ const createExamRoute = createRoute({
   },
   responses: {
     200: {
-      content: { 'application/json': { schema: InsertResultSchema } },
+      content: { 'application/json': { schema: UpsertResultSchema } },
       description: 'Created',
     },
   },
@@ -138,7 +137,7 @@ const createExamRoute = createRoute({
 
 const updateExamRoute = createRoute({
   method: 'put',
-  path: '/exams/update',
+  path: '/exams/:examId',
   tags: ['Exams'],
   security: BEARER,
   summary: 'Update exam',
@@ -146,13 +145,13 @@ const updateExamRoute = createRoute({
     'Replaces the exam document identified by `examId` with `updatedExam`.',
   request: {
     body: {
-      content: { 'application/json': { schema: UpdateExamBodySchema } },
+      content: { 'application/json': { schema: ExamSchema } },
       required: true,
     },
   },
   responses: {
     200: {
-      content: { 'application/json': { schema: MessageSchema } },
+      content: { 'application/json': { schema: UpsertResultSchema } },
       description: 'Updated',
     },
     400: {
@@ -418,7 +417,7 @@ const createTaskRoute = createRoute({
   },
   responses: {
     200: {
-      content: { 'application/json': { schema: InsertResultSchema } },
+      content: { 'application/json': { schema: UpsertResultSchema } },
       description: 'Created',
     },
   },
@@ -556,7 +555,7 @@ const createTagRoute = createRoute({
   },
   responses: {
     201: {
-      content: { 'application/json': { schema: InsertResultSchema } },
+      content: { 'application/json': { schema: UpsertResultSchema } },
       description: 'Created',
     },
   },
@@ -647,8 +646,8 @@ export function configureExamManagerRouter(
   router.openapi(getExamByIdRoute, c =>
     handle(c, () => h.getExamById(c, deps)),
   );
-  router.openapi(createExamRoute, c => handle(c, () => h.createExam(c, deps)));
-  router.openapi(updateExamRoute, c => handle(c, () => h.updateExam(c, deps)));
+  router.openapi(createExamRoute, c => handle(c, () => h.upsertExam(c, deps)));
+  router.openapi(updateExamRoute, c => handle(c, () => h.upsertExam(c, deps)));
   router.openapi(clearExamsRoute, c => handle(c, () => h.clearExams(c, deps)));
   router.openapi(deleteExamRoute, c => handle(c, () => h.deleteExam(c, deps)));
   // Files – binary responses, not suitable for JSON schema validation

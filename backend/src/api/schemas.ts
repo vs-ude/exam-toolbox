@@ -6,7 +6,7 @@ export const MessageSchema = z
   .object({ message: z.string() })
   .openapi('Message');
 
-export const InsertResultSchema = z
+export const UpsertResultSchema = z
   .object({ message: z.string(), insertedId: z.string() })
   .openapi('InsertResult');
 
@@ -71,7 +71,7 @@ export const TagSchema = z
 export const TaskSchema = z.record(z.string(), z.unknown()).openapi('Task');
 
 /** Top-level exam fields. Tasks are left as unknown to keep the spec concise. */
-export const ExamSummarySchema = z
+export const ExamStubSchema = z
   .object({
     _id: z.string().optional(),
     courseName: z.string(),
@@ -87,18 +87,11 @@ export const ExamSummarySchema = z
   })
   .openapi('ExamSummary');
 
-export const ExamSchema = ExamSummarySchema.extend({
+export const ExamSchema = ExamStubSchema.extend({
   tasks: z.array(z.unknown()).openapi({
     description: 'Task groups making up the exam',
   }),
 }).openapi('Exam');
-
-export const UpdateExamBodySchema = z
-  .object({
-    examId: z.string(),
-    updatedExam: z.record(z.string(), z.unknown()),
-  })
-  .openapi('UpdateExamBody');
 
 const JobProgressSchema = z.object({
   total: z.number(),

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Task } from '../types/shared/tasks';
+import { Task, TaskGroup } from '../types/shared/tasks';
 import { ApiService } from './api.service';
 import { User } from '../types/user';
 
@@ -20,6 +20,15 @@ export class TaskBuilderService {
     );
   }
 
+  public createDefaultGroup(): TaskGroup {
+    return {
+      groupNumber: 1,
+      groupTitle: { DE: '', EN: '' },
+      tasks: [],
+      points: 0,
+    };
+  }
+
   public createTask(taskType: string): Task {
     switch (taskType) {
       case 'new_multipleChoice':
@@ -31,7 +40,7 @@ export class TaskBuilderService {
           createdBy: this.user.id,
           createdAt: new Date(),
           lastUsed: new Date(),
-          usedIn: ['placeholder_id'],
+          usedIn: [],
           tags: [],
           tagIds: [],
           children: [],
@@ -45,7 +54,7 @@ export class TaskBuilderService {
           createdBy: this.user.id,
           createdAt: new Date(),
           lastUsed: new Date(),
-          usedIn: ['placeholder_id'],
+          usedIn: [],
           tags: [],
           tagIds: [],
           children: [],
@@ -60,7 +69,7 @@ export class TaskBuilderService {
           createdBy: this.user.id,
           createdAt: new Date(),
           lastUsed: new Date(),
-          usedIn: ['placeholder_id'],
+          usedIn: [],
           tagIds: [],
           tags: [],
           children: [],

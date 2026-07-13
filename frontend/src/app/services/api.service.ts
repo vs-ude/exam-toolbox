@@ -3,6 +3,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { filter, Observable, timeout } from 'rxjs';
 import { Exam } from '../types/shared/exam';
 import { Task } from '../types/shared/tasks';
+import { ExamStub } from '../types/shared/stubs';
 import { User } from '../types/user';
 import { Tag } from '../types/shared/tag';
 import { AuthService } from './auth.service';
@@ -72,7 +73,7 @@ export class ApiService {
   }
 
   getExams() {
-    return this.http.get<Exam[]>(`${this.apiUrl}/exams`);
+    return this.http.get<ExamStub[]>(`${this.apiUrl}/exams`);
   }
 
   getExam(examId: string) {
@@ -80,18 +81,17 @@ export class ApiService {
   }
 
   getExamsWithSearchText(searchText: string) {
-    return this.http.get<Exam[]>(`${this.apiUrl}/exams/search/${searchText}`);
+    return this.http.get<ExamStub[]>(
+      `${this.apiUrl}/exams/search/${searchText}`,
+    );
   }
 
-  getRecentExams(): Observable<Exam[]> {
-    return this.http.get<Exam[]>(`${this.apiUrl}/exams/recent`);
+  getRecentExams(): Observable<ExamStub[]> {
+    return this.http.get<ExamStub[]>(`${this.apiUrl}/exams/recent`);
   }
 
-  updateExam(examId: string | undefined, updatedExam: Exam) {
-    return this.http.put(`${this.apiUrl}/exams/update`, {
-      examId,
-      updatedExam,
-    });
+  updateExam(examId: string, updatedExam: Exam) {
+    return this.http.put(`${this.apiUrl}/exams/${examId}`, updatedExam);
   }
 
   deleteExams() {

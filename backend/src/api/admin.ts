@@ -1,4 +1,5 @@
 import { Context, Next } from '@hono/hono';
+import { HTTPException } from '@hono/hono/http-exception';
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 
 import { HandlerResult } from '../types/handler.ts';
@@ -7,7 +8,7 @@ import { getConfig, type AppConfig } from '../config/mod.ts';
 import { getOrCreateDb } from '../services/mod.ts';
 import { handle } from './helpers.ts';
 import { syncLdapUsers } from '../services/auth.ts';
-import { HTTPException } from '@hono/hono/http-exception';
+import { UserSchema, ErrorSchema } from './schemas.ts';
 
 const db = await getOrCreateDb();
 
@@ -65,6 +66,37 @@ const syncUsersRoute = createRoute({
   },
 });
 
+const usersRoute = createRoute({
+  method: 'get',
+  path: '/users',
+  tags: ['Admin'],
+  summary: 'Resolve user objects',
+  description:
+    'Returns full user objects for a list of UIDs supplied as repeated query params.',
+  security: [{ Bearer: [] }],
+  request: {
+    query: z.object({
+      uids: z.union([z.string(), z.array(z.string())]).openapi({
+        description: 'One or more user UIDs to resolve',
+      }),
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: z.object({ users: z.array(UserSchema) }),
+        },
+      },
+      description: 'Resolved user objects',
+    },
+    400: {
+      content: { 'application/json': { schema: ErrorSchema } },
+      description: 'No UIDs provided',
+    },
+  },
+});
+
 // ── Router ────────────────────────────────────────────────────────────────────
 
 export function configureAdminRouter(): OpenAPIHono<AppEnv> {
@@ -74,6 +106,7 @@ export function configureAdminRouter(): OpenAPIHono<AppEnv> {
   router.use('/*', checkAdmin);
   router.openapi(configRoute, c => handle(c, () => conf()));
   router.openapi(syncUsersRoute, c => handle(c, () => syncUsers(c)));
+  router.openapi(usersRoute, c => handle(c, () => getUserObjects(c)));
 
   return router;
 }
@@ -91,6 +124,20 @@ function conf(): HandlerResult {
 async function syncUsers(_: Context<AppEnv>): Promise<HandlerResult> {
   const users = await syncLdapUsers();
   return { kind: 'json', status: 200, body: users };
+}
+
+async function getUserObjects(c: Context<AppEnv>): Promise<HandlerResult> {
+  const uids = c.req.queries('uids') ?? [];
+  if (uids.length < 1) {
+    return {
+      kind: 'json',
+      status: 400,
+      body: { error: 'uids must be a non-empty query parameter list' },
+    };
+  }
+  const db = await getOrCreateDb();
+  const resolvedUsers = await db.getUsers(uids);
+  return { kind: 'json', status: 200, body: { users: resolvedUsers } };
 }
 
 /**
