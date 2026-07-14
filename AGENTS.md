@@ -6,7 +6,9 @@
 
 The rendering pipeline is LaTeX-based and supports bilingual output (DE/EN). Users can upload participant lists (Excel) to generate individualized exams in bulk.
 
-## What this system currently does
+> **Sub-system details**: see [`frontend/AGENTS.md`](frontend/AGENTS.md) and [`backend/AGENTS.md`](backend/AGENTS.md).
+
+## What this system does
 
 - Edit and manage exam definitions in a browser UI
 - Reuse and organize a task pool (question bank) with tags
@@ -15,79 +17,73 @@ The rendering pipeline is LaTeX-based and supports bilingual output (DE/EN). Use
 - Upload participant lists and generate per-student exam PDFs
 - Merge generated PDFs and provide downloadable ZIP artifacts
 - Generate attendance CSV data alongside exam outputs
-- Restrict access to authenticated LDAP users (using a natively integrated Hono JWT & OpenLDAP client flow) with required role memberships (like `teachers` or `admins`)
-- Embed QR codes in generated exams (front-page exam QR and per-page QR codes with page-level cache pre-generation)
-- Scan and decode QR codes from exam images, with ImageMagick-based contrast pre-processing to improve reliability
+- Restrict access to authenticated LDAP users (Hono JWT + OpenLDAP) with role-based permissions (`teachers`, `admins`)
+- Embed QR codes in generated exams (front-page and per-page, with startup cache pre-generation)
+- Scan and decode QR codes from exam images, with ImageMagick contrast pre-processing
 
-## Planned/next product step
+## Planned next step
 
-The scan ingest pipeline is actively being built. Scanned written exams can already be decoded (QR detection + exam-code validation with checksum); the next step is wiring this into a full grading-support workflow.
+The scan ingest pipeline is actively being built. QR detection and exam-code validation (with checksum) are working; the next step is wiring this into a full grading-support workflow.
 
 ## Repository structure
 
-- `frontend/`: Angular 18 application (UI for dashboard, exam builder, task pool, search, exam pool, mass-generation dialog)
-- `backend/`: Deno + Hono API, MongoDB integration, LaTeX generation pipeline, worker pool for mass generation
-  - `src/api/`: Hono router configuration with OpenAPI/Zod specs (separated from handler logic)
-  - `src/examManager/`: exam/task/tag/generation handlers
-  - `src/services/`: shared services – DB access, LDAP/JWT authentication, QR generation/scanning, image pre-processing, exam codes, ZIP
-  - `src/types/`: shared TypeScript types (exam, scan, student, tag, …)
-  - `src/config/`: runtime configuration constants
-- `backend/template/`: LaTeX template sources, split into:
-  - `meta/`: shared LaTeX macros (background, commands, header/footer, localisation, logging, symbols)
-  - `pages/`: individual page templates (title, info, concept, do-not-touch)
-  - `task_types/`: per-task-type Eta templates rendered by the backend before LaTeX compilation
-  - `cache/qr/`: pre-generated per-page QR code PNGs
-- `caddy/`: Caddy reverse proxy and static frontend file serving with watch support in development
-- `docs/`: Documentation
-- `docs/exam-toolbox-api/`: Bruno API client collection synced from the auto-generated OpenAPI 3.1 spec
-- `ldap/`: LDAP bootstrap/test data with updated structure mapping groups to granular application roles
-- `periodical/`: cron-based cleanup container for old mass-generation job directories
-- `testdata/`: shared test fixtures (exam JSON, CSVs, images, sample scanned exam JPEGs)
-- `docker-compose.yml`: local orchestration for caddy, backend, mongo, ldap, mail sandbox, and periodic cleanup
+```
+frontend/          Angular 18 SPA
+backend/           Deno + Hono API, generation pipeline, worker pool
+backend/template/  LaTeX / Eta template sources and QR cache
+caddy/             Reverse proxy config and static file serving
+docs/              Documentation + Bruno API collection
+ldap/              LDAP bootstrap and test data
+periodical/        Cron container for cleaning up old job directories
+testdata/          Shared test fixtures (JSON, CSVs, images, scan JPEGs)
+docker-compose.yml Local orchestration
+tools/             Utility scripts (e.g. copy_shared_types.sh)
+```
 
-## Architecture and runtime model
+## Architecture overview
 
-- Frontend talks to backend through `/api/*`
-- Caddy acts as a reverse proxy and serves static assets; watch-enabled in development
-- Backend implements native authentication via a direct LDAP client connection and issues Hono JWTs for session management
-- Backend enforces role-based access (e.g. `teachers` and `admins` permissions derived from LDAP groups) and serves exam, task, job, and authentication APIs
-- Exam generation uses LaTeX (`tectonic`) and post-processing (`gs`/Ghostscript)
-- Bulk generation is queued and processed in parallel via Deno workers
-- Job state is kept in memory; generated artifacts are written to mounted job directories
-- MongoDB stores exams, task pool entries, tags, and file-tracking metadata
+```
+Browser → Caddy (/:static, /api/*:proxy) → Deno/Hono backend → MongoDB
+                                                             ↘ OpenLDAP
+                                                             ↘ tectonic / gs / qrencode / zbarimg
+```
 
-## Key backend domains
-
-- Exam CRUD and recent/search endpoints
-- Task pool CRUD/search/type/tag/user filters
-- Tag management endpoints
-- Single exam PDF preview generation
-- Mass exam generation jobs:
-  - parse Excel student list
-  - enqueue student + solution + log tasks
-  - track progress and expose job status/download endpoints
-  - merge outputs and package ZIP deliverables
-  - notify requester via SMTP (MailCrab in dev)
-- QR code services:
-  - generate front-page exam QR (encodes course, semester, date, language, page count, points, random code)
-  - pre-generate and cache per-page QR codes at startup
-  - decode/scan QR codes from uploaded exam images, with contrast pre-processing via ImageMagick
-- Exam code generation and checksum validation (`exam_code` service)
-- Dynamic API documentation: OpenAPI 3.1 specification dynamically generated in dev mode and served at `/api/doc`
-- Native user authentication and session management using Hono JWT middleware and direct OpenLDAP binds
-
-## Operational notes
-
-- Intended for internal institutional use (not public-facing anonymous access)
-- Authentication and authorization rely on LDAP + Caddy policy
-- Bulk exam output directories are cleaned both in-memory (job map) and by periodic filesystem cleanup
-- Local development is container-first via `docker-compose.yml`
+- Frontend communicates exclusively through `/api/*` (proxied by Caddy).
+- The backend issues Hono JWTs after a direct LDAP credential bind and validates them on every protected request.
+- Exam generation uses `tectonic` (LaTeX) and Ghostscript for PDF post-processing.
+- Bulk generation runs in a Deno worker pool; job state is kept in memory and artifacts are written to mounted job directories.
+- MongoDB stores exams, task pool entries, tags, users, groups, and file-tracking metadata.
 
 ## Primary technologies
 
-- Frontend: Angular, Angular Material, RxJS, Prettier, Cypress/Karma
-- Backend: Deno, Hono, `@hono/zod-openapi`, MongoDB driver, worker threads
-- Document pipeline: LaTeX (tectonic), Ghostscript, ZIP archiving, Eta templating
-- Image processing: ImageMagick (contrast adjustment for QR scanning)
-- CI: GitLab CI with Deno unit + integration test stages
-- Infrastructure: Docker Compose, Caddy, OpenLDAP, MongoDB, MailCrab
+| Layer             | Stack                                                       |
+| ----------------- | ----------------------------------------------------------- |
+| Frontend          | Angular 18, Angular Material, RxJS, Prettier, Karma/Cypress |
+| Backend           | Deno, Hono, `@hono/zod-openapi`, MongoDB driver             |
+| Document pipeline | LaTeX (`tectonic`), Ghostscript, Eta templating, ZIP        |
+| Image / QR        | ImageMagick, `qrencode`, `zbarimg`                          |
+| Infrastructure    | Docker Compose, Caddy, OpenLDAP, MongoDB, MailCrab          |
+| CI                | GitLab CI (Deno unit + integration test stages)             |
+
+## Backend API
+
+- API is described in `docs/exam-toolbox-api` in Bruno format. It is generated from the OpenAPI spec hosted by the backend.
+
+## Shared files
+
+- **Types**: `backend/src/types/shared/` is the source of truth. After editing, run `tools/copy_shared_types.sh` to sync to `frontend/src/app/types/shared/`. Never edit the frontend copy directly.
+- **Public assets**: `caddy/public/` and `frontend/public/` are shared (Caddy serves them; Angular declares them). They do not need to be synchronised.
+
+## Local development
+
+The full stack runs via Docker Compose:
+
+```sh
+docker compose up --build --watch backend caddy frontend
+```
+
+Changes are hot-reloaded into the containers automatically — no manual rebuild is required.
+
+## Commits
+
+- Always include yourself in the `Co-authored-by` field of commit messages.
