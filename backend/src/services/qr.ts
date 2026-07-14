@@ -2,7 +2,8 @@ import { QRConfig } from '../config/mod.ts';
 
 import { type Exam, type Language } from '../types/mod.ts';
 import { ExamPageQRData, ExamQRData as ExamQRData } from '../types/scan.ts';
-import { getOrCreateDb, QRCacheDocument } from './db/db.ts';
+import { getOrCreateDb } from './db/db.ts';
+import { QRCacheDocument } from './db/qr.ts';
 import { parseExamCode } from './exam_code.ts';
 
 export class QRError extends Error {

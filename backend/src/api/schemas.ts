@@ -84,8 +84,14 @@ export const ExamStubSchema = z
     conceptPages: z.number().optional(),
     lastEditedBy: z.string().optional(),
     updatedAt: z.string().datetime().optional(),
+    access: z
+      .object({
+        users: z.array(z.string()).optional(),
+        groups: z.array(z.string()).optional(),
+      })
+      .optional(),
   })
-  .openapi('ExamSummary');
+  .openapi('ExamStub');
 
 export const ExamSchema = ExamStubSchema.extend({
   tasks: z.array(z.unknown()).openapi({

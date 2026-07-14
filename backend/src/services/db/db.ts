@@ -63,6 +63,10 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
     conceptPages: v.optional(v.number()),
     lastEditedBy: v.optional(v.string()),
     updatedAt: v.optional(v.any()),
+    access: v.object({
+      users: v.optional(v.array(v.string())),
+      groups: v.optional(v.array(v.string())),
+    }),
   };
 
   const taskSchema = {
@@ -132,10 +136,10 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
     pages: v.optional(v.any()),
   };
 
-  const [exams, taskPool, tags, fileTracker, users, groups, qrCodes] =
+  const [exams, tasks, tags, fileTracker, users, groups, qrCodes] =
     await Promise.all([
       collection(mongoDb, 'exams', examSchema),
-      collection(mongoDb, 'taskPool', taskSchema),
+      collection(mongoDb, 'tasks', taskSchema),
       collection(mongoDb, 'tags', tagSchema),
       collection(mongoDb, 'fileTracker', fileTrackerSchema),
       collection(mongoDb, 'users', userSchema),
@@ -145,7 +149,7 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
 
   db = new ExamToolboxDatabase(client, {
     exams: exams as any,
-    taskPool: taskPool as any,
+    tasks: tasks as any,
     tags: tags as any,
     fileTracker: fileTracker as any,
     users: users as any,
@@ -157,7 +161,7 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
 
 export interface Collections {
   exams: any;
-  taskPool: any;
+  tasks: any;
   tags: any;
   fileTracker: any;
   users: any;
@@ -187,6 +191,7 @@ export class ExamToolboxDatabase {
   public getUserById = u.getUserById;
   public getAllUserStubs = u.getAllUserStubs;
   public getUsers = u.getUsers;
+  public getGroups = u.getGroups;
   public upsertGroup = u.upsertGroup;
 
   public clearExams = e.clearExams;
@@ -199,7 +204,7 @@ export class ExamToolboxDatabase {
   public updateExam = e.updateExam;
 
   public addChildTask = t.addChildTask;
-  public clearTaskPool = t.clearTaskPool;
+  public clearTasks = t.clearTasks;
   public createTask = t.createTask;
   public deleteTask = t.deleteTask;
   public getAllTasks = t.getAllTasks;

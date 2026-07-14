@@ -3,14 +3,14 @@ import { User, Task, parseTask } from '../../types/mod.ts';
 import { newId } from '@diister/mongodbee';
 
 export async function getAllTasks(this: ExamToolboxDatabase): Promise<Task[]> {
-  return (await this.collections.taskPool.find({}).toArray()).map(parseTask);
+  return (await this.collections.tasks.find({}).toArray()).map(parseTask);
 }
 
 export async function getTaskById(
   this: ExamToolboxDatabase,
   taskId: string,
 ): Promise<Task | undefined> {
-  const doc = await this.collections.taskPool.findOne({ _id: taskId });
+  const doc = await this.collections.tasks.findOne({ _id: taskId });
   return doc ? parseTask(doc) : undefined;
 }
 
@@ -18,9 +18,7 @@ export async function getTasksByType(
   this: ExamToolboxDatabase,
   type: string,
 ): Promise<Task[]> {
-  return (await this.collections.taskPool.find({ type }).toArray()).map(
-    parseTask,
-  );
+  return (await this.collections.tasks.find({ type }).toArray()).map(parseTask);
 }
 
 export async function searchTasks(
@@ -28,7 +26,7 @@ export async function searchTasks(
   text: string,
 ): Promise<Task[]> {
   return (
-    await this.collections.taskPool
+    await this.collections.tasks
       .find({
         $or: [
           { 'question.DE': { $regex: text, $options: 'i' } },
@@ -44,7 +42,7 @@ export async function getTasksByUser(
   userId: string,
 ): Promise<Task[]> {
   return (
-    await this.collections.taskPool.find({ createdBy: userId }).toArray()
+    await this.collections.tasks.find({ createdBy: userId }).toArray()
   ).map(parseTask);
 }
 
@@ -52,9 +50,9 @@ export async function getTasksByTag(
   this: ExamToolboxDatabase,
   tagId: string,
 ): Promise<Task[]> {
-  return (
-    await this.collections.taskPool.find({ tagIds: tagId }).toArray()
-  ).map(parseTask);
+  return (await this.collections.tasks.find({ tagIds: tagId }).toArray()).map(
+    parseTask,
+  );
 }
 
 /**
@@ -87,10 +85,10 @@ export async function upsertTasks(
       if (!task.usedIn.includes(reference)) task.usedIn.push(reference);
       task.children = Array.isArray(task.children) ? task.children : [];
       task.tagIds = Array.isArray(task.tagIds) ? task.tagIds : [];
-      await this.collections.taskPool.insertOne({ ...task });
+      await this.collections.tasks.insertOne({ ...task });
       // If this task was derived from an existing one, register it as a child
       if (task.parent) {
-        await this.collections.taskPool.updateOne(
+        await this.collections.tasks.updateOne(
           { _id: task.parent },
           { $addToSet: { children: id } },
         );
@@ -102,7 +100,7 @@ export async function upsertTasks(
       const { _id, usedIn: _usedIn, ...taskData } = task as any;
       void _id;
       void _usedIn;
-      await this.collections.taskPool.updateOne(
+      await this.collections.tasks.updateOne(
         { _id: task._id },
         {
           $set: { ...taskData, lastUsed: now },
@@ -117,7 +115,7 @@ export async function createTask(
   this: ExamToolboxDatabase,
   task: Task,
 ): Promise<string> {
-  const id = await this.collections.taskPool.insertOne(task);
+  const id = await this.collections.tasks.insertOne(task);
   return String(id);
 }
 
@@ -126,7 +124,7 @@ export function updateTask(
   taskId: string,
   data: Task,
 ): Promise<{ matchedCount: number }> {
-  return this.collections.taskPool.updateOne({ _id: taskId }, { $set: data });
+  return this.collections.tasks.updateOne({ _id: taskId }, { $set: data });
 }
 
 export function addChildTask(
@@ -134,7 +132,7 @@ export function addChildTask(
   taskId: string,
   childTaskId: string,
 ): Promise<{ matchedCount: number }> {
-  return this.collections.taskPool.updateOne(
+  return this.collections.tasks.updateOne(
     { _id: taskId },
     { $addToSet: { children: childTaskId } },
   );
@@ -144,14 +142,12 @@ export async function deleteTask(
   this: ExamToolboxDatabase,
   taskId: string,
 ): Promise<number> {
-  const result = await this.collections.taskPool.deleteOne({ _id: taskId });
+  const result = await this.collections.tasks.deleteOne({ _id: taskId });
   return result.deletedCount;
 }
 
-export async function clearTaskPool(
-  this: ExamToolboxDatabase,
-): Promise<number> {
-  const result = await this.collections.taskPool.deleteMany({});
+export async function clearTasks(this: ExamToolboxDatabase): Promise<number> {
+  const result = await this.collections.tasks.deleteMany({});
   return result.deletedCount;
 }
 
@@ -159,7 +155,7 @@ export async function removeTagFromTasks(
   this: ExamToolboxDatabase,
   tagId: string,
 ): Promise<void> {
-  await this.collections.taskPool.updateMany(
+  await this.collections.tasks.updateMany(
     { tagIds: tagId },
     { $pull: { tagIds: tagId } },
   );
