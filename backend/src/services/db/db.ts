@@ -1,15 +1,14 @@
 // deno-lint-ignore-file no-explicit-any
-import {
-  MongoClient,
-  collection,
-  dbId,
-  newId,
-  withIndex,
-} from '@diister/mongodbee';
+import { MongoClient, collection, dbId, withIndex } from '@diister/mongodbee';
 import * as v from '@diister/mongodbee/schema';
 import { getConfig } from '../../config/appConfig.ts';
-import { Exam, ExamStub, parseExam, parseTask, Task } from '../../types/mod.ts';
-import { Group, User, UserStub } from '../../types/mod.ts';
+
+import * as u from './user.ts';
+import * as e from './exam.ts';
+import * as t from './tasks.ts';
+import * as g from './tags.ts';
+import * as f from './files.ts';
+import * as q from './qr.ts';
 
 let db: ExamToolboxDatabase;
 
@@ -156,7 +155,7 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
   return db;
 }
 
-interface Collections {
+export interface Collections {
   exams: any;
   taskPool: any;
   tags: any;
@@ -167,8 +166,8 @@ interface Collections {
 }
 
 export class ExamToolboxDatabase {
-  private client: MongoClient;
-  private collections: Collections;
+  protected client: MongoClient;
+  protected collections: Collections;
 
   constructor(client: MongoClient, collections: Collections) {
     this.client = client;
@@ -182,372 +181,48 @@ export class ExamToolboxDatabase {
     }
   }
 
-  // ── Exams ────────────────────────────────────────────────────────────────
+  public upsertUser = u.upsertUser;
+  public updateUserLogin = u.updateUserLogin;
+  public deactivateOtherUids = u.deactivateOtherUids;
+  public getUserById = u.getUserById;
+  public getAllUserStubs = u.getAllUserStubs;
+  public getUsers = u.getUsers;
+  public upsertGroup = u.upsertGroup;
 
-  newExamId(): string {
-    return `exam:${newId()}`;
-  }
+  public clearExams = e.clearExams;
+  public createExam = e.createExam;
+  public deleteExam = e.deleteExam;
+  public getAllExams = e.getAllExams;
+  public getExamById = e.getExamById;
+  public getRecentExams = e.getRecentExams;
+  public searchExams = e.searchExams;
+  public updateExam = e.updateExam;
 
-  async getAllExams(limit: number = 20): Promise<ExamStub[]> {
-    const exams: Exam[] = await this.collections.exams
-      .find({}, { sort: { updatedAt: -1 }, limit })
-      .toArray();
-    return exams.map(exam => parseExam(exam) as ExamStub);
-  }
+  public addChildTask = t.addChildTask;
+  public clearTaskPool = t.clearTaskPool;
+  public createTask = t.createTask;
+  public deleteTask = t.deleteTask;
+  public getAllTasks = t.getAllTasks;
+  public getTaskById = t.getTaskById;
+  public getTasksByTag = t.getTasksByTag;
+  public getTasksByType = t.getTasksByType;
+  public getTasksByUser = t.getTasksByUser;
+  public removeTagFromTasks = t.removeTagFromTasks;
+  public searchTasks = t.searchTasks;
+  public updateTask = t.updateTask;
+  public upsertTasks = t.upsertTasks;
 
-  async getRecentExams(user: User, limit: number = 20): Promise<ExamStub[]> {
-    return (
-      await this.collections.exams
-        .find({ lastEditedBy: user.sub }, { sort: { updatedAt: -1 }, limit })
-        .toArray()
-    ).map(parseExam);
-  }
+  public getQRCache = q.getQRCache;
+  public setQRCache = q.setQRCache;
 
-  async getExamById(id: string): Promise<Exam | undefined> {
-    const doc = await this.collections.exams.findOne({ _id: id });
-    return doc ? parseExam(doc) : undefined;
-  }
+  public addFileRef = f.addFileRef;
+  public clearFileTracker = f.clearFileTracker;
+  public createFileTrackerEntry = f.createFileTrackerEntry;
 
-  async searchExams(text: string): Promise<ExamStub[]> {
-    return (
-      await this.collections.exams
-        .find({
-          $or: [
-            { courseName: { $regex: text, $options: 'i' } },
-            { semester: { $regex: text, $options: 'i' } },
-          ],
-        })
-        .toArray()
-    ).map(parseExam);
-  }
-  /**
-   * Creates an exam. It creates or updates the tasks as needed using {@link upsertTasks}.
-   * @param exam The exam data to upsert.
-   * @param user The user performing the create.
-   * @returns The ID of the created exam.
-   */
-  async createExam(exam: Exam, user: User): Promise<string> {
-    const id = this.newExamId();
-    exam._id = id;
-    const allTasks = exam.tasks.flatMap((group: any) => group.tasks as Task[]);
-    await this.upsertTasks(allTasks, id, user);
-    exam.lastEditedBy = user.sub;
-    exam.updatedAt = new Date();
-    await this.collections.exams.insertOne({ ...exam });
-    return id;
-  }
-
-  /**
-   * Updates an exam, throwing an error if the id is not found. It creates or updates the tasks as needed using {@link upsertTasks}.
-   * @param id The ID of the exam to update.
-   * @param data The exam data to upsert.
-   * @param user The user performing the update.
-   * @returns The ID of the updated exam.
-   * @throws {Error} If the exam with the given id is not found.
-   */
-  async updateExam(id: string, data: Exam, user: User): Promise<string> {
-    const existing = await this.collections.exams.findOne({ _id: id });
-    if (!existing) {
-      throw new Error(`Exam with id ${id} not found`);
-    }
-    data._id = id;
-    const allTasks = data.tasks.flatMap((group: any) => group.tasks as Task[]);
-    await this.upsertTasks(allTasks, id, user);
-    data.lastEditedBy = user.sub;
-    data.updatedAt = new Date();
-    const { _id: _examId, ...updateData } = data as any;
-    void _examId;
-    await this.collections.exams.updateOne({ _id: id }, { $set: updateData });
-    return id;
-  }
-
-  async deleteExam(id: string): Promise<number> {
-    const result = await this.collections.exams.deleteOne({ _id: id });
-    return result.deletedCount;
-  }
-
-  async clearExams(): Promise<number> {
-    const result = await this.collections.exams.deleteMany({});
-    return result.deletedCount;
-  }
-
-  // ── FileTracker ──────────────────────────────────────────────────────────
-
-  async createFileTrackerEntry(entry: Record<string, unknown>): Promise<void> {
-    await this.collections.fileTracker.insertOne(entry);
-  }
-
-  async addFileRef(fileName: string, taskId: string): Promise<void> {
-    await this.collections.fileTracker.updateOne(
-      { name: fileName },
-      { $addToSet: { refs: taskId } },
-    );
-  }
-
-  async clearFileTracker(): Promise<void> {
-    await this.collections.fileTracker.deleteMany({});
-  }
-
-  // ── Tags ─────────────────────────────────────────────────────────────────
-
-  getAllTags(): Promise<Record<string, unknown>[]> {
-    return this.collections.tags.find({}, { sort: { name: 1 } }).toArray();
-  }
-
-  getTagById(id: string): Promise<Record<string, unknown> | null> {
-    return this.collections.tags.findOne({ _id: id });
-  }
-
-  async createTag(tag: Record<string, unknown>): Promise<string> {
-    const id = await this.collections.tags.insertOne(tag);
-    return String(id);
-  }
-
-  updateTag(
-    id: string,
-    data: Record<string, unknown>,
-  ): Promise<{ matchedCount: number }> {
-    return this.collections.tags.updateOne({ _id: id }, { $set: data });
-  }
-
-  async deleteTag(id: string): Promise<number> {
-    const result = await this.collections.tags.deleteOne({ _id: id });
-    return result.deletedCount;
-  }
-
-  async clearTags(): Promise<number> {
-    const result = await this.collections.tags.deleteMany({});
-    return result.deletedCount;
-  }
-
-  // ── TaskPool ─────────────────────────────────────────────────────────────
-
-  async getAllTasks(): Promise<Task[]> {
-    return (await this.collections.taskPool.find({}).toArray()).map(parseTask);
-  }
-
-  async getTaskById(taskId: string): Promise<Task | undefined> {
-    const doc = await this.collections.taskPool.findOne({ _id: taskId });
-    return doc ? parseTask(doc) : undefined;
-  }
-
-  async getTasksByType(type: string): Promise<Task[]> {
-    return (await this.collections.taskPool.find({ type }).toArray()).map(
-      parseTask,
-    );
-  }
-
-  async searchTasks(text: string): Promise<Task[]> {
-    return (
-      await this.collections.taskPool
-        .find({
-          $or: [
-            { 'question.DE': { $regex: text, $options: 'i' } },
-            { 'question.EN': { $regex: text, $options: 'i' } },
-          ],
-        })
-        .toArray()
-    ).map(parseTask);
-  }
-
-  async getTasksByUser(userId: string): Promise<Task[]> {
-    return (
-      await this.collections.taskPool.find({ createdBy: userId }).toArray()
-    ).map(parseTask);
-  }
-
-  async getTasksByTag(tagId: string): Promise<Task[]> {
-    return (
-      await this.collections.taskPool.find({ tagIds: tagId }).toArray()
-    ).map(parseTask);
-  }
-
-  /**
-   * Updates the given tasks. If a task has no _id, it is inserted instead.
-   * It sets the createdAt and createdBy fields if necessary. It updates the lastUsed field.
-   * It updates the usedIn list if necessary.
-   * @param tasks The tasks to upsert.
-   * @param reference The exam reference to set in the usedIn field.
-   * @param user The user to set in the createdBy field.
-   */
-  private async upsertTasks(
-    tasks: Task[],
-    reference: string,
-    user: User,
-  ): Promise<void> {
-    const now = new Date();
-    for (const task of tasks) {
-      // newPage tasks are layout markers only – they live exclusively in the exam document
-      if (task.type === 'newPage') continue;
-
-      if (!task._id) {
-        // No ID → create a new task in the pool and wire it into the exam in-place
-        const id = `task:${newId()}`;
-        task._id = id;
-        task.createdBy = task.createdBy || user.sub;
-        (task as any).createdAt = (task as any).createdAt || now;
-        task.lastUsed = now;
-        task.usedIn = Array.isArray(task.usedIn) ? task.usedIn : [];
-        if (!task.usedIn.includes(reference)) task.usedIn.push(reference);
-        task.children = Array.isArray(task.children) ? task.children : [];
-        task.tagIds = Array.isArray(task.tagIds) ? task.tagIds : [];
-        await this.collections.taskPool.insertOne({ ...task });
-        // If this task was derived from an existing one, register it as a child
-        if (task.parent) {
-          await this.collections.taskPool.updateOne(
-            { _id: task.parent },
-            { $addToSet: { children: id } },
-          );
-        }
-      } else {
-        // Has ID → update the existing pool task in-place.
-        // usedIn is handled exclusively by $addToSet to avoid a path conflict
-        // and to preserve references to other exams the task appears in.
-        const { _id, usedIn: _usedIn, ...taskData } = task as any;
-        void _id;
-        void _usedIn;
-        await this.collections.taskPool.updateOne(
-          { _id: task._id },
-          {
-            $set: { ...taskData, lastUsed: now },
-            $addToSet: { usedIn: reference },
-          },
-        );
-      }
-    }
-  }
-
-  async createTask(task: Task): Promise<string> {
-    const id = await this.collections.taskPool.insertOne(task);
-    return String(id);
-  }
-
-  updateTask(taskId: string, data: Task): Promise<{ matchedCount: number }> {
-    return this.collections.taskPool.updateOne({ _id: taskId }, { $set: data });
-  }
-
-  addChildTask(
-    taskId: string,
-    childTaskId: string,
-  ): Promise<{ matchedCount: number }> {
-    return this.collections.taskPool.updateOne(
-      { _id: taskId },
-      { $addToSet: { children: childTaskId } },
-    );
-  }
-
-  async deleteTask(taskId: string): Promise<number> {
-    const result = await this.collections.taskPool.deleteOne({ _id: taskId });
-    return result.deletedCount;
-  }
-
-  async clearTaskPool(): Promise<number> {
-    const result = await this.collections.taskPool.deleteMany({});
-    return result.deletedCount;
-  }
-
-  async removeTagFromTasks(tagId: string): Promise<void> {
-    await this.collections.taskPool.updateMany(
-      { tagIds: tagId },
-      { $pull: { tagIds: tagId } },
-    );
-  }
-
-  // ── Users ─────────────────────────────────────────────────────────────────
-
-  async upsertUser(user: User): Promise<void> {
-    const now = new Date();
-    await this.collections.users.updateOne(
-      { sub: user.sub },
-      {
-        $set: user,
-        $setOnInsert: { _id: `user:${newId()}`, createdAt: now },
-      },
-      { upsert: true },
-    );
-  }
-
-  async updateUserLogin(user: User): Promise<void> {
-    const now = new Date();
-    await this.collections.users.updateOne(
-      { sub: user.sub },
-      { $set: { lastLoginAt: now } },
-    );
-  }
-
-  /**
-   * Deactivates all users except those specified in the `uids` array.
-   */
-  async deactivateOtherUids(uids: string[]): Promise<void> {
-    await this.collections.users.updateMany(
-      { sub: { $nin: uids } },
-      { $set: { active: false } },
-    );
-  }
-
-  async getUserById(id: string): Promise<User | undefined> {
-    const result = await this.collections.users.findOne({ sub: id });
-    return result as User | undefined;
-  }
-
-  async getAllUserStubs(): Promise<UserStub[]> {
-    const results = await this.collections.users
-      .find({
-        active: true,
-      })
-      .toArray();
-    return results.map((res: any) => {
-      const { _id, ...rest } = res;
-      void _id;
-      return rest as UserStub;
-    });
-  }
-
-  async getUsers(uids: string[]): Promise<User[]> {
-    const results = await this.collections.users
-      .find({ sub: { $in: uids } })
-      .toArray();
-    return results.map((res: any) => {
-      const { _id, ...rest } = res;
-      void _id;
-      return rest as User;
-    });
-  }
-
-  // ── Groups ────────────────────────────────────────────────────────────────
-
-  async upsertGroup(group: Group): Promise<void> {
-    await this.collections.groups.updateOne(
-      { name: group.name },
-      { $set: group, $setOnInsert: { _id: `group:${newId()}` } },
-      { upsert: true },
-    );
-  }
-
-  async getGroups(): Promise<Group[]> {
-    const results = await this.collections.groups.find({}).toArray();
-    return results as unknown as Group[];
-  }
-
-  // ── QR Cache ─────────────────────────────────────────────────────────────
-
-  async getQRCache(): Promise<QRCacheDocument> {
-    return (await this.collections.qrCodes.findOne(
-      {},
-    )) as unknown as QRCacheDocument;
-  }
-
-  async setQRCache(updated: QRCacheDocument): Promise<void> {
-    await this.collections.qrCodes.updateOne(
-      {},
-      { $set: updated },
-      { upsert: true },
-    );
-  }
+  public clearTags = g.clearTags;
+  public createTag = g.createTag;
+  public deleteTag = g.deleteTag;
+  public getAllTags = g.getAllTags;
+  public getTagById = g.getTagById;
+  public updateTag = g.updateTag;
 }
-
-export type QRCacheDocument = {
-  studentsPerLanguage: number;
-  pagesPerStudent: number;
-  lastUpdated: string;
-};
