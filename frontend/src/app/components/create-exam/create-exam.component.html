@@ -1,25 +1,5 @@
 <div class="createExam_container">
   <div class="left_container">
-    <div class="exam_name_wrapper" id="examName">
-      <span
-        class="exam_name"
-        (click)="isNameChange = true"
-        *ngIf="!isNameChange"
-        id="examName"
-        data-cy="exam-name-display"
-      >
-        {{ exam.courseName }}
-      </span>
-      <input
-        class="name_input"
-        *ngIf="isNameChange"
-        [value]="exam.courseName"
-        (keydown)="onNameChange($event)"
-        id="examName"
-        #nameInput
-        data-cy="exam-name-input"
-      />
-    </div>
     <div class="add_tasks_container">
       <app-AddTask
         class="task_wrapper"
@@ -101,6 +81,26 @@
   </div>
 
   <div class="center_container">
+    <div class="exam_name_wrapper" id="examName">
+      <span
+        class="exam_name"
+        (click)="isNameChange = true"
+        *ngIf="!isNameChange"
+        id="examName"
+        data-cy="exam-name-display"
+      >
+        {{ exam.courseName }}
+      </span>
+      <input
+        class="name_input"
+        *ngIf="isNameChange"
+        [value]="exam.courseName"
+        (keydown)="onNameChange($event)"
+        id="examName"
+        #nameInput
+        data-cy="exam-name-input"
+      />
+    </div>
     <div class="viewBar_spacer"></div>
     <div class="viewBar_wrapper">
       <div class="icon_wrapper bar_icon">
@@ -139,14 +139,16 @@
         >
       </div>
 
-      <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"
-        ><img
-          [src]="
-            bilingual ? publicPath + 'english.svg' : publicPath + 'german.svg'
-          "
-      /></span>
+      <div
+        [matTooltip]="exam.bilingual ? 'Bilingual' : 'Monolingual'"
+        (click)="exam.bilingual = !exam.bilingual"
+        class="icon_wrapper language_icon"
+      >
+        <mat-icon aria-hidden="false">language</mat-icon
+        >{{ exam.bilingual ? '2' : '1' }}
+      </div>
 
-      <div class="duration_wrapper">
+      <div matTooltip="Exam duration" class="duration_wrapper">
         <div class="icon_wrapper">
           <mat-icon aria-hidden="false">access_time</mat-icon>
         </div>
@@ -160,7 +162,7 @@
         />
       </div>
 
-      <div class="date_wrapper">
+      <div matTooltip="Exam date" class="date_wrapper">
         <input
           type="date"
           class="datePicker"
@@ -170,19 +172,18 @@
         />
       </div>
 
-      <div class="examiner_wrapper">
-        <div class="icon_wrapper">
-          <mat-icon aria-hidden="false">person</mat-icon>
-        </div>
+      <div matTooltip="Examiner" class="examiner_wrapper" id="examiner">
+        <mat-icon matPrefix aria-hidden="false">person</mat-icon>
         <input
           class="examiner_input"
-          placeholder="Enter Examiner's Name"
+          placeholder="Name"
+          required
           [(ngModel)]="exam.examinerName"
           data-cy="examiner-input"
         />
       </div>
 
-      <div class="semester_wrapper">
+      <div matTooltip="Semester" class="semester_wrapper bar_icon">
         <div class="icon_wrapper">
           <mat-icon aria-hidden="false">school</mat-icon>
         </div>
@@ -197,6 +198,15 @@
             {{ semester }}
           </mat-option>
         </mat-select>
+      </div>
+
+      <div matTooltip="Configure Access Rights" class="icon_wrapper bar_icon">
+        <mat-icon
+          aria-hidden="false"
+          matTooltip="Configure Access Rights"
+          (click)="onConfigureAccess()"
+          >manage_accounts</mat-icon
+        >
       </div>
     </div>
 
@@ -277,7 +287,7 @@
               <app-task-group-title
                 class="task_container"
                 [assignmentNumber]="currentGroupView + 1"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [preTitle]="exam.tasks[currentGroupView].groupTitle"
                 (titleChangedEvent)="onTitleChange($event)"
               />
@@ -305,7 +315,7 @@
                 class="task_container"
                 [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [isModifiedPoolTask]="
                   isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i]._id)
                 "
@@ -329,7 +339,7 @@
                 class="task_container"
                 [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [isModifiedPoolTask]="
                   isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i]._id)
                 "
@@ -353,7 +363,7 @@
                 class="task_container"
                 [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [isModifiedPoolTask]="
                   isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i]._id)
                 "
@@ -373,7 +383,7 @@
                 class="task_container"
                 [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [isModifiedPoolTask]="
                   isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i]._id)
                 "
@@ -393,7 +403,7 @@
                 class="task_container"
                 [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [isModifiedPoolTask]="
                   isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i]._id)
                 "
@@ -417,7 +427,7 @@
                 class="task_container"
                 [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [isModifiedPoolTask]="
                   isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i]._id)
                 "
@@ -437,7 +447,7 @@
                 class="task_container"
                 [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 (deleteEvent)="deleteTask(i)"
                 (taskChangeEvent)="onTaskChange($event, i)"
                 (newTagEvent)="onAddTag(i)"

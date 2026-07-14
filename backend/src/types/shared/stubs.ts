@@ -6,3 +6,7 @@ export type UserStub = {
   sub: string;
   name: string;
 };
+
+export type GroupStub = {
+  name: string;
+};

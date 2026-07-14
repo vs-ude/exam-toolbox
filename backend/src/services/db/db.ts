@@ -67,6 +67,7 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
       users: v.optional(v.array(v.string())),
       groups: v.optional(v.array(v.string())),
     }),
+    bilingual: v.boolean(),
   };
 
   const taskSchema = {

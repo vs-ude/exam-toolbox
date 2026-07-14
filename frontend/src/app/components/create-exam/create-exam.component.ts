@@ -1,29 +1,15 @@
+import { debounceTime, forkJoin, Observable, retry, Subject, take } from 'rxjs';
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgFor, NgIf } from '@angular/common';
-import { Exam } from '../../types/shared/exam';
-import { Task } from '../../types/shared/tasks';
-import { AddTaskComponent } from './add-task/add-task.component';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../services/api.service';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MultiplechoiceTaskComponent } from './tasks/multipleChoiceTask/multiplechoice-task.component';
-import { ShortAnswerTaskComponent } from './tasks/short-answer-task/short-answer-task.component';
 import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { Router } from '@angular/router';
-import { TaskGroupTitleComponent } from './task-group-title/task-group-title.component';
-import { PictureTaskComponent } from './tasks/picture-task/picture-task.component';
-import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
-import { ColorProviderService } from '../../services/color-provider.service';
-import { LatexTaskComponent } from './tasks/latex-task/latex-task.component';
-import { TableTaskComponent } from './tasks/table-task/table-task.component';
-import { TaskBuilderService } from '../../services/task-builder.service';
-import { ManualTextComponent } from './tasks/manual-text/manual-text.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MassExamDialogComponent } from '../mass-exam-dialog/mass-exam-dialog.component';
-import { LoadingService } from '../../services/loading.service';
 import {
   CdkDrag,
   CdkDragDrop,
@@ -31,22 +17,46 @@ import {
   CdkDropList,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { NewPageComponent } from './tasks/new-page/new-page.component';
-import { UpdateTaskDialogComponent } from '../update-task-dialog/update-task-dialog.component';
 import { HttpResponse } from '@angular/common/http';
-import { NewPageDialogComponent } from './new-page-dialog/new-page-dialog.component';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Tag } from '../../types/shared/tag';
+
 import {
   AddTagDialogComponent,
   AddTagDialogData,
 } from '../add-tag-dialog/add-tag-dialog.component';
-import { TagHelperService } from '../../services/tag-helper.service';
-import { DraggablePoolComponent } from './draggable-pool/draggable-pool.component';
-import { debounceTime, forkJoin, Observable, retry, Subject, take } from 'rxjs';
-import { AutosaveService } from '../../services/autosave.service';
+import { MassExamDialogComponent } from '../mass-exam-dialog/mass-exam-dialog.component';
+import { UpdateTaskDialogComponent } from '../update-task-dialog/update-task-dialog.component';
 import { ConflictDialogComponent } from '../conflict-dialog/conflict-dialog.component';
+import {
+  ExamAuthDialogComponent,
+  ExamAuthDialogResult,
+} from '../../exam-auth-dialog/exam-auth-dialog.component';
+
+import { AddTaskComponent } from './add-task/add-task.component';
+import { ManualTextComponent } from './tasks/manual-text/manual-text.component';
+import { MultiplechoiceTaskComponent } from './tasks/multipleChoiceTask/multiplechoice-task.component';
+import { ShortAnswerTaskComponent } from './tasks/short-answer-task/short-answer-task.component';
+import { TaskGroupTitleComponent } from './task-group-title/task-group-title.component';
+import { PictureTaskComponent } from './tasks/picture-task/picture-task.component';
+import { LatexTaskComponent } from './tasks/latex-task/latex-task.component';
+import { TableTaskComponent } from './tasks/table-task/table-task.component';
+import { NewPageComponent } from './tasks/new-page/new-page.component';
+import { DraggablePoolComponent } from './draggable-pool/draggable-pool.component';
+import { NewPageDialogComponent } from './new-page-dialog/new-page-dialog.component';
+
+import { Exam } from '../../types/shared/exam';
+import { Task } from '../../types/shared/tasks';
+import { UserStub } from '../../types/shared/stubs';
+import { Tag } from '../../types/shared/tag';
+import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
+import { ColorProviderService } from '../../services/color-provider.service';
+import { TaskBuilderService } from '../../services/task-builder.service';
+import { LoadingService } from '../../services/loading.service';
+import { ApiService } from '../../services/api.service';
+import { TagHelperService } from '../../services/tag-helper.service';
+import { AutosaveService } from '../../services/autosave.service';
+
 import { environment } from '../../../environments/environment';
 
 interface PDFTaskInfo {
@@ -68,6 +78,7 @@ interface PDFTaskInfo {
     FormsModule,
     MatCardModule,
     MatTabsModule,
+    MatFormFieldModule,
     ShortAnswerTaskComponent,
     TaskGroupTitleComponent,
     PictureTaskComponent,
@@ -101,7 +112,6 @@ export class CreateExamComponent {
   public taskPool: Task[] = [];
   public refreshPool$: Subject<void> = new Subject<void>();
   public totalPoints = 0;
-  public bilingual = false;
   public exam = new Exam();
 
   public currentGroupView = 0;
@@ -519,6 +529,9 @@ export class CreateExamComponent {
   private submitUpdateExam() {
     this.api.updateExam(this.exam._id!, this.exam).subscribe({
       next: () => {
+        this.snackBar.open('Exam saved successfully', 'Close', {
+          duration: 3000,
+        });
         this.autosaveService.clearLocal(this.exam._id);
         this.modifiedPoolTasks.clear();
         this.newTasksToCreate.clear();
@@ -528,11 +541,18 @@ export class CreateExamComponent {
             this.exam = updated;
             this.importPoolTasks();
           },
-          error: err =>
-            console.error('Error re-fetching exam after update:', err),
+          error: err => {
+            console.error('Error re-fetching exam after update:', err);
+            this.snackBar.open('Error after saving the exam', 'Close', {
+              duration: 10000,
+            });
+          },
         });
       },
-      error: err => console.error('Error updating exam: ', err),
+      error: err => {
+        console.error('Error saving exam: ', err);
+        this.snackBar.open('Error during save', 'Close', { duration: 10000 });
+      },
     });
   }
 
@@ -686,6 +706,23 @@ export class CreateExamComponent {
 
   private mapTaskIndexToChar(index: number) {
     return String.fromCharCode(97 + (index % 26));
+  }
+
+  onConfigureAccess() {
+    this.dialog
+      .open(ExamAuthDialogComponent, {
+        width: '50%',
+        data: {
+          users: this.exam.access?.users ?? [],
+          groups: this.exam.access?.groups ?? [],
+        },
+      })
+      .afterClosed()
+      .subscribe((result: ExamAuthDialogResult | null) => {
+        if (result) {
+          this.exam.access = { users: result.users, groups: result.groups };
+        }
+      });
   }
 
   onMassExam() {

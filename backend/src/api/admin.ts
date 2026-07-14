@@ -1,5 +1,4 @@
-import { Context, Next } from '@hono/hono';
-import { HTTPException } from '@hono/hono/http-exception';
+import { Context } from '@hono/hono';
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 
 import { HandlerResult } from '../types/handler.ts';
@@ -9,8 +8,7 @@ import { getOrCreateDb } from '../services/mod.ts';
 import { handle } from './helpers.ts';
 import { syncLdapUsers } from '../services/auth.ts';
 import { UserSchema, ErrorSchema } from './schemas.ts';
-
-const db = await getOrCreateDb();
+import { checkAdmin } from './helpers.ts';
 
 // ── Route definitions ─────────────────────────────────────────────────────────
 
@@ -138,24 +136,4 @@ async function getUserObjects(c: Context<AppEnv>): Promise<HandlerResult> {
   const db = await getOrCreateDb();
   const resolvedUsers = await db.getUsers(uids);
   return { kind: 'json', status: 200, body: { users: resolvedUsers } };
-}
-
-/**
- * Middleware that guards routes under /api/admin.
- * Rejects requests whose user is not in the admin group.
- * Assumes the JWT has already been verified but checks the groups from DB
- * since the user may have been removed from the admins group in the meantime.
- */
-async function checkAdmin(
-  ctx: Context<AppEnv>,
-  next: Next,
-): Promise<void | Response> {
-  const userFromDB = (await db.getUsers([ctx.get('jwtPayload').sub]))[0];
-
-  const adminGroups = getConfig().auth.ldap.groups.admin;
-  if (userFromDB.groups.filter(g => adminGroups.includes(g)).length === 0) {
-    throw new HTTPException(403, { message: 'Forbidden' });
-  }
-
-  return await next();
 }

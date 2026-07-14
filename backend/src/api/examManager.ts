@@ -2,7 +2,7 @@ import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 
 import * as h from '../examManager/main.ts';
 import { AppEnv } from '../types/context.ts';
-import { handle } from './helpers.ts';
+import { checkAccess, checkAdmin, handle } from './helpers.ts';
 import {
   ActiveJobSchema,
   DeleteResultSchema,
@@ -633,6 +633,14 @@ export function configureExamManagerRouter(
 ): OpenAPIHono<AppEnv> {
   const router = new OpenAPIHono<AppEnv>();
 
+  // Routes restricted to admin/full-access groups
+  const restricted = new OpenAPIHono<AppEnv>();
+  restricted.use(checkAccess);
+
+  // Routes restricted to admin users
+  const admin = new OpenAPIHono<AppEnv>();
+  admin.use(checkAdmin);
+
   // Exams
   router.openapi(getAllExamsRoute, c =>
     handle(c, () => h.getAllExams(c, deps)),
@@ -646,67 +654,95 @@ export function configureExamManagerRouter(
   router.openapi(getExamByIdRoute, c =>
     handle(c, () => h.getExamById(c, deps)),
   );
-  router.openapi(createExamRoute, c => handle(c, () => h.upsertExam(c, deps)));
-  router.openapi(updateExamRoute, c => handle(c, () => h.upsertExam(c, deps)));
-  router.openapi(clearExamsRoute, c => handle(c, () => h.clearExams(c, deps)));
-  router.openapi(deleteExamRoute, c => handle(c, () => h.deleteExam(c, deps)));
+  restricted.openapi(createExamRoute, c =>
+    handle(c, () => h.upsertExam(c, deps)),
+  );
+  restricted.openapi(updateExamRoute, c =>
+    handle(c, () => h.upsertExam(c, deps)),
+  );
+  admin.openapi(clearExamsRoute, c => handle(c, () => h.clearExams(c, deps)));
+  restricted.openapi(deleteExamRoute, c =>
+    handle(c, () => h.deleteExam(c, deps)),
+  );
   // Files – binary responses, not suitable for JSON schema validation
-  router.get('/download', c => handle(c, () => h.downloadFile(c, deps)));
-  router.post('/upload', c => handle(c, () => h.uploadFile(c, deps)));
+  restricted.get('/download', c => handle(c, () => h.downloadFile(c, deps)));
+  restricted.post('/upload', c => handle(c, () => h.uploadFile(c, deps)));
   // Exam generation – multipart or binary responses
-  router.post('/generate-exam', c => handle(c, () => h.generateExam(c, deps)));
-  router.post('/generate-exams', c =>
+  restricted.post('/generate-exam', c =>
+    handle(c, () => h.generateExam(c, deps)),
+  );
+  restricted.post('/generate-exams', c =>
     handle(c, () => h.generateExams(c, deps)),
   );
   // Jobs
-  router.openapi(getDownloadableJobsRoute, c =>
+  restricted.openapi(getDownloadableJobsRoute, c =>
     handle(c, () => h.getDownloadableJobs(c, deps)),
   );
-  router.openapi(getJobStatusRoute, c =>
+  restricted.openapi(getJobStatusRoute, c =>
     handle(c, () => h.getJobStatus(c, deps)),
   );
-  router.get('/jobs/:jobId/download', c =>
+  restricted.get('/jobs/:jobId/download', c =>
     handle(c, () => h.downloadJob(c, deps)),
   );
-  router.openapi(cancelJobRoute, c => handle(c, () => h.cancelJob(c, deps)));
-  router.openapi(getActiveJobRoute, c =>
+  restricted.openapi(cancelJobRoute, c =>
+    handle(c, () => h.cancelJob(c, deps)),
+  );
+  restricted.openapi(getActiveJobRoute, c =>
     handle(c, () => h.getActiveJob(c, deps)),
   );
   // Task pool
-  router.openapi(getAllTasksRoute, c =>
+  restricted.openapi(getAllTasksRoute, c =>
     handle(c, () => h.getAllTasks(c, deps)),
   );
-  router.openapi(getTasksByTagRoute, c =>
+  restricted.openapi(getTasksByTagRoute, c =>
     handle(c, () => h.getTasksByTag(c, deps)),
   );
-  router.openapi(getTasksByTypeRoute, c =>
+  restricted.openapi(getTasksByTypeRoute, c =>
     handle(c, () => h.getTasksByType(c, deps)),
   );
-  router.openapi(searchTasksRoute, c =>
+  restricted.openapi(searchTasksRoute, c =>
     handle(c, () => h.searchTasks(c, deps)),
   );
-  router.openapi(getTasksByUserRoute, c =>
+  restricted.openapi(getTasksByUserRoute, c =>
     handle(c, () => h.getTasksByUser(c, deps)),
   );
-  router.openapi(getTaskByIdRoute, c =>
+  restricted.openapi(getTaskByIdRoute, c =>
     handle(c, () => h.getTaskById(c, deps)),
   );
-  router.openapi(createTaskRoute, c => handle(c, () => h.createTask(c, deps)));
-  router.openapi(addChildTaskRoute, c =>
+  restricted.openapi(createTaskRoute, c =>
+    handle(c, () => h.createTask(c, deps)),
+  );
+  restricted.openapi(addChildTaskRoute, c =>
     handle(c, () => h.addChildTask(c, deps)),
   );
-  router.openapi(updateTaskRoute, c => handle(c, () => h.updateTask(c, deps)));
-  router.openapi(deleteTaskRoute, c => handle(c, () => h.deleteTask(c, deps)));
-  router.openapi(clearTaskPoolRoute, c =>
+  restricted.openapi(updateTaskRoute, c =>
+    handle(c, () => h.updateTask(c, deps)),
+  );
+  restricted.openapi(deleteTaskRoute, c =>
+    handle(c, () => h.deleteTask(c, deps)),
+  );
+  admin.openapi(clearTaskPoolRoute, c =>
     handle(c, () => h.clearTaskPool(c, deps)),
   );
   // Tags
-  router.openapi(getAllTagsRoute, c => handle(c, () => h.getAllTags(c, deps)));
-  router.openapi(getTagByIdRoute, c => handle(c, () => h.getTagById(c, deps)));
-  router.openapi(createTagRoute, c => handle(c, () => h.createTag(c, deps)));
-  router.openapi(updateTagRoute, c => handle(c, () => h.updateTag(c, deps)));
-  router.openapi(clearTagsRoute, c => handle(c, () => h.clearTags(c, deps)));
-  router.openapi(deleteTagRoute, c => handle(c, () => h.deleteTag(c, deps)));
+  restricted.openapi(getAllTagsRoute, c =>
+    handle(c, () => h.getAllTags(c, deps)),
+  );
+  restricted.openapi(getTagByIdRoute, c =>
+    handle(c, () => h.getTagById(c, deps)),
+  );
+  restricted.openapi(createTagRoute, c =>
+    handle(c, () => h.createTag(c, deps)),
+  );
+  restricted.openapi(updateTagRoute, c =>
+    handle(c, () => h.updateTag(c, deps)),
+  );
+  admin.openapi(clearTagsRoute, c => handle(c, () => h.clearTags(c, deps)));
+  restricted.openapi(deleteTagRoute, c =>
+    handle(c, () => h.deleteTag(c, deps)),
+  );
+
+  router.route('/', restricted);
 
   return router;
 }

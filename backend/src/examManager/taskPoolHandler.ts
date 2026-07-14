@@ -144,7 +144,7 @@ export async function clearTaskPool(
   _c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const result = await deps.db.clearTaskPool();
+  const result = await deps.db.clearTasks();
   await deps.db.clearFileTracker();
   await emptyDir('./uploads');
   return {

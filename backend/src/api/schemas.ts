@@ -29,23 +29,15 @@ export const LoginResponseSchema = z
   .object({ token: z.string() })
   .openapi('LoginResponse');
 
-export const GroupSchema = z
+export const GroupStubSchema = z
   .object({
     name: z.string(),
-    rights: z.enum(['admin', 'full', 'limited']),
   })
-  .openapi('Group');
+  .openapi('GroupStub');
 
-export const UserSchema = z
-  .object({
-    sub: z.string(),
-    name: z.string(),
-    email: z.string().email(),
-    groups: z.array(z.string()),
-    active: z.boolean().optional(),
-    lastLoginAt: z.string().datetime().optional(),
-  })
-  .openapi('User');
+export const GroupSchema = GroupStubSchema.extend({
+  rights: z.enum(['admin', 'full', 'limited']),
+}).openapi('Group');
 
 export const UserStubSchema = z
   .object({
@@ -53,6 +45,13 @@ export const UserStubSchema = z
     name: z.string(),
   })
   .openapi('UserStub');
+
+export const UserSchema = UserStubSchema.extend({
+  email: z.string().email(),
+  groups: z.array(z.string()),
+  active: z.boolean().optional(),
+  lastLoginAt: z.string().datetime().optional(),
+}).openapi('User');
 
 export const TagSchema = z
   .object({
@@ -75,6 +74,7 @@ export const ExamStubSchema = z
   .object({
     _id: z.string().optional(),
     courseName: z.string(),
+    bilingual: z.boolean(),
     examinerName: z.string(),
     semester: z.string(),
     date: z.string(),

@@ -1,7 +1,7 @@
 .createExam_container {
   display: flex;
   flex-direction: row;
-  height: 100%;
+  min-height: calc(100vh - 65px);
   flex-wrap: nowrap;
   color: var(--color-text);
   background-color: var(--color-background);
@@ -106,7 +106,7 @@
   border-radius: 10px;
   padding: 2%;
   flex-grow: 1;
-  max-height: 10%;
+  min-height: 64px;
   width: 100%;
   flex-wrap: wrap;
 }
@@ -221,6 +221,10 @@
 .bar_icon {
   color: var(--color-icon);
   margin-right: 1%;
+}
+
+.bar-icon :last-child {
+  margin-right: 0;
 }
 
 .bar_icon:hover {

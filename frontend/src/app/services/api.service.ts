@@ -3,7 +3,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { filter, Observable, timeout } from 'rxjs';
 import { Exam } from '../types/shared/exam';
 import { Task } from '../types/shared/tasks';
-import { ExamStub } from '../types/shared/stubs';
+import { UserStub, GroupStub, ExamStub } from '../types/shared/stubs';
 import { User } from '../types/user';
 import { Tag } from '../types/shared/tag';
 import { AuthService } from './auth.service';
@@ -54,6 +54,12 @@ export class ApiService {
   getUser(): Observable<User> {
     return this.authService.currentUser$.pipe(
       filter((user): user is User => user !== null),
+    );
+  }
+
+  getUsersAndGroups(): Observable<{ users: UserStub[]; groups: GroupStub[] }> {
+    return this.http.get<{ users: UserStub[]; groups: GroupStub[] }>(
+      `${this.apiUrl}/auth/entities`,
     );
   }
 

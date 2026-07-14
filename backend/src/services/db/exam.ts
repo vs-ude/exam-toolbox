@@ -68,6 +68,9 @@ export async function createExam(
   await this.upsertTasks(allTasks, id, user);
   exam.lastEditedBy = user.sub;
   exam.updatedAt = new Date();
+  if (!exam.access.users.includes(user.sub)) {
+    exam.access.users.push(user.sub);
+  }
   await this.collections.exams.insertOne({ ...exam });
   return id;
 }
@@ -78,7 +81,7 @@ export async function createExam(
  * @param data The exam data to upsert.
  * @param user The user performing the update.
  * @returns The ID of the updated exam.
- * @throws {Error} If the exam with the given id is not found.
+ * @throws {Error} If the exam with the given id is not found or if the user is not authorized to edit the exam.
  */
 export async function updateExam(
   this: ExamToolboxDatabase,
@@ -86,15 +89,25 @@ export async function updateExam(
   data: Exam,
   user: User,
 ): Promise<string> {
-  const existing = await this.collections.exams.findOne({ _id: id });
+  const existing = (await this.collections.exams.findOne({ _id: id })) as Exam;
   if (!existing) {
     throw new Error(`Exam with id ${id} not found`);
+  }
+  if (
+    !(user.sub in existing.access.users) &&
+    !existing.access.groups?.filter(group => group.includes(user.sub))
+  ) {
+    throw new Error(`User ${user.sub} is not authorized to edit this exam`);
   }
   data._id = id;
   const allTasks = data.tasks.flatMap((group: any) => group.tasks as Task[]);
   await this.upsertTasks(allTasks, id, user);
   data.lastEditedBy = user.sub;
   data.updatedAt = new Date();
+  if (!data.access.users.includes(user.sub)) {
+    data.access.users.push(user.sub);
+  }
+
   const { _id: _examId, ...updateData } = data as any;
   void _examId;
   await this.collections.exams.updateOne({ _id: id }, { $set: updateData });

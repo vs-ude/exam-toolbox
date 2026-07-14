@@ -4,6 +4,7 @@ export class Exam {
   _id?: string = undefined;
   courseName: string;
   examinerName: string;
+  bilingual: boolean = false;
   semester: string;
   date: string;
   examLengthMinutes: number;
@@ -13,6 +14,10 @@ export class Exam {
   conceptPages?: number;
   public lastEditedBy?: string;
   public updatedAt?: Date;
+  access: {
+    users: string[];
+    groups?: string[];
+  };
 
   constructor(
     courseName?: string,
@@ -21,14 +26,16 @@ export class Exam {
     date?: string,
     examLengthMinutes?: number,
     tasks?: TaskGroup[],
+    access?: { users: string[]; groups?: string[] },
     _id?: string,
   ) {
     this.courseName = courseName ?? 'placeholder';
     this.examinerName = examinerName ?? 'placeholder';
-    this.semester = semester ?? 'placeholder';
+    this.semester = semester ?? 'WS 70/71';
     this.date = date ?? '1970-01-01';
     this.examLengthMinutes = examLengthMinutes ?? 0;
     this.tasks = tasks ?? [];
+    this.access = access ?? { users: [], groups: [] };
   }
 
   fillPagesAndPoints(this: Exam) {
@@ -73,6 +80,7 @@ export const EXAM_FIELDS: (keyof Exam)[] = [
   'date',
   'examLengthMinutes',
   'tasks',
+  'access',
 ];
 
 /**

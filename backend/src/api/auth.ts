@@ -2,13 +2,13 @@ import { Context } from '@hono/hono';
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 
 import { authenticate } from '../services/auth.ts';
-import { HandlerResult, HttpError } from '../types/handler.ts';
-import { AppEnv } from '../types/context.ts';
-import { handle } from './helpers.ts';
 import { getOrCreateDb } from '../services/mod.ts';
+import { AppEnv } from '../types/context.ts';
+import { HandlerResult, HttpError } from '../types/handler.ts';
+import { handle } from './helpers.ts';
 import {
   ErrorSchema,
-  GroupSchema,
+  GroupStubSchema,
   LoginBodySchema,
   LoginResponseSchema,
   MessageSchema,
@@ -91,7 +91,7 @@ const entitiesRoute = createRoute({
         'application/json': {
           schema: z.object({
             users: z.array(UserStubSchema),
-            groups: z.array(GroupSchema),
+            groups: z.array(GroupStubSchema),
           }),
         },
       },
@@ -152,5 +152,5 @@ async function getUsersAndGroups(): Promise<HandlerResult> {
   const db = await getOrCreateDb();
   const users = await db.getAllUserStubs();
   const groups = await db.getGroups();
-  return { kind: 'json', status: 200, body: { uids: users, groups } };
+  return { kind: 'json', status: 200, body: { users: users, groups } };
 }
