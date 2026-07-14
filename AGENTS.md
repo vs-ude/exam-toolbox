@@ -38,7 +38,8 @@ The scan ingest pipeline is actively being built. Scanned written exams can alre
   - `task_types/`: per-task-type Eta templates rendered by the backend before LaTeX compilation
   - `cache/qr/`: pre-generated per-page QR code PNGs
 - `caddy/`: Caddy reverse proxy and static frontend file serving with watch support in development
-- `docs/`: API specifications, including auto-generated OpenAPI 3.1 definitions and a Bruno API client collection (`docs/exam-toolbox-api`)
+- `docs/`: Documentation
+- `docs/exam-toolbox-api/`: Bruno API client collection synced from the auto-generated OpenAPI 3.1 spec
 - `ldap/`: LDAP bootstrap/test data with updated structure mapping groups to granular application roles
 - `periodical/`: cron-based cleanup container for old mass-generation job directories
 - `testdata/`: shared test fixtures (exam JSON, CSVs, images, sample scanned exam JPEGs)
