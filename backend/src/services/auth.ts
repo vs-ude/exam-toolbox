@@ -3,20 +3,12 @@ import { sign } from '@hono/hono/jwt';
 
 import { getConfig } from '../config/appConfig.ts';
 import { HttpError } from '../types/handler.ts';
-import { Rights, User } from '../types/mod.ts';
+import { Rights, User, JwtPayload } from '../types/mod.ts';
 
 import { getOrCreateDb } from './db/db.ts';
 
 const config = getConfig().auth;
 const LDAP_USER_FIELDS = ['uid', 'cn', 'sn', 'givenName', 'mail', 'memberOf'];
-
-/**
- * Represents the payload of a JWT.
- */
-export interface JwtPayload extends Omit<User, 'active' | 'lastLoginAt'> {
-  iat: number;
-  exp: number;
-}
 
 const SAFE_CHARS = /^[A-Za-z0-9._@-]+$/;
 

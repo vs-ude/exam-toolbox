@@ -4,21 +4,20 @@ import {
   OpenAPIObjectConfigure,
 } from '@hono/zod-openapi';
 import { cors } from '@hono/hono/cors';
-import { jwt } from '@hono/hono/jwt';
-import { Context, Next } from '@hono/hono';
-import { createMiddleware } from '@hono/hono/factory';
 
 import {
+  checkActive,
   configureAdminRouter,
   configureAuthRouter,
   configureBaseRouter,
   configureExamManagerRouter,
+  validateJwt,
+  registerPublicRoutes,
 } from './src/api/mod.ts';
 import { getConfig, QRConfig } from './src/config/mod.ts';
 import { AppEnv } from './src/types/context.ts';
 import { createExamManagerRuntime } from './src/examManager/mod.ts';
 import {
-  checkUserExistsAndActive,
   scheduleLdapUserSync,
   setupConfiguredGroups,
   syncLdapUsers,
@@ -27,7 +26,6 @@ import {
 import { getOrCreateDb } from './src/services/mod.ts';
 import { parseLogFileForSubtaskInfo } from './src/services/mod.ts';
 import { preGeneratePageQRCache } from './src/services/qr.ts';
-import { HTTPException } from '@hono/hono/http-exception';
 
 const config = getConfig();
 console.debug('Config loaded', config);
@@ -78,6 +76,13 @@ const routesB = routesA.route('/api', configureBaseRouter()).route(
 // Export the fully-typed app for client SDK generation
 export type AppType = typeof routesB;
 
+registerPublicRoutes([
+  { path: '/api/auth/login', method: 'POST' },
+  { path: '/api/health', method: 'GET' },
+  { path: '/api/doc', method: 'GET' },
+  { path: '/api/doc/ui', method: 'GET' },
+]);
+
 // Create the live app and layer middleware on top of routes
 const app = new OpenAPIHono<AppEnv>();
 
@@ -90,41 +95,8 @@ app.use(
   }),
 );
 
-// Authentication middleware: public endpoints bypass JWT verification
-app.use((c, next) => {
-  const path = c.req.path;
-  const method = c.req.method;
-
-  if (
-    (path === '/api/auth/login' && method === 'POST') ||
-    (path === '/api/health' && method === 'GET') ||
-    (path === '/api/doc' && method === 'GET') ||
-    (path === '/api/doc/ui' && method === 'GET')
-  ) {
-    return next();
-  }
-
-  return jwt({
-    secret: config.auth.jwt.secret,
-    alg: 'HS384',
-  })(c, next);
-});
-
-// Authentication middleware: reject if the user is no longer active even though the JWT is valid
-app.use(
-  createMiddleware(async (c: Context<AppEnv>, next: Next): Promise<void> => {
-    const jwtPayload = c.get('jwtPayload');
-    if (
-      jwtPayload === undefined ||
-      (await checkUserExistsAndActive(jwtPayload.sub))
-    ) {
-      await next();
-      return;
-    } else {
-      throw new HTTPException(403, { message: 'User is inactive' });
-    }
-  }),
-);
+app.use(validateJwt);
+app.use(checkActive);
 
 // Mount all routes
 app.route('/', routesB);
@@ -170,7 +142,7 @@ if (Deno.env.get('NODE_ENV') === 'development') {
   app.doc('/api/doc', apidoc, generator);
 
   console.log(`API docs available at ${config.server.publicUrl}/api/doc`);
-  // app.getOpenAPI31Document(apidoc, generator);
+  app.getOpenAPI31Document(apidoc, generator);
 }
 
 // Schedule periodic in-memory job cleanup and start server

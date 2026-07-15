@@ -1,13 +1,8 @@
-import { Context, Input, Next } from '@hono/hono';
+import { Context, Input } from '@hono/hono';
 import type { ContentfulStatusCode } from '@hono/hono/utils/http-status';
-import { HTTPException } from '@hono/hono/http-exception';
 
-import { AppEnv } from '../types/context.ts';
+import { AppEnv } from '../types/mod.ts';
 import { HandlerResult, HttpError } from '../types/handler.ts';
-import { getConfig } from '../config/mod.ts';
-import { getOrCreateDb } from '../services/mod.ts';
-
-const db = await getOrCreateDb();
 
 export async function handle<
   E extends AppEnv = AppEnv,
@@ -52,46 +47,4 @@ export async function handle<
       500 as ContentfulStatusCode,
     );
   }
-}
-
-/**
- * Middleware that checks for admin rights.
- * Rejects requests whose user is not in the admin group.
- * Assumes the JWT has already been verified but checks the groups from DB
- * since the user may have been removed from the admins group in the meantime.
- */
-export async function checkAdmin(
-  ctx: Context<AppEnv>,
-  next: Next,
-): Promise<void | Response> {
-  const userFromDB = (await db.getUsers([ctx.get('jwtPayload').sub]))[0];
-
-  const adminGroups = getConfig().auth.ldap.groups.admin;
-  if (userFromDB.groups.filter(g => adminGroups.includes(g)).length === 0) {
-    throw new HTTPException(403, { message: 'Forbidden' });
-  }
-
-  return await next();
-}
-
-/**
- * Middleware that guards routes with direct content access (exam, tasks).
- * Rejects requests whose user is not in the admin group.
- * Assumes the JWT has already been verified but checks the groups from DB
- * since the user may have been removed from the admins group in the meantime.
- */
-export async function checkAccess(
-  ctx: Context<AppEnv>,
-  next: Next,
-): Promise<void | Response> {
-  const user = ctx.get('jwtPayload');
-
-  const groups = getConfig().auth.ldap.groups.admin.concat(
-    getConfig().auth.ldap.groups.full,
-  );
-  if (user.groups.filter(g => groups.includes(g)).length === 0) {
-    throw new HTTPException(403, { message: 'Forbidden' });
-  }
-
-  return await next();
 }

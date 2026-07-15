@@ -6,6 +6,7 @@
     "jsr:@diister/valibot-mock@0.1.1": "0.1.1",
     "jsr:@hono/hono@^4.12.27": "4.12.28",
     "jsr:@hono/hono@^4.8.3": "4.12.28",
+    "jsr:@hono/zod-openapi@*": "1.4.0",
     "jsr:@hono/zod-openapi@^1.4.0": "1.4.0",
     "jsr:@hono/zod-validator@0.8": "0.8.0",
     "jsr:@mirror/xlsx@~0.20.3": "0.20.3",

@@ -84,6 +84,7 @@ docker compose up --build --watch backend caddy frontend
 
 Changes are hot-reloaded into the containers automatically — no manual rebuild is required.
 
-## Commits
+## Conventions
 
 - Always include yourself in the `Co-authored-by` field of commit messages.
+- Do not generate output just for indentation. This will be handled by the user using `prettier`.

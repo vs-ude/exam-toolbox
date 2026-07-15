@@ -1,5 +1,11 @@
 import { Context } from '@hono/hono';
-import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
+import {
+  createRoute,
+  defineOpenAPIRoute,
+  OpenAPIHono,
+  RouteConfig,
+  z,
+} from '@hono/zod-openapi';
 
 import { authenticate } from '../services/auth.ts';
 import { getOrCreateDb } from '../services/mod.ts';
@@ -15,100 +21,108 @@ import {
   UserStubSchema,
 } from './schemas.ts';
 
-// ── Route definitions ─────────────────────────────────────────────────────────
-const validateRoute = createRoute({
-  method: 'get',
-  path: '/validate',
-  tags: ['Auth'],
-  summary: 'Validate',
-  description: 'Validate the JWT token and do nothing else.',
-  security: [],
-  responses: {
-    200: {
-      description: 'Authentication successful',
-    },
-    401: {
-      description: 'Authentication failed',
-    },
-  },
-});
-
-const loginRoute = createRoute({
-  method: 'post',
-  path: '/login',
-  tags: ['Auth'],
-  summary: 'Authenticate',
-  description:
-    'Authenticate with LDAP credentials. Returns a JWT and also sets it as an HTTP-only cookie.',
-  security: [],
-  request: {
-    body: {
-      content: { 'application/json': { schema: LoginBodySchema } },
-      required: true,
-    },
-  },
-  responses: {
-    200: {
-      content: { 'application/json': { schema: LoginResponseSchema } },
-      description: 'Authentication successful',
-    },
-    400: {
-      content: { 'application/json': { schema: ErrorSchema } },
-      description: 'Missing or invalid credentials',
-    },
-    401: {
-      content: { 'application/json': { schema: ErrorSchema } },
-      description: 'Authentication failed',
-    },
-  },
-});
-
-const logoutRoute = createRoute({
-  method: 'post',
-  path: '/logout',
-  tags: ['Auth'],
-  summary: 'Logout',
-  description: 'Noop.',
-  security: [{ Bearer: [] }],
-  responses: {
-    200: {
-      content: { 'application/json': { schema: MessageSchema } },
-      description: 'Logged out successfully',
-    },
-  },
-});
-
-const entitiesRoute = createRoute({
-  method: 'get',
-  path: '/entities',
-  tags: ['Auth'],
-  summary: 'List users and groups',
-  description: 'Returns stubs for all active users and configured groups.',
-  security: [{ Bearer: [] }],
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: z.object({
-            users: z.array(UserStubSchema),
-            groups: z.array(GroupStubSchema),
-          }),
+export function configureAuthRouter(): OpenAPIHono<AppEnv> {
+  const validateRoute = defineOpenAPIRoute<RouteConfig, AppEnv>({
+    route: createRoute({
+      method: 'get',
+      path: '/validate',
+      tags: ['Auth'],
+      summary: 'Validate',
+      description: 'Validate the JWT token and do nothing else.',
+      security: [],
+      responses: {
+        200: {
+          description: 'Authentication successful',
+        },
+        401: {
+          description: 'Authentication failed',
         },
       },
-      description: 'Users and groups',
-    },
-  },
-});
+    }),
+    handler: c => handle(c, () => success(c)),
+  });
 
-// ── Router ────────────────────────────────────────────────────────────────────
+  const loginRoute = defineOpenAPIRoute<RouteConfig, AppEnv>({
+    route: createRoute({
+      method: 'post',
+      path: '/login',
+      tags: ['Auth'],
+      summary: 'Authenticate',
+      description:
+        'Authenticate with LDAP credentials. Returns a JWT and also sets it as an HTTP-only cookie.',
+      security: [],
+      request: {
+        body: {
+          content: { 'application/json': { schema: LoginBodySchema } },
+          required: true,
+        },
+      },
+      responses: {
+        200: {
+          content: { 'application/json': { schema: LoginResponseSchema } },
+          description: 'Authentication successful',
+        },
+        400: {
+          content: { 'application/json': { schema: ErrorSchema } },
+          description: 'Missing or invalid credentials',
+        },
+        401: {
+          content: { 'application/json': { schema: ErrorSchema } },
+          description: 'Authentication failed',
+        },
+      },
+    }),
+    handler: c => handle(c, () => login(c)),
+  });
 
-export function configureAuthRouter(): OpenAPIHono<AppEnv> {
+  const logoutRoute = defineOpenAPIRoute<RouteConfig, AppEnv>({
+    route: createRoute({
+      method: 'post',
+      path: '/logout',
+      tags: ['Auth'],
+      summary: 'Logout',
+      description: 'Noop.',
+      security: [{ Bearer: [] }],
+      responses: {
+        200: {
+          content: { 'application/json': { schema: MessageSchema } },
+          description: 'Logged out successfully',
+        },
+      },
+    }),
+    handler: c => handle(c, () => logout(c)),
+  });
+
+  const entitiesRoute = defineOpenAPIRoute<RouteConfig, AppEnv>({
+    route: createRoute({
+      method: 'get',
+      path: '/entities',
+      tags: ['Auth'],
+      summary: 'List users and groups',
+      description: 'Returns stubs for all active users and configured groups.',
+      security: [{ Bearer: [] }],
+      responses: {
+        200: {
+          content: {
+            'application/json': {
+              schema: z.object({
+                users: z.array(UserStubSchema),
+                groups: z.array(GroupStubSchema),
+              }),
+            },
+          },
+          description: 'Users and groups',
+        },
+      },
+    }),
+    handler: c => handle(c, () => getUsersAndGroups()),
+  });
+
+  // ── Router ────────────────────────────────────────────────────────────────────
+
   const router = new OpenAPIHono<AppEnv>();
 
-  router.openapi(validateRoute, c => handle(c, () => success(c)));
-  router.openapi(loginRoute, c => handle(c, () => login(c)));
-  router.openapi(logoutRoute, c => handle(c, () => logout(c)));
-  router.openapi(entitiesRoute, c => handle(c, () => getUsersAndGroups()));
+  router.openapiRoutes([validateRoute, loginRoute, logoutRoute, entitiesRoute]);
 
   return router;
 }
