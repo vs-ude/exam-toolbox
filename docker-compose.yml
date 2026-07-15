@@ -56,7 +56,7 @@ services:
       - backend_jobs:/app/jobs
       - uploads:/app/uploads
     environment:
-      DB_CONNSTRING: mongodb://mongo:27017/examToolboxDB
+      DB_CONNSTRING: mongodb://mongo:27017/examToolboxDB?directConnection=true&replicaSet=rs0
       AUTH_LDAP_URL: 'ldap://ldap-host:389'
       AUTH_LDAP_BIND_DN: 'cn=readonly,dc=university,dc=example'
       AUTH_LDAP_BIND_PASSWORD: 'readonly'

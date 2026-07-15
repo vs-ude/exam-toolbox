@@ -93,13 +93,13 @@ cypress_e2e:
         LDAP_DOMAIN: university.example
         LDAP_BASE_DN: dc=university,dc=example
         LDAP_READONLY_USER: 'True' # username: "readonly", pw: "readonly"
-    - name: mongo:6.0
+    - name: mongo:8
       alias: mongo
       command: ['--replSet', 'rs0']
     - name: marlonb/mailcrab:latest
       alias: mailcrab
   variables:
-    DB_CONNSTRING: mongodb://mongo:27017/examToolboxDB
+    DB_CONNSTRING: mongodb://mongo:27017/examToolboxDB?directConnection=true&replicaSet=rs0
     AUTH_LDAP_URL: 'ldap://ldap-host:389'
     AUTH_LDAP_BIND_DN: 'cn=readonly,dc=university,dc=example'
     AUTH_LDAP_BIND_PASSWORD: 'readonly'

@@ -83,7 +83,6 @@ export async function checkAdmin(
   ctx: Context<AppEnv>,
   next: Next,
 ): Promise<void | Response> {
-  console.debug('Admin Check on', ctx.req.method, ctx.req.url);
   const user = ctx.get('jwtPayload')!;
   if (!user) {
     console.warn('Admin Check: No JWT payload, something is wrong.');
@@ -110,7 +109,6 @@ export async function checkAccess(
   ctx: Context<AppEnv>,
   next: Next,
 ): Promise<void | Response> {
-  console.debug('Access Check on', ctx.req.method, ctx.req.url);
   const user = ctx.get('jwtPayload');
   if (!user) {
     console.warn('Access Check: No JWT payload, something is wrong.');

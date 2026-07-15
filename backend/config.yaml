@@ -25,7 +25,7 @@ auth:
     lifetimeDays: 30
 
 db:
-  connstring: 'mongodb://mongo:27017/examToolboxDB'
+  connstring: 'mongodb://mongo:27017/examToolboxDB?directConnection=true&replicaSet=rs0'
 
 paths:
   templateBasePath: /app/template

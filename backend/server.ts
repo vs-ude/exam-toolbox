@@ -1,9 +1,9 @@
+import { cors } from '@hono/hono/cors';
 import {
   OpenAPIGeneratorConfigure,
   OpenAPIHono,
   OpenAPIObjectConfigure,
 } from '@hono/zod-openapi';
-import { cors } from '@hono/hono/cors';
 
 import {
   checkActive,
@@ -11,32 +11,44 @@ import {
   configureAuthRouter,
   configureBaseRouter,
   configureExamManagerRouter,
-  validateJwt,
   registerPublicRoutes,
+  validateJwt,
 } from './src/api/mod.ts';
 import { getConfig, QRConfig } from './src/config/mod.ts';
-import { AppEnv } from './src/types/context.ts';
 import { createExamManagerRuntime } from './src/examManager/mod.ts';
 import {
   scheduleLdapUserSync,
   setupConfiguredGroups,
   syncLdapUsers,
-  waitForLdapConnection,
+  testLDAPConnection,
 } from './src/services/auth.ts';
-import { getOrCreateDb } from './src/services/mod.ts';
-import { parseLogFileForSubtaskInfo } from './src/services/mod.ts';
+import {
+  getOrCreateDb,
+  parseLogFileForSubtaskInfo,
+} from './src/services/mod.ts';
 import { preGeneratePageQRCache } from './src/services/qr.ts';
+import { AppEnv } from './src/types/context.ts';
 
 const config = getConfig();
 console.debug('Config loaded', config);
 const db = await getOrCreateDb();
-try {
-  await waitForLdapConnection(10);
-  await setupConfiguredGroups();
-  await syncLdapUsers();
-} catch (e) {
-  console.error('Failed during LDAP setup:', e);
-  Deno.exit(1);
+
+let count = 0;
+while (count < 10) {
+  try {
+    await testLDAPConnection();
+    await setupConfiguredGroups();
+    await syncLdapUsers();
+    break;
+  } catch {
+    console.info('Temporary error during LDAP setup, retrying...');
+    count++;
+    if (count === 10) {
+      console.error('LDAP setup failed:');
+      Deno.exit(1);
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
 }
 
 // Create exam manager runtime (generation queue, workers, finalization, cleanup)

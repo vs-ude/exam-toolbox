@@ -17,30 +17,20 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
   if (db) return db;
 
   const connString = getConfig().db.connString;
-  async function initReplSet() {
-    const host = new URL(connString).hostname;
-    const mongoClient = new MongoClient(connString, {
-      replicaSet: 'rs0',
-      directConnection: true,
+  const client = new MongoClient(connString);
+  const host = new URL(connString).hostname;
+  const adminDb = client.db('admin');
+  try {
+    const status = await adminDb.command({
+      replSetGetStatus: { replicaSet: 'rs0' },
     });
-    const adminDb = mongoClient.db('admin');
-    try {
-      const status = await adminDb.command({
-        replSetGetStatus: { replicaSet: 'rs0' },
-      });
-      if (status.ok) return;
-    } catch (_) {
-      await adminDb.command({
-        replSetInitiate: { _id: 'rs0', members: [{ _id: 0, host }] },
-      });
-    }
+    if (!status.ok) throw new Error('Replica set not initialized');
+  } catch (_) {
+    console.info('Initializing replica set for host', host);
+    await adminDb.command({
+      replSetInitiate: { _id: 'rs0', members: [{ _id: 0, host }] },
+    });
   }
-
-  await initReplSet();
-  const client = new MongoClient(connString, {
-    replicaSet: 'rs0',
-    writeConcern: { w: 'majority' },
-  });
 
   await client.connect();
   // Extract database name from the connection string path component

@@ -29,25 +29,6 @@ function sanitizeInput(value: string, field: string): string {
 }
 
 /**
- * Waits for the LDAP connection to be established within the specified timeout.
- * @param timeout The maximum time to wait in seconds.
- */
-export async function waitForLdapConnection(timeout: number) {
-  let count = 0;
-  while (count < timeout) {
-    try {
-      await testLDAPConnection();
-      return;
-    } catch {
-      console.info('LDAP connection failed, retrying...');
-      count++;
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-  }
-  throw new Error('Timed out while waiting for LDAP connection.');
-}
-
-/**
  * Tests the LDAP connection by binding as the service account.
  */
 export async function testLDAPConnection() {
