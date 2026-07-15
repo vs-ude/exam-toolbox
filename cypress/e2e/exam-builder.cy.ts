@@ -22,8 +22,6 @@ describe('Exam Builder Drag and Drop and create pdf preview', () => {
     // insert required exam meta-data
     cy.get('[data-cy="examiner-input"]').type('Dr. Cypress');
     cy.get('[data-cy="date-input"]').type('2026-12-24');
-    cy.get('[data-cy="semester-select"]').click();
-    cy.get('mat-option').first().click();
 
     // generate preview PDF
     cy.get('[data-cy="preview-btn"]').click();

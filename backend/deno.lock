@@ -2,35 +2,33 @@
   "version": "5",
   "specifiers": {
     "jsr:@bgub/eta@^4.6.0": "4.6.0",
-    "jsr:@diister/mongodbee@~0.22.4": "0.22.4",
-    "jsr:@diister/valibot-mock@0.1.1": "0.1.1",
-    "jsr:@hono/hono@^4.12.27": "4.12.28",
-    "jsr:@hono/hono@^4.8.3": "4.12.28",
-    "jsr:@hono/zod-openapi@*": "1.4.0",
-    "jsr:@hono/zod-openapi@^1.4.0": "1.4.0",
+    "jsr:@diister/mongodbee@~0.23.0-beta.5": "0.23.0-beta.5",
+    "jsr:@diister/valibot-mock@0.1.3": "0.1.3",
+    "jsr:@hono/hono@^4.12.30": "4.12.30",
+    "jsr:@hono/hono@^4.8.3": "4.12.30",
+    "jsr:@hono/zod-openapi@^1.5.0": "1.5.0",
     "jsr:@hono/zod-validator@0.8": "0.8.0",
     "jsr:@mirror/xlsx@~0.20.3": "0.20.3",
     "jsr:@std/assert@^1.0.19": "1.0.19",
     "jsr:@std/cli@1.0.29": "1.0.29",
-    "jsr:@std/cli@^1.0.30": "1.0.30",
-    "jsr:@std/crypto@^1.0.5": "1.1.0",
-    "jsr:@std/encoding@^1.0.10": "1.0.10",
+    "jsr:@std/cli@^1.0.32": "1.0.32",
+    "jsr:@std/crypto@^1.1.0": "1.1.0",
+    "jsr:@std/encoding@^1.0.11": "1.0.11",
     "jsr:@std/fmt@1.0.10": "1.0.10",
     "jsr:@std/fmt@^1.0.10": "1.0.10",
-    "jsr:@std/fs@^1.0.22": "1.0.24",
+    "jsr:@std/fs@^1.0.24": "1.0.24",
     "jsr:@std/internal@^1.0.12": "1.0.14",
     "jsr:@std/internal@^1.0.14": "1.0.14",
     "jsr:@std/path@1.1.4": "1.1.4",
     "jsr:@std/path@^1.1.5": "1.1.5",
     "jsr:@std/ulid@1.0.0": "1.0.0",
-    "jsr:@std/yaml@^1.1.1": "1.1.1",
+    "jsr:@std/yaml@^1.1.2": "1.1.2",
     "npm:@asteasolutions/zod-to-openapi@^8.5.0": "8.5.0_zod@4.4.3",
     "npm:@eslint-community/regexpp@^4.12.2": "4.12.2",
     "npm:@faker-js/faker@10.0.0": "10.0.0",
-    "npm:ldapts@^8.1.8": "8.1.8",
+    "npm:ldapts@9": "9.0.0",
     "npm:mongodb@6.21.0": "6.21.0",
-    "npm:nodemailer@^8.0.1": "8.0.1",
-    "npm:openapi3-ts@^4.5.0": "4.6.0",
+    "npm:nodemailer@^9.0.3": "9.0.3",
     "npm:randexp@0.5.3": "0.5.3",
     "npm:valibot@1.1.0": "1.1.0",
     "npm:valibot@1.4.0": "1.4.0",
@@ -40,8 +38,8 @@
     "@bgub/eta@4.6.0": {
       "integrity": "fe872004cd6c64ca25c7e71fd80bbbad7d8d552cefd31828bddddb7db0f79eb1"
     },
-    "@diister/mongodbee@0.22.4": {
-      "integrity": "2dec8b609937796bfd5186e31691ff724638afc1b57d50f2216555eb33ee2acb",
+    "@diister/mongodbee@0.23.0-beta.5": {
+      "integrity": "1f4a709b4327db9c0be42bbe3d2f711b2a1a64a4b6d4ac8903fe43c73a5046e0",
       "dependencies": [
         "jsr:@diister/valibot-mock",
         "jsr:@std/cli@1.0.29",
@@ -52,8 +50,8 @@
         "npm:valibot@1.4.0"
       ]
     },
-    "@diister/valibot-mock@0.1.1": {
-      "integrity": "6b640090bbdae5e86fdbeac8e4cd17450067e22a0d2d017c4fd5578c3a2ecc56",
+    "@diister/valibot-mock@0.1.3": {
+      "integrity": "4133dc67edc12f3d8740721a92e301df8e92c864b9ec6ee54132ee79515a7914",
       "dependencies": [
         "npm:@eslint-community/regexpp",
         "npm:@faker-js/faker",
@@ -61,24 +59,22 @@
         "npm:valibot@1.1.0"
       ]
     },
-    "@hono/hono@4.12.28": {
-      "integrity": "4f109a4673ee3131191be485affc98131508d8fcf5621ffa24775f4205526d92"
+    "@hono/hono@4.12.30": {
+      "integrity": "cd8e61aedab7e765e4e262728273ee0fdea3bc667af5eb6badd2772223b544fc"
     },
-    "@hono/zod-openapi@1.4.0": {
-      "integrity": "11fc09a6b6821ec00c0953ebe4971bd8dc76caba3dd0350072dcd519011368cb",
+    "@hono/zod-openapi@1.5.0": {
+      "integrity": "67d8c25173e45ba118a609f661763e9e48c6a094a9bfe4341e977d8398440507",
       "dependencies": [
         "jsr:@hono/hono@^4.8.3",
         "jsr:@hono/zod-validator",
         "npm:@asteasolutions/zod-to-openapi",
-        "npm:openapi3-ts",
         "npm:zod"
       ]
     },
     "@hono/zod-validator@0.8.0": {
       "integrity": "0ed9cdc57055b44c2fc9a031350122b90cede88c7dcec49162701ddfb27c7aa7",
       "dependencies": [
-        "jsr:@hono/hono@^4.8.3",
-        "npm:zod"
+        "jsr:@hono/hono@^4.8.3"
       ]
     },
     "@mirror/xlsx@0.20.3": {
@@ -96,8 +92,8 @@
     "@std/cli@1.0.29": {
       "integrity": "fa4ef29130baa834d8a13b7d138240c3a2fcfba740bfb7afa646a360a15ec84f"
     },
-    "@std/cli@1.0.30": {
-      "integrity": "769446536522d0417d7127ebcabcafac1ab0ce6766d0eb3fca1d36326fe98d13",
+    "@std/cli@1.0.32": {
+      "integrity": "188b3a100d6202d64e3f5bd3d799c7fa4f6d77f92cc65eb7f641c1fa0aa92a66",
       "dependencies": [
         "jsr:@std/fmt@^1.0.10",
         "jsr:@std/internal@^1.0.14"
@@ -109,8 +105,8 @@
     "@std/crypto@1.1.0": {
       "integrity": "b8d6d0a6377a32b213af2661ed7bf1062d94feac0c57def5526a8e74a95c3ec8"
     },
-    "@std/encoding@1.0.10": {
-      "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
+    "@std/encoding@1.0.11": {
+      "integrity": "e7cef2f0b3153bccc17431e7c864a1de03a4b6d9647389c43e08aaa775d37385"
     },
     "@std/fmt@1.0.10": {
       "integrity": "90dfba288802ac6de82fb31d0917eb9e4450b9925b954d5e51fc29ac07419db5"
@@ -143,8 +139,8 @@
     "@std/ulid@1.0.0": {
       "integrity": "d41c3d27a907714413649fee864b7cde8d42ee68437d22b79d5de4f81d808780"
     },
-    "@std/yaml@1.1.1": {
-      "integrity": "a57665ecf3d17b926380593a56625d8a10cc7281802f1e993b5ebc94a48e71f8"
+    "@std/yaml@1.1.2": {
+      "integrity": "de612653c036749ba2044165e316f52412b0f0698afffb7ee80b5331d6d2abae"
     },
     "@zip-js/zip-js@2.8.20": {
       "integrity": "64bbc8b46777e1369dd258852c2244083a413a1e7cba3a7bf27a99cc88d3b860"
@@ -185,8 +181,8 @@
     "drange@1.1.1": {
       "integrity": "sha512-pYxfDYpued//QpnLIm4Avk7rsNtAtQkUES2cwAYSvD/wd2pKD71gN2Ebj3e7klzXwjocvE8c5vx/1fxwpqmSxA=="
     },
-    "ldapts@8.1.8": {
-      "integrity": "sha512-Wpdvo+/0DREIynYf2he2efHtjptr5zD7dpesSkZWJqfQdMEgSTytEIsSZVuoDSiiE1+SpXf3emZ7ewxGBTo7Pw==",
+    "ldapts@9.0.0": {
+      "integrity": "sha512-OaaoYBSuan7g0Nm2e1wsRl+9xol41zY+pDlRRSsBq36iKCd2tG/K8WifevNRDjyEfhz4bvkxKdDvJ6xHXwj7+Q==",
       "dependencies": [
         "strict-event-emitter-types"
       ]
@@ -209,8 +205,8 @@
         "mongodb-connection-string-url"
       ]
     },
-    "nodemailer@8.0.1": {
-      "integrity": "sha512-5kcldIXmaEjZcHR6F28IKGSgpmZHaF1IXLWFTG+Xh3S+Cce4MiakLtWY+PlBU69fLbRa8HlaGIrC/QolUpHkhg=="
+    "nodemailer@9.0.3": {
+      "integrity": "sha512-n+YP+NKwR5zRWa60k3GiQ6Q3B4KXCoAw40dAKeCtYn020iNN74aWK2liXIC3ZEATeGql7we3tE3t8QwhY0eskw=="
     },
     "openapi3-ts@4.6.0": {
       "integrity": "sha512-a4sfn6L2sIShhtzJqmjGrARvxAW/3F2BJDdyRVvNF9VhAsZSh5hSyI3a9TNvmzBxXmq66nY5LNT5bQcBxYAZZg==",
@@ -273,18 +269,18 @@
   "workspace": {
     "dependencies": [
       "jsr:@bgub/eta@^4.6.0",
-      "jsr:@diister/mongodbee@~0.22.4",
-      "jsr:@hono/hono@^4.12.27",
-      "jsr:@hono/zod-openapi@^1.4.0",
+      "jsr:@diister/mongodbee@~0.23.0-beta.5",
+      "jsr:@hono/hono@^4.12.30",
+      "jsr:@hono/zod-openapi@^1.5.0",
       "jsr:@mirror/xlsx@~0.20.3",
       "jsr:@std/assert@^1.0.19",
-      "jsr:@std/cli@^1.0.30",
-      "jsr:@std/crypto@^1.0.5",
-      "jsr:@std/encoding@^1.0.10",
-      "jsr:@std/fs@^1.0.22",
-      "jsr:@std/yaml@^1.1.1",
-      "npm:ldapts@^8.1.8",
-      "npm:nodemailer@^8.0.1"
+      "jsr:@std/cli@^1.0.32",
+      "jsr:@std/crypto@^1.1.0",
+      "jsr:@std/encoding@^1.0.11",
+      "jsr:@std/fs@^1.0.24",
+      "jsr:@std/yaml@^1.1.2",
+      "npm:ldapts@9",
+      "npm:nodemailer@^9.0.3"
     ]
   }
 }
