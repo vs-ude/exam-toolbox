@@ -742,6 +742,7 @@ export function configureExamManagerRouter(
     handle(c, () => h.deleteTag(c, deps)),
   );
 
+  router.route('/', admin);
   router.route('/', restricted);
 
   return router;

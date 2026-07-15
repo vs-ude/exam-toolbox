@@ -101,7 +101,6 @@
         data-cy="exam-name-input"
       />
     </div>
-    <div class="viewBar_spacer"></div>
     <div class="viewBar_wrapper">
       <div class="icon_wrapper bar_icon">
         <mat-icon
@@ -141,11 +140,14 @@
 
       <div
         [matTooltip]="exam.bilingual ? 'Bilingual' : 'Monolingual'"
-        (click)="exam.bilingual = !exam.bilingual"
         class="icon_wrapper language_icon"
       >
-        <mat-icon aria-hidden="false">language</mat-icon
-        >{{ exam.bilingual ? '2' : '1' }}
+        <mat-icon aria-hidden="false">language</mat-icon>
+        <mat-slide-toggle
+          labelPosition="before"
+          class="small"
+          [(ngModel)]="exam.bilingual"
+        />
       </div>
 
       <div matTooltip="Exam duration" class="duration_wrapper">

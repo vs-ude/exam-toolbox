@@ -20,6 +20,7 @@ import {
 import { HttpResponse } from '@angular/common/http';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 import {
   AddTagDialogComponent,
@@ -75,6 +76,7 @@ interface PDFTaskInfo {
     NgFor,
     NgIf,
     MatSelectModule,
+    MatSlideToggleModule,
     FormsModule,
     MatCardModule,
     MatTabsModule,

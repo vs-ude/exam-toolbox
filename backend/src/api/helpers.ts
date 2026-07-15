@@ -84,12 +84,12 @@ export async function checkAccess(
   ctx: Context<AppEnv>,
   next: Next,
 ): Promise<void | Response> {
-  const userFromDB = (await db.getUsers([ctx.get('jwtPayload').sub]))[0];
+  const user = ctx.get('jwtPayload');
 
   const groups = getConfig().auth.ldap.groups.admin.concat(
     getConfig().auth.ldap.groups.full,
   );
-  if (userFromDB.groups.filter(g => groups.includes(g)).length === 0) {
+  if (user.groups.filter(g => groups.includes(g)).length === 0) {
     throw new HTTPException(403, { message: 'Forbidden' });
   }
 
