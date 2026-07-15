@@ -38,8 +38,8 @@ Deno.test('Exam constructor sets placeholders and defaults', () => {
 
   assertEquals(exam.courseName, 'placeholder');
   assertEquals(exam.examinerName, 'placeholder');
-  assertEquals(exam.semester, 'placeholder');
-  assertEquals(exam.date, 'placeholder');
+  assertEquals(exam.semester, 'WS 70/71');
+  assertEquals(exam.date, '1970-01-01');
   assertEquals(exam.examLengthMinutes, 0);
   assertEquals(exam.tasks, []);
   assertEquals(exam._id, undefined);
