@@ -1,7 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
-import { MongoClient, collection, dbId, withIndex } from '@diister/mongodbee';
-import * as v from '@diister/mongodbee/schema';
+import { MongoClient, collection } from '@diister/mongodbee';
 import { getConfig } from '../../config/appConfig.ts';
+
+import * as s from './schemas.ts';
 
 import * as u from './user.ts';
 import * as e from './exam.ts';
@@ -46,106 +47,15 @@ export async function getOrCreateDb(): Promise<ExamToolboxDatabase> {
   const dbName = new URL(connString).pathname.slice(1);
   const mongoDb = client.db(dbName);
 
-  // ── Schemas ───────────────────────────────────────────────────────────────
-  // Schemas are intentionally loose (v.any() for nested structures) since
-  // application-level validation is handled by parseExam / parseTask.
-
-  const examSchema = {
-    _id: dbId('exam'),
-    courseName: v.string(),
-    examinerName: v.string(),
-    semester: v.string(),
-    date: v.string(),
-    examLengthMinutes: v.number(),
-    tasks: v.any(),
-    points: v.optional(v.number()),
-    pageCount: v.optional(v.number()),
-    conceptPages: v.optional(v.number()),
-    lastEditedBy: v.optional(v.string()),
-    updatedAt: v.optional(v.any()),
-    access: v.object({
-      users: v.optional(v.array(v.string())),
-      groups: v.optional(v.array(v.string())),
-    }),
-    bilingual: v.boolean(),
-  };
-
-  const taskSchema = {
-    _id: dbId('task'),
-    type: v.string(),
-    question: v.any(),
-    points: v.number(),
-    tagIds: v.array(v.string()),
-    tags: v.any(),
-    createdBy: v.string(),
-    createdAt: v.any(),
-    lastUsed: v.any(),
-    usedIn: v.array(v.string()),
-    parent: v.optional(v.string()),
-    children: v.array(v.string()),
-    numCorrect: v.optional(v.any()),
-    answerOptions: v.optional(v.any()),
-    header: v.optional(v.any()),
-    lines: v.optional(v.any()),
-    noLines: v.optional(v.any()),
-    solution: v.optional(v.any()),
-    questionPicture: v.optional(v.any()),
-    solutionPicture: v.optional(v.any()),
-    size: v.optional(v.any()),
-    questionLatex: v.optional(v.any()),
-    tableHeadersQuestion: v.optional(v.any()),
-    tableDataQuestion: v.optional(v.any()),
-    tableHeadersSolution: v.optional(v.any()),
-    tableDataSolution: v.optional(v.any()),
-  };
-
-  const tagSchema = {
-    _id: dbId('tag'),
-    name: v.string(),
-    color: v.optional(v.string()),
-    textColor: v.optional(v.string()),
-  };
-
-  const fileTrackerSchema = {
-    _id: dbId('file'),
-    name: v.string(),
-    refs: v.optional(v.array(v.string())),
-  };
-
-  const userSchema = {
-    _id: dbId('user'),
-    sub: withIndex(v.string(), { unique: true }),
-    name: v.string(),
-    email: v.pipe(v.string(), v.email()),
-    active: v.boolean(),
-    groups: v.array(v.string()),
-    lastLoginAt: v.optional(v.date()),
-    createdAt: v.date(),
-  };
-
-  const groupSchema = {
-    _id: dbId('group'),
-    name: withIndex(v.string(), { unique: true }),
-    rights: v.optional(v.any()),
-  };
-
-  const qrCodeSchema = {
-    _id: dbId('qr'),
-    studentsPerLanguage: v.optional(v.number()),
-    pagesPerStudent: v.optional(v.number()),
-    lastUpdated: v.optional(v.string()),
-    pages: v.optional(v.any()),
-  };
-
   const [exams, tasks, tags, fileTracker, users, groups, qrCodes] =
     await Promise.all([
-      collection(mongoDb, 'exams', examSchema),
-      collection(mongoDb, 'tasks', taskSchema),
-      collection(mongoDb, 'tags', tagSchema),
-      collection(mongoDb, 'fileTracker', fileTrackerSchema),
-      collection(mongoDb, 'users', userSchema),
-      collection(mongoDb, 'groups', groupSchema),
-      collection(mongoDb, 'qrCodes', qrCodeSchema),
+      collection(mongoDb, 'exams', s.examSchema),
+      collection(mongoDb, 'tasks', s.taskSchema),
+      collection(mongoDb, 'tags', s.tagSchema),
+      collection(mongoDb, 'fileTracker', s.fileTrackerSchema),
+      collection(mongoDb, 'users', s.userSchema),
+      collection(mongoDb, 'groups', s.groupSchema),
+      collection(mongoDb, 'qrCodes', s.qrCodeSchema),
     ]);
 
   db = new ExamToolboxDatabase(client, {
@@ -200,6 +110,7 @@ export class ExamToolboxDatabase {
   public deleteExam = e.deleteExam;
   public getAllExams = e.getAllExams;
   public getExamById = e.getExamById;
+  public getExamByIdInternal = e.getExamByIdInternal;
   public getRecentExams = e.getRecentExams;
   public searchExams = e.searchExams;
   public updateExam = e.updateExam;

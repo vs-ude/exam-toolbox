@@ -143,6 +143,11 @@ These are run with [Cypress](https://www.cypress.io/) on our GitLab Runner.
 The easiest way to run them locally is to set up [GitLab CI Local](https://github.com/firecow/gitlab-ci-local) and run `gitlab-ci-local cypress_e2e --mount-cache`.
 This requires Docker.
 
+> [!NOTE]
+> When this is done in an unclean git folder,
+> be aware that gitlab-ci-local only copies files that are tracked by git.
+> You have to `git add` new files if they should be included in the pipeline.
+
 You can then inspect the output in the `.gitlab-ci-local` directory.
 There are logs for all services (LDAP, DB, etc.) in the `outputs` folder,
 screenshots of failures in `artifacts/cypress_e2e/cypress/screenshots/`

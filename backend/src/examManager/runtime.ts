@@ -188,7 +188,7 @@ export function createExamManagerRuntime(
     let semester: string | undefined = undefined;
 
     try {
-      const exam = await deps.db.getExamById(job.examId.trim());
+      const exam = await deps.db.getExamByIdInternal(job.examId.trim());
 
       if (exam?.courseName) {
         examName = exam.courseName;

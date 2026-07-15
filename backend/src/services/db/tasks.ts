@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { ExamToolboxDatabase } from '../mod.ts';
 import { User, Task, parseTask } from '../../types/mod.ts';
 import { newId } from '@diister/mongodbee';

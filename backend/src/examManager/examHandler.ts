@@ -22,7 +22,8 @@ export async function getAllExams(
   _c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
-  const examList = await deps.db.getAllExams();
+  const user = _c.get('jwtPayload') as User;
+  const examList = await deps.db.getAllExams(user);
   return { kind: 'json', status: 200, body: examList };
 }
 
@@ -39,8 +40,9 @@ export async function getExamById(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
+  const user = c.get('jwtPayload') as User;
   const examId = c.req.param('id')!;
-  const exam = await deps.db.getExamById(examId);
+  const exam = await deps.db.getExamById(examId, user);
   if (!exam) {
     throw new HttpError(404, 'Exam not found');
   }
@@ -51,8 +53,9 @@ export async function searchExams(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
+  const user = c.get('jwtPayload') as User;
   const searchText = c.req.param('searchText')!;
-  const examList = await deps.db.searchExams(searchText);
+  const examList = await deps.db.searchExams(searchText, user);
   return { kind: 'json', status: 200, body: examList };
 }
 
@@ -503,11 +506,12 @@ export async function deleteExam(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
+  const user = c.get('jwtPayload') as User;
   const id = c.req.param('examId')!;
   if (!id) {
     throw new HttpError(400, 'Exam ID is required');
   }
-  const result = await deps.db.deleteExam(id);
+  const result = await deps.db.deleteExam(id, user);
   if (result === 0) {
     throw new HttpError(404, 'Exam not found');
   }
