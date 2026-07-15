@@ -95,6 +95,7 @@ cypress_e2e:
         LDAP_READONLY_USER: 'True' # username: "readonly", pw: "readonly"
     - name: mongo:6.0
       alias: mongo
+      command: ['--replSet', 'rs0']
     - name: marlonb/mailcrab:latest
       alias: mailcrab
   variables:
