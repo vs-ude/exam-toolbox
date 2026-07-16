@@ -80,8 +80,10 @@ export class ExamToolboxDatabase {
   }
 
   // Test
-  test(): void {
-    if (!this.client) {
+  async test(): Promise<void> {
+    type Pong = { ok: number; $clusterTime: any };
+    const pong = (await this.client.db().command({ ping: 1 })) as Pong;
+    if (!pong.ok) {
       throw new Error('Failed to connect to MongoDB');
     }
   }
