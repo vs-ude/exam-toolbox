@@ -34,6 +34,9 @@ default:
     - key: exam-toolbox-e2e-cache
       paths:
         - .npm_cache/
+    - key: $CI_PROJECT_NAME-tectonic
+      paths:
+        - .cache/Tectonic
 
 checks:
   image: alpine:latest
@@ -116,6 +119,9 @@ cypress_e2e:
     PATHS_TEMPLATE_BASE_PATH: '${CI_PROJECT_DIR}/backend/template'
     PATHS_CACHE_DIR: /tmp/cache
     PATHS_JOBS_DIR: /tmp/jobs
+    QR_MIN_STUDENTS: 3
+    QR_MIN_PAGES: 6
+    TECTONIC_VERSION: '0.16.9'
   before_script:
     - bash .ci/prepare_backend_integration.sh .ci/backend_integration_packages.txt
     - bash .ci/prepare_backend_integration.sh .ci/e2e/packages.txt
@@ -124,11 +130,12 @@ cypress_e2e:
     - bash -c 'cd frontend && deno install -q'
     - mkdir -p /tmp/cache /tmp/jobs /tmp/uploads # For caddy
     - ldapadd -f ldap/10-testuser.ldif -D cn=admin,dc=university,dc=example -w admin -H ldap://ldap-host:389 > /dev/null
+    - bash .ci/e2e/tectonic.sh
   script:
     - bash .ci/e2e/start.sh
     - cypress run --config-file cypress/cypress.config.ts --quiet
   artifacts:
-    when: on_failure
+    when: always
     paths:
       - .logs/*.log
       - cypress/screenshots/**/*.png

@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -qy -o=Dpkg::Use-Pty=0 --no-install-recomm
 
 RUN --mount=type=cache,target=/usr/local/cargo/git/db \
     --mount=type=cache,target=/usr/local/cargo/registry/ \
-    cargo install --git https://github.com/tectonic-typesetting/tectonic.git --rev d7f3275 --force tectonic
+    cargo install --git https://github.com/tectonic-typesetting/tectonic.git --tag tectonic@0.16.9 --force tectonic
 
 WORKDIR /tmp
 ENV HOME=/tmp
@@ -42,7 +42,7 @@ COPY --parents src/ server.ts /app/
 EXPOSE 3000
 
 # Set environment variables
-ENV MONGODB_URI=mongodb://mongo:27017/examToolboxDB
+ENV MONGODB_URI=mongodb://mongo:27017/examToolboxDB?replicaSet=rs0&directConnection=true
 
 # Run the server.ts script using Deno
 CMD ["deno", "task", "start:watch"]

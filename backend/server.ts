@@ -28,9 +28,22 @@ import {
 } from './src/services/mod.ts';
 import { preGeneratePageQRCache } from './src/services/qr.ts';
 import { AppEnv } from './src/types/context.ts';
+import { checkDependencies } from './src/services/dependencies.ts';
 
 const config = getConfig();
 console.debug('Config loaded', config);
+
+if (!checkDependencies()) {
+  if (Deno.env.get('DEPS_OVERRIDE') === 'true') {
+    console.warn('Dependency check failed; continuing due to DEPS_OVERRIDE');
+  } else {
+    console.error(
+      'Dependency check failed; exiting; you can set DEPS_OVERRIDE=true to continue anyway',
+    );
+    Deno.exit(1);
+  }
+}
+
 const db = await getOrCreateDb();
 
 let count = 0;

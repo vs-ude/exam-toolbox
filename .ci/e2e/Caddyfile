@@ -9,13 +9,13 @@
 
 :80 {
   route /public/* {
-    root * {$CI_PROJECT_DIR}/public/
+    root * {$CI_PROJECT_DIR}/caddy/
     file_server
   }
 
   # This is not protected in e2e testing
   route /uploads/* {
-    root * /tmp/uploads
+    root * /tmp/
     file_server
   }
 

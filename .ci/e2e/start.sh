@@ -20,7 +20,7 @@ LOG_FOLDER=${CI_PROJECT_DIR}/.logs/
 mkdir -p ${LOG_FOLDER}
 
 export NO_COLOR=1 # make the logs readable
-bash -c 'cd backend && deno task start' > ${LOG_FOLDER}/backend.log 2>&1 &
+bash -c 'cd backend && HOME="${CI_PROJECT_DIR}" deno task start' > ${LOG_FOLDER}/backend.log 2>&1 &
 bash -c 'cd frontend && deno run ng serve --watch false --live-reload false' > ${LOG_FOLDER}/frontend.log 2>&1 &
 caddy run --config .ci/e2e/Caddyfile --adapter caddyfile 2>/dev/null &
 

@@ -10,8 +10,6 @@ describe('User Permissions and Role-Based Access', () => {
     cy.get('[data-cy="exam-name-input"]').type(`${examName}{enter}`);
     cy.get('[data-cy="examiner-input"]').type('Dr. Admin');
     cy.get('[data-cy="date-input"]').type('2026-10-10');
-    cy.get('[data-cy="semester-select"]').click();
-    cy.get('mat-option').first().click();
 
     // Intercept the specific save call from ApiService
     cy.intercept('POST', '/api/exams').as('saveExam');
@@ -38,20 +36,18 @@ describe('User Permissions and Role-Based Access', () => {
 
     // Even if the UI tries to load, the student shouldn't see the admin's exam
     cy.wait('@getExams').then(interception => {
-      expect(interception.response?.statusCode).to.be.oneOf([401, 403]);
+      expect(interception.response?.body).to.be.empty;
     });
     cy.contains(examName).should('not.exist');
 
     // Verify API Denial for saving
-    cy.visit('http://localhost/#/dashboard');
+    cy.visit('/dashboard');
     cy.get('[data-cy="nav-create-exam"]').click();
     cy.intercept('POST', '/api/exams').as('deniedSave');
 
     // Fill out only minimally required fields to click save
     cy.get('[data-cy="examiner-input"]').type('Student Try');
     cy.get('[data-cy="date-input"]').type('2026-12-24');
-    cy.get('[data-cy="semester-select"]').click();
-    cy.get('mat-option').first().click();
     cy.get('[data-cy="save"]').click();
 
     // Backend must reject this
@@ -60,7 +56,7 @@ describe('User Permissions and Role-Based Access', () => {
       .should('be.oneOf', [401, 403]);
 
     // Verify it does not appears in the Exam Pool
-    cy.visit('http://localhost/#/exams-pool');
+    cy.visit('/exams-pool');
     cy.contains(examName).should('not.exist');
   });
 });

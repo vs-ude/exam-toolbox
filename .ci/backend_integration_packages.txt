@@ -1,3 +1,5 @@
-zbar-tools
-qrencode
+ghostscript
 imagemagick
+qrencode
+zbar-tools
+zip
