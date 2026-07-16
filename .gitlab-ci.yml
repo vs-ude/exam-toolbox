@@ -97,7 +97,7 @@ cypress_e2e:
         LDAP_BASE_DN: dc=university,dc=example
         LDAP_READONLY_USER: 'True' # username: "readonly", pw: "readonly"
     - name: mongo:8
-      command: ['--bind_ip', 'mongo', '--replSet', 'rs0']
+      command: ['--replSet', 'rs0']
     - name: marlonb/mailcrab:latest
       alias: mailcrab
   variables:
@@ -130,6 +130,7 @@ cypress_e2e:
     - mkdir -p /tmp/cache /tmp/jobs /tmp/uploads # For caddy
     - ldapadd -f ldap/10-testuser.ldif -D cn=admin,dc=university,dc=example -w admin -H ldap://ldap-host:389 > /dev/null
     - bash .ci/e2e/tectonic.sh
+    - bash .ci/e2e/mongo_init.sh # We need to init the replica set here because mongo cannot resolve it own hostname
   script:
     - bash .ci/e2e/start.sh
     - cypress run --config-file cypress/cypress.config.ts --quiet
