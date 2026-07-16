@@ -1,13 +1,15 @@
-import { appConfig } from "../config/appConfig.ts";
-import { ExamToolboxDatabase } from "../services/db.ts";
+import { getConfig } from '../config/appConfig.ts';
+import { ExamToolboxDatabase } from '../services/mod.ts';
 
 import {
   createZipArchiveFromDirectory,
   genExamCode,
   mergePdfs,
   sendEmail,
-} from "../services/mod.ts";
-import { Language } from "../types/exam.ts";
+} from '../services/mod.ts';
+import { Language } from '../types/mod.ts';
+
+const appConfig = getConfig();
 
 // output from a successful student PDF generation
 export interface StudentResult {
@@ -21,7 +23,7 @@ export interface ExamGenerationJob {
   jobId: string;
   examId: string;
   userEmail: string;
-  status: "queued" | "processing" | "finalizing" | "completed" | "failed";
+  status: 'queued' | 'processing' | 'finalizing' | 'completed' | 'failed';
   progress: {
     total: number;
     completed: number;
@@ -37,9 +39,9 @@ export interface ExamGenerationJob {
 
 // a union type for all possible tasks that a worker can handle
 export type GenerationTask =
-  | { type: "student"; [key: string]: any }
-  | { type: "solution"; [key: string]: any }
-  | { type: "log"; [key: string]: any };
+  | { type: 'student'; [key: string]: any }
+  | { type: 'solution'; [key: string]: any }
+  | { type: 'log'; [key: string]: any };
 
 export interface RuntimeConfig {
   basePath: string;
@@ -76,7 +78,7 @@ export function createExamManagerRuntime(
   const {
     basePath,
     jobsDir,
-    workerModulePath = "../examManager/worker.ts",
+    workerModulePath = '../examManager/worker.ts',
     jobExpirationAgeMs = 7 * 24 * 60 * 60 * 1000,
     memoryWarningThresholdPercent = 0.05,
     memoryCheckIntervalMs = 5000,
@@ -94,7 +96,7 @@ export function createExamManagerRuntime(
   function processQueue() {
     if (taskQueue.length === 0) return;
 
-    const availableWorker = workers.find((w) => !w.isBusy);
+    const availableWorker = workers.find(w => !w.isBusy);
     if (!availableWorker) return;
 
     const task = taskQueue.shift();
@@ -117,8 +119,8 @@ export function createExamManagerRuntime(
     finalOutputDir: string,
   ): Promise<void> {
     job.studentResults.sort((a, b) => a.seatNumber - b.seatNumber);
-    const sortedGermanPaths = job.studentResults.map((r) => r.pdfPathDE);
-    const sortedEnglishPaths = job.studentResults.map((r) => r.pdfPathEN);
+    const sortedGermanPaths = job.studentResults.map(r => r.pdfPathDE);
+    const sortedEnglishPaths = job.studentResults.map(r => r.pdfPathEN);
     await mergePdfs(
       sortedGermanPaths.concat(sortedEnglishPaths),
       `${finalOutputDir}/exam_merged.pdf`,
@@ -126,13 +128,12 @@ export function createExamManagerRuntime(
   }
 
   function buildAttendanceCsv(job: ExamGenerationJob): string {
-    let csvContent = "Sitzplatz,Random,Matrikelnr,Name,Anwesend? (X)\n";
+    let csvContent = 'Sitzplatz,Random,Matrikelnr,Name,Anwesend? (X)\n';
     job.studentData.forEach((student, index) => {
       const seatNumber = index + 1;
       const randoms = job.examCodes[index];
       const randomCode = `${randoms.de}/${randoms.en}`;
-      csvContent +=
-        `${seatNumber},${randomCode},${student.studentId},"${student.firstName} ${student.lastName}",\n`;
+      csvContent += `${seatNumber},${randomCode},${student.studentId},"${student.firstName} ${student.lastName}",\n`;
     });
     return csvContent;
   }
@@ -173,9 +174,9 @@ export function createExamManagerRuntime(
   ): Promise<string> {
     const zipFilePath = `${job.jobDir}/exams_output.zip`;
     await createZipArchiveFromDirectory(finalOutputDir, zipFilePath, [
-      "*.pdf",
-      "*.log",
-      "*.csv",
+      '*.pdf',
+      '*.log',
+      '*.csv',
     ]);
     return zipFilePath;
   }
@@ -183,21 +184,21 @@ export function createExamManagerRuntime(
   async function getExamDisplayData(
     job: ExamGenerationJob,
   ): Promise<{ examName: string; semester?: string }> {
-    let examName = "Exam";
+    let examName = 'Exam';
     let semester: string | undefined = undefined;
 
     try {
-      const exam = await deps.db.getExamById(job.examId.trim());
+      const exam = await deps.db.getExamByIdInternal(job.examId.trim());
 
       if (exam?.courseName) {
         examName = exam.courseName;
       }
       if (exam?.semester) {
         semester = exam.semester;
-        if (examName !== "Exam") examName += ` (${semester})`;
+        if (examName !== 'Exam') examName += ` (${semester})`;
       }
     } catch (error) {
-      console.error("Error querying exam name:", error);
+      console.error('Error querying exam name:', error);
     }
 
     return { examName, semester };
@@ -208,8 +209,7 @@ export function createExamManagerRuntime(
     examName: string,
     semester?: string,
   ): void {
-    const domain = appConfig.server.domain;
-    const downloadUrl = `http://${domain}/api/jobs/${job.jobId}/download`;
+    const downloadUrl = `${appConfig.server.publicUrl}/api/jobs/${job.jobId}/download`;
 
     sendEmail({
       to: job.userEmail,
@@ -228,7 +228,7 @@ export function createExamManagerRuntime(
         </p>
       </div>
       `,
-    }).catch((error) => {
+    }).catch(error => {
       console.error(
         `Failed to send completion email for job ${job.jobId} to ${job.userEmail}:`,
         error,
@@ -249,20 +249,20 @@ export function createExamManagerRuntime(
     if (!job) return;
 
     if (job.progress.failed > 0) {
-      job.status = "failed";
-      console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      job.status = 'failed';
+      console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
       console.error(`Job ${jobId} FAILED during generation phase.`);
       console.error(`${job.progress.failed} tasks failed. Aborting merge.`);
-      console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      console.error('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
       return;
     }
 
-    job.status = "finalizing";
+    job.status = 'finalizing';
     console.log(`Finalizing job ${jobId}...`);
 
     try {
       const zipFilePath = await finalizeJobArtifacts(job);
-      job.status = "completed";
+      job.status = 'completed';
       job.zipPath = zipFilePath;
 
       const { examName, semester } = await getExamDisplayData(job);
@@ -271,7 +271,7 @@ export function createExamManagerRuntime(
       console.log(`Job ${jobId} completed. ZIP at ${zipFilePath}`);
     } catch (error) {
       console.error(`Failed to finalize job ${jobId}:`, error);
-      job.status = "failed";
+      job.status = 'failed';
     }
   }
 
@@ -282,7 +282,7 @@ export function createExamManagerRuntime(
     const latestJobs = new Map<string, ExamGenerationJob>();
 
     for (const job of jobs.values()) {
-      if (job.status !== "completed") continue;
+      if (job.status !== 'completed') continue;
       const existing = latestJobs.get(job.examId);
       if (!existing || job.createdAt > existing.createdAt) {
         latestJobs.set(job.examId, job);
@@ -315,7 +315,7 @@ export function createExamManagerRuntime(
     for (const job of jobs.values()) {
       if (
         job.examId === examId &&
-        ["queued", "processing", "finalizing"].includes(job.status)
+        ['queued', 'processing', 'finalizing'].includes(job.status)
       ) {
         return job;
       }
@@ -328,7 +328,7 @@ export function createExamManagerRuntime(
     let cleanedCount = 0;
 
     for (const [jobId, job] of jobs.entries()) {
-      if (job.status !== "completed" && job.status !== "failed") continue;
+      if (job.status !== 'completed' && job.status !== 'failed') continue;
 
       const jobAge = now - job.createdAt.getTime();
       if (jobAge > jobExpirationAgeMs) {
@@ -342,7 +342,7 @@ export function createExamManagerRuntime(
         `Memory cleanup: Removed ${cleanedCount} old job(s) from the in-memory list.`,
       );
     } else {
-      console.log("Memory cleanup: No old jobs to remove.");
+      console.log('Memory cleanup: No old jobs to remove.');
     }
   }
 
@@ -360,16 +360,16 @@ export function createExamManagerRuntime(
     );
 
     setTimeout(() => {
-      console.log("Running daily in-memory job cleanup...");
+      console.log('Running daily in-memory job cleanup...');
       cleanupOldJobs();
       scheduleDailyCleanup();
     }, delay);
   }
 
   function monitorMemoryUsage() {
-    const hasActiveWorkers = workers.some((w) => w.isBusy);
-    const isFinalizing = [...jobs.values()].some((job) =>
-      job.status === "finalizing"
+    const hasActiveWorkers = workers.some(w => w.isBusy);
+    const isFinalizing = [...jobs.values()].some(
+      job => job.status === 'finalizing',
     );
 
     if (!hasActiveWorkers && !isFinalizing) {
@@ -407,29 +407,29 @@ export function createExamManagerRuntime(
 
   for (let i = 0; i < poolSize; i++) {
     const worker = new Worker(new URL(workerModulePath, import.meta.url).href, {
-      type: "module",
+      type: 'module',
     });
 
-    worker.onmessage = async (e) => {
+    worker.onmessage = async e => {
       const result = e.data;
-      const wrapper = workers.find((w) => w.worker === worker);
+      const wrapper = workers.find(w => w.worker === worker);
       if (wrapper) wrapper.isBusy = false;
 
       if (!result?.jobId) {
-        console.error("Worker message received without a jobId.");
+        console.error('Worker message received without a jobId.');
         processQueue();
         return;
       }
 
       const associatedJob = jobs.get(result.jobId);
-      if (!associatedJob || associatedJob.status !== "processing") {
+      if (!associatedJob || associatedJob.status !== 'processing') {
         processQueue();
         return;
       }
 
-      if (result.status === "success") {
+      if (result.status === 'success') {
         associatedJob.progress.completed++;
-        if (result.type === "student") {
+        if (result.type === 'student') {
           associatedJob.studentResults.push({
             seatNumber: result.seatNumber,
             pdfPathDE: result.pdfPathDE,
@@ -438,7 +438,7 @@ export function createExamManagerRuntime(
         }
       } else {
         associatedJob.progress.failed++;
-        associatedJob.status = "failed";
+        associatedJob.status = 'failed';
         console.error(
           `Worker task failed for job ${associatedJob.jobId}:`,
           result.error,
@@ -448,7 +448,7 @@ export function createExamManagerRuntime(
       if (
         associatedJob.progress.completed + associatedJob.progress.failed >=
           associatedJob.progress.total &&
-        associatedJob.status === "processing"
+        associatedJob.status === 'processing'
       ) {
         await finalizeJob(associatedJob.jobId);
       }
@@ -456,9 +456,9 @@ export function createExamManagerRuntime(
       processQueue();
     };
 
-    worker.onerror = (err) => {
-      console.error("A critical worker error occurred:", err.message);
-      const wrapper = workers.find((w) => w.worker === worker);
+    worker.onerror = err => {
+      console.error('A critical worker error occurred:', err.message);
+      const wrapper = workers.find(w => w.worker === worker);
       if (wrapper) wrapper.isBusy = false;
       processQueue();
     };

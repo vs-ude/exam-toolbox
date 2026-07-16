@@ -1,7 +1,7 @@
 export class ImageProcessingError extends Error {
   constructor(msg: string, opt?: ErrorOptions) {
     super(msg, opt);
-    this.name = "ImageProcessingError";
+    this.name = 'ImageProcessingError';
     Object.setPrototypeOf(this, ImageProcessingError.prototype);
   }
 }
@@ -16,15 +16,15 @@ export async function contrastAdjust(
   dest: string,
   threshold: number,
 ): Promise<string> {
-  const cmd = new Deno.Command("magick", {
+  const cmd = new Deno.Command('magick', {
     args: [
       path,
-      "-level",
+      '-level',
       `${threshold}%,${100 - threshold}%`, // lowest x% map to black, highest x% to white
       dest,
     ],
-    stdout: "null",
-    stderr: "piped",
+    stdout: 'null',
+    stderr: 'piped',
   });
 
   const child = cmd.spawn();

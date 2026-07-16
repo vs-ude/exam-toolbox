@@ -1,0 +1,57 @@
+info:
+  name: Create tag
+  type: http
+  seq: 2
+  tags:
+    - Tags
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/tags"
+  body:
+    type: json
+    data: |-
+      {
+        "_id": "",
+        "name": "",
+        "color": "",
+        "textColor": ""
+      }
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 201 Response
+    description: Created
+    request:
+      url: "{{baseUrl}}/api/tags"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "_id": "",
+            "name": "",
+            "color": "",
+            "textColor": ""
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": "",
+            "insertedId": ""
+          }

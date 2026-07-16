@@ -1,122 +1,118 @@
 .task-pool-container {
-    background-color: var(--color-bg-accent);
-    height: 80%;
-    border-radius: 15px;
-    padding: 10px 32px 10px 32px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    overflow-x: hidden;
-    width: 100%;
+  background-color: var(--color-bg-accent);
+  height: 80%;
+  border-radius: 15px;
+  padding: 10px 32px 10px 32px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .filter-container {
-    border: 2px solid var(--border-color);
-    padding: 2%;
-    border-radius: 5px;
-    margin: 0 -16px 0 -16px;
-    display: flex;
-    align-items: left;
-    justify-content: space-between;
-    flex-wrap: wrap
+  border: 2px solid var(--border-color);
+  padding: 2%;
+  border-radius: 5px;
+  margin: 0 -16px 0 -16px;
+  display: flex;
+  align-items: left;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .search-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: nowrap;
-    border-radius: 5px;
-    background-color: var(--color-bg-lifted);
-    width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  border-radius: 5px;
+  background-color: var(--color-bg-lifted);
+  width: 100%;
 }
 
 .search-input {
-    width: 80%;
-    padding: 8px 12px;
-    font-size: 14px;
-    color: var(--color-text);
-    background-color: transparent;
-    outline: none;
-    border: 0;
+  width: 80%;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--color-text);
+  background-color: transparent;
+  outline: none;
+  border: 0;
 }
 
 ::placeholder {
-    color: var(--color-text-secondary);
+  color: var(--color-text-secondary);
 }
 
 .sort-container {
-    display: flex;
-    align-items: baseline;
-    justify-content: left;
-    flex-wrap: wrap;
-    font-size: 14px;
-    color: var(--color-text);
-    width: 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: left;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: var(--color-text);
+  width: 100%;
 }
 
 .type-filter-container {
-    display: flex;
-    align-items: center;
-    justify-content: left;
-    flex-wrap: nowrap;
-    padding: 8px 0px 8px 0px;
-    font-size: 14px;
-    color: var(--color-text);
-    margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  flex-wrap: nowrap;
+  padding: 8px 0px 8px 0px;
+  font-size: 14px;
+  color: var(--color-text);
+  margin-top: 4px;
 }
 
 .type-filter-container select {
-    background-color: var(--color-bg-lifted);
-    color: var(--color-text);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    padding: 6px 10px;
-    cursor: pointer;
-    outline: none;
-    width: 100%;
+  background-color: var(--color-bg-lifted);
+  color: var(--color-text);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  outline: none;
+  width: 100%;
 }
 
 .type-filter-container select:hover {
-    border-color: var(--color-icon);
+  border-color: var(--color-icon);
 }
 
-
 .sort-points-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: nowrap;
-    margin-left: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
-    color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  margin-left: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--color-text);
 }
 
 .icon {
-    color: var(--color-icon);
-    cursor: pointer;
-    border-radius: 5px;
+  color: var(--color-icon);
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 .icon:hover {
-    background-color: var(--color-bg-lifted);
+  background-color: var(--color-bg-lifted);
 }
-
 
 .active {
-    color: var(--color-primary);
+  color: var(--color-primary);
 }
 
-
-
 .task_wrapper {
-    margin-left: 1%;
+  margin-left: 1%;
 }
 
 .task_wrapper:hover {
-    cursor: grab;
+  cursor: grab;
 }
 
 .task_wrapper:active {
-    cursor: grabbing;
+  cursor: grabbing;
 }

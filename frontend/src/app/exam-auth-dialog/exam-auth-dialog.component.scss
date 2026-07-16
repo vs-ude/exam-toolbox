@@ -1,0 +1,15 @@
+.full-width {
+  width: 100%;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.hidden {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}

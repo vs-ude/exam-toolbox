@@ -1,0 +1,41 @@
+info:
+  name: Delete all exams
+  type: http
+  seq: 3
+  tags:
+    - Exams
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/exams"
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: All exams deleted
+    request:
+      url: "{{baseUrl}}/api/exams"
+      method: DELETE
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": "",
+            "deletedCount": 0
+          }
+
+docs: Removes every exam from the database. Intended for development/testing only.

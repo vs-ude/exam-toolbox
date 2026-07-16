@@ -1,12 +1,12 @@
 export type HandlerResult =
-  | { kind: "json"; status?: number; body: unknown }
+  | { kind: 'json'; status?: number; body: unknown }
   | {
-    kind: "binary";
-    content: Uint8Array;
-    contentType: string;
-    fileName: string;
-    extraHeaders?: Record<string, string>;
-  };
+      kind: 'binary';
+      content: Uint8Array;
+      contentType: string;
+      fileName: string;
+      extraHeaders?: Record<string, string>;
+    };
 
 export class HttpError extends Error {
   status: number;

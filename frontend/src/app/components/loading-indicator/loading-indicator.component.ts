@@ -1,8 +1,12 @@
 import { Component, ContentChild, Input, TemplateRef } from '@angular/core';
-import { RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
+import {
+  RouteConfigLoadEnd,
+  RouteConfigLoadStart,
+  Router,
+} from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { LoadingService } from '../../services/loading.service';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AsyncPipe, NgIf, NgTemplateOutlet } from '@angular/common';
 
 @Component({
@@ -10,7 +14,7 @@ import { AsyncPipe, NgIf, NgTemplateOutlet } from '@angular/common';
   standalone: true,
   imports: [MatProgressSpinnerModule, AsyncPipe, NgTemplateOutlet],
   templateUrl: './loading-indicator.component.html',
-  styleUrl: './loading-indicator.component.scss'
+  styleUrl: './loading-indicator.component.scss',
 })
 export class LoadingIndicatorComponent {
   loading$: Observable<boolean>;
@@ -18,10 +22,13 @@ export class LoadingIndicatorComponent {
   @Input()
   detectRouteTransitions = false;
 
-  @ContentChild("loading")
+  @ContentChild('loading')
   customLoadingIndicator: TemplateRef<any> | null = null;
 
-  constructor(private loadingService: LoadingService, private router: Router) {
+  constructor(
+    private loadingService: LoadingService,
+    private router: Router,
+  ) {
     this.loading$ = this.loadingService.loading$;
   }
 
@@ -29,13 +36,13 @@ export class LoadingIndicatorComponent {
     if (this.detectRouteTransitions) {
       this.router.events
         .pipe(
-          tap((event) => {
+          tap(event => {
             if (event instanceof RouteConfigLoadStart) {
               this.loadingService.loadingOn();
             } else if (event instanceof RouteConfigLoadEnd) {
               this.loadingService.loadingOff();
             }
-          })
+          }),
         )
         .subscribe();
     }

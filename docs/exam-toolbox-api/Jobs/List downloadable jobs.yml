@@ -1,0 +1,43 @@
+info:
+  name: List downloadable jobs
+  type: http
+  seq: 1
+  tags:
+    - Jobs
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/jobs/downloadable"
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Downloadable jobs
+    request:
+      url: "{{baseUrl}}/api/jobs/downloadable"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          [
+            {
+              "examId": "",
+              "jobId": ""
+            }
+          ]
+
+docs: Returns all completed generation jobs that have a downloadable ZIP artifact.

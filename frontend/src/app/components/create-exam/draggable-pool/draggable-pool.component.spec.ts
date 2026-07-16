@@ -8,9 +8,8 @@ describe('DraggablePoolComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DraggablePoolComponent]
-    })
-    .compileComponents();
+      imports: [DraggablePoolComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DraggablePoolComponent);
     component = fixture.componentInstance;

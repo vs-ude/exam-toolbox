@@ -1,81 +1,78 @@
-import { Component, HostListener, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
-import { forkJoin } from "rxjs";
-import { ExamCardComponent } from "../exam-card/exam-card.component";
-import { Exam } from "../../exam";
-import { ApiService, DownloadableJob } from "../../services/api.service";
-import { saveAs } from "file-saver";
-import { LoadingService } from "../../services/loading.service";
-import { MatIconModule } from "@angular/material/icon";
-import { NgClass, NgIf } from "@angular/common";
-import { MatTooltip } from "@angular/material/tooltip";
-import { MatDialog } from "@angular/material/dialog";
-import { DeleteConfirmationDialogComponent } from "../delete-confirmation-dialog/delete-confirmation-dialog.component";
-import { trigger, transition, style, animate } from "@angular/animations";
-import { ExamsTableComponent } from "../exams-table/exams-table.component";
+import { Component, HostListener, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { ExamCardComponent } from '../exam-card/exam-card.component';
+import { ExamStub } from '../../types/shared/stubs';
+import { ApiService, DownloadableJob } from '../../services/api.service';
+import { saveAs } from 'file-saver';
+import { LoadingService } from '../../services/loading.service';
+import { MatIconModule } from '@angular/material/icon';
+import { NgClass, NgIf } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
+import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { trigger, transition, style, animate } from '@angular/animations';
+import { ExamsTableComponent } from '../exams-table/exams-table.component';
 
-type FilterFn = (exams: Exam[]) => Exam[];
+type FilterFn = (exams: ExamStub[]) => ExamStub[];
 type ExamFilter = {
   active: boolean;
   filter: FilterFn;
-}
-
+};
 
 @Component({
-  selector: "app-exams-pool",
+  selector: 'app-exams-pool',
   standalone: true,
-  imports: [ExamCardComponent, MatIconModule, NgClass, MatTooltip, NgIf, ExamsTableComponent],
-  templateUrl: "./exams-pool.component.html",
-  styleUrl: "./exams-pool.component.scss",
+  imports: [
+    ExamCardComponent,
+    MatIconModule,
+    NgClass,
+    MatTooltip,
+    NgIf,
+    ExamsTableComponent,
+  ],
+  templateUrl: './exams-pool.component.html',
+  styleUrl: './exams-pool.component.scss',
   animations: [
-    trigger(
-      'leftRightAnimation',
-      [
-        transition(
-          ':enter',
-          [
-            style({ height: 0, opacity: 0, transform: 'translateX(100%)' }),
-            animate('0.25s ease-out',
-              style({ height: '*', opacity: 1, transform: 'translateX(0%)' })
-            )
-          ]
+    trigger('leftRightAnimation', [
+      transition(':enter', [
+        style({ height: 0, opacity: 0, transform: 'translateX(100%)' }),
+        animate(
+          '0.25s ease-out',
+          style({ height: '*', opacity: 1, transform: 'translateX(0%)' }),
         ),
-        transition(
-          ':leave',
-          [
-            style({ height: '*', opacity: 1, transform: 'translateX(0%)' }),
-            animate('0.25s ease-in',
-              style({ height: 0, opacity: 0, transform: 'translateX(-100%)' })
-            )
-          ]
-        )
-      ],
-
-    ),
-
-  ]
+      ]),
+      transition(':leave', [
+        style({ height: '*', opacity: 1, transform: 'translateX(0%)' }),
+        animate(
+          '0.25s ease-in',
+          style({ height: 0, opacity: 0, transform: 'translateX(-100%)' }),
+        ),
+      ]),
+    ]),
+  ],
 })
 export class ExamsPoolComponent implements OnInit {
-  public exams: Exam[] = [];
-  public filteredExams: Exam[] = [];
+  public exams: ExamStub[] = [];
+  public filteredExams: ExamStub[] = [];
   public downloadableJobs: DownloadableJob[] = [];
 
-  private username: string = "";
+  private username: string = '';
 
   public showDropdowns = { sorting: false, filter: false };
-  public viewMode: "grid" | "list" = "grid";
+  public viewMode: 'grid' | 'list' = 'grid';
 
-  @HostListener("document:click", ["$event"])
+  @HostListener('document:click', ['$event'])
   handleDropdownStates(event: MouseEvent) {
     const elementId = (event.target as Element).id;
 
-    if (elementId === "openSortingDropdown") {
+    if (elementId === 'openSortingDropdown') {
       this.showDropdowns.sorting = !this.showDropdowns.sorting;
     } else {
       this.showDropdowns.sorting = false;
     }
 
-    if (elementId === "openFilterDropdown") {
+    if (elementId === 'openFilterDropdown') {
       this.showDropdowns.filter = !this.showDropdowns.filter;
     } else {
       this.showDropdowns.filter = false;
@@ -87,10 +84,11 @@ export class ExamsPoolComponent implements OnInit {
     private loader: LoadingService,
     private router: Router,
     private dialog: MatDialog,
-  ) { }
+  ) {}
 
   ngOnInit() {
-    this.viewMode = localStorage.getItem("viewMode") === "list" ? "list" : "grid";
+    this.viewMode =
+      localStorage.getItem('viewMode') === 'list' ? 'list' : 'grid';
     this.fetchExams();
     this.fetchCurrentUser();
   }
@@ -107,41 +105,39 @@ export class ExamsPoolComponent implements OnInit {
         this.downloadableJobs = downloadableJobs;
         this.loader.loadingOff();
       },
-      error: (err) => {
-        console.error("Error fetching initial data for exams pool:", err);
+      error: err => {
+        console.error('Error fetching initial data for exams pool:', err);
         this.loader.loadingOff();
       },
     });
   }
 
   private fetchCurrentUser() {
-    this.api.getUser().subscribe(
-      user => {
-        this.username = user.id
-      }
-    )
+    this.api.getUser().subscribe(user => {
+      this.username = user.id;
+    });
   }
 
   isDownloadable(examId: string | undefined): boolean {
     if (!examId) return false;
-    return this.downloadableJobs.some((job) => job.examId === examId);
+    return this.downloadableJobs.some(job => job.examId === examId);
   }
 
   onEdit(examId: string | undefined) {
     if (!examId) return;
-    this.router.navigate(["/create-exam", examId]);
+    this.router.navigate(['/edit-exam', examId]);
   }
 
   onDownload(event: MouseEvent, examId: string | undefined) {
     event.stopPropagation();
     if (!examId) {
-      console.error("Exam ID is undefined, cannot start download.");
+      console.error('Exam ID is undefined, cannot start download.');
       return;
     }
 
-    const job = this.downloadableJobs.find((j) => j.examId === examId);
+    const job = this.downloadableJobs.find(j => j.examId === examId);
     if (!job) {
-      console.error("No downloadable job found for examId:", examId);
+      console.error('No downloadable job found for examId:', examId);
       return;
     }
 
@@ -155,8 +151,8 @@ export class ExamsPoolComponent implements OnInit {
         saveAs(zipBlob, `exams_${jobId}.zip`);
         this.loader.loadingOff();
       },
-      error: (err) => {
-        console.error("Download error:", err);
+      error: err => {
+        console.error('Download error:', err);
         this.loader.loadingOff();
       },
     });
@@ -167,15 +163,15 @@ export class ExamsPoolComponent implements OnInit {
     if (!examId) return;
 
     // Find the exam object to get the name for the dialog
-    const examToDelete = this.exams.find((e) => e._id === examId);
-    const examName = examToDelete ? examToDelete.courseName : "this exam";
+    const examToDelete = this.exams.find(e => e._id === examId);
+    const examName = examToDelete ? examToDelete.courseName : 'this exam';
 
     const dialogRef = this.dialog.open(DeleteConfirmationDialogComponent, {
-      width: "400px",
+      width: '400px',
       data: { courseName: examName },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe(result => {
       if (result === true) {
         this.performDeletion(examId);
         this.fetchExams();
@@ -189,11 +185,11 @@ export class ExamsPoolComponent implements OnInit {
       next: () => {
         this.loader.loadingOff();
         // Remove from local array so we don't need to refetch
-        this.exams = this.exams.filter((e) => e._id !== examId);
+        this.exams = this.exams.filter(e => e._id !== examId);
         // this.router.navigate(["exams-pool"]); // No need to navigate if we are already here
       },
-      error: (err) => {
-        console.error("Delete exam error:", err);
+      error: err => {
+        console.error('Delete exam error:', err);
         this.loader.loadingOff();
       },
     });
@@ -252,49 +248,64 @@ export class ExamsPoolComponent implements OnInit {
   }
 
   private applyFilters() {
-    const activeFilters = Object.values(this.filters).filter(f => f.active).map(f => f.filter);
-    this.filteredExams = activeFilters.reduce((result, filter) => filter(result), [...this.exams]);
+    const activeFilters = Object.values(this.filters)
+      .filter(f => f.active)
+      .map(f => f.filter);
+    this.filteredExams = activeFilters.reduce(
+      (result, filter) => filter(result),
+      [...this.exams],
+    );
   }
 
   public filters = {
     filterRecentlyViewed: {
       active: true,
-      filter: (exams: Exam[]) => { console.log("recentlyViewed not implemented"); return exams; }
+      filter: (exams: ExamStub[]) => {
+        console.log('recentlyViewed not implemented');
+        return exams;
+      },
     },
     filterMyExams: {
       active: false,
-      filter: (exams: Exam[]) => exams.filter(exam => exam.examinerName === this.username)
+      filter: (exams: ExamStub[]) =>
+        exams.filter(exam => exam.examinerName === this.username),
     },
     filterRelevantExams: {
       active: false,
-      filter: (exams: Exam[]) => exams.filter(exam => exam.date >= new Date().toISOString())
+      filter: (exams: ExamStub[]) =>
+        exams.filter(exam => exam.date >= new Date().toISOString()),
     },
     sortAlphabetically: {
       active: true,
-      filter: (exams: Exam[]) => [...exams].sort((a, b) => a.courseName.localeCompare(b.courseName))
+      filter: (exams: ExamStub[]) =>
+        [...exams].sort((a, b) => a.courseName.localeCompare(b.courseName)),
     },
     sortSemester: {
       active: false,
-      filter: (exams: Exam[]) => [...exams].sort((a, b) => a.semester.localeCompare(b.semester))
+      filter: (exams: ExamStub[]) =>
+        [...exams].sort((a, b) => a.semester.localeCompare(b.semester)),
     },
     sortLastViewed: {
       active: false,
-      filter: (exams: Exam[]) => { console.log("lastViewed not implemented"); return exams; }
+      filter: (exams: ExamStub[]) => {
+        console.log('lastViewed not implemented');
+        return exams;
+      },
     },
     sortAscending: {
       active: false,
-      filter: (exams: Exam[]) => exams.reverse()
-    }
-  }
+      filter: (exams: ExamStub[]) => exams.reverse(),
+    },
+  };
 
   public currentSortString(): string {
-    if (this.filters.sortAlphabetically.active) return "Alphabetically";
-    if (this.filters.sortSemester.active) return "By Semester";
-    return "Last Viewed";
+    if (this.filters.sortAlphabetically.active) return 'Alphabetically';
+    if (this.filters.sortSemester.active) return 'By Semester';
+    return 'Last Viewed';
   }
 
-  public toggleViewMode(mode: "grid" | "list") {
+  public toggleViewMode(mode: 'grid' | 'list') {
     this.viewMode = mode;
-    localStorage.setItem("viewMode", mode);
+    localStorage.setItem('viewMode', mode);
   }
 }

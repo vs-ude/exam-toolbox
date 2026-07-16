@@ -8,9 +8,8 @@ describe('UpdateTaskDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UpdateTaskDialogComponent]
-    })
-    .compileComponents();
+      imports: [UpdateTaskDialogComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(UpdateTaskDialogComponent);
     component = fixture.componentInstance;

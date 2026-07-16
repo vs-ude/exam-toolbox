@@ -8,9 +8,8 @@ describe('AddTagDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AddTagDialogComponent]
-    })
-    .compileComponents();
+      imports: [AddTagDialogComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AddTagDialogComponent);
     component = fixture.componentInstance;

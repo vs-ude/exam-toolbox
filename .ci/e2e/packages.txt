@@ -1,0 +1,8 @@
+caddy
+curl
+ldap-utils
+libfontconfig-dev
+libgraphite2-dev
+libharfbuzz-dev
+libicu-dev
+zlib1g-dev

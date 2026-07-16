@@ -1,0 +1,76 @@
+info:
+  name: Get job status
+  type: http
+  seq: 2
+  tags:
+    - Jobs
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/jobs/:jobId/status"
+  params:
+    - name: jobId
+      value: ""
+      type: path
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Job status
+    request:
+      url: "{{baseUrl}}/api/jobs/:jobId/status"
+      method: GET
+      params:
+        - name: jobId
+          value: ""
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "jobId": "",
+            "status": "queued",
+            "progress": {
+              "total": 0,
+              "completed": 0,
+              "failed": 0
+            },
+            "downloadUrl": ""
+          }
+  - name: 404 Response
+    description: Job not found
+    request:
+      url: "{{baseUrl}}/api/jobs/:jobId/status"
+      method: GET
+      params:
+        - name: jobId
+          value: ""
+          type: path
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+
+docs: Returns the current status and progress of a generation job.

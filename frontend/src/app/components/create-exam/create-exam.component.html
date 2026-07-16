@@ -1,25 +1,5 @@
 <div class="createExam_container">
   <div class="left_container">
-    <div class="exam_name_wrapper" id="examName">
-      <span
-        class="exam_name"
-        (click)="isNameChange = true"
-        *ngIf="!isNameChange"
-        id="examName"
-        data-cy="exam-name-display"
-      >
-        {{ exam.courseName }}
-      </span>
-      <input
-        class="name_input"
-        *ngIf="isNameChange"
-        [value]="exam.courseName"
-        (keydown)="onNameChange($event)"
-        id="examName"
-        #nameInput
-        data-cy="exam-name-input"
-      />
-    </div>
     <div class="add_tasks_container">
       <app-AddTask
         class="task_wrapper"
@@ -101,51 +81,78 @@
   </div>
 
   <div class="center_container">
-    <div class="viewBar_spacer"></div>
+    <div class="exam_name_wrapper" id="examName">
+      <span
+        class="exam_name"
+        (click)="isNameChange = true"
+        *ngIf="!isNameChange"
+        id="examName"
+        data-cy="exam-name-display"
+      >
+        {{ exam.courseName }}
+      </span>
+      <input
+        class="name_input"
+        *ngIf="isNameChange"
+        [value]="exam.courseName"
+        (keydown)="onNameChange($event)"
+        id="examName"
+        #nameInput
+        data-cy="exam-name-input"
+      />
+    </div>
     <div class="viewBar_wrapper">
       <div class="icon_wrapper bar_icon">
         <mat-icon
           aria-hidden="false"
-          fontIcon="remove_red_eye"
           matTooltip="Preview"
           (click)="onPreview()"
           data-cy="preview-btn"
-        ></mat-icon>
+          >remove_red_eye</mat-icon
+        >
       </div>
       <div class="icon_wrapper bar_icon">
         <mat-icon
           *ngIf="!isUpdateMode"
           aria-hidden="false"
-          fontIcon="save"
           matTooltip="Save"
           (click)="onSave()"
           data-cy="save"
-        ></mat-icon>
+          >save</mat-icon
+        >
         <mat-icon
           *ngIf="isUpdateMode"
           aria-hidden="false"
-          fontIcon="update"
           matTooltip="Update"
           (click)="onUpdate()"
-        ></mat-icon>
+          >save</mat-icon
+        >
       </div>
 
       <div class="icon_wrapper bar_icon">
         <mat-icon
           aria-hidden="false"
-          fontIcon="download"
           matTooltip="Generate all Exams"
           (click)="onMassExam()"
-        ></mat-icon>
+          >download</mat-icon
+        >
       </div>
 
-      <span class="icon_wrapper language_icon" (click)="bilingual = !bilingual"
-        ><img src="{{ bilingual ? 'english.svg' : 'german.svg' }}"
-      /></span>
+      <div
+        [matTooltip]="exam.bilingual ? 'Bilingual' : 'Monolingual'"
+        class="icon_wrapper language_icon"
+      >
+        <mat-icon aria-hidden="false">language</mat-icon>
+        <mat-slide-toggle
+          labelPosition="before"
+          class="small"
+          [(ngModel)]="exam.bilingual"
+        />
+      </div>
 
-      <div class="duration_wrapper">
+      <div matTooltip="Exam duration" class="duration_wrapper">
         <div class="icon_wrapper">
-          <mat-icon aria-hidden="false" fontIcon="access_time"></mat-icon>
+          <mat-icon aria-hidden="false">access_time</mat-icon>
         </div>
         <input
           class="duration_picker"
@@ -157,7 +164,7 @@
         />
       </div>
 
-      <div class="date_wrapper">
+      <div matTooltip="Exam date" class="date_wrapper">
         <input
           type="date"
           class="datePicker"
@@ -167,21 +174,20 @@
         />
       </div>
 
-      <div class="examiner_wrapper">
-        <div class="icon_wrapper">
-          <mat-icon aria-hidden="false" fontIcon="person"></mat-icon>
-        </div>
+      <div matTooltip="Examiner" class="examiner_wrapper" id="examiner">
+        <mat-icon matPrefix aria-hidden="false">person</mat-icon>
         <input
           class="examiner_input"
-          placeholder="Enter Examiner's Name"
+          placeholder="Name"
+          required
           [(ngModel)]="exam.examinerName"
           data-cy="examiner-input"
         />
       </div>
 
-      <div class="semester_wrapper">
+      <div matTooltip="Semester" class="semester_wrapper bar_icon">
         <div class="icon_wrapper">
-          <mat-icon aria-hidden="false" fontIcon="school"></mat-icon>
+          <mat-icon aria-hidden="false">school</mat-icon>
         </div>
         <mat-select
           class="selectSemester"
@@ -194,6 +200,15 @@
             {{ semester }}
           </mat-option>
         </mat-select>
+      </div>
+
+      <div matTooltip="Configure Access Rights" class="icon_wrapper bar_icon">
+        <mat-icon
+          aria-hidden="false"
+          matTooltip="Configure Access Rights"
+          (click)="onConfigureAccess()"
+          >manage_accounts</mat-icon
+        >
       </div>
     </div>
 
@@ -212,10 +227,10 @@
         >
           {{
             exam.tasks.length < 5
-              ? "Assignment " + (i + 1)
+              ? 'Assignment ' + (i + 1)
               : i < 9
-                ? "A 0" + (i + 1)
-                : "A " + (i + 1)
+                ? 'A 0' + (i + 1)
+                : 'A ' + (i + 1)
           }}
           <div
             *ngIf="i === 0"
@@ -229,7 +244,7 @@
           matTooltip="add Group"
           [matTooltipShowDelay]="800"
         >
-          <mat-icon aria-hidden="false" fontIcon="add"></mat-icon>
+          <mat-icon aria-hidden="false">add</mat-icon>
         </button>
         <button
           class="tab preview-tab"
@@ -241,7 +256,9 @@
         </button>
       </div>
 
-      <ng-container *ngIf="!isPreviewTabActive">
+      <ng-container
+        *ngIf="!isPreviewTabActive && exam.tasks[currentGroupView]?.tasks"
+      >
         <div
           *ngIf="exam.tasks[currentGroupView].tasks.length === 0"
           class="empty_group_holder"
@@ -261,7 +278,7 @@
         >
           @for (
             task of exam.tasks[currentGroupView].tasks;
-            track task.taskId;
+            track task._id;
             let i = $index
           ) {
             <mat-card
@@ -272,7 +289,7 @@
               <app-task-group-title
                 class="task_container"
                 [assignmentNumber]="currentGroupView + 1"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [preTitle]="exam.tasks[currentGroupView].groupTitle"
                 (titleChangedEvent)="onTitleChange($event)"
               />
@@ -298,13 +315,11 @@
             >
               <app-multiplechoiceTask
                 class="task_container"
-                [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
+                [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [isModifiedPoolTask]="
-                  isModifiedPoolTask(
-                    exam.tasks[currentGroupView].tasks[i].taskId
-                  )
+                  isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i]._id)
                 "
                 (createNewTaskEvent)="onCreateNewTaskChange($event, i)"
                 (taskChangeEvent)="onTaskChange($event, i)"
@@ -324,13 +339,11 @@
             >
               <app-short-answer-task
                 class="task_container"
-                [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
+                [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [isModifiedPoolTask]="
-                  isModifiedPoolTask(
-                    exam.tasks[currentGroupView].tasks[i].taskId
-                  )
+                  isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i]._id)
                 "
                 (createNewTaskEvent)="onCreateNewTaskChange($event, i)"
                 (deleteEvent)="deleteTask(i)"
@@ -350,13 +363,11 @@
             >
               <app-picture-task
                 class="task_container"
-                [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
+                [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [isModifiedPoolTask]="
-                  isModifiedPoolTask(
-                    exam.tasks[currentGroupView].tasks[i].taskId
-                  )
+                  isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i]._id)
                 "
                 (createNewTaskEvent)="onCreateNewTaskChange($event, i)"
                 (deleteEvent)="deleteTask(i)"
@@ -372,13 +383,11 @@
             <mat-card class="form-card" *ngIf="task.type === 'latex'" cdkDrag>
               <app-latex-task
                 class="task_container"
-                [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
+                [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [isModifiedPoolTask]="
-                  isModifiedPoolTask(
-                    exam.tasks[currentGroupView].tasks[i].taskId
-                  )
+                  isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i]._id)
                 "
                 (createNewTaskEvent)="onCreateNewTaskChange($event, i)"
                 (deleteEvent)="deleteTask(i)"
@@ -394,13 +403,11 @@
             <mat-card class="form-card" *ngIf="task.type === 'table'" cdkDrag>
               <app-table-task
                 class="task_container"
-                [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
+                [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [isModifiedPoolTask]="
-                  isModifiedPoolTask(
-                    exam.tasks[currentGroupView].tasks[i].taskId
-                  )
+                  isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i]._id)
                 "
                 (createNewTaskEvent)="onCreateNewTaskChange($event, i)"
                 (deleteEvent)="deleteTask(i)"
@@ -420,13 +427,11 @@
             >
               <app-manual-text
                 class="task_container"
-                [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
+                [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 [isModifiedPoolTask]="
-                  isModifiedPoolTask(
-                    exam.tasks[currentGroupView].tasks[i].taskId
-                  )
+                  isModifiedPoolTask(exam.tasks[currentGroupView].tasks[i]._id)
                 "
                 (createNewTaskEvent)="onCreateNewTaskChange($event, i)"
                 (deleteEvent)="deleteTask(i)"
@@ -442,9 +447,9 @@
             <mat-card class="form-card" *ngIf="task.type === 'newPage'" cdkDrag>
               <app-new-page
                 class="task_container"
-                [taskId]="exam.tasks[currentGroupView].tasks[i].taskId"
+                [taskId]="exam.tasks[currentGroupView].tasks[i]._id"
                 [preTask]="exam.tasks[currentGroupView].tasks[i]"
-                [bilingual]="bilingual"
+                [bilingual]="exam.bilingual"
                 (deleteEvent)="deleteTask(i)"
                 (taskChangeEvent)="onTaskChange($event, i)"
                 (newTagEvent)="onAddTag(i)"

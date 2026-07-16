@@ -1,14 +1,15 @@
-import { QRConfig } from "../config/mod.ts";
+import { QRConfig } from '../config/mod.ts';
 
-import { type Exam, type Language } from "../types/exam.ts";
-import { ExamPageQRData, ExamQRData as ExamQRData } from "../types/scan.ts";
-import { getOrCreateDb, QRCacheDocument } from "./db.ts";
-import { parseExamCode } from "./exam_code.ts";
+import { type Exam, type Language } from '../types/mod.ts';
+import { ExamPageQRData, ExamQRData as ExamQRData } from '../types/scan.ts';
+import { getOrCreateDb } from './db/db.ts';
+import { QRCacheDocument } from './db/qr.ts';
+import { parseExamCode } from './exam_code.ts';
 
 export class QRError extends Error {
   constructor(msg: string, opt?: ErrorOptions) {
     super(msg, opt);
-    this.name = "QRError";
+    this.name = 'QRError';
     Object.setPrototypeOf(this, QRError.prototype);
   }
 }
@@ -28,15 +29,14 @@ export async function generateExamQR(
   code: string,
 ): Promise<string> {
   if (exam.points === undefined || exam.points < 1) {
-    throw new QRError("Exam points must be defined and greater than 0");
+    throw new QRError('Exam points must be defined and greater than 0');
   }
 
   if (exam.pageCount === undefined || exam.pageCount < 4) {
-    throw new QRError("Undefined or invalid exam page count (<4)");
+    throw new QRError('Undefined or invalid exam page count (<4)');
   }
 
-  const content =
-    `{'v':'${exam.courseName}','s':'${exam.semester}','d':'${exam.date}','l':'${language}','c':${exam.pageCount},'t':${exam.points},'r':'${code}'}`;
+  const content = `{'v':'${exam.courseName}','s':'${exam.semester}','d':'${exam.date}','l':'${language}','c':${exam.pageCount},'t':${exam.points},'r':'${code}'}`;
 
   await generate(path, content);
 
@@ -61,26 +61,23 @@ export async function generatePageQR(
   return content;
 }
 
-async function generate(
-  path: string,
-  content: string,
-) {
-  const cmd = new Deno.Command("qrencode", {
+async function generate(path: string, content: string) {
+  const cmd = new Deno.Command('qrencode', {
     args: [
-      "--level",
-      "H",
-      "--size", // per pixel
-      "5",
-      "--dpi",
-      "300",
-      "--type",
-      "PNG",
-      "--output",
+      '--level',
+      'H',
+      '--size', // per pixel
+      '5',
+      '--dpi',
+      '300',
+      '--type',
+      'PNG',
+      '--output',
       path,
       content,
     ],
-    stdout: "null",
-    stderr: "piped",
+    stdout: 'null',
+    stderr: 'piped',
   });
 
   const child = cmd.spawn();
@@ -94,15 +91,10 @@ async function generate(
 }
 
 async function removeAlphaChannel(path: string) {
-  const cmd = new Deno.Command("magick", {
-    args: [
-      path,
-      "-alpha",
-      "off",
-      path,
-    ],
-    stdout: "null",
-    stderr: "piped",
+  const cmd = new Deno.Command('magick', {
+    args: [path, '-alpha', 'off', path],
+    stdout: 'null',
+    stderr: 'piped',
   });
 
   const child = cmd.spawn();
@@ -122,15 +114,10 @@ async function removeAlphaChannel(path: string) {
 export async function parseQR(
   path: string,
 ): Promise<ExamQRData | ExamPageQRData> {
-  const cmd = new Deno.Command("zbarimg", {
-    args: [
-      "-q",
-      "-Sdisable",
-      "-Sqrcode.enable",
-      path,
-    ],
-    stdout: "piped",
-    stderr: "null",
+  const cmd = new Deno.Command('zbarimg', {
+    args: ['-q', '-Sdisable', '-Sqrcode.enable', path],
+    stdout: 'piped',
+    stderr: 'null',
   });
 
   const child = cmd.spawn();
@@ -141,24 +128,24 @@ export async function parseQR(
       break;
     case 1:
       await child.stdout.cancel();
-      throw new QRError("IO error or ImageMagick error");
+      throw new QRError('IO error or ImageMagick error');
     case 2:
       await child.stdout.cancel();
-      throw new QRError("ImageMagick fatal error");
+      throw new QRError('ImageMagick fatal error');
     // 3 is not possible since we are not running in interactive mode
     case 4:
       await child.stdout.cancel();
-      throw new QRError("QR code not found");
+      throw new QRError('QR code not found');
     default:
       await child.stdout.cancel();
-      throw new QRError("Unknown error");
+      throw new QRError('Unknown error');
   }
 
   const stdoutStr = await child.stdout.text();
-  if (!stdoutStr.startsWith("QR-Code:")) {
+  if (!stdoutStr.startsWith('QR-Code:')) {
     throw new QRError(`Unexpected data found: ${stdoutStr}`);
   }
-  for (let line of stdoutStr.split("\n")) {
+  for (let line of stdoutStr.split('\n')) {
     line = line.slice(9, line.length - 1); // Removes the Prefix and "{" "}"
     try {
       if (line.startsWith("'v'")) {
@@ -174,10 +161,10 @@ export async function parseQR(
 }
 
 function parsePageData(line: string): ExamPageQRData {
-  const fields = line.split(",");
+  const fields = line.split(',');
   const map: Record<string, string> = {};
   for (const f of fields) {
-    const [key, value] = f.split(":");
+    const [key, value] = f.split(':');
     switch (key) {
       case "'p'":
         map.page = value;
@@ -191,10 +178,10 @@ function parsePageData(line: string): ExamPageQRData {
 }
 
 function parseExamData(line: string): ExamQRData {
-  const fields = line.split(",");
+  const fields = line.split(',');
   const map: Record<string, string> = {};
   for (const f of fields) {
-    const [key, value] = f.split(":");
+    const [key, value] = f.split(':');
     switch (key) {
       case "'r'":
         map.code = value.slice(1, -1);
@@ -235,10 +222,7 @@ function mapToExamScan(map: Record<string, string>): ExamQRData {
 }
 
 function mapToExamPageScan(map: Record<string, string>): ExamPageQRData {
-  return new ExamPageQRData(
-    map.code,
-    parseInt(map.page),
-  );
+  return new ExamPageQRData(map.code, parseInt(map.page));
 }
 
 export type QRCacheStats = {
@@ -262,9 +246,9 @@ export function getQRCacheStats(cacheDir: string): QRCacheStats {
 
   try {
     for (const entry of Deno.readDirSync(cacheDir)) {
-      if (!entry.isFile || !entry.name.endsWith(".png")) continue;
+      if (!entry.isFile || !entry.name.endsWith('.png')) continue;
 
-      if (entry.name.startsWith("R4ND_")) {
+      if (entry.name.startsWith('R4ND_')) {
         const pageNum = parseInt(entry.name.slice(5, -4), 10);
         if (!isNaN(pageNum) && pageNum > pagesPerStudent) {
           pagesPerStudent = pageNum;
@@ -288,7 +272,7 @@ export function getQRCacheStats(cacheDir: string): QRCacheStats {
 
   for (let i = studentFilenames.length - 1; i >= 0; i--) {
     const name = studentFilenames[i];
-    const code = name.slice(0, name.indexOf("_"));
+    const code = name.slice(0, name.indexOf('_'));
     try {
       const { counter } = parseExamCode(code);
       return { studentsPerLanguage: counter, pagesPerStudent };
@@ -331,11 +315,13 @@ export async function ensureQRCache(
   console.log(
     `QR cache insufficient before generation ` +
       `(have ${current.studentsPerLanguage} students / ${current.pagesPerStudent} pages, ` +
-      `need ${
-        Math.max(requiredStudentsPerLanguage, current.studentsPerLanguage)
-      } / ${
-        Math.max(requiredPagesPerStudent, current.pagesPerStudent)
-      }. Generating more…`,
+      `need ${Math.max(
+        requiredStudentsPerLanguage,
+        current.studentsPerLanguage,
+      )} / ${Math.max(
+        requiredPagesPerStudent,
+        current.pagesPerStudent,
+      )}. Generating more…`,
   );
 
   await preGeneratePageQRCache(
@@ -366,9 +352,10 @@ export async function preGeneratePageQRCache(
   // If we only need more students (page count unchanged), generate incrementally.
   // If the required page count grew we must regenerate from student 1 so every
   // existing student also gets the extra page files.
-  const startStudentNumber = current.pagesPerStudent >= pagesPerStudent
-    ? current.studentsPerLanguage + 1
-    : 1;
+  const startStudentNumber =
+    current.pagesPerStudent >= pagesPerStudent
+      ? current.studentsPerLanguage + 1
+      : 1;
 
   const targetStudents = Math.max(
     studentsPerLanguage,
@@ -383,14 +370,14 @@ export async function preGeneratePageQRCache(
 
   await new Promise<void>((resolve, reject) => {
     const worker = new Worker(
-      new URL("./qr_cache_worker.ts", import.meta.url).href,
-      { type: "module" },
+      new URL('./qr_cache_worker.ts', import.meta.url).href,
+      { type: 'module' },
     );
 
     worker.onmessage = (e: MessageEvent) => {
       const data = e.data;
 
-      if (data?.status === "success") {
+      if (data?.status === 'success') {
         console.log(
           `QR cache warmup completed: generated ${data.generatedCount} files in ${QRConfig.cachePath}.`,
         );
@@ -402,7 +389,7 @@ export async function preGeneratePageQRCache(
           lastUpdated: new Date().toISOString(),
         };
 
-        getOrCreateDb().then((db) => {
+        getOrCreateDb().then(db => {
           db.setQRCache(updated);
 
           console.log(
@@ -417,12 +404,12 @@ export async function preGeneratePageQRCache(
       worker.terminate();
       reject(
         new QRError(
-          `QR cache warmup failed: ${data?.error ?? "unknown worker error"}`,
+          `QR cache warmup failed: ${data?.error ?? 'unknown worker error'}`,
         ),
       );
     };
 
-    worker.onerror = (error) => {
+    worker.onerror = error => {
       worker.terminate();
       reject(new QRError(`QR cache warmup worker failed: ${error.message}`));
     };
@@ -431,7 +418,7 @@ export async function preGeneratePageQRCache(
       startStudentNumber,
       studentsPerLanguage: targetStudents,
       pagesPerStudent: targetPages,
-      languages: ["DE", "EN"],
+      languages: ['DE', 'EN'],
     });
   });
 }

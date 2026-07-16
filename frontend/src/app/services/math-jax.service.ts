@@ -13,24 +13,23 @@ declare global {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MathJaxService {
-  
   // A variable to check if MathJax was successfully loaded
   private mathJaxLoaded: Promise<void>;
-  
+
   // Configure which MathJax version we want
   private mathJax: any = {
     source: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js',
-  }
+  };
 
   constructor() {
     this.mathJaxLoaded = this.loadMathJax()
       .then(() => {
         console.log('MathJax loaded');
       })
-      .catch((err) => {
+      .catch(err => {
         console.log('MathJax failed to load', err);
         // Fallback strategy in case the load doesn't succeed, e.g. load from local file
       });
@@ -43,7 +42,7 @@ export class MathJaxService {
   private async loadMathJax(): Promise<any> {
     return new Promise((resolve, reject) => {
       console.log('loading MathJax');
-      
+
       const script: HTMLScriptElement = document.createElement('script');
       script.type = 'text/javascript';
       script.src = this.mathJax.source;
@@ -51,13 +50,13 @@ export class MathJaxService {
 
       // Once the script is loaded, resolve the promise
       script.onload = () => {
-        resolve("MathJax loaded")
+        resolve('MathJax loaded');
       };
 
       // If there's an error, reject the promise
       script.onerror = () => {
-        reject("Error loading MathJax");
-      }
+        reject('Error loading MathJax');
+      };
 
       document.head.appendChild(script); // Append the script to start loading it
     });
@@ -65,7 +64,6 @@ export class MathJaxService {
 
   render() {
     window.MathJax.startup.promise.then(() => {
-
       console.log('Typesetting LaTex');
 
       window.MathJax.typesetPromise();

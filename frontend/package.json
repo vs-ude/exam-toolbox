@@ -1,15 +1,15 @@
 {
   "name": "frontend",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "e2e": "ng e2e",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run"
+    "format": "prettier --write \"src/**/*.{ts,html,scss,css,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,html,scss,css,json}\""
   },
   "private": true,
   "dependencies": {
@@ -32,7 +32,6 @@
     "@angular-devkit/build-angular": "^18.2.11",
     "@angular/cli": "^18.2.11",
     "@angular/compiler-cli": "^18.2.0",
-    "@cypress/schematic": "^4.3.0",
     "@types/file-saver": "^2.0.7",
     "@types/jasmine": "~5.1.0",
     "@types/zone.js": "^0.0.27",
@@ -42,7 +41,13 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.5.2",
-    "cypress": "15.11.0"
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.9.4",
+    "typescript": "~5.5.2"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,html,scss,css,json}": [
+      "prettier --write"
+    ]
   }
 }

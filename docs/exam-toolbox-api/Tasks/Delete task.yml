@@ -1,0 +1,67 @@
+info:
+  name: Delete task
+  type: http
+  seq: 10
+  tags:
+    - Tasks
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/taskPool/:taskId"
+  params:
+    - name: taskId
+      value: ""
+      type: path
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Deleted
+    request:
+      url: "{{baseUrl}}/api/taskPool/:taskId"
+      method: DELETE
+      params:
+        - name: taskId
+          value: ""
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+  - name: 404 Response
+    description: Not found
+    request:
+      url: "{{baseUrl}}/api/taskPool/:taskId"
+      method: DELETE
+      params:
+        - name: taskId
+          value: ""
+          type: path
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }

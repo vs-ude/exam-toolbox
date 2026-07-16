@@ -1,25 +1,44 @@
-import { Component, ElementRef, EventEmitter, Input, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { Task } from '../../../../exam';
-import { Tag } from '../../../../tag';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
+import { Task } from '../../../../types/shared/tasks';
+import { Tag } from '../../../../types/shared/tag';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-base-task',
   standalone: true,
   imports: [],
   template: '',
-  styleUrl: '../task.scss'
+  styleUrl: '../task.scss',
 })
 export abstract class BaseTaskComponent {
-  @Input() public taskId!: string;
-  @Input() public preTask?: Task;
-  @Input() public bilingual?: boolean;
-  @Input() public isModifiedPoolTask?: boolean;
-  @Output() deleteEvent = new EventEmitter<string>();
-  @Output() createNewTaskEvent = new EventEmitter<boolean>()
-  @Output() newTagEvent = new EventEmitter<void>();
-  @Output() previewEvent = new EventEmitter();
-  @ViewChild("questionFieldDE") questionFieldDE!: ElementRef;
-  @ViewChild("questionFieldEN") questionFieldEN?: ElementRef;
+  @Input()
+  public taskId?: string;
+  @Input()
+  public preTask?: Task;
+  @Input()
+  public bilingual?: boolean;
+  @Input()
+  public isModifiedPoolTask?: boolean;
+  @Output()
+  deleteEvent = new EventEmitter<string>();
+  @Output()
+  createNewTaskEvent = new EventEmitter<boolean>();
+  @Output()
+  newTagEvent = new EventEmitter<void>();
+  @Output()
+  previewEvent = new EventEmitter();
+  @ViewChild('questionFieldDE')
+  questionFieldDE!: ElementRef;
+  @ViewChild('questionFieldEN')
+  questionFieldEN?: ElementRef;
 
   abstract taskChangeEvent: EventEmitter<Task>;
 
@@ -37,7 +56,7 @@ export abstract class BaseTaskComponent {
   ngAfterViewInit() {
     this.questionFieldDE.nativeElement.innerHTML = this.task.question.DE;
 
-    if (this.questionFieldEN == undefined) { return; }
+    if (this.questionFieldEN == undefined) return;
     this.questionFieldEN.nativeElement.innerHTML = this.task.question.EN;
   }
 
@@ -54,12 +73,12 @@ export abstract class BaseTaskComponent {
   }
 
   ngAfterViewChecked(): void {
-    if (!this.languageChanged) { return; }
+    if (!this.languageChanged) return;
     this.languageChanged = false;
 
     this.questionFieldDE.nativeElement.innerHTML = this.task.question.DE;
 
-    if (this.questionFieldEN == undefined) { return; }
+    if (this.questionFieldEN == undefined) return;
     this.questionFieldEN.nativeElement.innerHTML = this.task.question.EN;
   }
 
@@ -84,12 +103,12 @@ export abstract class BaseTaskComponent {
   }
 
   public onDelete() {
-    this.deleteEvent.emit("delete");
+    this.deleteEvent.emit('delete');
   }
 
   public updateQuestion(event: Event, language: string) {
     const element = event.target as HTMLElement;
-    if (language === "DE") {
+    if (language === 'DE') {
       this.task.question.DE = element.innerHTML;
     } else {
       this.task.question.EN = element.innerHTML;
@@ -103,10 +122,10 @@ export abstract class BaseTaskComponent {
   }
 
   public onCreateNewTaskChange(state: boolean) {
-    console.log("Create New Task state changed to:", state);
+    console.log('Create New Task state changed to:', state);
     this.createNewTask = state;
     this.createNewTaskEvent.emit(this.createNewTask);
-    console.log("Emitted createNewTaskEvent with value:", this.createNewTask);
+    console.log('Emitted createNewTaskEvent with value:', this.createNewTask);
   }
 
   public onAddTag() {
@@ -116,5 +135,4 @@ export abstract class BaseTaskComponent {
   public onPreview() {
     this.previewEvent.emit();
   }
-
 }

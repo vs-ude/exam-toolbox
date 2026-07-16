@@ -1,43 +1,79 @@
 <div class="form-header">
-
   <!-- Bilingual -->
   <div *ngIf="bilingual" class="question-container" [@leftRightAnimation]>
     <div class="question-language-wrapper">
-      <span class="language_icon"><img src="german.svg" /></span>
-      <div #questionFieldDE contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
-        (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event,'DE')"
-        [attr.data-placeholder]="'Frage Eingeben...'"></div>
+      <span class="language_icon"
+        ><img [src]="publicPath + 'german.svg'"
+      /></span>
+      <div
+        #questionFieldDE
+        contenteditable="true"
+        class="form-question"
+        (focus)="activateFormatButtons()"
+        (blur)="deactivateFormatButtons($event)"
+        (input)="updateQuestion($event, 'DE')"
+        [attr.data-placeholder]="'Frage Eingeben...'"
+      ></div>
     </div>
     <div class="question-language-wrapper">
-      <span class="language_icon"><img src="english.svg" /></span>
-      <div #questionFieldEN contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
-        (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event, 'EN')"
-        [attr.data-placeholder]="'Enter Question...'"></div>
+      <span class="language_icon"
+        ><img [src]="publicPath + 'english.svg'"
+      /></span>
+      <div
+        #questionFieldEN
+        contenteditable="true"
+        class="form-question"
+        (focus)="activateFormatButtons()"
+        (blur)="deactivateFormatButtons($event)"
+        (input)="updateQuestion($event, 'EN')"
+        [attr.data-placeholder]="'Enter Question...'"
+      ></div>
     </div>
   </div>
 
   <!-- German -->
-  <div *ngIf="!bilingual" #questionFieldDE contenteditable="true" class="form-question"
-    (focus)="activateFormatButtons()" (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event,'DE')"
-    [attr.data-placeholder]="'Enter Question...'"></div>
+  <div
+    *ngIf="!bilingual"
+    #questionFieldDE
+    contenteditable="true"
+    class="form-question"
+    (focus)="activateFormatButtons()"
+    (blur)="deactivateFormatButtons($event)"
+    (input)="updateQuestion($event, 'DE')"
+    [attr.data-placeholder]="'Enter Question...'"
+  ></div>
 </div>
 
 <!-- Buttons for formatting -->
 <div *ngIf="isQuestionActive" [@inOutAnimation] class="form-toolbar">
-
-  <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('bold', $event)"
-    [ngStyle]="{ 'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-    <mat-icon aria-hidden="false" fontIcon="format_bold"></mat-icon>
+  <div
+    class="icon_wrapper format_icon"
+    (mousedown)="setQuestionFormat('bold', $event)"
+    [ngStyle]="{
+      'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+    }"
+  >
+    <mat-icon aria-hidden="false">format_bold</mat-icon>
   </div>
 
-  <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('italic', $event)"
-    [ngStyle]="{ 'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-    <mat-icon aria-hidden="false" fontIcon="format_italic"></mat-icon>
+  <div
+    class="icon_wrapper format_icon"
+    (mousedown)="setQuestionFormat('italic', $event)"
+    [ngStyle]="{
+      'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+    }"
+  >
+    <mat-icon aria-hidden="false">format_italic</mat-icon>
   </div>
 
-  <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('underline', $event)"
-    [ngStyle]="{ 'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-    <mat-icon aria-hidden="false" fontIcon="format_underline"></mat-icon>
+  <div
+    class="icon_wrapper format_icon"
+    (mousedown)="setQuestionFormat('underline', $event)"
+    [ngStyle]="{
+      'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+    }"
+  >
+    <mat-icon aria-hidden="false">format_underlined</mat-icon>
   </div>
 </div>
 
@@ -49,65 +85,115 @@
   </label>
 </div> -->
 
-
 <!-- German -->
 <div *ngIf="!bilingual">
-  <div class="table-header">
-    Question:
-  </div>
+  <div class="table-header">Question:</div>
 
-  <div class="table-task-container" style="display: flex; align-items: flex-start;">
-    <table class="editable-table" style="flex: 1;">
+  <div
+    class="table-task-container"
+    style="display: flex; align-items: flex-start"
+  >
+    <table class="editable-table" style="flex: 1">
       <thead *ngIf="hasHeader">
         <tr>
-          <th *ngFor="let cell of task.tableDataQuestion[0]; let i = index" class="table-header">
+          <th
+            *ngFor="let cell of task.tableDataQuestion[0]; let i = index"
+            class="table-header"
+          >
             <div class="header-input-container">
-              <input type="text" class="header-input" [(ngModel)]="task.tableHeadersQuestion[i].DE"
-                (ngModelChange)="updateTask()" (keydown.enter)="blurOnEnter($event)" />
-              <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
-                <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+              <input
+                type="text"
+                class="header-input"
+                [(ngModel)]="task.tableHeadersQuestion[i].DE"
+                (ngModelChange)="updateTask()"
+                (keydown.enter)="blurOnEnter($event)"
+              />
+              <button
+                type="button"
+                class="remove-col-btn"
+                (click)="removeColumn(i)"
+              >
+                <span style="color: #e57373; font-size: 1.2em">&minus;</span>
               </button>
             </div>
           </th>
           <th>
-            <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
-              <span style="font-size: 1.5em; color: #81c784;">+</span>
+            <button
+              class="add-column-btn"
+              (click)="addColumn()"
+              matTooltip="Add column"
+              type="button"
+            >
+              <span style="font-size: 1.5em; color: #81c784">+</span>
             </button>
           </th>
         </tr>
       </thead>
       <thead *ngIf="!hasHeader">
         <tr>
-          <th *ngFor="let cell of task.tableDataQuestion[0]; let i = index" class="table-header">
-            <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
-              <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+          <th
+            *ngFor="let cell of task.tableDataQuestion[0]; let i = index"
+            class="table-header"
+          >
+            <button
+              type="button"
+              class="remove-col-btn"
+              (click)="removeColumn(i)"
+            >
+              <span style="color: #e57373; font-size: 1.2em">&minus;</span>
             </button>
           </th>
           <th>
-            <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
-              <span style="font-size: 1.5em; color: #81c784;">+</span>
+            <button
+              class="add-column-btn"
+              (click)="addColumn()"
+              matTooltip="Add column"
+              type="button"
+            >
+              <span style="font-size: 1.5em; color: #81c784">+</span>
             </button>
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let row of task.tableDataQuestion; let i = index; trackBy: trackByIndex">
+        <tr
+          *ngFor="
+            let row of task.tableDataQuestion;
+            let i = index;
+            trackBy: trackByIndex
+          "
+        >
           <td *ngFor="let cell of row; let j = index" class="table-cell">
             <div class="cell-input-container">
-              <input type="text" class="cell-input" [(ngModel)]="task.tableDataQuestion[i][j].DE"
-                (ngModelChange)="updateTask()" (keydown.enter)="blurOnEnter($event)" />
+              <input
+                type="text"
+                class="cell-input"
+                [(ngModel)]="task.tableDataQuestion[i][j].DE"
+                (ngModelChange)="updateTask()"
+                (keydown.enter)="blurOnEnter($event)"
+              />
             </div>
           </td>
           <td>
             <button type="button" class="remove-row-btn" (click)="removeRow(i)">
-              <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+              <span style="color: #e57373; font-size: 1.2em">&minus;</span>
             </button>
           </td>
         </tr>
         <tr>
-          <td [attr.colspan]="(task.tableDataQuestion[0] ? task.tableDataQuestion[0].length : 0) + 1">
+          <td
+            [attr.colspan]="
+              (task.tableDataQuestion[0]
+                ? task.tableDataQuestion[0].length
+                : 0) + 1
+            "
+          >
             <button type="button" class="add-row-btn" (click)="addRow()">
-              <span style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch;">+</span> Add Row
+              <span
+                style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch"
+                >+</span
+              >
+              Add Row
             </button>
           </td>
         </tr>
@@ -115,64 +201,113 @@
     </table>
   </div>
 
+  <div class="table-header">Solution:</div>
 
-
-  <div class="table-header">
-    Solution:
-  </div>
-
-  <div class="table-task-container" style="display: flex; align-items: flex-start;">
-    <table class="editable-table" style="flex: 1;">
+  <div
+    class="table-task-container"
+    style="display: flex; align-items: flex-start"
+  >
+    <table class="editable-table" style="flex: 1">
       <thead *ngIf="hasHeader">
         <tr>
-          <th *ngFor="let cell of task.tableDataSolution[0]; let i = index" class="table-header">
+          <th
+            *ngFor="let cell of task.tableDataSolution[0]; let i = index"
+            class="table-header"
+          >
             <div class="header-input-container">
-              <input type="text" class="header-input" [(ngModel)]="task.tableHeadersSolution[i].DE"
-                (ngModelChange)="updateTask()" (keydown.enter)="blurOnEnter($event)" />
-              <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
-                <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+              <input
+                type="text"
+                class="header-input"
+                [(ngModel)]="task.tableHeadersSolution[i].DE"
+                (ngModelChange)="updateTask()"
+                (keydown.enter)="blurOnEnter($event)"
+              />
+              <button
+                type="button"
+                class="remove-col-btn"
+                (click)="removeColumn(i)"
+              >
+                <span style="color: #e57373; font-size: 1.2em">&minus;</span>
               </button>
             </div>
           </th>
           <th>
-            <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
-              <span style="font-size: 1.5em; color: #81c784;">+</span>
+            <button
+              class="add-column-btn"
+              (click)="addColumn()"
+              matTooltip="Add column"
+              type="button"
+            >
+              <span style="font-size: 1.5em; color: #81c784">+</span>
             </button>
           </th>
         </tr>
       </thead>
       <thead *ngIf="!hasHeader">
         <tr>
-          <th *ngFor="let cell of task.tableDataSolution[0]; let i = index" class="table-header">
-            <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
-              <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+          <th
+            *ngFor="let cell of task.tableDataSolution[0]; let i = index"
+            class="table-header"
+          >
+            <button
+              type="button"
+              class="remove-col-btn"
+              (click)="removeColumn(i)"
+            >
+              <span style="color: #e57373; font-size: 1.2em">&minus;</span>
             </button>
           </th>
           <th>
-            <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
-              <span style="font-size: 1.5em; color: #81c784;">+</span>
+            <button
+              class="add-column-btn"
+              (click)="addColumn()"
+              matTooltip="Add column"
+              type="button"
+            >
+              <span style="font-size: 1.5em; color: #81c784">+</span>
             </button>
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let row of task.tableDataSolution; let i = index; trackBy: trackByIndex">
+        <tr
+          *ngFor="
+            let row of task.tableDataSolution;
+            let i = index;
+            trackBy: trackByIndex
+          "
+        >
           <td *ngFor="let cell of row; let j = index" class="table-cell">
             <div class="cell-input-container">
-              <input type="text" class="cell-input" [(ngModel)]="task.tableDataSolution[i][j].DE"
-                (ngModelChange)="updateTask()" (keydown.enter)="blurOnEnter($event)" />
+              <input
+                type="text"
+                class="cell-input"
+                [(ngModel)]="task.tableDataSolution[i][j].DE"
+                (ngModelChange)="updateTask()"
+                (keydown.enter)="blurOnEnter($event)"
+              />
             </div>
           </td>
           <td>
             <button type="button" class="remove-row-btn" (click)="removeRow(i)">
-              <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+              <span style="color: #e57373; font-size: 1.2em">&minus;</span>
             </button>
           </td>
         </tr>
         <tr>
-          <td [attr.colspan]="(task.tableDataSolution[0] ? task.tableDataSolution[0].length : 0) + 1">
+          <td
+            [attr.colspan]="
+              (task.tableDataSolution[0]
+                ? task.tableDataSolution[0].length
+                : 0) + 1
+            "
+          >
             <button type="button" class="add-row-btn" (click)="addRow()">
-              <span style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch;">+</span> Add Row
+              <span
+                style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch"
+                >+</span
+              >
+              Add Row
             </button>
           </td>
         </tr>
@@ -180,71 +315,127 @@
     </table>
   </div>
 </div>
-
 
 <!-- Bilingual -->
 <div *ngIf="bilingual">
-
-
   <!-- Question -->
   <div class="bilingual-container">
-    <div class="table-header" style="display: flex; gap: 2%;">
-      <span class="language_icon"><img src="german.svg" /></span>
+    <div class="table-header" style="display: flex; gap: 2%">
+      <span class="language_icon"
+        ><img [src]="publicPath + 'german.svg'"
+      /></span>
       Frage:
     </div>
 
-    <div class="table-task-container" style="display: flex; align-items: flex-start;">
-      <table class="editable-table" style="flex: 1;">
+    <div
+      class="table-task-container"
+      style="display: flex; align-items: flex-start"
+    >
+      <table class="editable-table" style="flex: 1">
         <thead *ngIf="hasHeader">
           <tr>
-            <th *ngFor="let cell of task.tableDataQuestion[0]; let i = index" class="table-header">
+            <th
+              *ngFor="let cell of task.tableDataQuestion[0]; let i = index"
+              class="table-header"
+            >
               <div class="header-input-container">
-                <input type="text" class="header-input" [(ngModel)]="task.tableHeadersQuestion[i].DE"
-                  (ngModelChange)="updateTask()" (keydown.enter)="blurOnEnter($event)" />
-                <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
-                  <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+                <input
+                  type="text"
+                  class="header-input"
+                  [(ngModel)]="task.tableHeadersQuestion[i].DE"
+                  (ngModelChange)="updateTask()"
+                  (keydown.enter)="blurOnEnter($event)"
+                />
+                <button
+                  type="button"
+                  class="remove-col-btn"
+                  (click)="removeColumn(i)"
+                >
+                  <span style="color: #e57373; font-size: 1.2em">&minus;</span>
                 </button>
               </div>
             </th>
             <th>
-              <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
-                <span style="font-size: 1.5em; color: #81c784;">+</span>
+              <button
+                class="add-column-btn"
+                (click)="addColumn()"
+                matTooltip="Add column"
+                type="button"
+              >
+                <span style="font-size: 1.5em; color: #81c784">+</span>
               </button>
             </th>
           </tr>
         </thead>
         <thead *ngIf="!hasHeader">
           <tr>
-            <th *ngFor="let cell of task.tableDataQuestion[0]; let i = index" class="table-header">
-              <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
-                <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+            <th
+              *ngFor="let cell of task.tableDataQuestion[0]; let i = index"
+              class="table-header"
+            >
+              <button
+                type="button"
+                class="remove-col-btn"
+                (click)="removeColumn(i)"
+              >
+                <span style="color: #e57373; font-size: 1.2em">&minus;</span>
               </button>
             </th>
             <th>
-              <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
-                <span style="font-size: 1.5em; color: #81c784;">+</span>
+              <button
+                class="add-column-btn"
+                (click)="addColumn()"
+                matTooltip="Add column"
+                type="button"
+              >
+                <span style="font-size: 1.5em; color: #81c784">+</span>
               </button>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of task.tableDataQuestion; let i = index; trackBy: trackByIndex">
+          <tr
+            *ngFor="
+              let row of task.tableDataQuestion;
+              let i = index;
+              trackBy: trackByIndex
+            "
+          >
             <td *ngFor="let cell of row; let j = index" class="table-cell">
               <div class="cell-input-container">
-                <input type="text" class="cell-input" [(ngModel)]="task.tableDataQuestion[i][j].DE"
-                  (ngModelChange)="updateTask()" (keydown.enter)="blurOnEnter($event)" />
+                <input
+                  type="text"
+                  class="cell-input"
+                  [(ngModel)]="task.tableDataQuestion[i][j].DE"
+                  (ngModelChange)="updateTask()"
+                  (keydown.enter)="blurOnEnter($event)"
+                />
               </div>
             </td>
             <td>
-              <button type="button" class="remove-row-btn" (click)="removeRow(i)">
-                <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+              <button
+                type="button"
+                class="remove-row-btn"
+                (click)="removeRow(i)"
+              >
+                <span style="color: #e57373; font-size: 1.2em">&minus;</span>
               </button>
             </td>
           </tr>
           <tr>
-            <td [attr.colspan]="(task.tableDataQuestion[0] ? task.tableDataQuestion[0].length : 0) + 1">
+            <td
+              [attr.colspan]="
+                (task.tableDataQuestion[0]
+                  ? task.tableDataQuestion[0].length
+                  : 0) + 1
+              "
+            >
               <button type="button" class="add-row-btn" (click)="addRow()">
-                <span style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch;">+</span> Add Row
+                <span
+                  style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch"
+                  >+</span
+                >
+                Add Row
               </button>
             </td>
           </tr>
@@ -252,134 +443,248 @@
       </table>
     </div>
 
-
-    <div class="table-header" style="display: flex; gap: 2%;">
-      <span class="language_icon"><img src="english.svg" /></span>
+    <div class="table-header" style="display: flex; gap: 2%">
+      <span class="language_icon"
+        ><img [src]="publicPath + 'english.svg'"
+      /></span>
       Question:
     </div>
 
-    <div class="table-task-container" style="display: flex; align-items: flex-start;">
-      <table class="editable-table" style="flex: 1;">
+    <div
+      class="table-task-container"
+      style="display: flex; align-items: flex-start"
+    >
+      <table class="editable-table" style="flex: 1">
         <thead *ngIf="hasHeader">
           <tr>
-            <th *ngFor="let cell of task.tableDataQuestion[0]; let i = index" class="table-header">
+            <th
+              *ngFor="let cell of task.tableDataQuestion[0]; let i = index"
+              class="table-header"
+            >
               <div class="header-input-container">
-                <input type="text" class="header-input" [(ngModel)]="task.tableHeadersQuestion[i].EN"
-                  (ngModelChange)="updateTask()" (keydown.enter)="blurOnEnter($event)" />
-                <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
-                  <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+                <input
+                  type="text"
+                  class="header-input"
+                  [(ngModel)]="task.tableHeadersQuestion[i].EN"
+                  (ngModelChange)="updateTask()"
+                  (keydown.enter)="blurOnEnter($event)"
+                />
+                <button
+                  type="button"
+                  class="remove-col-btn"
+                  (click)="removeColumn(i)"
+                >
+                  <span style="color: #e57373; font-size: 1.2em">&minus;</span>
                 </button>
               </div>
             </th>
             <th>
-              <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
-                <span style="font-size: 1.5em; color: #81c784;">+</span>
+              <button
+                class="add-column-btn"
+                (click)="addColumn()"
+                matTooltip="Add column"
+                type="button"
+              >
+                <span style="font-size: 1.5em; color: #81c784">+</span>
               </button>
             </th>
           </tr>
         </thead>
         <thead *ngIf="!hasHeader">
           <tr>
-            <th *ngFor="let cell of task.tableDataQuestion[0]; let i = index" class="table-header">
-              <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
-                <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+            <th
+              *ngFor="let cell of task.tableDataQuestion[0]; let i = index"
+              class="table-header"
+            >
+              <button
+                type="button"
+                class="remove-col-btn"
+                (click)="removeColumn(i)"
+              >
+                <span style="color: #e57373; font-size: 1.2em">&minus;</span>
               </button>
             </th>
             <th>
-              <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
-                <span style="font-size: 1.5em; color: #81c784;">+</span>
+              <button
+                class="add-column-btn"
+                (click)="addColumn()"
+                matTooltip="Add column"
+                type="button"
+              >
+                <span style="font-size: 1.5em; color: #81c784">+</span>
               </button>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of task.tableDataQuestion; let i = index; trackBy: trackByIndex">
+          <tr
+            *ngFor="
+              let row of task.tableDataQuestion;
+              let i = index;
+              trackBy: trackByIndex
+            "
+          >
             <td *ngFor="let cell of row; let j = index" class="table-cell">
               <div class="cell-input-container">
-                <input type="text" class="cell-input" [(ngModel)]="task.tableDataQuestion[i][j].EN"
-                  (ngModelChange)="updateTask()" (keydown.enter)="blurOnEnter($event)" />
+                <input
+                  type="text"
+                  class="cell-input"
+                  [(ngModel)]="task.tableDataQuestion[i][j].EN"
+                  (ngModelChange)="updateTask()"
+                  (keydown.enter)="blurOnEnter($event)"
+                />
               </div>
             </td>
             <td>
-              <button type="button" class="remove-row-btn" (click)="removeRow(i)">
-                <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+              <button
+                type="button"
+                class="remove-row-btn"
+                (click)="removeRow(i)"
+              >
+                <span style="color: #e57373; font-size: 1.2em">&minus;</span>
               </button>
             </td>
           </tr>
           <tr>
-            <td [attr.colspan]="(task.tableDataQuestion[0] ? task.tableDataQuestion[0].length : 0) + 1">
+            <td
+              [attr.colspan]="
+                (task.tableDataQuestion[0]
+                  ? task.tableDataQuestion[0].length
+                  : 0) + 1
+              "
+            >
               <button type="button" class="add-row-btn" (click)="addRow()">
-                <span style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch;">+</span> Add Row
+                <span
+                  style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch"
+                  >+</span
+                >
+                Add Row
               </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-
-
   </div>
 
   <!-- Solution -->
-  <div class="bilingual-container" style="margin-top: 1em;">
-
-    <div class="table-header" style="display: flex; gap: 2%;">
-      <span class="language_icon"><img src="german.svg" /></span>
+  <div class="bilingual-container" style="margin-top: 1em">
+    <div class="table-header" style="display: flex; gap: 2%">
+      <span class="language_icon"
+        ><img [src]="publicPath + 'german.svg'"
+      /></span>
       Lösung:
     </div>
 
-    <div class="table-task-container" style="display: flex; align-items: flex-start;">
-      <table class="editable-table" style="flex: 1;">
+    <div
+      class="table-task-container"
+      style="display: flex; align-items: flex-start"
+    >
+      <table class="editable-table" style="flex: 1">
         <thead *ngIf="hasHeader">
           <tr>
-            <th *ngFor="let cell of task.tableDataSolution[0]; let i = index" class="table-header">
+            <th
+              *ngFor="let cell of task.tableDataSolution[0]; let i = index"
+              class="table-header"
+            >
               <div class="header-input-container">
-                <input type="text" class="header-input" [(ngModel)]="task.tableHeadersSolution[i].DE"
-                  (ngModelChange)="updateTask()" (keydown.enter)="blurOnEnter($event)" />
-                <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
-                  <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+                <input
+                  type="text"
+                  class="header-input"
+                  [(ngModel)]="task.tableHeadersSolution[i].DE"
+                  (ngModelChange)="updateTask()"
+                  (keydown.enter)="blurOnEnter($event)"
+                />
+                <button
+                  type="button"
+                  class="remove-col-btn"
+                  (click)="removeColumn(i)"
+                >
+                  <span style="color: #e57373; font-size: 1.2em">&minus;</span>
                 </button>
               </div>
             </th>
             <th>
-              <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
-                <span style="font-size: 1.5em; color: #81c784;">+</span>
+              <button
+                class="add-column-btn"
+                (click)="addColumn()"
+                matTooltip="Add column"
+                type="button"
+              >
+                <span style="font-size: 1.5em; color: #81c784">+</span>
               </button>
             </th>
           </tr>
         </thead>
         <thead *ngIf="!hasHeader">
           <tr>
-            <th *ngFor="let cell of task.tableDataSolution[0]; let i = index" class="table-header">
-              <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
-                <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+            <th
+              *ngFor="let cell of task.tableDataSolution[0]; let i = index"
+              class="table-header"
+            >
+              <button
+                type="button"
+                class="remove-col-btn"
+                (click)="removeColumn(i)"
+              >
+                <span style="color: #e57373; font-size: 1.2em">&minus;</span>
               </button>
             </th>
             <th>
-              <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
-                <span style="font-size: 1.5em; color: #81c784;">+</span>
+              <button
+                class="add-column-btn"
+                (click)="addColumn()"
+                matTooltip="Add column"
+                type="button"
+              >
+                <span style="font-size: 1.5em; color: #81c784">+</span>
               </button>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of task.tableDataSolution; let i = index; trackBy: trackByIndex">
+          <tr
+            *ngFor="
+              let row of task.tableDataSolution;
+              let i = index;
+              trackBy: trackByIndex
+            "
+          >
             <td *ngFor="let cell of row; let j = index" class="table-cell">
               <div class="cell-input-container">
-                <input type="text" class="cell-input" [(ngModel)]="task.tableDataSolution[i][j].DE"
-                  (ngModelChange)="updateTask()" (keydown.enter)="blurOnEnter($event)" />
+                <input
+                  type="text"
+                  class="cell-input"
+                  [(ngModel)]="task.tableDataSolution[i][j].DE"
+                  (ngModelChange)="updateTask()"
+                  (keydown.enter)="blurOnEnter($event)"
+                />
               </div>
             </td>
             <td>
-              <button type="button" class="remove-row-btn" (click)="removeRow(i)">
-                <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+              <button
+                type="button"
+                class="remove-row-btn"
+                (click)="removeRow(i)"
+              >
+                <span style="color: #e57373; font-size: 1.2em">&minus;</span>
               </button>
             </td>
           </tr>
           <tr>
-            <td [attr.colspan]="(task.tableDataSolution[0] ? task.tableDataSolution[0].length : 0) + 1">
+            <td
+              [attr.colspan]="
+                (task.tableDataSolution[0]
+                  ? task.tableDataSolution[0].length
+                  : 0) + 1
+              "
+            >
               <button type="button" class="add-row-btn" (click)="addRow()">
-                <span style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch;">+</span> Add Row
+                <span
+                  style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch"
+                  >+</span
+                >
+                Add Row
               </button>
             </td>
           </tr>
@@ -387,85 +692,138 @@
       </table>
     </div>
 
-
-    <div class="table-header" style="display: flex; gap: 2%;">
-      <span class="language_icon"><img src="english.svg" /></span>
+    <div class="table-header" style="display: flex; gap: 2%">
+      <span class="language_icon"
+        ><img [src]="publicPath + 'english.svg'"
+      /></span>
       Solution:
     </div>
 
-    <div class="table-task-container" style="display: flex; align-items: flex-start;">
-      <table class="editable-table" style="flex: 1;">
+    <div
+      class="table-task-container"
+      style="display: flex; align-items: flex-start"
+    >
+      <table class="editable-table" style="flex: 1">
         <thead *ngIf="hasHeader">
           <tr>
-            <th *ngFor="let cell of task.tableDataSolution[0]; let i = index" class="table-header">
+            <th
+              *ngFor="let cell of task.tableDataSolution[0]; let i = index"
+              class="table-header"
+            >
               <div class="header-input-container">
-                <input type="text" class="header-input" [(ngModel)]="task.tableHeadersSolution[i].EN"
-                  (ngModelChange)="updateTask()" (keydown.enter)="blurOnEnter($event)" />
-                <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
-                  <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+                <input
+                  type="text"
+                  class="header-input"
+                  [(ngModel)]="task.tableHeadersSolution[i].EN"
+                  (ngModelChange)="updateTask()"
+                  (keydown.enter)="blurOnEnter($event)"
+                />
+                <button
+                  type="button"
+                  class="remove-col-btn"
+                  (click)="removeColumn(i)"
+                >
+                  <span style="color: #e57373; font-size: 1.2em">&minus;</span>
                 </button>
               </div>
             </th>
             <th>
-              <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
-                <span style="font-size: 1.5em; color: #81c784;">+</span>
+              <button
+                class="add-column-btn"
+                (click)="addColumn()"
+                matTooltip="Add column"
+                type="button"
+              >
+                <span style="font-size: 1.5em; color: #81c784">+</span>
               </button>
             </th>
           </tr>
         </thead>
         <thead *ngIf="!hasHeader">
           <tr>
-            <th *ngFor="let cell of task.tableDataSolution[0]; let i = index" class="table-header">
-              <button type="button" class="remove-col-btn" (click)="removeColumn(i)">
-                <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+            <th
+              *ngFor="let cell of task.tableDataSolution[0]; let i = index"
+              class="table-header"
+            >
+              <button
+                type="button"
+                class="remove-col-btn"
+                (click)="removeColumn(i)"
+              >
+                <span style="color: #e57373; font-size: 1.2em">&minus;</span>
               </button>
             </th>
             <th>
-              <button class="add-column-btn" (click)="addColumn()" matTooltip="Add column" type="button">
-                <span style="font-size: 1.5em; color: #81c784;">+</span>
+              <button
+                class="add-column-btn"
+                (click)="addColumn()"
+                matTooltip="Add column"
+                type="button"
+              >
+                <span style="font-size: 1.5em; color: #81c784">+</span>
               </button>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of task.tableDataSolution; let i = index; trackBy: trackByIndex">
+          <tr
+            *ngFor="
+              let row of task.tableDataSolution;
+              let i = index;
+              trackBy: trackByIndex
+            "
+          >
             <td *ngFor="let cell of row; let j = index" class="table-cell">
               <div class="cell-input-container">
-                <input type="text" class="cell-input" [(ngModel)]="task.tableDataSolution[i][j].EN"
-                  (ngModelChange)="updateTask()" (keydown.enter)="blurOnEnter($event)" />
+                <input
+                  type="text"
+                  class="cell-input"
+                  [(ngModel)]="task.tableDataSolution[i][j].EN"
+                  (ngModelChange)="updateTask()"
+                  (keydown.enter)="blurOnEnter($event)"
+                />
               </div>
             </td>
             <td>
-              <button type="button" class="remove-row-btn" (click)="removeRow(i)">
-                <span style="color: #e57373; font-size: 1.2em;">&minus;</span>
+              <button
+                type="button"
+                class="remove-row-btn"
+                (click)="removeRow(i)"
+              >
+                <span style="color: #e57373; font-size: 1.2em">&minus;</span>
               </button>
             </td>
           </tr>
           <tr>
-            <td [attr.colspan]="(task.tableDataSolution[0] ? task.tableDataSolution[0].length : 0) + 1">
+            <td
+              [attr.colspan]="
+                (task.tableDataSolution[0]
+                  ? task.tableDataSolution[0].length
+                  : 0) + 1
+              "
+            >
               <button type="button" class="add-row-btn" (click)="addRow()">
-                <span style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch;">+</span> Add Row
+                <span
+                  style="font-size: 1.5em; color: #81c784; margin-right: 0.5ch"
+                  >+</span
+                >
+                Add Row
               </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-
-
   </div>
 </div>
 
-
-
-
-
-<app-task-footer 
+<app-task-footer
   [task]="task"
   [isModifiedPoolTask]="isModifiedPoolTask"
   (deleteEvent)="onDelete()"
   (createNewTaskEvent)="onCreateNewTaskChange($event)"
-  (newTagEvent)="onAddTag()" 
+  (newTagEvent)="onAddTag()"
   (previewEvent)="onPreview()"
-  (taskChangeEvent)="updateTask()">
+  (taskChangeEvent)="updateTask()"
+>
 </app-task-footer>

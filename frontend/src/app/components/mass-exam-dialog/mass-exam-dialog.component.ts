@@ -1,18 +1,18 @@
-import { Component, Inject, OnDestroy, OnInit } from "@angular/core";
-import { MatDialogModule, MatDialogRef } from "@angular/material/dialog";
-import { MatButtonModule } from "@angular/material/button";
-import { MatIconModule } from "@angular/material/icon";
-import { ApiService, JobStatus } from "../../services/api.service";
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { saveAs } from "file-saver";
-import { CommonModule } from "@angular/common";
-import { MatProgressBarModule } from "@angular/material/progress-bar";
-import { MatSlideToggleModule } from "@angular/material/slide-toggle";
-import { Router } from "@angular/router";
-import { FormsModule } from "@angular/forms";
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { ApiService, JobStatus } from '../../services/api.service';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { saveAs } from 'file-saver';
+import { CommonModule } from '@angular/common';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: "app-mass-exam-dialog",
+  selector: 'app-mass-exam-dialog',
   standalone: true,
   imports: [
     CommonModule,
@@ -23,8 +23,8 @@ import { FormsModule } from "@angular/forms";
     MatSlideToggleModule,
     FormsModule,
   ],
-  templateUrl: "./mass-exam-dialog.component.html",
-  styleUrl: "./mass-exam-dialog.component.scss",
+  templateUrl: './mass-exam-dialog.component.html',
+  styleUrl: './mass-exam-dialog.component.scss',
 })
 export class MassExamDialogComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
@@ -33,9 +33,9 @@ export class MassExamDialogComponent implements OnInit, OnDestroy {
   isSingleMode = false;
   startSeatNumber = 1;
   singleStudent = {
-    firstName: "",
-    lastName: "",
-    studentId: "",
+    firstName: '',
+    lastName: '',
+    studentId: '',
   };
 
   // Job State
@@ -57,7 +57,7 @@ export class MassExamDialogComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Check backend if there is already a running job for this exam
     this.api.getActiveJob(this.data.exam._id).subscribe({
-      next: (activeJob) => {
+      next: activeJob => {
         if (activeJob) {
           console.log(`Resuming active job: ${activeJob.jobId}`);
 
@@ -81,8 +81,8 @@ export class MassExamDialogComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         }
       },
-      error: (err) => {
-        console.error("Failed to check active job:", err);
+      error: err => {
+        console.error('Failed to check active job:', err);
         // On error just show the upload form so user isn't stuck
         this.isLoading = false;
       },
@@ -99,18 +99,18 @@ export class MassExamDialogComponent implements OnInit, OnDestroy {
   createSingleStudentCsv(): File {
     // Backend expects the padding rows to be present
     // And SheetJS on the Backend is too smart, so the rows can't be empty
-    const dummyRow = "IGNORE,IGNORE,IGNORE,IGNORE,IGNORE,IGNORE";
+    const dummyRow = 'IGNORE,IGNORE,IGNORE,IGNORE,IGNORE,IGNORE';
     const paddingRows = [dummyRow, dummyRow, dummyRow, dummyRow, dummyRow].join(
-      "\n",
+      '\n',
     );
 
     // Columns match backend header: [0]PlanId, [1]ExamNr, [2]Title, [3]LastName, [4]FirstName, [5]StudentId
     const studentRow = `123,DUMMY,SingleExam,${this.singleStudent.lastName},${this.singleStudent.firstName},${this.singleStudent.studentId}`;
 
-    const csvContent = paddingRows + "\n" + studentRow;
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    return new File([blob], "single_student_generated.csv", {
-      type: "text/csv",
+    const csvContent = paddingRows + '\n' + studentRow;
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    return new File([blob], 'single_student_generated.csv', {
+      type: 'text/csv',
     });
   }
 
@@ -128,14 +128,14 @@ export class MassExamDialogComponent implements OnInit, OnDestroy {
         !this.singleStudent.lastName ||
         !this.singleStudent.studentId
       ) {
-        this.handleError("Please fill out all student fields.");
+        this.handleError('Please fill out all student fields.');
         return;
       }
       fileToUpload = this.createSingleStudentCsv();
     } else {
       // Mass Exam Generation
       if (!this.selectedFile) {
-        this.handleError("Please select a file.");
+        this.handleError('Please select a file.');
         return;
       }
       fileToUpload = this.selectedFile;
@@ -148,14 +148,14 @@ export class MassExamDialogComponent implements OnInit, OnDestroy {
         this.startSeatNumber,
       )
       .subscribe({
-        next: (response) => {
+        next: response => {
           this.jobId = response.jobId;
           console.log(`Job started with ID: ${this.jobId}`);
           this.startPolling();
         },
-        error: (err) => {
-          this.handleError("Failed to start the generation job.");
-          console.error("Error starting job: ", err);
+        error: err => {
+          this.handleError('Failed to start the generation job.');
+          console.error('Error starting job: ', err);
         },
       });
   }
@@ -167,11 +167,11 @@ export class MassExamDialogComponent implements OnInit, OnDestroy {
 
     this.api.cancelJob(this.jobId).subscribe({
       next: () => {
-        this.handleError("Generation has been cancelled.");
+        this.handleError('Generation has been cancelled.');
       },
-      error: (err) => {
-        this.handleError("Cancellation requested, but an error occurred.");
-        console.error("Error cancelling job:", err);
+      error: err => {
+        this.handleError('Cancellation requested, but an error occurred.');
+        console.error('Error cancelling job:', err);
       },
     });
   }
@@ -187,25 +187,25 @@ export class MassExamDialogComponent implements OnInit, OnDestroy {
       }
 
       this.api.getJobStatus(this.jobId).subscribe({
-        next: (status) => {
+        next: status => {
           this.jobStatus = status;
-          if (status.status === "completed") {
+          if (status.status === 'completed') {
             this.stopPolling();
             this.isLoading = false;
             if (this.autoDownload) {
               this.downloadResult();
             }
-          } else if (status.status === "failed") {
+          } else if (status.status === 'failed') {
             this.stopPolling();
             this.handleError(
-              "Exam generation failed. Please check the backend logs for details.",
+              'Exam generation failed. Please check the backend logs for details.',
             );
           }
         },
-        error: (err) => {
+        error: err => {
           this.stopPolling();
-          this.handleError("Failed to get job status.");
-          console.error("Polling error:", err);
+          this.handleError('Failed to get job status.');
+          console.error('Polling error:', err);
         },
       });
     }, 1000);
@@ -220,16 +220,16 @@ export class MassExamDialogComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.downloadSuccessful = true;
       },
-      error: (err) => {
-        this.handleError("Failed to download the final ZIP file.");
-        console.error("Download error:", err);
+      error: err => {
+        this.handleError('Failed to download the final ZIP file.');
+        console.error('Download error:', err);
       },
     });
   }
 
   navigateToExamsPool() {
     this.dialogRef.close();
-    this.router.navigate(["/exams-pool"]);
+    this.router.navigate(['/exams-pool']);
   }
 
   private stopPolling() {

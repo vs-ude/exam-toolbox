@@ -8,9 +8,8 @@ describe('MassExamDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MassExamDialogComponent]
-    })
-    .compileComponents();
+      imports: [MassExamDialogComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(MassExamDialogComponent);
     component = fixture.componentInstance;

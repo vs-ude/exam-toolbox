@@ -3,28 +3,25 @@ import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export enum Theme {
-  LIGHT = "light",
-  DARK = "dark",
+  LIGHT = 'light',
+  DARK = 'dark',
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ThemeToggleService {
-
   private currentTheme: Theme = Theme.LIGHT;
   private themeChangedSubject = new BehaviorSubject<Theme>(this.currentTheme);
   public themeChanged$: Observable<Theme>;
 
-  constructor(
-    @Inject(DOCUMENT) private document: Document
-  ) {
+  constructor(@Inject(DOCUMENT) private document: Document) {
     this.themeChanged$ = this.themeChangedSubject.asObservable();
     this.init();
   }
 
   private init() {
-    const deviceMode = window.matchMedia("(prefers-color-scheme: dark)");
+    const deviceMode = window.matchMedia('(prefers-color-scheme: dark)');
     let initialTheme = deviceMode.matches ? Theme.DARK : Theme.LIGHT;
     this.updateCurrentTheme(initialTheme);
     this.document.body.classList.add(this.currentTheme);
@@ -38,9 +35,9 @@ export class ThemeToggleService {
   toggleTheme() {
     this.document.body.classList.toggle(Theme.LIGHT);
     this.document.body.classList.toggle(Theme.DARK);
-    if (this.currentTheme === Theme.LIGHT){
+    if (this.currentTheme === Theme.LIGHT) {
       this.updateCurrentTheme(Theme.DARK);
-    }else{
+    } else {
       this.updateCurrentTheme(Theme.LIGHT);
     }
   }

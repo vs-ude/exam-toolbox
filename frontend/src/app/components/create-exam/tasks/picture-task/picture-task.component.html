@@ -1,254 +1,355 @@
 <!-- Question -->
 <div class="form-header">
-
-    <!-- Bilingual -->
-    <div *ngIf="bilingual" class="question-container" [@leftRightAnimation]>
-        <div class="question-language-wrapper">
-            <span class="language_icon"><img src="german.svg" /></span>
-            <div #questionFieldDE contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
-                (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event,'DE')"
-                [attr.data-placeholder]="'Frage Eingeben...'"></div>
-        </div>
-        <div class="question-language-wrapper">
-            <span class="language_icon"><img src="english.svg" /></span>
-            <div #questionFieldEN contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
-                (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event, 'EN')"
-                [attr.data-placeholder]="'Enter Question...'"></div>
-        </div>
+  <!-- Bilingual -->
+  <div *ngIf="bilingual" class="question-container" [@leftRightAnimation]>
+    <div class="question-language-wrapper">
+      <span class="language_icon"
+        ><img [src]="publicPath + 'german.svg'"
+      /></span>
+      <div
+        #questionFieldDE
+        contenteditable="true"
+        class="form-question"
+        (focus)="activateFormatButtons()"
+        (blur)="deactivateFormatButtons($event)"
+        (input)="updateQuestion($event, 'DE')"
+        [attr.data-placeholder]="'Frage Eingeben...'"
+      ></div>
     </div>
+    <div class="question-language-wrapper">
+      <span class="language_icon"
+        ><img [src]="publicPath + 'english.svg'"
+      /></span>
+      <div
+        #questionFieldEN
+        contenteditable="true"
+        class="form-question"
+        (focus)="activateFormatButtons()"
+        (blur)="deactivateFormatButtons($event)"
+        (input)="updateQuestion($event, 'EN')"
+        [attr.data-placeholder]="'Enter Question...'"
+      ></div>
+    </div>
+  </div>
 
-    <!-- German -->
-    <div *ngIf="!bilingual" #questionFieldDE contenteditable="true" class="form-question"
-        (focus)="activateFormatButtons()" (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event,'DE')"
-        [attr.data-placeholder]="'Enter Question...'"></div>
+  <!-- German -->
+  <div
+    *ngIf="!bilingual"
+    #questionFieldDE
+    contenteditable="true"
+    class="form-question"
+    (focus)="activateFormatButtons()"
+    (blur)="deactivateFormatButtons($event)"
+    (input)="updateQuestion($event, 'DE')"
+    [attr.data-placeholder]="'Enter Question...'"
+  ></div>
 </div>
 
 <!-- Buttons for formatting -->
 <div *ngIf="isQuestionActive" [@inOutAnimation] class="form-toolbar">
+  <div
+    class="icon_wrapper format_icon"
+    (mousedown)="setQuestionFormat('bold', $event)"
+    [ngStyle]="{
+      'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+    }"
+  >
+    <mat-icon aria-hidden="false">format_bold</mat-icon>
+  </div>
 
-    <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('bold', $event)"
-        [ngStyle]="{ 'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-        <mat-icon aria-hidden="false" fontIcon="format_bold"></mat-icon>
-    </div>
+  <div
+    class="icon_wrapper format_icon"
+    (mousedown)="setQuestionFormat('italic', $event)"
+    [ngStyle]="{
+      'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+    }"
+  >
+    <mat-icon aria-hidden="false">format_italic</mat-icon>
+  </div>
 
-    <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('italic', $event)"
-        [ngStyle]="{ 'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-        <mat-icon aria-hidden="false" fontIcon="format_italic"></mat-icon>
-    </div>
-
-    <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('underline', $event)"
-        [ngStyle]="{ 'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-        <mat-icon aria-hidden="false" fontIcon="format_underline"></mat-icon>
-    </div>
+  <div
+    class="icon_wrapper format_icon"
+    (mousedown)="setQuestionFormat('underline', $event)"
+    [ngStyle]="{
+      'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+    }"
+  >
+    <mat-icon aria-hidden="false">format_underlined</mat-icon>
+  </div>
 </div>
-
-
-
 
 <!-- actual Component HTML here -->
 
-
-
 <!-- German Version -->
 <div *ngIf="!bilingual">
-    <h2 class="dropzone_header">Question Picture:</h2>
-    <div *ngIf="pictureFileUrlQuestionDE" class="preview_container">
-        <img [src]="pictureFileUrlQuestionDE" class="image_preview">
-        <span class="remove_image">
-            <div class="icon_wrapper footer_icon_delete">
-                <mat-icon aria-hidden="false" fontIcon="clear" matTooltip="remove" matTooltipPosition="right"
-                    (click)="onRemovePreviewQuestionDE()"></mat-icon>
-            </div>
-        </span>
-    </div>
+  <h2 class="dropzone_header">Question Picture:</h2>
+  <div *ngIf="pictureFileUrlQuestionDE" class="preview_container">
+    <img [src]="pictureFileUrlQuestionDE" class="image_preview" />
+    <span class="remove_image">
+      <div class="icon_wrapper footer_icon_delete">
+        <mat-icon
+          aria-hidden="false"
+          matTooltip="remove"
+          matTooltipPosition="right"
+          (click)="onRemovePreviewQuestionDE()"
+          >clear</mat-icon
+        >
+      </div>
+    </span>
+  </div>
 
+  <div
+    class="dropzone"
+    appDragAndDrop
+    (fileDropped)="onFileDropped($event, 'questionDE')"
+    *ngIf="!pictureFileUrlQuestionDE"
+  >
+    <input
+      class="upload_input"
+      type="file"
+      #fileDropRef
+      id="fileDropRef"
+      (change)="fileBrowseHandler($event, 'questionDE')"
+      accept="image/*"
+    />
+    <h3>Drag and Drop picture here</h3>
+    <h3>or</h3>
+    <label class="browse_button" for="fileDropRef">Browse for picture</label>
+  </div>
 
-    <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event, 'questionDE')"
-        *ngIf="!pictureFileUrlQuestionDE">
-        <input class="upload_input" type="file" #fileDropRef id="fileDropRef"
-            (change)="fileBrowseHandler($event, 'questionDE')" accept="image/*" />
-        <h3>Drag and Drop picture here</h3>
-        <h3>or</h3>
-        <label class="browse_button" for="fileDropRef">Browse for picture</label>
-    </div>
+  <h2 class="dropzone_header">Solution Picture:</h2>
 
+  <div *ngIf="pictureFileUrlSolutionDE" class="preview_container">
+    <img [src]="pictureFileUrlSolutionDE" class="image_preview" />
+    <span class="remove_image">
+      <div class="icon_wrapper footer_icon_delete">
+        <mat-icon
+          aria-hidden="false"
+          matTooltip="remove"
+          matTooltipPosition="right"
+          (click)="onRemovePreviewSolutionDE()"
+          >clear</mat-icon
+        >
+      </div>
+    </span>
+  </div>
 
-    <h2 class="dropzone_header">Solution Picture:</h2>
-
-    <div *ngIf="pictureFileUrlSolutionDE" class="preview_container">
-        <img [src]="pictureFileUrlSolutionDE" class="image_preview">
-        <span class="remove_image">
-            <div class="icon_wrapper footer_icon_delete">
-                <mat-icon aria-hidden="false" fontIcon="clear" matTooltip="remove" matTooltipPosition="right"
-                    (click)="onRemovePreviewSolutionDE()"></mat-icon>
-            </div>
-        </span>
-    </div>
-
-    <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event, 'solutionDE')"
-        *ngIf="!pictureFileUrlSolutionDE">
-        <input class="upload_input" type="file" #fileDropRef id="fileDropRef"
-            (change)="fileBrowseHandler($event, 'solutionDE')" accept="image/*" />
-        <h3>Drag and Drop picture here</h3>
-        <h3>or</h3>
-        <label class="browse_button" for="fileDropRef">Browse for picture</label>
-    </div>
+  <div
+    class="dropzone"
+    appDragAndDrop
+    (fileDropped)="onFileDropped($event, 'solutionDE')"
+    *ngIf="!pictureFileUrlSolutionDE"
+  >
+    <input
+      class="upload_input"
+      type="file"
+      #fileDropRef
+      id="fileDropRef"
+      (change)="fileBrowseHandler($event, 'solutionDE')"
+      accept="image/*"
+    />
+    <h3>Drag and Drop picture here</h3>
+    <h3>or</h3>
+    <label class="browse_button" for="fileDropRef">Browse for picture</label>
+  </div>
 </div>
-
 
 <!-- Bilingual Version -->
 <div *ngIf="bilingual">
-    <h2 class="dropzone_header">Question Picture:</h2>
-    <div class="image_preview_container">
-        <!-- German -->
-        <div *ngIf="pictureFileUrlQuestionDE" class="preview_container">
-            <img [src]="pictureFileUrlQuestionDE" class="image_preview">
-            <span class="remove_image">
-                <div class="icon_wrapper footer_icon_delete">
-                    <mat-icon aria-hidden="false" fontIcon="clear" matTooltip="remove" matTooltipPosition="right"
-                        (click)="onRemovePreviewQuestionDE()"></mat-icon>
-                </div>
-            </span>
-            <span class="preview_language_icon">
-                <div class="icon_wrapper ">
-                    <img src="german.svg" />
-                </div>
-            </span>
-
+  <h2 class="dropzone_header">Question Picture:</h2>
+  <div class="image_preview_container">
+    <!-- German -->
+    <div *ngIf="pictureFileUrlQuestionDE" class="preview_container">
+      <img [src]="pictureFileUrlQuestionDE" class="image_preview" />
+      <span class="remove_image">
+        <div class="icon_wrapper footer_icon_delete">
+          <mat-icon
+            aria-hidden="false"
+            matTooltip="remove"
+            matTooltipPosition="right"
+            (click)="onRemovePreviewQuestionDE()"
+            >clear</mat-icon
+          >
         </div>
-
-
-        <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event, 'questionDE')"
-            *ngIf="!pictureFileUrlQuestionDE">
-            <input class="upload_input" type="file" #fileDropRef id="fileDropRef"
-                (change)="fileBrowseHandler($event, 'questionDE')" accept="image/*" />
-            <h3>Drag and Drop picture here</h3>
-            <h3>or</h3>
-            <label class="browse_button" for="fileDropRef">Browse for picture</label>
-            <span class="preview_language_icon">
-                <div class="icon_wrapper ">
-                    <img src="german.svg" />
-                </div>
-            </span>
+      </span>
+      <span class="preview_language_icon">
+        <div class="icon_wrapper">
+          <img [src]="publicPath + 'german.svg'" />
         </div>
-
-
-
-        <!-- English -->
-        <div *ngIf="pictureFileUrlQuestionEN" class="preview_container">
-            <img [src]="pictureFileUrlQuestionEN" class="image_preview">
-            <span class="remove_image">
-                <div class="icon_wrapper footer_icon_delete">
-                    <mat-icon aria-hidden="false" fontIcon="clear" matTooltip="remove" matTooltipPosition="right"
-                        (click)="onRemovePreviewQuestionEN()"></mat-icon>
-                </div>
-            </span>
-            <span class="preview_language_icon">
-                <div class="icon_wrapper ">
-                    <img src="english.svg" />
-                </div>
-            </span>
-        </div>
-
-
-        <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event, 'questionEN')"
-            *ngIf="!pictureFileUrlQuestionEN">
-            <input class="upload_input" type="file" #fileDropRef id="fileDropRef"
-                (change)="fileBrowseHandler($event, 'questionEN')" accept="image/*" />
-            <h3>Drag and Drop picture here</h3>
-            <h3>or</h3>
-            <label class="browse_button" for="fileDropRef">Browse for picture</label>
-            <span class="preview_language_icon">
-                <div class="icon_wrapper ">
-                    <img src="english.svg" />
-                </div>
-            </span>
-        </div>
+      </span>
     </div>
 
-
-    <h2 class="dropzone_header">Solution Picture:</h2>
-    <div class="image_preview_container">
-        <!-- German -->
-        <div *ngIf="pictureFileUrlSolutionDE" class="preview_container">
-            <img [src]="pictureFileUrlSolutionDE" class="image_preview">
-            <span class="remove_image">
-                <div class="icon_wrapper footer_icon_delete">
-                    <mat-icon aria-hidden="false" fontIcon="clear" matTooltip="remove" matTooltipPosition="right"
-                        (click)="onRemovePreviewSolutionDE()"></mat-icon>
-                </div>
-            </span>
-            <span class="preview_language_icon">
-                <div class="icon_wrapper ">
-                    <img src="german.svg" />
-                </div>
-            </span>
+    <div
+      class="dropzone"
+      appDragAndDrop
+      (fileDropped)="onFileDropped($event, 'questionDE')"
+      *ngIf="!pictureFileUrlQuestionDE"
+    >
+      <input
+        class="upload_input"
+        type="file"
+        #fileDropRef
+        id="fileDropRef"
+        (change)="fileBrowseHandler($event, 'questionDE')"
+        accept="image/*"
+      />
+      <h3>Drag and Drop picture here</h3>
+      <h3>or</h3>
+      <label class="browse_button" for="fileDropRef">Browse for picture</label>
+      <span class="preview_language_icon">
+        <div class="icon_wrapper">
+          <img [src]="publicPath + 'german.svg'" />
         </div>
-
-
-        <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event, 'solutionDE')"
-            *ngIf="!pictureFileUrlSolutionDE">
-            <input class="upload_input" type="file" #fileDropRef id="fileDropRef"
-                (change)="fileBrowseHandler($event, 'solutionDE')" accept="image/*" />
-            <h3>Drag and Drop picture here</h3>
-            <h3>or</h3>
-            <label class="browse_button" for="fileDropRef">Browse for picture</label>
-            <span class="preview_language_icon">
-                <div class="icon_wrapper ">
-                    <img src="german.svg" />
-                </div>
-            </span>
-        </div>
-
-
-        <!-- English -->
-        <div *ngIf="pictureFileUrlSolutionEN" class="preview_container">
-            <img [src]="pictureFileUrlSolutionEN" class="image_preview">
-            <span class="remove_image">
-                <div class="icon_wrapper footer_icon_delete">
-                    <mat-icon aria-hidden="false" fontIcon="clear" matTooltip="remove" matTooltipPosition="right"
-                        (click)="onRemovePreviewSolutionEN()"></mat-icon>
-                </div>
-            </span>
-            <span class="preview_language_icon">
-                <div class="icon_wrapper ">
-                    <img src="english.svg" />
-                </div>
-            </span>
-        </div>
-
-
-        <div class="dropzone" appDragAndDrop (fileDropped)="onFileDropped($event, 'solutionEN')"
-            *ngIf="!pictureFileUrlSolutionEN">
-            <input class="upload_input" type="file" #fileDropRef id="fileDropRef"
-                (change)="fileBrowseHandler($event, 'solutionEN')" accept="image/*" />
-            <h3>Drag and Drop picture here</h3>
-            <h3>or</h3>
-            <label class="browse_button" for="fileDropRef">Browse for picture</label>
-            <span class="preview_language_icon">
-                <div class="icon_wrapper ">
-                    <img src="english.svg" />
-                </div>
-            </span>
-        </div>
+      </span>
     </div>
 
+    <!-- English -->
+    <div *ngIf="pictureFileUrlQuestionEN" class="preview_container">
+      <img [src]="pictureFileUrlQuestionEN" class="image_preview" />
+      <span class="remove_image">
+        <div class="icon_wrapper footer_icon_delete">
+          <mat-icon
+            aria-hidden="false"
+            matTooltip="remove"
+            matTooltipPosition="right"
+            (click)="onRemovePreviewQuestionEN()"
+            >clear</mat-icon
+          >
+        </div>
+      </span>
+      <span class="preview_language_icon">
+        <div class="icon_wrapper">
+          <img [src]="publicPath + 'english.svg'" />
+        </div>
+      </span>
+    </div>
+
+    <div
+      class="dropzone"
+      appDragAndDrop
+      (fileDropped)="onFileDropped($event, 'questionEN')"
+      *ngIf="!pictureFileUrlQuestionEN"
+    >
+      <input
+        class="upload_input"
+        type="file"
+        #fileDropRef
+        id="fileDropRef"
+        (change)="fileBrowseHandler($event, 'questionEN')"
+        accept="image/*"
+      />
+      <h3>Drag and Drop picture here</h3>
+      <h3>or</h3>
+      <label class="browse_button" for="fileDropRef">Browse for picture</label>
+      <span class="preview_language_icon">
+        <div class="icon_wrapper">
+          <img [src]="publicPath + 'english.svg'" />
+        </div>
+      </span>
+    </div>
+  </div>
+
+  <h2 class="dropzone_header">Solution Picture:</h2>
+  <div class="image_preview_container">
+    <!-- German -->
+    <div *ngIf="pictureFileUrlSolutionDE" class="preview_container">
+      <img [src]="pictureFileUrlSolutionDE" class="image_preview" />
+      <span class="remove_image">
+        <div class="icon_wrapper footer_icon_delete">
+          <mat-icon
+            aria-hidden="false"
+            matTooltip="remove"
+            matTooltipPosition="right"
+            (click)="onRemovePreviewSolutionDE()"
+            >clear</mat-icon
+          >
+        </div>
+      </span>
+      <span class="preview_language_icon">
+        <div class="icon_wrapper">
+          <img [src]="publicPath + 'german.svg'" />
+        </div>
+      </span>
+    </div>
+
+    <div
+      class="dropzone"
+      appDragAndDrop
+      (fileDropped)="onFileDropped($event, 'solutionDE')"
+      *ngIf="!pictureFileUrlSolutionDE"
+    >
+      <input
+        class="upload_input"
+        type="file"
+        #fileDropRef
+        id="fileDropRef"
+        (change)="fileBrowseHandler($event, 'solutionDE')"
+        accept="image/*"
+      />
+      <h3>Drag and Drop picture here</h3>
+      <h3>or</h3>
+      <label class="browse_button" for="fileDropRef">Browse for picture</label>
+      <span class="preview_language_icon">
+        <div class="icon_wrapper">
+          <img [src]="publicPath + 'german.svg'" />
+        </div>
+      </span>
+    </div>
+
+    <!-- English -->
+    <div *ngIf="pictureFileUrlSolutionEN" class="preview_container">
+      <img [src]="pictureFileUrlSolutionEN" class="image_preview" />
+      <span class="remove_image">
+        <div class="icon_wrapper footer_icon_delete">
+          <mat-icon
+            aria-hidden="false"
+            matTooltip="remove"
+            matTooltipPosition="right"
+            (click)="onRemovePreviewSolutionEN()"
+            >clear</mat-icon
+          >
+        </div>
+      </span>
+      <span class="preview_language_icon">
+        <div class="icon_wrapper">
+          <img [src]="publicPath + 'english.svg'" />
+        </div>
+      </span>
+    </div>
+
+    <div
+      class="dropzone"
+      appDragAndDrop
+      (fileDropped)="onFileDropped($event, 'solutionEN')"
+      *ngIf="!pictureFileUrlSolutionEN"
+    >
+      <input
+        class="upload_input"
+        type="file"
+        #fileDropRef
+        id="fileDropRef"
+        (change)="fileBrowseHandler($event, 'solutionEN')"
+        accept="image/*"
+      />
+      <h3>Drag and Drop picture here</h3>
+      <h3>or</h3>
+      <label class="browse_button" for="fileDropRef">Browse for picture</label>
+      <span class="preview_language_icon">
+        <div class="icon_wrapper">
+          <img [src]="publicPath + 'english.svg'" />
+        </div>
+      </span>
+    </div>
+  </div>
 </div>
 
-
-
-
-
-
-
-
-
-<app-task-footer 
+<app-task-footer
   [task]="task"
   [isModifiedPoolTask]="isModifiedPoolTask"
   (deleteEvent)="onDelete()"
   (createNewTaskEvent)="onCreateNewTaskChange($event)"
-  (newTagEvent)="onAddTag()" 
+  (newTagEvent)="onAddTag()"
   (previewEvent)="onPreview()"
-  (taskChangeEvent)="updateTask()">
+  (taskChangeEvent)="updateTask()"
+>
 </app-task-footer>

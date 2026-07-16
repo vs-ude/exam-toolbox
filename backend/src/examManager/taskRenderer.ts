@@ -1,5 +1,5 @@
-import { type Eta } from "@bgub/eta";
-import { escapeLatex, getEta } from "../services/mod.ts";
+import { type Eta } from '@bgub/eta';
+import { escapeLatex, getEta } from '../services/mod.ts';
 import type {
   BaseTask,
   Dimension,
@@ -13,16 +13,17 @@ import type {
   TableTask,
   TaskGroup,
   Translation,
-} from "../types/exam.ts";
-import { appConfig } from "../config/mod.ts";
-import { LatexRenderError } from "./err.ts";
+} from '../types/mod.ts';
+import { getConfig } from '../config/mod.ts';
+import { LatexRenderError } from './err.ts';
 
+const config = getConfig();
 let cachedTaskRenderer: TaskRenderer;
 
 export function getTaskRenderer(): TaskRenderer {
   if (cachedTaskRenderer) return cachedTaskRenderer;
 
-  cachedTaskRenderer = new TaskRenderer(getEta(appConfig.paths.templateBase));
+  cachedTaskRenderer = new TaskRenderer(getEta(config.paths.templateBase));
   return cachedTaskRenderer;
 }
 
@@ -37,24 +38,19 @@ export class TaskRenderer {
       throw new LatexRenderError(
         `Error during ${template} template rendering`,
         {
-          cause: err instanceof Error ? err.message : "unknown error",
+          cause: err instanceof Error ? err.message : 'unknown error',
         },
       );
     }
-    if (typeof rendered !== "string") {
-      throw new LatexRenderError(
-        `Failed to render ${template} template`,
-        {
-          cause: rendered,
-        },
-      );
+    if (typeof rendered !== 'string') {
+      throw new LatexRenderError(`Failed to render ${template} template`, {
+        cause: rendered,
+      });
     }
     return rendered;
   }
 
-  renderTaskHeading(
-    group: TaskGroup,
-  ): string {
+  renderTaskHeading(group: TaskGroup): string {
     const data: HeadingTemplateData = {
       id: String(group.groupNumber),
       title: {
@@ -64,12 +60,10 @@ export class TaskRenderer {
       points: group.points,
       solution: false,
     };
-    return this.render("task_types/taskHeading", data);
+    return this.render('task_types/taskHeading', data);
   }
 
-  renderSubTaskStart(
-    task: BaseTask,
-  ): string {
+  renderSubTaskStart(task: BaseTask): string {
     const data: TaskTemplateData = {
       points: task.points,
       question: {
@@ -78,27 +72,30 @@ export class TaskRenderer {
       },
       solution: false,
     };
-    return this.render("task_types/subTaskStart", data);
+    return this.render('task_types/subTaskStart', data);
   }
 
   renderSubTaskEnd(): string {
-    return this.render("task_types/subTaskEnd", { solution: false });
+    return this.render('task_types/subTaskEnd', { solution: false });
   }
 
   renderMultipleChoice(
     task: MultipleChoiceTask,
     options: RenderMultipleChoiceOptions,
   ): string {
-    const numCorrect = task.numCorrect ??
-      task.answerOptions.filter((option) => option.correct).length;
+    const numCorrect =
+      task.numCorrect ??
+      task.answerOptions.filter(option => option.correct).length;
     const pointsPerCorrect = Math.round(task.points / numCorrect);
 
     let condensed = false;
     const maxLenCondensed = 16; // Empirically determined with 'M' characters
     if (task.answerOptions.length % 2 == 0) {
       if (
-        task.answerOptions.every((opt) =>
-          opt.DE.length <= maxLenCondensed && opt.EN.length <= maxLenCondensed
+        task.answerOptions.every(
+          opt =>
+            opt.DE.length <= maxLenCondensed &&
+            opt.EN.length <= maxLenCondensed,
         )
       ) {
         condensed = true;
@@ -108,22 +105,19 @@ export class TaskRenderer {
       points: task.points ?? 0,
       numCorrect,
       pointsPerCorrect,
-      answerOptions: task.answerOptions.map((opt) => ({
+      answerOptions: task.answerOptions.map(opt => ({
         DE: escapeLatex(opt.DE),
         EN: escapeLatex(opt.EN),
-        correct: opt.correct ? "w" : "f",
+        correct: opt.correct ? 'w' : 'f',
       })),
       solution: options.solution ?? false,
       condensed: condensed,
     };
 
-    return this.render("task_types/multipleChoice", data);
+    return this.render('task_types/multipleChoice', data);
   }
 
-  renderMultilineText(
-    task: ShortAnswerTask,
-    options: RenderOptions,
-  ): string {
+  renderMultilineText(task: ShortAnswerTask, options: RenderOptions): string {
     const solutionTexts = [];
     let maxNoLines = 0;
     for (const val of Object.values(task.solution)) {
@@ -135,26 +129,22 @@ export class TaskRenderer {
     const data: MultilineTextTemplateData = {
       solution: options.solution ?? false,
       solutionText: solutionTexts,
-      noLines: task.noLines == undefined || task.noLines == 0
-        ? maxNoLines
-        : task.noLines,
+      noLines:
+        task.noLines == undefined || task.noLines == 0
+          ? maxNoLines
+          : task.noLines,
     };
 
-    return this.render("task_types/multilineText", data);
+    return this.render('task_types/multilineText', data);
   }
 
-  renderPictureTask(
-    task: PictureTask,
-    options: RenderOptionsWithAux,
-  ): string {
-    const taskPath = "img/" + copyUrlToPath(
-      options.workingDir + "/img",
-      task.questionPicture.urlDE,
-    );
-    const solutionPath = "img/" + copyUrlToPath(
-      options.workingDir + "/img",
-      task.solutionPicture.urlDE,
-    );
+  renderPictureTask(task: PictureTask, options: RenderOptionsWithAux): string {
+    const taskPath =
+      'img/' +
+      copyUrlToPath(options.workingDir + '/img', task.questionPicture.urlDE);
+    const solutionPath =
+      'img/' +
+      copyUrlToPath(options.workingDir + '/img', task.solutionPicture.urlDE);
     return this.renderPictureTaskImpl(task, options, taskPath, solutionPath);
   }
 
@@ -166,68 +156,60 @@ export class TaskRenderer {
   ): string {
     const taskText = task.questionPicture.altTextDE
       ? {
-        DE: task.questionPicture.altTextDE,
-        EN: task.questionPicture.altTextEN ?? task.questionPicture.altTextDE,
-      }
+          DE: task.questionPicture.altTextDE,
+          EN: task.questionPicture.altTextEN ?? task.questionPicture.altTextDE,
+        }
       : undefined;
 
     const data: PictureTaskTemplateData = {
       solution: options.solution ?? false,
-      lang: options.lang ?? "DE",
+      lang: options.lang ?? 'DE',
       taskPath: taskPath,
       solutionPath: solutionPath,
       text: taskText,
-      dimension: task.size ? dimToLatex(task.size) : "height=5cm",
+      dimension: task.size ? dimToLatex(task.size) : 'height=5cm',
     };
 
-    return this.render("task_types/pictureTask", data);
+    return this.render('task_types/pictureTask', data);
   }
 
-  renderManualText(
-    text: Translation,
-  ): string {
+  renderManualText(text: Translation): string {
     const data: ManualTextTemplateData = { solution: false, text: text };
-    return this.render("task_types/manualText", data);
+    return this.render('task_types/manualText', data);
   }
 
-  renderTableTask(
-    subTask: TableTask,
-    options: RenderOptions,
-  ): string {
+  renderTableTask(subTask: TableTask, options: RenderOptions): string {
     const solution = options.solution ?? false;
 
-    const cellWidthInt =
-      [subTask.tableHeadersSolution].concat(subTask.tableDataSolution)
-        .map((col) =>
-          col.reduce((maxLength, cell) =>
-            maxLength.DE.length > cell.DE.length ? maxLength : cell
-          )
-        )
-        .reduce((maxLength, cell) =>
-          maxLength.DE.length > cell.DE.length ? maxLength : cell
-        ).DE.length;
+    const cellWidthInt = [subTask.tableHeadersSolution]
+      .concat(subTask.tableDataSolution)
+      .map(col =>
+        col.reduce((maxLength, cell) =>
+          maxLength.DE.length > cell.DE.length ? maxLength : cell,
+        ),
+      )
+      .reduce((maxLength, cell) =>
+        maxLength.DE.length > cell.DE.length ? maxLength : cell,
+      ).DE.length;
 
     const hasHeaders = subTask.tableHeadersSolution[0].DE ?? false;
     const tableData: TableTaskTemplateData = {
       solution,
-      lang: options.lang ?? "DE",
+      lang: options.lang ?? 'DE',
       header: hasHeaders ? subTask.tableHeadersSolution : [],
       cells: solution ? subTask.tableDataSolution : subTask.tableDataQuestion,
       columns: subTask.tableDataSolution[0].length,
       cellWidth: `${cellWidthInt}em`,
     };
 
-    return this.render("task_types/tableTask", tableData);
+    return this.render('task_types/tableTask', tableData);
   }
 
-  renderPropertyTask(
-    task: PropertyTask,
-    options: RenderOptions,
-  ): string {
+  renderPropertyTask(task: PropertyTask, options: RenderOptions): string {
     /* The header should have one name per box column and one for the texts */
-    task.lines.forEach((line) => {
+    task.lines.forEach(line => {
       if (line.options.length !== task.header.length - 1) {
-        throw new LatexRenderError("Line options do not match header length", {
+        throw new LatexRenderError('Line options do not match header length', {
           cause: `(options) ${line.options.length} !== ${
             task.header.length - 1
           } (header - 1)`,
@@ -236,7 +218,7 @@ export class TaskRenderer {
     });
     if (task.header.length - 1 > 4) {
       throw new LatexRenderError(
-        "Cannot render more than 4 options in PropertyLines",
+        'Cannot render more than 4 options in PropertyLines',
         { cause: `${task.header.length - 1} options requested` },
       );
     }
@@ -244,14 +226,14 @@ export class TaskRenderer {
 
     const data: PropertyTaskTemplateData = {
       solution: options.solution ?? false,
-      lang: options.lang ?? "DE",
+      lang: options.lang ?? 'DE',
       header: task.header,
       lines: task.lines,
       columns: task.lines[0].options.length, // substract the text header column
       pointsPerCorrect,
     };
 
-    return this.render("task_types/propertyTask", data);
+    return this.render('task_types/propertyTask', data);
   }
 }
 
@@ -290,7 +272,7 @@ type ManualTextTemplateData = TemplateData & {
 type MultipleChoiceTemplateData = TemplateData & {
   numCorrect: number;
   pointsPerCorrect: number;
-  answerOptions: { DE: string; EN: string; correct: "w" | "f" }[];
+  answerOptions: { DE: string; EN: string; correct: 'w' | 'f' }[];
   condensed: boolean;
 };
 
@@ -322,12 +304,12 @@ type TableTaskTemplateData = TemplateData & {
 
 /* Copies the image from the given URL to the working directory and returns the name */
 function copyUrlToPath(workingDir: string, url: string): string {
-  const name = url.split("/").pop();
+  const name = url.split('/').pop();
   Deno.copyFileSync(url, `${workingDir}/${name}`);
   return `${name}`;
 }
 
 function dimToLatex(dim: Dimension): string {
-  const unit = dim.unit === "relative" ? `\\text${dim.dimension}` : dim.unit;
+  const unit = dim.unit === 'relative' ? `\\text${dim.dimension}` : dim.unit;
   return `${dim.dimension}=${dim.scalar}${unit}`;
 }

@@ -1,65 +1,100 @@
 services:
-  # documentation (basic usage): ofhttps://hub.docker.com/_/caddy
-  # auto-generates crypto key (https://docs.authcrunch.com/docs/authenticate/auth-cookie)
-  # also possible to set a key manually, for better persistance (and possible other advantages). Not needed here for now.
   caddy:
     build:
-      context: .
-      dockerfile: ./caddy/Dockerfile
-    command:
-      [
-        "caddy",
-        "run",
-        "--config",
-        "/etc/caddy/Caddyfile",
-        "--adapter",
-        "caddyfile",
-      ]
+      context: ./caddy/
+    command: caddy run --config /etc/caddy/Caddyfile --watch
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
+      - ./caddy/conf:/etc/caddy
       - caddy_data:/data # https://caddyserver.com/docs/conventions#data-directory
-      - caddy_config:/config # https://caddyserver.com/docs/conventions#configuration-directory
+      - uploads:/app/uploads
     networks:
       - web
     depends_on:
       - backend
+      - frontend
     environment:
-      - LDAP_BIND_PASSWORD=readonly
-      - CADDY_DOMAIN=localhost # needs to be changed for production (with domain)
-      - JWT_SHARED_KEY=1999fcc6-5499-4524-9b93-f4ad2dd46e5e
+      LOGLEVEL: info # debug, info, warn
+    develop:
+      watch:
+        - path: ./caddy/
+          include:
+            - Dockerfile
+          action: rebuild
+        - path: ./frontend/
+          include:
+            - public/
+          target: /srv/public/
+          action: sync
+
+  frontend:
+    build:
+      context: ./frontend/
+    networks:
+      - web
+    develop:
+      watch:
+        - path: ./frontend/
+          include:
+            - src/
+          target: /app/
+          action: sync
+        - path: ./frontend/
+          include:
+            - '*.json'
+            - Dockerfile
+          action: rebuild
 
   backend:
     build:
       context: ./backend
-    # ports: # not exposed when caddy is used
-    #   - "3000:3000"
     volumes:
-      - ./backend/uploads:/app/uploads
+      - ./backend/config.yaml:/app/config.yaml
       - backend_cache:/app/cache
       - backend_jobs:/app/jobs
+      - uploads:/app/uploads
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/examToolboxDB
-      - SMTP_HOST=mailcrab
-      - SMTP_PORT=1025
-      - SMTP_FROM=noreply@example.com
-      - CADDY_DOMAIN=${CADDY_DOMAIN}
-      - CACHE_DIR=/app/cache
+      DB_CONNSTRING: mongodb://mongo:27017/examToolboxDB?directConnection=true&replicaSet=rs0
+      AUTH_LDAP_URL: 'ldap://ldap-host:389'
+      AUTH_LDAP_BIND_DN: 'cn=readonly,dc=university,dc=example'
+      AUTH_LDAP_BIND_PASSWORD: 'readonly'
+      AUTH_LDAP_USER_SEARCH_BASE: 'ou=users,ou=accounts,dc=university,dc=example'
+      AUTH_LDAP_GROUP_DN_BASE: 'cn=%s,ou=groups,ou=accounts,dc=university,dc=example'
+      AUTH_LDAP_GROUPS_REQUIRED: 'toolboxUsers'
+      AUTH_LDAP_GROUPS_ADMIN: 'admins'
+      AUTH_LDAP_GROUPS_FULL: 'teachers'
+      AUTH_JWT_SECRET: 'ad06569335976252a1cea6ee4521f0c33e2fa93507e228a053dc8b75f3418312'
+      SMTP_HOST: mailcrab
+      SMTP_PORT: 1025
+      SMTP_FROM: noreply@example.com
+      SERVER_PUBLIC_URL: 'http://${DOMAIN}'
+      PATHS_CACHE_DIR: /app/cache
+      PATHS_JOBS_DIR: /app/jobs
+      CONFIG: /app/config.yaml
+      NODE_ENV: development
     depends_on:
       - mongo
+      - ldap-host
       - mailcrab
+      - periodic-tasks
     networks:
       - web
     develop:
       watch:
         - path: ./backend/
           include:
-            - "**/*.ts"
-            - "server.ts"
-          action: sync
+            - '**/*.ts'
+            - 'server.ts'
+            - config.yaml
+          action: sync+restart
           target: /app/
-        - path: backend/template/
+        - path: ./backend/
+          include:
+            - template/
+            - Dockerfile
+            - deno.*
           action: rebuild
 
   mailcrab:
@@ -67,27 +102,20 @@ services:
     container_name: mailcrab
     restart: unless-stopped
     ports:
-      - "1080:1080"
-      - "1025:1025"
+      - '1080:1080'
+      - '1025:1025'
     networks:
       - web
 
-  # not needed when caddy hosts static frontend build files
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #   ports:
-  #     - "4200:80"
-  #   networks:
-  #     - web
-
   mongo:
-    image: mongo:6.0
+    image: mongo:8
     restart: unless-stopped
+    command: ['--replSet', 'rs0', '--bind_ip_all', '--port', '27017']
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - mongodb_data:/data/db
+      # - ./seed/mongodb:/docker-entrypoint-initdb.d:ro
     networks:
       - web
 
@@ -97,13 +125,14 @@ services:
     restart: unless-stopped
     networks:
       web:
-    environment:
-      - LDAP_ORGANISATION="Exascan" # Login: cn=admin,dc=exascan,dc=com
-      - LDAP_DOMAIN=exascan.com
-      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_SECRET} # ldap-host needs the pw to create the admin-account.
-      - LDAP_READONLY_USER=True # username: "readonly", pw: "readonly"
+    environment: # LDAP Admin Login: cn=admin,dc=university,dc=example (default)
+      OPENLDAP_DEBUG_LEVEL: 256 # See Table 7.1 at https://www.openldap.org/doc/admin24/runningslapd.html
+      LDAP_ORGANISATION: 'University'
+      LDAP_DOMAIN: university.example
+      LDAP_BASE_DN: dc=university,dc=example
+      LDAP_READONLY_USER: 'True' # username: "readonly", pw: "readonly"
     volumes:
-      # needed to make users persistant, else everytime the docker-container is rebuild (docker-compose down && docker-compose up) all users would be deleted. Also makes the configurations persistant.
+      # make users/config persistent
       - ldap_data:/var/lib/ldap
       - ldap_config:/etc/ldap/slapd.d
       - ./ldap/:/container/service/slapd/assets/config/bootstrap/ldif/custom:ro
@@ -114,10 +143,10 @@ services:
     networks:
       web:
     ports:
-      - "6080:80"
+      - '6080:80'
     environment:
-      - PHPLDAPADMIN_LDAP_HOSTS=ldap-host
-      - PHPLDAPADMIN_HTTPS=false
+      PHPLDAPADMIN_LDAP_HOSTS: ldap-host
+      PHPLDAPADMIN_HTTPS: 'false'
     depends_on:
       - ldap-host
 
@@ -135,6 +164,7 @@ volumes:
   ldap_config:
   backend_jobs:
   backend_cache:
+  uploads:
 
 networks:
   web:

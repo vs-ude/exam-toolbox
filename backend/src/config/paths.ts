@@ -1,4 +1,6 @@
-import { appConfig } from "./appConfig.ts";
+import { getConfig } from './appConfig.ts';
 
-export const TEMPLATE_BASE_PATH = appConfig.paths.templateBase;
-export const CACHE_DIR = appConfig.paths.cacheDir;
+const config = getConfig();
+
+export const TEMPLATE_BASE_PATH = config.paths.templateBase;
+export const CACHE_DIR = config.paths.cacheDir;

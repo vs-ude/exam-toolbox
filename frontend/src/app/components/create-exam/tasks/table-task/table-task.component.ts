@@ -1,13 +1,14 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { BaseTaskComponent } from '../base-task/base-task.component';
-import { TableTask, Task } from '../../../../exam';
+import { TableTask, Task } from '../../../../types/shared/tasks';
 import { NgFor, NgIf, NgStyle } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatLabel } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { TaskAnimations } from '../task-animations';
 import { MatTooltip } from '@angular/material/tooltip';
-import { TaskFooterComponent } from "../base-task/task-footer/task-footer.component";
+import { TaskFooterComponent } from '../base-task/task-footer/task-footer.component';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-table-task',
@@ -20,28 +21,26 @@ import { TaskFooterComponent } from "../base-task/task-footer/task-footer.compon
     FormsModule,
     NgFor,
     MatTooltip,
-    TaskFooterComponent
-],
-  templateUrl: './table-task.component.html',
-  styleUrls: [
-    './table-task.component.scss',
-    '../task.scss'
+    TaskFooterComponent,
   ],
+  templateUrl: './table-task.component.html',
+  styleUrls: ['./table-task.component.scss', '../task.scss'],
   animations: [
     TaskAnimations.inOutAnimation,
-    TaskAnimations.leftRightAnimation
+    TaskAnimations.leftRightAnimation,
   ],
 })
 export class TableTaskComponent extends BaseTaskComponent {
+  @Output()
+  taskChangeEvent = new EventEmitter<Task>();
 
-  @Output() taskChangeEvent = new EventEmitter<Task>();
+  public readonly publicPath = environment.publicPath;
 
   public hasHeader: boolean = false;
 
   public task: TableTask = {
-    taskId: "",
-    type: "table",
-    question: { "DE": "", "EN": "" },
+    type: 'table',
+    question: { DE: '', EN: '' },
     tableHeadersQuestion: [],
     tableDataQuestion: [],
     tableDataSolution: [],
@@ -49,23 +48,21 @@ export class TableTaskComponent extends BaseTaskComponent {
     points: 0,
     tagIds: [],
     tags: [],
-    createdBy: "placeholder",
+    createdBy: 'placeholder',
     createdAt: new Date(),
     lastUsed: new Date(),
     usedIn: [],
     children: [],
-  }
+  };
 
   ngOnInit(): void {
     if (this.preTask) {
       this.task = this.preTask as TableTask;
-      console.log(this.task)
+      console.log(this.task);
       //this.hasHeader = !!this.task.tableHeadersQuestion && this.task.tableHeadersQuestion.length > 0;
       return;
     }
-    this.task.taskId = this.taskId;
     this.taskChangeEvent.emit(this.task);
-
   }
 
   trackByIndex(index: number, item: any): number {
@@ -75,16 +72,33 @@ export class TableTaskComponent extends BaseTaskComponent {
   addRow() {
     if (!this.task.tableDataQuestion.length) {
       this.task.tableDataQuestion = [
-        [{ DE: '', EN: '' }, { DE: '', EN: '' }],
-        [{ DE: '', EN: '' }, { DE: '', EN: '' }]
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
       ];
       this.task.tableDataSolution = [
-        [{ DE: '', EN: '' }, { DE: '', EN: '' }],
-        [{ DE: '', EN: '' }, { DE: '', EN: '' }]
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
       ];
     } else {
       const numberOfColumns = this.task.tableDataQuestion[0].length;
-      const newRow = Array(numberOfColumns).fill(0).map(() => ({ DE: '', EN: '' }));
+      const newRow = Array(numberOfColumns)
+        .fill(0)
+        .map(() => ({
+          DE: '',
+          EN: '',
+        }));
       this.task.tableDataQuestion.push(newRow);
       this.task.tableDataSolution.push(newRow.map(() => ({ DE: '', EN: '' })));
     }
@@ -102,18 +116,28 @@ export class TableTaskComponent extends BaseTaskComponent {
     this.task.tableDataSolution = [];
   }
 
-
   addColumn() {
     if (!this.task.tableDataQuestion.length) {
       this.task.tableDataQuestion = [
-        [{ DE: '', EN: '' }, { DE: '', EN: '' }],
-        [{ DE: '', EN: '' }, { DE: '', EN: '' }],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
       ];
       this.task.tableDataSolution = [
-        [{ DE: '', EN: '' }, { DE: '', EN: '' }],
-        [{ DE: '', EN: '' }, { DE: '', EN: '' }]
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
+        [
+          { DE: '', EN: '' },
+          { DE: '', EN: '' },
+        ],
       ];
-
     } else {
       for (let row of this.task.tableDataQuestion) {
         row.push({ DE: '', EN: '' });
@@ -127,7 +151,6 @@ export class TableTaskComponent extends BaseTaskComponent {
 
     this.updateTask();
   }
-
 
   removeColumn(colIdx: number) {
     if (this.task.tableDataQuestion[0].length > 1) {
@@ -155,5 +178,4 @@ export class TableTaskComponent extends BaseTaskComponent {
       keyboardEvent.preventDefault();
     }
   }
-
 }

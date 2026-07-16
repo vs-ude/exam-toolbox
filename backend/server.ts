@@ -1,36 +1,89 @@
-import { Application } from "@oak/oak";
+import { cors } from '@hono/hono/cors';
+import {
+  OpenAPIGeneratorConfigure,
+  OpenAPIHono,
+  OpenAPIObjectConfigure,
+} from '@hono/zod-openapi';
 
-import { configureExamManagerRouter } from "./src/api/examManager.ts";
-import { appConfig, QRConfig } from "./src/config/mod.ts";
-import { createExamManagerRuntime } from "./src/examManager/mod.ts";
-import { getOrCreateDb } from "./src/services/db.ts";
-import { parseLogFileForSubtaskInfo } from "./src/services/mod.ts";
-import { preGeneratePageQRCache } from "./src/services/qr.ts";
-import { configureUserRouter } from "./src/api/user.ts";
+import {
+  checkActive,
+  configureAdminRouter,
+  configureAuthRouter,
+  configureBaseRouter,
+  configureExamManagerRouter,
+  registerPublicRoutes,
+  validateJwt,
+} from './src/api/mod.ts';
+import { getConfig, QRConfig } from './src/config/mod.ts';
+import { createExamManagerRuntime } from './src/examManager/mod.ts';
+import {
+  scheduleLdapUserSync,
+  setupConfiguredGroups,
+  syncLdapUsers,
+  testLDAPConnection,
+} from './src/services/auth.ts';
+import {
+  getOrCreateDb,
+  parseLogFileForSubtaskInfo,
+} from './src/services/mod.ts';
+import { preGeneratePageQRCache } from './src/services/qr.ts';
+import { AppEnv } from './src/types/context.ts';
+import { checkDependencies } from './src/services/dependencies.ts';
+
+const config = getConfig();
+console.debug('Config loaded', config);
+
+if (!checkDependencies()) {
+  if (Deno.env.get('DEPS_OVERRIDE') === 'true') {
+    console.warn('Dependency check failed; continuing due to DEPS_OVERRIDE');
+  } else {
+    console.error(
+      'Dependency check failed; exiting; you can set DEPS_OVERRIDE=true to continue anyway',
+    );
+    Deno.exit(1);
+  }
+}
 
 const db = await getOrCreateDb();
+
+let count = 0;
+while (count < 10) {
+  try {
+    await testLDAPConnection();
+    await setupConfiguredGroups();
+    await syncLdapUsers();
+    break;
+  } catch {
+    console.info('Temporary error during LDAP setup, retrying...');
+    count++;
+    if (count === 10) {
+      console.error('LDAP setup failed:');
+      Deno.exit(1);
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+}
 
 // Create exam manager runtime (generation queue, workers, finalization, cleanup)
 const examRuntime = createExamManagerRuntime(
   {
-    basePath: appConfig.paths.templateBase,
-    jobsDir: appConfig.paths.jobsDir,
-    workerModulePath: "./worker.ts",
+    basePath: config.paths.templateBase,
+    jobsDir: config.paths.jobsDir,
+    workerModulePath: './worker.ts',
   },
   { db },
 );
 
 await Deno.mkdir(examRuntime.jobsDir, { recursive: true });
-preGeneratePageQRCache(
-  QRConfig.minStudents,
-  QRConfig.minPages,
-);
+preGeneratePageQRCache(QRConfig.minStudents, QRConfig.minPages);
 
-// Create Oak application + routers
-const app = new Application();
+// Build the typed route tree (split to avoid TS instantiation-depth limits)
+const routesA = new OpenAPIHono<AppEnv>()
+  .route('/api/admin', configureAdminRouter())
+  .route('/api/auth', configureAuthRouter());
 
-const routers = [
-  configureUserRouter(),
+const routesB = routesA.route('/api', configureBaseRouter()).route(
+  '/api',
   configureExamManagerRouter({
     db,
     jobs: examRuntime.jobs,
@@ -43,57 +96,82 @@ const routers = [
     getDownloadableJobs: examRuntime.getDownloadableJobs,
     parseLogFileForSubtaskInfo,
   }),
-];
+);
 
-// Core middleware: CORS + authentication/authorization
-app.use(async (ctx, next) => {
-  ctx.response.headers.set("Access-Control-Allow-Origin", "*");
-  ctx.response.headers.set(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS",
-  );
-  ctx.response.headers.set(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, X-Auth-Uid, X-Auth-Email, X-Auth-Member-Of",
-  );
+// Export the fully-typed app for client SDK generation
+export type AppType = typeof routesB;
 
-  if (ctx.request.method === "OPTIONS") {
-    ctx.response.status = 204;
-    return;
-  }
+registerPublicRoutes([
+  { path: '/api/auth/login', method: 'POST' },
+  { path: '/api/health', method: 'GET' },
+  { path: '/api/doc', method: 'GET' },
+  { path: '/api/doc/ui', method: 'GET' },
+]);
 
-  const userId = ctx.request.headers.get("X-Token-Subject");
-  const userEmail = ctx.request.headers.get("X-Token-User-Email");
-  const userRolesHeader = ctx.request.headers.get("X-Token-User-Roles");
-  const userRoles = userRolesHeader
-    ? userRolesHeader
-      .split(" ")
-      .map((role) => role.trim())
-      .filter((role) => role !== "")
-    : [];
+// Create the live app and layer middleware on top of routes
+const app = new OpenAPIHono<AppEnv>();
 
-  if (!userRoles.includes(appConfig.auth.requiredGroup)) {
-    console.warn(
-      `⛔ Access Denied: User ${
-        userId || "Anonymous"
-      } lacks group '${appConfig.auth.requiredGroup}'`,
-    );
-    ctx.response.status = 403;
-    ctx.response.body = { error: "Access Denied: You do not have permission." };
-    return;
-  }
+// Core middleware: CORS
+app.use(
+  cors({
+    origin: '*',
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization'],
+  }),
+);
 
-  ctx.state.user = { id: userId, email: userEmail, roles: userRoles };
-  await next();
-});
+app.use(validateJwt);
+app.use(checkActive);
 
-// Route registration
-for (const router of routers) {
-  app.use(router.routes());
-  app.use(router.allowedMethods());
+// Mount all routes
+app.route('/', routesB);
+
+// OpenAPI spec + Swagger UI (only when NODE_ENV=development)
+if (Deno.env.get('NODE_ENV') === 'development') {
+  app.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
+    type: 'http',
+    scheme: 'bearer',
+    bearerFormat: 'JWT',
+    name: 'Authorization',
+    in: 'header',
+    description:
+      'JWT obtained from POST /api/auth/login. Can also be supplied as the `auth_token` cookie.',
+  });
+  const apidoc: OpenAPIObjectConfigure<AppEnv, string> = {
+    openapi: '3.1.0',
+    info: {
+      title: 'Exam Toolbox API',
+      version: '0.2.0',
+      description: 'WIP API for the exam toolbox',
+    },
+    tags: [
+      { name: 'System', description: 'Health and operational endpoints' },
+      { name: 'Auth', description: 'Authentication and user management' },
+      { name: 'Admin', description: 'Admin-only configuration endpoints' },
+      { name: 'Exams', description: 'Exam CRUD and search' },
+      { name: 'Tasks', description: 'Task pool management' },
+      { name: 'Tags', description: 'Tag management' },
+      { name: 'Jobs', description: 'Bulk exam generation jobs' },
+      { name: 'Files', description: 'File upload and download' },
+    ],
+    servers: [
+      {
+        url: `${config.server.publicUrl}`,
+        description: 'Current environment',
+      },
+    ],
+  };
+  const generator: OpenAPIGeneratorConfigure<AppEnv, string> = {
+    unionPreferredType: 'oneOf',
+  };
+  app.doc('/api/doc', apidoc, generator);
+
+  console.log(`API docs available at ${config.server.publicUrl}/api/doc`);
+  app.getOpenAPI31Document(apidoc, generator);
 }
 
 // Schedule periodic in-memory job cleanup and start server
 examRuntime.scheduleDailyCleanup();
+scheduleLdapUserSync();
 
-await app.listen({ port: appConfig.server.port });
+Deno.serve({ port: config.server.port }, app.fetch);

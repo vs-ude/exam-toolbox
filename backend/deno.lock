@@ -2,73 +2,86 @@
   "version": "5",
   "specifiers": {
     "jsr:@bgub/eta@^4.6.0": "4.6.0",
-    "jsr:@db/mongo@0.34": "0.34.0",
-    "jsr:@lucsoft/web-bson@0.4": "0.4.0",
+    "jsr:@diister/mongodbee@~0.23.0-beta.5": "0.23.0-beta.5",
+    "jsr:@diister/valibot-mock@0.1.3": "0.1.3",
+    "jsr:@hono/hono@^4.12.30": "4.12.30",
+    "jsr:@hono/hono@^4.8.3": "4.12.30",
+    "jsr:@hono/zod-openapi@^1.5.0": "1.5.0",
+    "jsr:@hono/zod-validator@0.8": "0.8.0",
     "jsr:@mirror/xlsx@~0.20.3": "0.20.3",
-    "jsr:@oak/commons@1": "1.0.1",
-    "jsr:@oak/oak@^17.2.0": "17.2.0",
-    "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/assert@^1.0.19": "1.0.19",
-    "jsr:@std/bytes@1": "1.0.6",
-    "jsr:@std/cli@^1.0.30": "1.0.30",
-    "jsr:@std/crypto@1": "1.1.0",
-    "jsr:@std/crypto@^1.0.3": "1.1.0",
-    "jsr:@std/crypto@^1.0.5": "1.1.0",
-    "jsr:@std/encoding@1": "1.0.10",
-    "jsr:@std/encoding@^1.0.10": "1.0.10",
-    "jsr:@std/encoding@^1.0.5": "1.0.10",
+    "jsr:@std/cli@1.0.29": "1.0.29",
+    "jsr:@std/cli@^1.0.32": "1.0.32",
+    "jsr:@std/crypto@^1.1.0": "1.1.0",
+    "jsr:@std/encoding@^1.0.11": "1.0.11",
+    "jsr:@std/fmt@1.0.10": "1.0.10",
     "jsr:@std/fmt@^1.0.10": "1.0.10",
-    "jsr:@std/fs@^1.0.22": "1.0.24",
-    "jsr:@std/http@1": "1.1.1",
+    "jsr:@std/fs@^1.0.24": "1.0.24",
     "jsr:@std/internal@^1.0.12": "1.0.14",
     "jsr:@std/internal@^1.0.14": "1.0.14",
-    "jsr:@std/media-types@1": "1.1.0",
-    "jsr:@std/path@1": "1.1.5",
+    "jsr:@std/path@1.1.4": "1.1.4",
     "jsr:@std/path@^1.1.5": "1.1.5",
-    "jsr:@std/yaml@^1.1.1": "1.1.1",
-    "npm:nodemailer@^8.0.1": "8.0.1",
-    "npm:path-to-regexp@^6.3.0": "6.3.0"
+    "jsr:@std/ulid@1.0.0": "1.0.0",
+    "jsr:@std/yaml@^1.1.2": "1.1.2",
+    "npm:@asteasolutions/zod-to-openapi@^8.5.0": "8.5.0_zod@4.4.3",
+    "npm:@eslint-community/regexpp@^4.12.2": "4.12.2",
+    "npm:@faker-js/faker@10.0.0": "10.0.0",
+    "npm:ldapts@9": "9.0.0",
+    "npm:mongodb@6.21.0": "6.21.0",
+    "npm:nodemailer@^9.0.3": "9.0.3",
+    "npm:openapi3-ts@^4.5.0": "4.6.0",
+    "npm:randexp@0.5.3": "0.5.3",
+    "npm:valibot@1.1.0": "1.1.0",
+    "npm:valibot@1.4.0": "1.4.0",
+    "npm:zod@^4.2.1": "4.4.3"
   },
   "jsr": {
     "@bgub/eta@4.6.0": {
       "integrity": "fe872004cd6c64ca25c7e71fd80bbbad7d8d552cefd31828bddddb7db0f79eb1"
     },
-    "@db/mongo@0.34.0": {
-      "integrity": "48960c99392e9899579b1e23ca87c7a3b42fb5788bcc6fa72b2f2a0090f52a6e",
+    "@diister/mongodbee@0.23.0-beta.5": {
+      "integrity": "1f4a709b4327db9c0be42bbe3d2f711b2a1a64a4b6d4ac8903fe43c73a5046e0",
       "dependencies": [
-        "jsr:@lucsoft/web-bson",
-        "jsr:@std/crypto@^1.0.3",
-        "jsr:@std/encoding@^1.0.5"
+        "jsr:@diister/valibot-mock",
+        "jsr:@std/cli@1.0.29",
+        "jsr:@std/fmt@1.0.10",
+        "jsr:@std/path@1.1.4",
+        "jsr:@std/ulid",
+        "npm:mongodb",
+        "npm:valibot@1.4.0"
       ]
     },
-    "@lucsoft/web-bson@0.4.0": {
-      "integrity": "8ede9f3c223dd6095869fae84e99dcf0f12da52f37426e22d57181ecc5524308"
+    "@diister/valibot-mock@0.1.3": {
+      "integrity": "4133dc67edc12f3d8740721a92e301df8e92c864b9ec6ee54132ee79515a7914",
+      "dependencies": [
+        "npm:@eslint-community/regexpp",
+        "npm:@faker-js/faker",
+        "npm:randexp",
+        "npm:valibot@1.1.0"
+      ]
+    },
+    "@hono/hono@4.12.30": {
+      "integrity": "cd8e61aedab7e765e4e262728273ee0fdea3bc667af5eb6badd2772223b544fc"
+    },
+    "@hono/zod-openapi@1.5.0": {
+      "integrity": "67d8c25173e45ba118a609f661763e9e48c6a094a9bfe4341e977d8398440507",
+      "dependencies": [
+        "jsr:@hono/hono@^4.8.3",
+        "jsr:@hono/zod-validator",
+        "npm:@asteasolutions/zod-to-openapi",
+        "npm:openapi3-ts",
+        "npm:zod"
+      ]
+    },
+    "@hono/zod-validator@0.8.0": {
+      "integrity": "0ed9cdc57055b44c2fc9a031350122b90cede88c7dcec49162701ddfb27c7aa7",
+      "dependencies": [
+        "jsr:@hono/hono@^4.8.3",
+        "npm:zod"
+      ]
     },
     "@mirror/xlsx@0.20.3": {
       "integrity": "40cab5da1e169471e439f04e5980d67a435e8211846923737e268d16ee9fd0da"
-    },
-    "@oak/commons@1.0.1": {
-      "integrity": "889ff210f0b4292591721be07244ecb1b5c118742f5273c70cf30d7cd4184d0c",
-      "dependencies": [
-        "jsr:@std/assert@1",
-        "jsr:@std/bytes",
-        "jsr:@std/crypto@1",
-        "jsr:@std/encoding@1",
-        "jsr:@std/http",
-        "jsr:@std/media-types"
-      ]
-    },
-    "@oak/oak@17.2.0": {
-      "integrity": "938537a92fc7922a46a9984696c65fb189c9baad164416ac3e336768a9ff0cd1",
-      "dependencies": [
-        "jsr:@oak/commons",
-        "jsr:@std/assert@1",
-        "jsr:@std/bytes",
-        "jsr:@std/http",
-        "jsr:@std/media-types",
-        "jsr:@std/path@1",
-        "npm:path-to-regexp"
-      ]
     },
     "@std/assert@1.0.18": {
       "integrity": "270245e9c2c13b446286de475131dc688ca9abcd94fc5db41d43a219b34d1c78"
@@ -79,13 +92,13 @@
         "jsr:@std/internal@^1.0.12"
       ]
     },
-    "@std/bytes@1.0.6": {
-      "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
+    "@std/cli@1.0.29": {
+      "integrity": "fa4ef29130baa834d8a13b7d138240c3a2fcfba740bfb7afa646a360a15ec84f"
     },
-    "@std/cli@1.0.30": {
-      "integrity": "769446536522d0417d7127ebcabcafac1ab0ce6766d0eb3fca1d36326fe98d13",
+    "@std/cli@1.0.32": {
+      "integrity": "188b3a100d6202d64e3f5bd3d799c7fa4f6d77f92cc65eb7f641c1fa0aa92a66",
       "dependencies": [
-        "jsr:@std/fmt",
+        "jsr:@std/fmt@^1.0.10",
         "jsr:@std/internal@^1.0.14"
       ]
     },
@@ -95,8 +108,8 @@
     "@std/crypto@1.1.0": {
       "integrity": "b8d6d0a6377a32b213af2661ed7bf1062d94feac0c57def5526a8e74a95c3ec8"
     },
-    "@std/encoding@1.0.10": {
-      "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
+    "@std/encoding@1.0.11": {
+      "integrity": "e7cef2f0b3153bccc17431e7c864a1de03a4b6d9647389c43e08aaa775d37385"
     },
     "@std/fmt@1.0.10": {
       "integrity": "90dfba288802ac6de82fb31d0917eb9e4450b9925b954d5e51fc29ac07419db5"
@@ -108,20 +121,17 @@
         "jsr:@std/path@^1.1.5"
       ]
     },
-    "@std/http@1.1.1": {
-      "integrity": "e343a9a80aea07c716b91be5c79df764144430ad2dd7c9121ed7443f08dc74f7",
-      "dependencies": [
-        "jsr:@std/encoding@^1.0.10"
-      ]
-    },
     "@std/internal@1.0.12": {
       "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
     },
     "@std/internal@1.0.14": {
       "integrity": "291516b3d4c35024d6ffbc0a9df5bf4c64116e05b50012cf846710152d2ffdf7"
     },
-    "@std/media-types@1.1.0": {
-      "integrity": "c9d093f0c05c3512932b330e3cc1fe1d627b301db33a4c2c2185c02471d6eaa4"
+    "@std/path@1.1.4": {
+      "integrity": "1d2d43f39efb1b42f0b1882a25486647cb851481862dc7313390b2bb044314b5",
+      "dependencies": [
+        "jsr:@std/internal@^1.0.12"
+      ]
     },
     "@std/path@1.1.5": {
       "integrity": "ccea00982ea28c36becaf6e62f855406c76a8c32d462f66f415bbb7d83a271bc",
@@ -129,34 +139,151 @@
         "jsr:@std/internal@^1.0.14"
       ]
     },
-    "@std/yaml@1.1.1": {
-      "integrity": "a57665ecf3d17b926380593a56625d8a10cc7281802f1e993b5ebc94a48e71f8"
+    "@std/ulid@1.0.0": {
+      "integrity": "d41c3d27a907714413649fee864b7cde8d42ee68437d22b79d5de4f81d808780"
+    },
+    "@std/yaml@1.1.2": {
+      "integrity": "de612653c036749ba2044165e316f52412b0f0698afffb7ee80b5331d6d2abae"
     },
     "@zip-js/zip-js@2.8.20": {
       "integrity": "64bbc8b46777e1369dd258852c2244083a413a1e7cba3a7bf27a99cc88d3b860"
     }
   },
   "npm": {
-    "nodemailer@8.0.1": {
-      "integrity": "sha512-5kcldIXmaEjZcHR6F28IKGSgpmZHaF1IXLWFTG+Xh3S+Cce4MiakLtWY+PlBU69fLbRa8HlaGIrC/QolUpHkhg=="
+    "@asteasolutions/zod-to-openapi@8.5.0_zod@4.4.3": {
+      "integrity": "sha512-SABbKiObg5dLRiTFnqiW1WWwGcg1BJfmHtT2asIBnBHg6Smy/Ms2KHc650+JI4Hw7lSkdiNebEGXpwoxfben8Q==",
+      "dependencies": [
+        "openapi3-ts",
+        "zod"
+      ]
     },
-    "path-to-regexp@6.3.0": {
-      "integrity": "sha512-Yhpw4T9C6hPpgPeA28us07OJeqZ5EzQTkbfwuhsUg0c237RomFoETJgmp2sa3F/41gfLE6G5cqcYwznmeEeOlQ=="
+    "@eslint-community/regexpp@4.12.2": {
+      "integrity": "sha512-EriSTlt5OC9/7SXkRSCAhfSxxoSUgBm33OH+IkwbdpgoqsSsUg7y3uh+IICI/Qg4BBWr3U2i39RpmycbxMq4ew=="
+    },
+    "@faker-js/faker@10.0.0": {
+      "integrity": "sha512-UollFEUkVXutsaP+Vndjxar40Gs5JL2HeLcl8xO1QAjJgOdhc3OmBFWyEylS+RddWaaBiAzH+5/17PLQJwDiLw=="
+    },
+    "@mongodb-js/saslprep@1.4.12": {
+      "integrity": "sha512-QAfAMwNgnYxZ2C6D1HgeP7Gc4i/uvJRim415PCIL9ptRxWMNbWeLBYb2/9R4pGKny/s1FVu2JA2cxCUBUOggrA==",
+      "dependencies": [
+        "sparse-bitfield"
+      ]
+    },
+    "@types/webidl-conversions@7.0.3": {
+      "integrity": "sha512-CiJJvcRtIgzadHCYXw7dqEnMNRjhGZlYK05Mj9OyktqV8uVT8fD2BFOB7S1uwBE3Kj2Z+4UyPmFw/Ixgw/LAlA=="
+    },
+    "@types/whatwg-url@11.0.5": {
+      "integrity": "sha512-coYR071JRaHa+xoEvvYqvnIHaVqaYrLPbsufM9BF63HkwI5Lgmy2QR8Q5K/lYDYo5AK82wOvSOS0UsLTpTG7uQ==",
+      "dependencies": [
+        "@types/webidl-conversions"
+      ]
+    },
+    "bson@6.10.4": {
+      "integrity": "sha512-WIsKqkSC0ABoBJuT1LEX+2HEvNmNKKgnTAyd0fL8qzK4SH2i9NXg+t08YtdZp/V9IZ33cxe3iV4yM0qg8lMQng=="
+    },
+    "drange@1.1.1": {
+      "integrity": "sha512-pYxfDYpued//QpnLIm4Avk7rsNtAtQkUES2cwAYSvD/wd2pKD71gN2Ebj3e7klzXwjocvE8c5vx/1fxwpqmSxA=="
+    },
+    "ldapts@9.0.0": {
+      "integrity": "sha512-OaaoYBSuan7g0Nm2e1wsRl+9xol41zY+pDlRRSsBq36iKCd2tG/K8WifevNRDjyEfhz4bvkxKdDvJ6xHXwj7+Q==",
+      "dependencies": [
+        "strict-event-emitter-types"
+      ]
+    },
+    "memory-pager@1.5.0": {
+      "integrity": "sha512-ZS4Bp4r/Zoeq6+NLJpP+0Zzm0pR8whtGPf1XExKLJBAczGMnSi3It14OiNCStjQjM6NU1okjQGSxgEZN8eBYKg=="
+    },
+    "mongodb-connection-string-url@3.0.2": {
+      "integrity": "sha512-rMO7CGo/9BFwyZABcKAWL8UJwH/Kc2x0g72uhDWzG48URRax5TCIcJ7Rc3RZqffZzO/Gwff/jyKwCU9TN8gehA==",
+      "dependencies": [
+        "@types/whatwg-url",
+        "whatwg-url"
+      ]
+    },
+    "mongodb@6.21.0": {
+      "integrity": "sha512-URyb/VXMjJ4da46OeSXg+puO39XH9DeQpWCslifrRn9JWugy0D+DvvBvkm2WxmHe61O/H19JM66p1z7RHVkZ6A==",
+      "dependencies": [
+        "@mongodb-js/saslprep",
+        "bson",
+        "mongodb-connection-string-url"
+      ]
+    },
+    "nodemailer@9.0.3": {
+      "integrity": "sha512-n+YP+NKwR5zRWa60k3GiQ6Q3B4KXCoAw40dAKeCtYn020iNN74aWK2liXIC3ZEATeGql7we3tE3t8QwhY0eskw=="
+    },
+    "openapi3-ts@4.6.0": {
+      "integrity": "sha512-a4sfn6L2sIShhtzJqmjGrARvxAW/3F2BJDdyRVvNF9VhAsZSh5hSyI3a9TNvmzBxXmq66nY5LNT5bQcBxYAZZg==",
+      "dependencies": [
+        "yaml"
+      ]
+    },
+    "punycode@2.3.1": {
+      "integrity": "sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg=="
+    },
+    "randexp@0.5.3": {
+      "integrity": "sha512-U+5l2KrcMNOUPYvazA3h5ekF80FHTUG+87SEAmHZmolh1M+i/WyTCxVzmi+tidIa1tM4BSe8g2Y/D3loWDjj+w==",
+      "dependencies": [
+        "drange",
+        "ret"
+      ]
+    },
+    "ret@0.2.2": {
+      "integrity": "sha512-M0b3YWQs7R3Z917WRQy1HHA7Ba7D8hvZg6UE5mLykJxQVE2ju0IXbGlaHPPlkY+WN7wFP+wUMXmBFA0aV6vYGQ=="
+    },
+    "sparse-bitfield@3.0.3": {
+      "integrity": "sha512-kvzhi7vqKTfkh0PZU+2D2PIllw2ymqJKujUcyPMd9Y75Nv4nPbGJZXNhxsgdQab2BmlDct1YnfQCguEvHr7VsQ==",
+      "dependencies": [
+        "memory-pager"
+      ]
+    },
+    "strict-event-emitter-types@2.0.0": {
+      "integrity": "sha512-Nk/brWYpD85WlOgzw5h173aci0Teyv8YdIAEtV+N88nDB0dLlazZyJMIsN6eo1/AR61l+p6CJTG1JIyFaoNEEA=="
+    },
+    "tr46@5.1.1": {
+      "integrity": "sha512-hdF5ZgjTqgAntKkklYw0R03MG2x/bSzTtkxmIRw/sTNV8YXsCJ1tfLAX23lhxhHJlEf3CRCOCGGWw3vI3GaSPw==",
+      "dependencies": [
+        "punycode"
+      ]
+    },
+    "valibot@1.1.0": {
+      "integrity": "sha512-Nk8lX30Qhu+9txPYTwM0cFlWLdPFsFr6LblzqIySfbZph9+BFsAHsNvHOymEviUepeIW6KFHzpX8TKhbptBXXw=="
+    },
+    "valibot@1.4.0": {
+      "integrity": "sha512-iC/x7fVcSyOwlm/VSt7RlHnzNGLGvR9GnxdifUeWoCJo0q4ZZvrVkIHC6faTlkxG47I2Y4UrFquPuVHCrOnrLg=="
+    },
+    "webidl-conversions@7.0.0": {
+      "integrity": "sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g=="
+    },
+    "whatwg-url@14.2.0": {
+      "integrity": "sha512-De72GdQZzNTUBBChsXueQUnPKDkg/5A5zp7pFDuQAj5UFoENpiACU0wlCvzpAGnTkj++ihpKwKyYewn/XNUbKw==",
+      "dependencies": [
+        "tr46",
+        "webidl-conversions"
+      ]
+    },
+    "yaml@2.9.0": {
+      "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+      "bin": true
+    },
+    "zod@4.4.3": {
+      "integrity": "sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ=="
     }
   },
   "workspace": {
     "dependencies": [
       "jsr:@bgub/eta@^4.6.0",
-      "jsr:@db/mongo@0.34",
+      "jsr:@diister/mongodbee@~0.23.0-beta.5",
+      "jsr:@hono/hono@^4.12.30",
+      "jsr:@hono/zod-openapi@^1.5.0",
       "jsr:@mirror/xlsx@~0.20.3",
-      "jsr:@oak/oak@^17.2.0",
       "jsr:@std/assert@^1.0.19",
-      "jsr:@std/cli@^1.0.30",
-      "jsr:@std/crypto@^1.0.5",
-      "jsr:@std/encoding@^1.0.10",
-      "jsr:@std/fs@^1.0.22",
-      "jsr:@std/yaml@^1.1.1",
-      "npm:nodemailer@^8.0.1"
+      "jsr:@std/cli@^1.0.32",
+      "jsr:@std/crypto@^1.1.0",
+      "jsr:@std/encoding@^1.0.11",
+      "jsr:@std/fs@^1.0.24",
+      "jsr:@std/yaml@^1.1.2",
+      "npm:ldapts@9",
+      "npm:nodemailer@^9.0.3"
     ]
   }
 }

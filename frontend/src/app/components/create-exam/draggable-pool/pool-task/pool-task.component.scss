@@ -1,96 +1,96 @@
 .task_container {
-    position: relative;
-    border-radius: 10px;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    background-color: var(--color-bg-lifted);
-    user-select: none;
-    min-width: 100px;
-    max-width: 100%;
-    z-index: auto;
+  position: relative;
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-bg-lifted);
+  user-select: none;
+  min-width: 100px;
+  max-width: 100%;
+  z-index: auto;
 }
 
 .task_icon {
-    background-color: var(--color-primary);
-    padding: 4px 10px 4px 10px;
-    border-radius: 10px;
+  background-color: var(--color-primary);
+  padding: 4px 10px 4px 10px;
+  border-radius: 10px;
 }
 
-.task_name{
-    padding: 4px 10px 4px 10px;
-    padding-right: 60px;
-    font-size: smaller;
-    overflow: hidden;
-    max-height: 40px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    display: block;
+.task_name {
+  padding: 4px 10px 4px 10px;
+  padding-right: 60px;
+  font-size: smaller;
+  overflow: hidden;
+  max-height: 40px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
 }
 
-.task-points{
-    position: absolute;
-    right: 8px;
-    bottom: 6px;
-    font-size: 0.8rem;
-    opacity: 0.85;
-    white-space: nowrap;
+.task-points {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  font-size: 0.8rem;
+  opacity: 0.85;
+  white-space: nowrap;
 }
 
 .task_tooltip {
-    position: absolute;
-    left: 0;
-    top: calc(100% + 8px);
-    z-index: 999;
-    width: min(320px, calc(100vw - 24px));
-    max-width: 320px;
-    background: var(--color-background);
-    color: var(--color-text);
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 16px 38px rgba(0,0,0,0.18);
-    border-radius: 14px;
-    padding: 10px;
-    font-size: 0.82rem;
-    line-height: 1.4;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  z-index: 999;
+  width: min(320px, calc(100vw - 24px));
+  max-width: 320px;
+  background: var(--color-background);
+  color: var(--color-text);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.18);
+  border-radius: 14px;
+  padding: 10px;
+  font-size: 0.82rem;
+  line-height: 1.4;
 }
 
 /* fade + slight slide animation */
 .task_tooltip {
-    opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 180ms ease, transform 180ms ease;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
 }
 .task_tooltip.tooltip-visible {
-    opacity: 1;
-    transform: translateY(0);
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .tooltip_question {
-    white-space: normal;
-    overflow: auto;
-    max-height: 108px;
-    margin-bottom: 8px;
+  white-space: normal;
+  overflow: auto;
+  max-height: 108px;
+  margin-bottom: 8px;
 }
 
 .tooltip_tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .tooltip_tag {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    line-height: 1.2;
-    min-height: 18px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  line-height: 1.2;
+  min-height: 18px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
-
-

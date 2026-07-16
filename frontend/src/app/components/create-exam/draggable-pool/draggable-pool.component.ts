@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Task } from '../../../exam';
+import { Task } from '../../../types/shared/tasks';
 import { ColorProviderService } from '../../../services/color-provider.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatIcon } from "@angular/material/icon";
+import { MatIcon } from '@angular/material/icon';
 import { ApiService } from '../../../services/api.service';
 import { forkJoin, Observable, Subscription } from 'rxjs';
 import { PoolTaskComponent } from './pool-task/pool-task.component';
-import { Tag } from '../../../tag';
+import { Tag } from '../../../types/shared/tag';
 
 enum SortPoints {
   Ascending,
@@ -15,15 +15,15 @@ enum SortPoints {
 }
 
 interface TypeOption {
-  value: string,
-  viewValue: string,
+  value: string;
+  viewValue: string;
 }
 @Component({
   selector: 'app-draggable-pool',
   standalone: true,
   imports: [PoolTaskComponent, MatTooltipModule, MatIcon],
   templateUrl: './draggable-pool.component.html',
-  styleUrl: './draggable-pool.component.scss'
+  styleUrl: './draggable-pool.component.scss',
 })
 export class DraggablePoolComponent {
   @Input() refreshPool$!: Observable<void>;
@@ -48,7 +48,7 @@ export class DraggablePoolComponent {
     { value: 'newPage', viewValue: 'New Page' },
     { value: 'latex', viewValue: 'LaTeX' },
     { value: 'table', viewValue: 'Table' },
-  ]
+  ];
 
   ngOnInit(): void {
     this.refreshSubscription = this.refreshPool$.subscribe(() => {
@@ -60,30 +60,30 @@ export class DraggablePoolComponent {
     this.refreshSubscription.unsubscribe();
   }
 
-  constructor(public colorProvider: ColorProviderService, private api: ApiService) {
+  constructor(
+    public colorProvider: ColorProviderService,
+    private api: ApiService,
+  ) {
     this.refreshTaskPool();
   }
 
   private refreshTaskPool(): void {
-
     forkJoin({
       tasks: this.api.getTasksFromPool(),
-      tags: this.api.getAllTags()
+      tags: this.api.getAllTags(),
     }).subscribe({
       next: ({ tasks, tags }) => {
         this.taskPool = (tasks as Task[]).map(task => ({
           ...task,
-          tags: (tags as Tag[]).filter(tag => task.tagIds.includes(tag._id!))
+          tags: (tags as Tag[]).filter(tag => task.tagIds.includes(tag._id!)),
         }));
         this.applyCurrentFilters();
       },
-      error: (error) => {
+      error: error => {
         console.error('Error fetching data:', error);
-      }
+      },
     });
   }
-
-
 
   public onFilterType(type: string): void {
     this.currentTypeFilter = type;
@@ -112,25 +112,26 @@ export class DraggablePoolComponent {
   }
 
   private filterTasksByType(): Task[] {
-    if (this.currentTypeFilter === "") {
+    if (this.currentTypeFilter === '') {
       return this.filteredTaskPool;
     }
-    return this.filteredTaskPool.filter(task => task.type === this.currentTypeFilter);
-  }
-
-  private filterTasksBySearchTerm(): Task[] {
-    if (this.currentSearchTerm === "") {
-      return this.filteredTaskPool;
-    }
-    const lowerSearchTerm = this.currentSearchTerm.toLowerCase();
-    return this.filteredTaskPool.filter(task =>
-      task.question.DE.toLowerCase().includes(lowerSearchTerm) ||
-      task.question.EN.toLowerCase().includes(lowerSearchTerm) ||
-      task.tags.some(tag => tag.name.toLowerCase().includes(lowerSearchTerm))
+    return this.filteredTaskPool.filter(
+      task => task.type === this.currentTypeFilter,
     );
   }
 
-
+  private filterTasksBySearchTerm(): Task[] {
+    if (this.currentSearchTerm === '') {
+      return this.filteredTaskPool;
+    }
+    const lowerSearchTerm = this.currentSearchTerm.toLowerCase();
+    return this.filteredTaskPool.filter(
+      task =>
+        task.question.DE.toLowerCase().includes(lowerSearchTerm) ||
+        task.question.EN.toLowerCase().includes(lowerSearchTerm) ||
+        task.tags.some(tag => tag.name.toLowerCase().includes(lowerSearchTerm)),
+    );
+  }
 
   private sortTasksByPoints(): Task[] {
     if (this.sortPoints === SortPoints.None) {
@@ -142,15 +143,6 @@ export class DraggablePoolComponent {
       } else {
         return b.points - a.points;
       }
-    }
-    );
+    });
   }
-
 }
-
-
-
-
-
-
-

@@ -1,75 +1,111 @@
 <!-- Main Question and Buttons for Styling -->
 <div class="form-header">
-
   <!-- Bilingual -->
   <div *ngIf="bilingual" class="question-container" [@leftRightAnimation]>
     <div class="question-language-wrapper">
-      <span class="language_icon"><img src="german.svg" /></span>
-      <div #questionFieldDE contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
-        (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event,'DE')"
-        [attr.data-placeholder]="'Frage Eingeben...'"></div>
+      <span class="language_icon"
+        ><img [src]="publicPath + 'german.svg'"
+      /></span>
+      <div
+        #questionFieldDE
+        contenteditable="true"
+        class="form-question"
+        (focus)="activateFormatButtons()"
+        (blur)="deactivateFormatButtons($event)"
+        (input)="updateQuestion($event, 'DE')"
+        [attr.data-placeholder]="'Frage Eingeben...'"
+      ></div>
     </div>
     <div class="question-language-wrapper">
-      <span class="language_icon"><img src="english.svg" /></span>
-      <div #questionFieldEN contenteditable="true" class="form-question" (focus)="activateFormatButtons()"
-        (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event, 'EN')"
-        [attr.data-placeholder]="'Enter Question...'"></div>
+      <span class="language_icon"
+        ><img [src]="publicPath + 'english.svg'"
+      /></span>
+      <div
+        #questionFieldEN
+        contenteditable="true"
+        class="form-question"
+        (focus)="activateFormatButtons()"
+        (blur)="deactivateFormatButtons($event)"
+        (input)="updateQuestion($event, 'EN')"
+        [attr.data-placeholder]="'Enter Question...'"
+      ></div>
     </div>
   </div>
 
   <!-- German -->
-  <div *ngIf="!bilingual" #questionFieldDE contenteditable="true" class="form-question"
-    (focus)="activateFormatButtons()" (blur)="deactivateFormatButtons($event)" (input)="updateQuestion($event,'DE')"
-    [attr.data-placeholder]="'Enter Question...'"></div>
+  <div
+    *ngIf="!bilingual"
+    #questionFieldDE
+    contenteditable="true"
+    class="form-question"
+    (focus)="activateFormatButtons()"
+    (blur)="deactivateFormatButtons($event)"
+    (input)="updateQuestion($event, 'DE')"
+    [attr.data-placeholder]="'Enter Question...'"
+  ></div>
 </div>
 
 <!-- Buttons for formatting -->
 <div *ngIf="isQuestionActive" [@inOutAnimation] class="form-toolbar">
-
-  <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('bold', $event)"
-    [ngStyle]="{ 'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-    <mat-icon aria-hidden="false" fontIcon="format_bold"></mat-icon>
+  <div
+    class="icon_wrapper format_icon"
+    (mousedown)="setQuestionFormat('bold', $event)"
+    [ngStyle]="{
+      'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+    }"
+  >
+    <mat-icon aria-hidden="false">format_bold</mat-icon>
   </div>
 
-  <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('italic', $event)"
-    [ngStyle]="{ 'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-    <mat-icon aria-hidden="false" fontIcon="format_italic"></mat-icon>
+  <div
+    class="icon_wrapper format_icon"
+    (mousedown)="setQuestionFormat('italic', $event)"
+    [ngStyle]="{
+      'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+    }"
+  >
+    <mat-icon aria-hidden="false">format_italic</mat-icon>
   </div>
 
-  <div class="icon_wrapper format_icon" (mousedown)="setQuestionFormat('underline', $event)"
-    [ngStyle]="{ 'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent' }">
-    <mat-icon aria-hidden="false" fontIcon="format_underline"></mat-icon>
+  <div
+    class="icon_wrapper format_icon"
+    (mousedown)="setQuestionFormat('underline', $event)"
+    [ngStyle]="{
+      'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+    }"
+  >
+    <mat-icon aria-hidden="false">format_underlined</mat-icon>
   </div>
 </div>
 
-
-
-
-
-
 <!-- Latex Question Input -->
 <div class="form-body">
-  <span class="latex_input_label">LaTeX content in this format -> \( &lt;content&gt; \)</span>
-  <textarea class="latex_input" [(ngModel)]="this.task.questionLatex.DE" (blur)="updateTask()"></textarea>
+  <span class="latex_input_label"
+    >LaTeX content in this format -> \( &lt;content&gt; \)</span
+  >
+  <textarea
+    class="latex_input"
+    [(ngModel)]="this.task.questionLatex.DE"
+    (blur)="updateTask()"
+  ></textarea>
   <!-- <div  class="latex_preview_container">
     <span class="latex_input_label">Preview:</span>
     <app-math-jax-paragraph mathString="{{ task.questionLatex.DE }}"></app-math-jax-paragraph>
   </div> -->
-
 </div>
 
 <div class="icon_wrapper presets" (click)="onOpenPreview()">
-  <mat-icon aria-hidden="false" fontIcon="style"></mat-icon>
+  <mat-icon aria-hidden="false">style</mat-icon>
   Select LaTeX Template
 </div>
 
-
-<app-task-footer 
+<app-task-footer
   [task]="task"
   [isModifiedPoolTask]="isModifiedPoolTask"
   (deleteEvent)="onDelete()"
   (createNewTaskEvent)="onCreateNewTaskChange($event)"
-  (newTagEvent)="onAddTag()" 
+  (newTagEvent)="onAddTag()"
   (previewEvent)="onPreview()"
-  (taskChangeEvent)="updateTask()">
+  (taskChangeEvent)="updateTask()"
+>
 </app-task-footer>

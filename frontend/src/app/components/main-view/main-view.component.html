@@ -1,111 +1,159 @@
 <div class="main">
-    <div class="sidenav" id="sidenav" #sidenav>
+  <mat-toolbar *ngIf="!isLoginPage()" class="app-toolbar">
+    <img src="public/logo.png" id="header-logo" aria-hidden="false" />
+    <span class="app-title">Exam Toolbox</span>
+    <span class="spacer"></span>
+    <button
+      mat-stroked-button
+      [mat-menu-trigger-for]="userMenu"
+      class="user-menu-button"
+      data-cy="user-menu-button"
+      aria-label="User menu"
+    >
+      <div class="avatar">{{ initialLetter }}</div>
+      <span class="username-text">{{ username }}</span>
+      <mat-icon iconPositionEnd>more_vert</mat-icon>
+    </button>
+    <mat-menu #userMenu="matMenu" xPosition="after">
+      <button data-cy="logout-button" mat-menu-item (click)="onLogout()">
+        <mat-icon aria-hidden="false">logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+  <mat-divider></mat-divider>
 
-        <button class="dropdown-button">
-            <div class="user-profile">
-                <div class="avatar">{{initialLetter}}</div>
-                <span class="user-name">{{username}}</span>
-                <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
-                    <path fill="currentColor" fill-opacity="1" fill-rule="nonzero" stroke="none"
-                        d="m.646 3.354.708-.708L4 5.293l2.646-2.647.708.708L4 6.707z"></path>
-                </svg>
-            </div>
+  <mat-drawer-container
+    class="main-drawer-container"
+    *ngIf="!isLoginPage()"
+    autosize
+  >
+    <mat-drawer
+      #drawer
+      class="main-drawer"
+      [class.collapsed]="sidebarCollapsed"
+      mode="side"
+      [opened]="true"
+    >
+      <mat-action-list>
+        <button
+          mat-list-item
+          routerLink="/dashboard"
+          routerLinkActive="active-button"
+          class="nav-item"
+          data-cy="nav-dashboard"
+          [matTooltip]="sidebarCollapsed ? 'Dashboard' : ''"
+          matTooltipPosition="right"
+          aria-label="Dashboard"
+        >
+          <mat-icon matListItemIcon aria-hidden="false">dashboard</mat-icon>
+          <span matListItemTitle class="nav-label">Dashboard</span>
+        </button>
+        <button
+          mat-list-item
+          routerLink="/create-exam"
+          routerLinkActive="active-button"
+          class="nav-item"
+          data-cy="nav-create-exam"
+          [matTooltip]="sidebarCollapsed ? 'Create New Exam' : ''"
+          matTooltipPosition="right"
+          aria-label="Create New Exam"
+        >
+          <mat-icon matListItemIcon aria-hidden="false"
+            >note_stack_add</mat-icon
+          >
+          <span matListItemTitle class="nav-label">Create New Exam</span>
+        </button>
+        <a
+          mat-list-item
+          routerLink="/exams-pool"
+          routerLinkActive="active-button"
+          class="nav-item"
+          data-cy="nav-exams-pool"
+          [matTooltip]="sidebarCollapsed ? 'Exams Pool' : ''"
+          matTooltipPosition="right"
+          aria-label="Exams Pool"
+        >
+          <mat-icon matListItemIcon aria-hidden="false">note_stack</mat-icon>
+          <span matListItemTitle class="nav-label">Exams Pool</span>
+        </a>
+        <button
+          mat-list-item
+          routerLink="/task-pool"
+          routerLinkActive="active-button"
+          class="nav-item"
+          data-cy="nav-task-pool"
+          [matTooltip]="sidebarCollapsed ? 'Task Pool' : ''"
+          matTooltipPosition="right"
+          aria-label="Task Pool"
+        >
+          <mat-icon matListItemIcon aria-hidden="false">list_alt</mat-icon>
+          <span matListItemTitle class="nav-label">Task Pool</span>
         </button>
 
-        <button class="search-button">
-            <div class="search-container">
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path fill="var(--color-icon)" fill-rule="evenodd"
-                        d="M16 11.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0m-.956 4.206a5.5 5.5 0 1 1 .662-.662.5.5 0 0 1 .148.102l3 3a.5.5 0 1 1-.707.707l-3-3a.5.5 0 0 1-.103-.147"
-                        clip-rule="evenodd"></path>
-                </svg>
-                <input type="text" placeholder="Search..." class="search-input" aria-label="Search"
-                    aria-autocomplete="list" aria-controls="mat-autocomplete-0" aria-activedescendant="mat-option-0"
-                    #search (keydown.enter)="onSearch(search.value)">
-            </div>
-        </button>
+        <div id="bottom-buttons">
+          <button
+            mat-list-item
+            (click)="toggleTheme()"
+            class="nav-item"
+            [matTooltip]="sidebarCollapsed ? 'Theme' : ''"
+            matTooltipPosition="right"
+            aria-label="Toggle Theme"
+          >
+            <mat-icon matListItemIcon aria-hidden="false">{{
+              themeIcon
+            }}</mat-icon>
+            <span matListItemTitle class="nav-label">Theme</span>
+          </button>
 
-        <div class="separator-horizontal" style="margin-top: 5%;"></div>
+          <button
+            mat-list-item
+            routerLink="/getting-started"
+            class="nav-item"
+            routerLinkActive="active-button"
+            [matTooltip]="sidebarCollapsed ? 'Getting Started' : ''"
+            matTooltipPosition="right"
+            aria-label="Getting Started"
+            data-cy="nav-getting-started"
+          >
+            <mat-icon matListItemIcon aria-hidden="false">help</mat-icon>
+            <span matListItemTitle class="nav-label">Getting Started</span>
+          </button>
 
-        <button class="nav-item" (click)="toggleNavCollapse()">
-            <div class="icon-container">
-                <svg viewBox="-0.5 -0.5 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"
-                    id="Sidebar-Collapse--Streamline-Iconoir" height="22" width="22">
-                    <path d="M12.7769375 14.284625H2.2230625c-0.8326875 0 -1.5076875 -0.675 -1.5076875 -1.5076875l0 -10.553875c0
-                         -0.8326875 0.675 -1.5076875 1.5076875 -1.5076875h10.553875c0.8326875 0 1.5076875 0.675 1.5076875
-                          1.5076875v10.553875c0 0.8326875 -0.675 1.5076875 -1.5076875 1.5076875Z" stroke="currentColor"
-                        stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path>
-                    <!-- <path d="M3.9192500000000003 5.9923125 2.6 7.5l1.3192499999999998 1.5076875" stroke="currentColor"
-                        stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path> -->
-                    <path d="M5.615375 14.284625V0.7153750000000001" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round" stroke-width="1.8"></path>
-                </svg>
-            </div>
-            Collapse
-        </button>
+          <button
+            mat-list-item
+            routerLink="/about"
+            class="nav-item"
+            routerLinkActive="active-button"
+            [matTooltip]="sidebarCollapsed ? 'About' : ''"
+            matTooltipPosition="right"
+            aria-label="About"
+            data-cy="nav-about"
+          >
+            <mat-icon matListItemIcon aria-hidden="false">info</mat-icon>
+            <span matListItemTitle class="nav-label">About</span>
+          </button>
 
-        <button routerLink="/dashboard" class="nav-item">
-            <div class="icon-container">
-                <mat-icon aria-hidden="false" fontIcon="dashboard"></mat-icon>
-            </div>
-            Dashboard
-        </button>
+          <button
+            mat-list-item
+            class="drawer-toggle"
+            [matTooltip]="sidebarCollapsed ? 'Show sidebar' : ''"
+            matTooltipPosition="right"
+            aria-label="Toggle Left Sidebar"
+            (click)="toggleSidebar()"
+          >
+            <mat-icon matListItemIcon aria-hidden="false">{{
+              sidebarCollapsed ? 'left_panel_open' : 'left_panel_close'
+            }}</mat-icon>
+            <span matListItemTitle class="nav-label">Hide Sidebar</span>
+          </button>
+        </div>
+      </mat-action-list>
+    </mat-drawer>
+    <mat-drawer-content class="drawer-outlet">
+      <router-outlet></router-outlet>
+    </mat-drawer-content>
+  </mat-drawer-container>
 
-        <button routerLink="/getting-started" class="nav-item">
-            <div class="icon-container">
-                <mat-icon aria-hidden="false" fontIcon="info"></mat-icon>
-            </div>
-            Getting Started
-        </button>
-
-        <button routerLink="/about" class="nav-item">
-            <div class="icon-container">
-                <mat-icon aria-hidden="false" fontIcon="bug_report"></mat-icon>
-            </div>
-            About
-        </button>
-
-        <button (click)="toggleTheme()" class="nav-item">
-            <div class="icon-container">
-                <mat-icon aria-hidden="false" fontIcon="format_color_fill"></mat-icon>
-            </div>
-            Theme
-        </button>
-
-        <button (click)="onLogout()" class="nav-item">
-            <div class="icon-container">
-                <mat-icon aria-hidden="false" fontIcon="logout"></mat-icon>
-            </div>
-            Logout
-        </button>
-    </div>
-
-
-    <div class="separator-vertical" *ngIf="!isNavCollapsed"></div>
-    <div class="content" #content>
-        <router-outlet></router-outlet>
-    </div>
+  <router-outlet *ngIf="isLoginPage()"></router-outlet>
 </div>
-
-
-
-<!-- <div class="main">
-    <mat-drawer-container >
-        <mat-drawer mode="side" opened class="sidenav">
-            <mat-selection-list>
-                <mat-list>
-                    <div>
-                        <a mat-button class="sideButton" routerLink="/dashboard">Dashboard</a>
-                        <a mat-button class="sideButton" routerLink="/getting-started">Getting Started</a>
-                        <a mat-button class="sideButton" routerLink="/about">About</a>
-                        <button mat-button (click)="onLogout()">Logout</button>
-                        <app-theme-toggle></app-theme-toggle>
-                    </div>
-                </mat-list>
-            </mat-selection-list>
-        </mat-drawer>
-        <mat-drawer-content>
-            <router-outlet></router-outlet>
-        </mat-drawer-content>
-    </mat-drawer-container>
-</div> -->

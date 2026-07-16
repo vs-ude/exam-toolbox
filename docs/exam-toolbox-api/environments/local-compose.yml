@@ -1,0 +1,6 @@
+name: local-compose
+variables:
+  - secret: true
+    name: token
+  - name: baseUrl
+    value: http://localhost

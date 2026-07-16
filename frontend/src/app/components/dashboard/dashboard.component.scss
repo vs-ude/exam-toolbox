@@ -1,578 +1,516 @@
 .file_browser {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 
-   
-    border-color: var(--border-color);
-    background-color: var(--color-background);
+  border-color: var(--border-color);
+  background-color: var(--color-background);
 }
 
 .recents {
-    border-bottom-width: 100px;
-    border-bottom: solid 1px;
-    border-color: var(--border-color);
-    padding: 10px 32px 10px 32px;
-    color: var(--color-text);
+  border-bottom-width: 100px;
+  border-bottom: solid 1px;
+  border-color: var(--border-color);
+  padding: 10px 32px 10px 32px;
+  color: var(--color-text);
 }
-
-
 
 .file_creation_thumbnails {
-    margin: 32px 0 16px 0;
-    padding: 0 32px 0 32px;
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: stretch;
-    align-items: center;
-    gap: 4%;
-    row-gap: 16px;
+  margin: 32px 0 16px 0;
+  padding: 0 32px 0 32px;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: stretch;
+  align-items: center;
+  gap: 4%;
+  row-gap: 16px;
 }
-
-
 
 /*------------------------------------------------------------------
   [ Create Exam Section ]*/
 .create_exam_button {
-    padding: 24px 0 24px 0;
-    display: flex;
-    align-items: center;
-    flex: 1;
-    flex-direction: column;
-    padding: 24px 0;
-    height: 128px;
-    width: 15vw;
-    min-width: 164px;
-    border-radius: 8px;
-    border: 0;
-    background: var(--color-bg-accent);
-    text-align: center;
-    box-sizing: border-box;
-    transition: .1s ease-in;
+  padding: 24px 0 24px 0;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px 0;
+  height: 128px;
+  width: 15vw;
+  min-width: 164px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--color-bg-accent);
+  text-align: center;
+  box-sizing: border-box;
+  transition: 0.1s ease-in;
 }
 
 .create_exam_button:hover {
-    transition: .1s ease-in;
+  transition: 0.1s ease-in;
 
-    .create_icon_container {
-        background-color: #0768c4
-    }
-
-    ;
-
-    .create_name {
-        color: #ffff
-    }
-
-    ;
-
-    .create_description {
-        color: #ffffffcc
-    }
-
-    ;
-    background-color:var(--color-primary);
-    cursor: pointer;
+  .create_icon_container {
+    background-color: #0768c4;
+  }
+  .create_name {
+    color: #ffff;
+  }
+  .create_description {
+    color: #ffffffcc;
+  }
+  background-color: var(--color-primary);
+  cursor: pointer;
 }
 
 .create_exam_button:active {
-    filter: brightness(85%);
-    transition: .05 ease-in;
+  filter: brightness(85%);
+  transition: 0.05 ease-in;
 }
 
 .create_icon_container {
-    width: 32px;
-    height: 32px;
-    margin: 0 0 12 0;
-    background-color: var(--color-primary);
-    color: white;
-    box-sizing: border-box;
-    border-radius: 24px;
-    padding: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 12px;
-    animation: create_background-fadeIn .2s ease-in-out;
-    transition: .1s ease-in;
+  width: 32px;
+  height: 32px;
+  margin: 0 0 12 0;
+  background-color: var(--color-primary);
+  color: white;
+  box-sizing: border-box;
+  border-radius: 24px;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  animation: create_background-fadeIn 0.2s ease-in-out;
+  transition: 0.1s ease-in;
 }
 
-
 .description_shelf {
-    display: flex;
-    flex-direction: column;
-    font-size: 11px;
-    font-style: normal;
-    gap: 4px;
-    line-height: 16px;
-    transition: .1s ease-in;
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  font-style: normal;
+  gap: 4px;
+  line-height: 16px;
+  transition: 0.1s ease-in;
 }
 
 .create_name {
-    color: var(--color-text);
-    font-weight: 550;
-    transition: .1s ease-in;
+  color: var(--color-text);
+  font-weight: 550;
+  transition: 0.1s ease-in;
 }
 
 .create_description {
-    color: var(--color-text-secondary);
-    font-weight: 450;
-    transition: .1s ease-in;
+  color: var(--color-text-secondary);
+  font-weight: 450;
+  transition: 0.1s ease-in;
 }
-
-
 
 /*------------------------------------------------------------------
   [ Exercise Pool Section ]*/
 
 .pool_exam_button {
-    padding: 24px 0 24px 0;
-    display: flex;
-    align-items: center;
-    flex: 1;
-    flex-direction: column;
-    padding: 24px 0;
-    height: 128px;
-    width: 15vw;
-    min-width: 164px;
-    border-radius: 8px;
-    border: 0;
-    background: var(--color-bg-accent);
-    text-align: center;
-    box-sizing: border-box;
-    transition: .1s ease-in;
+  padding: 24px 0 24px 0;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px 0;
+  height: 128px;
+  width: 15vw;
+  min-width: 164px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--color-bg-accent);
+  text-align: center;
+  box-sizing: border-box;
+  transition: 0.1s ease-in;
 }
 
 .pool_exam_button:hover {
-    transition: .1s ease-in;
+  transition: 0.1s ease-in;
 
-    .pool_icon_container {
-        background-color: #0000001a
-    }
-
-    ;
-
-    .pool_name {
-        color: #ffff
-    }
-
-    ;
-
-    .pool_description {
-        color: #ffffffcc
-    }
-
-    ;
-    background-color:var(--color-secondary);
-    cursor: pointer;
+  .pool_icon_container {
+    background-color: #0000001a;
+  }
+  .pool_name {
+    color: #ffff;
+  }
+  .pool_description {
+    color: #ffffffcc;
+  }
+  background-color: var(--color-secondary);
+  cursor: pointer;
 }
 
 .pool_exam_button:active {
-    filter: brightness(85%);
-    transition: .05 ease-in;
+  filter: brightness(85%);
+  transition: 0.05 ease-in;
 }
 
 .pool_icon_container {
-    width: 32px;
-    height: 32px;
-    margin: 0 0 12 0;
-    background-color: var(--color-secondary);
-    color: white;
-    box-sizing: border-box;
-    border-radius: 24px;
-    padding: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 12px;
-    animation: create_background-fadeIn .2s ease-in-out;
-    transition: .1s ease-in;
+  width: 32px;
+  height: 32px;
+  margin: 0 0 12 0;
+  background-color: var(--color-secondary);
+  color: white;
+  box-sizing: border-box;
+  border-radius: 24px;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  animation: create_background-fadeIn 0.2s ease-in-out;
+  transition: 0.1s ease-in;
 }
 
 .pool_name {
-    color: var(--color-text);
-    font-weight: 550;
-    transition: .1s ease-in;
+  color: var(--color-text);
+  font-weight: 550;
+  transition: 0.1s ease-in;
 }
 
 .pool_description {
-    color: var(--color-text-secondary);
-    font-weight: 450;
-    transition: .1s ease-in;
+  color: var(--color-text-secondary);
+  font-weight: 450;
+  transition: 0.1s ease-in;
 }
-
 
 /*------------------------------------------------------------------
   [ Download Section ]*/
 .download_exam_button {
-    padding: 24px 0 24px 0;
-    display: flex;
-    align-items: center;
-    flex: 1;
-    flex-direction: column;
-    padding: 24px 0;
-    height: 128px;
-    width: 15vw;
-    min-width: 164px;
-    border-radius: 8px;
-    border: 0;
-    background: var(--color-bg-accent);
-    text-align: center;
-    box-sizing: border-box;
-    transition: .1s ease-in;
+  padding: 24px 0 24px 0;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px 0;
+  height: 128px;
+  width: 15vw;
+  min-width: 164px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--color-bg-accent);
+  text-align: center;
+  box-sizing: border-box;
+  transition: 0.1s ease-in;
 }
 
 .download_exam_button:hover {
-    transition: .1s ease-in;
+  transition: 0.1s ease-in;
 
-    .download_icon_container {
-        background-color: #0000001a
-    }
-
-    ;
-
-    .download_name {
-        color: #ffff
-    }
-
-    ;
-
-    .download_description {
-        color: #ffffffcc
-    }
-
-    ;
-    background-color:var(--color-warn);
-    cursor: pointer;
+  .download_icon_container {
+    background-color: #0000001a;
+  }
+  .download_name {
+    color: #ffff;
+  }
+  .download_description {
+    color: #ffffffcc;
+  }
+  background-color: var(--color-warn);
+  cursor: pointer;
 }
 
 .download_exam_button:active {
-    filter: brightness(85%);
-    transition: .05 ease-in;
+  filter: brightness(85%);
+  transition: 0.05 ease-in;
 }
 
 .download_icon_container {
-    width: 32px;
-    height: 32px;
-    margin: 0 0 12 0;
-    background-color: var(--color-warn);
-    color: white;
-    box-sizing: border-box;
-    border-radius: 24px;
-    padding: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 12px;
-    animation: create_background-fadeIn .2s ease-in-out;
-    transition: .1s ease-in;
+  width: 32px;
+  height: 32px;
+  margin: 0 0 12 0;
+  background-color: var(--color-warn);
+  color: white;
+  box-sizing: border-box;
+  border-radius: 24px;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  animation: create_background-fadeIn 0.2s ease-in-out;
+  transition: 0.1s ease-in;
 }
 
 .download_name {
-    color: var(--color-text);
-    font-weight: 550;
-    transition: .1s ease-in;
+  color: var(--color-text);
+  font-weight: 550;
+  transition: 0.1s ease-in;
 }
 
 .download_description {
-    color: var(--color-text-secondary);
-    font-weight: 450;
-    transition: .1s ease-in;
+  color: var(--color-text-secondary);
+  font-weight: 450;
+  transition: 0.1s ease-in;
 }
-
 
 /*------------------------------------------------------------------
   [ Import Section ]*/
 .import_exam_button {
-    padding: 24px 0 24px 0;
-    display: flex;
-    align-items: center;
-    flex: 1;
-    flex-direction: column;
-    padding: 24px 0;
-    height: 128px;
-    width: 15vw;
-    min-width: 164px;
-    border-radius: 8px;
-    border: 0;
-    background: var(--color-bg-accent);
-    text-align: center;
-    box-sizing: border-box;
-    transition: .1s ease-in;
+  padding: 24px 0 24px 0;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px 0;
+  height: 128px;
+  width: 15vw;
+  min-width: 164px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--color-bg-accent);
+  text-align: center;
+  box-sizing: border-box;
+  transition: 0.1s ease-in;
 }
 
 .import_exam_button:hover {
-    transition: .1s ease-in;
+  transition: 0.1s ease-in;
 
-    .import_icon_container {
-        background-color: #0000001a
-    }
-
-    ;
-
-    .import_name {
-        color: #ffff
-    }
-
-    ;
-
-    .import_description {
-        color: #ffffffcc
-    }
-
-    ;
-    background-color:#757575;
-    cursor: pointer;
+  .import_icon_container {
+    background-color: #0000001a;
+  }
+  .import_name {
+    color: #ffff;
+  }
+  .import_description {
+    color: #ffffffcc;
+  }
+  background-color: #757575;
+  cursor: pointer;
 }
 
 .import_exam_button:active {
-    filter: brightness(85%);
-    transition: .05 ease-in;
+  filter: brightness(85%);
+  transition: 0.05 ease-in;
 }
 
 .import_icon_container {
-    width: 32px;
-    height: 32px;
-    margin: 0 0 12 0;
-    background-color: var(--color-dark-gray);
-    color: white;
-    box-sizing: border-box;
-    border-radius: 24px;
-    padding: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 12px;
-    animation: create_background-fadeIn .2s ease-in-out;
-    transition: .1s ease-in;
+  width: 32px;
+  height: 32px;
+  margin: 0 0 12 0;
+  background-color: var(--color-dark-gray);
+  color: white;
+  box-sizing: border-box;
+  border-radius: 24px;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  animation: create_background-fadeIn 0.2s ease-in-out;
+  transition: 0.1s ease-in;
 }
 
 .import_name {
-    color: var(--color-text);
-    font-weight: 550;
-    transition: .1s ease-in;
+  color: var(--color-text);
+  font-weight: 550;
+  transition: 0.1s ease-in;
 }
 
 .import_description {
-    color: var(--color-text-secondary);
-    font-weight: 450;
-    transition: .1s ease-in;
+  color: var(--color-text-secondary);
+  font-weight: 450;
+  transition: 0.1s ease-in;
 }
-
-
-
 
 /*------------------------------------------------------------------
   [ View Bar ]*/
 .viewBar_wrapper {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 32px 0 32px;
-    height: 64px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 32px 0 32px;
+  height: 64px;
 }
 
-
 .viewBar_left {
-    display: flex;
-    flex-shrink: 0;
-    gap: 4px;
-    align-items: center;
-    padding-right: 1px;
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+  align-items: center;
+  padding-right: 1px;
 }
 
 .tab_button {
-    padding: 0 8px 0 8px;
-    height: 24px;
-    font-size: 11px;
-    line-height: 16px;
-    border-radius: 5px;
-    border: none;
-    background: var(--color-bg);
-    color: var(--color-text-secondary);
-    transition: .1s ease-in;
-    font-weight: normal;
+  padding: 0 8px 0 8px;
+  height: 24px;
+  font-size: 11px;
+  line-height: 16px;
+  border-radius: 5px;
+  border: none;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  transition: 0.1s ease-in;
+  font-weight: normal;
 }
 
 .tab_button:hover {
-    cursor: pointer;
-    background-color: var(--border-color);
-    transition: ease-in .05s;
+  cursor: pointer;
+  background-color: var(--border-color);
+  transition: ease-in 0.05s;
 }
 
 .tab_button:active {
-    filter: brightness(85%);
+  filter: brightness(85%);
 }
 
 .tab_select {
-    background: var(--color-bg-accent);
-    color: var(--color-text);
-    transition: .1s ease-in;
-    font-weight: 500;
+  background: var(--color-bg-accent);
+  color: var(--color-text);
+  transition: 0.1s ease-in;
+  font-weight: 500;
 }
-
 
 .viewBar_right {
-    display: flex;
-    flex-shrink: 0;
-    gap: 4px;
-    align-items: center;
-    padding-right: 1px;
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+  align-items: center;
+  padding-right: 1px;
 }
 
-
 .sortingOptions_wrapper {
-    display: flex;
-    align-items: center;
-    padding-right: 17px;
-    font-size: 11px;
-    position: relative;
-    color: var(--color-text);
+  display: flex;
+  align-items: center;
+  padding-right: 17px;
+  font-size: 11px;
+  position: relative;
+  color: var(--color-text);
 }
 
 .sortingOptions_wrapper:hover {
-    cursor: pointer;
-}
-
-
-
-.filterOptions_wrapper {
-    display: flex;
-    align-items: center;
-    padding-right: 17px;
-    font-size: 11px;
-    position: relative;
-    color: var(--color-text);
+  cursor: pointer;
 }
 
 .filterOptions_wrapper {
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding-right: 17px;
+  font-size: 11px;
+  position: relative;
+  color: var(--color-text);
+}
+
+.filterOptions_wrapper {
+  cursor: pointer;
 }
 
 .viewOptions_wrapper {
-    color: var(--color-text-secondary);
-    display: flex;
-    align-items: center;
-    padding-right: 17px;
-    font-size: 11px;
-    box-sizing: border-box;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  padding-right: 17px;
+  font-size: 11px;
+  box-sizing: border-box;
 }
 
 .icon_wrapper {
-
-    box-sizing: border-box;
-    padding: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  box-sizing: border-box;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .icon_wrapper:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .icon_wrapper:active {
-    filter: brightness(85%);
+  filter: brightness(85%);
 }
-
 
 .viewOptions_select {
-    color: var(--color-text);
-    background-color: var(--border-color);
-    border-radius: 5px;
+  color: var(--color-text);
+  background-color: var(--border-color);
+  border-radius: 5px;
 }
-
 
 /*------------------------------------------------------------------
   [ Dropdowns ]*/
 .dropdown {
-    background-color: #1e1e1e;
-    color: #ffffff;
-    font-size: small;
-    position: absolute;
-    top: 100%;
-    z-index: 999;
-    min-width: 100%;
-    display: flex;
-    justify-content: left;
-    flex-direction: column;
-    padding: 10% 10% 10% 10%;
+  background-color: #1e1e1e;
+  color: #ffffff;
+  font-size: small;
+  position: absolute;
+  top: 100%;
+  z-index: 999;
+  min-width: 100%;
+  display: flex;
+  justify-content: left;
+  flex-direction: column;
+  padding: 10% 10% 10% 10%;
 }
 
 .triangle:before {
-    content: "";
-    width: 0px;
-    height: 0px;
-    position: absolute;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-bottom: 8px solid #1e1e1e;
-    left: 5%;
-    top: -8px;
+  content: '';
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 8px solid #1e1e1e;
+  left: 5%;
+  top: -8px;
 }
 
-
-
 .dropdown_header {
-    color: var(--color-dark-gray);
-    margin-bottom: 5%;
+  color: var(--color-dark-gray);
+  margin-bottom: 5%;
 }
 
 .option_container {
-    display: flex;
-    justify-content: left;
-    flex-direction: row;
-    padding: 2%;
-    align-items:center ;
+  display: flex;
+  justify-content: left;
+  flex-direction: row;
+  padding: 2%;
+  align-items: center;
 }
 
-.option_container:hover{
-    background-color: #0768c4;
-    margin-left: -10%;
-    margin-right: -10%;
-    transition: .1s ease-in;
+.option_container:hover {
+  background-color: #0768c4;
+  margin-left: -10%;
+  margin-right: -10%;
+  transition: 0.1s ease-in;
 }
 
-.dropdown_icon_wrapper{
-    display: flex;
-    justify-content: left;
-    align-items: center;
+.dropdown_icon_wrapper {
+  display: flex;
+  justify-content: left;
+  align-items: center;
 }
-
 
 .divider {
-    margin-left: -10%;
-    margin-right: -10%;
-    border-bottom: 1px solid var(--color-dark-gray);
+  margin-left: -10%;
+  margin-right: -10%;
+  border-bottom: 1px solid var(--color-dark-gray);
 }
 
-
 .hide_dropdown {
-    display: none;
+  display: none;
 }
 
 .hide_icon {
-    visibility: hidden;
+  visibility: hidden;
 }
-
-
-
-
-
 
 /*------------------------------------------------------------------
   [ File Browser ]*/
 
 .fileBrowser_view {
-    padding: 0 32px 0 32px;
-    display: grid;
-    grid-template-columns: 22% 22% 22% 22%;
-    gap: 4%;
-    grid-auto-rows: 25vh;
+  padding: 0 32px 0 32px;
+  display: grid;
+  grid-template-columns: 22% 22% 22% 22%;
+  gap: 4%;
+  grid-auto-rows: 25vh;
 }
 
 .fileBrowser_item {
-    margin-bottom: 4%;
+  margin-bottom: 4%;
 }
 
 .exams_table {
-    padding: 0 32px 0 32px;
+  padding: 0 32px 0 32px;
 }
