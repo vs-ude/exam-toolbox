@@ -1,37 +1,19 @@
-import {
-  Component,
-  EventEmitter,
-  NgModule,
-  OnInit,
-  Output,
-} from '@angular/core';
-import { BaseTaskComponent } from '../base-task/base-task.component';
-import { LatexTask, Task } from '../../../../types/shared/tasks';
-import { NgIf, NgStyle } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { FormsModule } from '@angular/forms';
-import { MatLabel } from '@angular/material/form-field';
-import { TaskAnimations } from '../task-animations';
-import { MathJaxParagraphComponent } from '../../../math-jax-paragraph/math-jax-paragraph.component';
-import { MatTooltip } from '@angular/material/tooltip';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { PreviewDialogComponent } from './preview-dialog/preview-dialog.component';
-import { TaskFooterComponent } from '../base-task/task-footer/task-footer.component';
+
 import { environment } from '../../../../../environments/environment';
+import { LatexTask, Task } from '../../../../types/shared/tasks';
+import { COMMON_IMPORTS } from '../../../common-imports';
+
+import { TASK_COMMON_IMPORTS } from '../task-common-imports';
+import { BaseTaskComponent } from '../base-task/base-task.component';
+import { TaskAnimations } from '../task-animations';
+import { PreviewDialogComponent } from './preview-dialog/preview-dialog.component';
 
 @Component({
   selector: 'app-latex-task',
   standalone: true,
-  imports: [
-    NgIf,
-    NgStyle,
-    MatIconModule,
-    FormsModule,
-    MatLabel,
-    MathJaxParagraphComponent,
-    MatTooltip,
-    TaskFooterComponent,
-  ],
+  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   templateUrl: './latex-task.component.html',
   styleUrls: ['./latex-task.component.scss', '../task.scss'],
   animations: [

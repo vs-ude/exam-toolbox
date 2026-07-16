@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+
 import { Task, TaskGroup } from '../types/shared/tasks';
-import { ApiService } from './api.service';
 import { User } from '../types/user';
+
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root',

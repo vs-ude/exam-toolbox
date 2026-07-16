@@ -1,18 +1,13 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
+
 import { MainViewComponent } from './components/main-view/main-view.component';
 import { LoadingIndicatorComponent } from './components/loading-indicator/loading-indicator.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    RouterOutlet,
-    CommonModule,
-    MainViewComponent,
-    LoadingIndicatorComponent,
-  ],
+  imports: [CommonModule, MainViewComponent, LoadingIndicatorComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

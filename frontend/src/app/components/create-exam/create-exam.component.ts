@@ -1,13 +1,9 @@
 import { debounceTime, forkJoin, Observable, retry, Subject, take } from 'rxjs';
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { NgFor, NgIf } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
-import { FormsModule } from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { COMMON_IMPORTS } from '../common-imports';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import {
@@ -32,7 +28,7 @@ import { ConflictDialogComponent } from '../conflict-dialog/conflict-dialog.comp
 import {
   ExamAuthDialogComponent,
   ExamAuthDialogResult,
-} from '../../exam-auth-dialog/exam-auth-dialog.component';
+} from '../exam-auth-dialog/exam-auth-dialog.component';
 
 import { AddTaskComponent } from './add-task/add-task.component';
 import { ManualTextComponent } from './tasks/manual-text/manual-text.component';
@@ -69,16 +65,11 @@ interface PDFTaskInfo {
   selector: 'app-create-exam',
   standalone: true,
   imports: [
-    MatIconModule,
-    MatTooltipModule,
+    ...COMMON_IMPORTS,
     AddTaskComponent,
     MultiplechoiceTaskComponent,
-    NgFor,
-    NgIf,
     MatSelectModule,
     MatSlideToggleModule,
-    FormsModule,
-    MatCardModule,
     MatTabsModule,
     MatFormFieldModule,
     ShortAnswerTaskComponent,

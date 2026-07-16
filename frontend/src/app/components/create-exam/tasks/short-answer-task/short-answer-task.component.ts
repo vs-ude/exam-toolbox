@@ -7,33 +7,19 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+
+import { environment } from '../../../../../environments/environment';
 import { ShortAnswerTask, Task } from '../../../../types/shared/tasks';
-import { NgIf, NgStyle } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { FormsModule } from '@angular/forms';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatCardModule } from '@angular/material/card';
-import { MatInputModule } from '@angular/material/input';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { COMMON_IMPORTS } from '../../../common-imports';
+
 import { BaseTaskComponent } from '../base-task/base-task.component';
 import { TaskAnimations } from '../task-animations';
-import { TaskFooterComponent } from '../base-task/task-footer/task-footer.component';
-import { environment } from '../../../../../environments/environment';
+import { TASK_COMMON_IMPORTS } from '../task-common-imports';
 
 @Component({
   selector: 'app-short-answer-task',
   standalone: true,
-  imports: [
-    FormsModule,
-    MatCardModule,
-    MatButtonToggleModule,
-    MatIconModule,
-    MatInputModule,
-    NgStyle,
-    NgIf,
-    MatTooltipModule,
-    TaskFooterComponent,
-  ],
+  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation,

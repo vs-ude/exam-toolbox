@@ -1,27 +1,24 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { ApiService, JobStatus } from '../../services/api.service';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { saveAs } from 'file-saver';
-import { CommonModule } from '@angular/common';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { COMMON_IMPORTS } from '../common-imports';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { saveAs } from 'file-saver';
+
+import { ApiService, JobStatus } from '../../services/api.service';
 
 @Component({
   selector: 'app-mass-exam-dialog',
   standalone: true,
   imports: [
-    CommonModule,
+    ...COMMON_IMPORTS,
     MatDialogModule,
     MatButtonModule,
-    MatIconModule,
     MatProgressBarModule,
     MatSlideToggleModule,
-    FormsModule,
   ],
   templateUrl: './mass-exam-dialog.component.html',
   styleUrl: './mass-exam-dialog.component.scss',

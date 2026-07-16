@@ -1,13 +1,14 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { CommonModule } from '@angular/common';
-import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
 import { Subscription } from 'rxjs';
+
+import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
 
 @Component({
   selector: 'app-delete-confirmation-dialog',

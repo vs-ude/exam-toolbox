@@ -1,17 +1,17 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { trigger, transition, style, animate } from '@angular/animations';
+import { COMMON_IMPORTS } from '../common-imports';
+import { MatDialog } from '@angular/material/dialog';
 import { forkJoin } from 'rxjs';
-import { ExamCardComponent } from '../exam-card/exam-card.component';
+import { saveAs } from 'file-saver';
+
 import { ExamStub } from '../../types/shared/stubs';
 import { ApiService, DownloadableJob } from '../../services/api.service';
-import { saveAs } from 'file-saver';
 import { LoadingService } from '../../services/loading.service';
-import { MatIconModule } from '@angular/material/icon';
-import { NgClass, NgIf } from '@angular/common';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatDialog } from '@angular/material/dialog';
+
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { ExamCardComponent } from '../exam-card/exam-card.component';
 import { ExamsTableComponent } from '../exams-table/exams-table.component';
 
 type FilterFn = (exams: ExamStub[]) => ExamStub[];
@@ -23,14 +23,7 @@ type ExamFilter = {
 @Component({
   selector: 'app-exams-pool',
   standalone: true,
-  imports: [
-    ExamCardComponent,
-    MatIconModule,
-    NgClass,
-    MatTooltip,
-    NgIf,
-    ExamsTableComponent,
-  ],
+  imports: [...COMMON_IMPORTS, ExamCardComponent, ExamsTableComponent],
   templateUrl: './exams-pool.component.html',
   styleUrl: './exams-pool.component.scss',
   animations: [

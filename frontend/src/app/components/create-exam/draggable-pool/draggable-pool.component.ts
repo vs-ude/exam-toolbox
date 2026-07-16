@@ -1,12 +1,14 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Task } from '../../../types/shared/tasks';
-import { ColorProviderService } from '../../../services/color-provider.service';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
-import { ApiService } from '../../../services/api.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { forkJoin, Observable, Subscription } from 'rxjs';
-import { PoolTaskComponent } from './pool-task/pool-task.component';
+
+import { ApiService } from '../../../services/api.service';
+import { ColorProviderService } from '../../../services/color-provider.service';
+import { Task } from '../../../types/shared/tasks';
 import { Tag } from '../../../types/shared/tag';
+
+import { PoolTaskComponent } from './pool-task/pool-task.component';
 
 enum SortPoints {
   Ascending,

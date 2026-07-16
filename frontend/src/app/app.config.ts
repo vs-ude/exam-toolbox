@@ -5,14 +5,15 @@ import {
   provideZoneChangeDetection,
 } from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
-import { ApiService } from './services/api.service';
-
-import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { MatIconRegistry } from '@angular/material/icon';
-import { authInterceptor } from './interceptors/auth.interceptor';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { MatIconRegistry } from '@angular/material/icon';
+
+import { ApiService } from './services/api.service';
+import { authInterceptor } from './interceptors/auth.interceptor';
+
+import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [

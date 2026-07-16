@@ -1,28 +1,17 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { BaseTaskComponent } from '../base-task/base-task.component';
-import { TableTask, Task } from '../../../../types/shared/tasks';
-import { NgFor, NgIf, NgStyle } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { MatLabel } from '@angular/material/form-field';
-import { FormsModule } from '@angular/forms';
-import { TaskAnimations } from '../task-animations';
-import { MatTooltip } from '@angular/material/tooltip';
-import { TaskFooterComponent } from '../base-task/task-footer/task-footer.component';
+
 import { environment } from '../../../../../environments/environment';
+import { TableTask, Task } from '../../../../types/shared/tasks';
+import { COMMON_IMPORTS } from '../../../common-imports';
+
+import { TASK_COMMON_IMPORTS } from '../task-common-imports';
+import { BaseTaskComponent } from '../base-task/base-task.component';
+import { TaskAnimations } from '../task-animations';
 
 @Component({
   selector: 'app-table-task',
   standalone: true,
-  imports: [
-    NgIf,
-    NgStyle,
-    MatIconModule,
-    MatLabel,
-    FormsModule,
-    NgFor,
-    MatTooltip,
-    TaskFooterComponent,
-  ],
+  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   templateUrl: './table-task.component.html',
   styleUrls: ['./table-task.component.scss', '../task.scss'],
   animations: [

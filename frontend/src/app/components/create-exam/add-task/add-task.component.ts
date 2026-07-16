@@ -1,5 +1,6 @@
 import { NgStyle } from '@angular/common';
 import { Component, inject, Input } from '@angular/core';
+
 import { environment } from '../../../../environments/environment';
 
 @Component({

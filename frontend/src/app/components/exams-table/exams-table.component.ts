@@ -10,12 +10,13 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { ExamStub } from '../../types/shared/stubs';
-import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { DownloadableJob } from '../../services/api.service';
-import { MatTooltip } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+
+import { ExamStub } from '../../types/shared/stubs';
+import { DownloadableJob } from '../../services/api.service';
 
 @Component({
   selector: 'app-exams-table',

@@ -1,25 +1,23 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { COMMON_IMPORTS } from '../common-imports';
+
 import { ApiService } from '../../services/api.service';
 import { Tag } from '../../types/shared/tag';
-import { RouterModule } from '@angular/router';
-import { ExamCardComponent } from '../exam-card/exam-card.component';
-import { TaskPoolCardComponent } from '../task-pool-card/task-pool-card.component'; // Import RouterModule
-import { AsyncPipe, JsonPipe, NgIf, NgStyle } from '@angular/common';
 import { ExamStub } from '../../types/shared/stubs';
 import { Task } from '../../types/shared/tasks';
+
+import { TaskPoolCardComponent } from '../task-pool-card/task-pool-card.component';
+import { ExamCardComponent } from '../exam-card/exam-card.component';
 
 @Component({
   selector: 'app-search',
   standalone: true,
   imports: [
+    ...COMMON_IMPORTS,
     RouterModule,
     ExamCardComponent,
     TaskPoolCardComponent,
-    AsyncPipe,
-    NgIf,
-    JsonPipe,
-    NgStyle,
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss',

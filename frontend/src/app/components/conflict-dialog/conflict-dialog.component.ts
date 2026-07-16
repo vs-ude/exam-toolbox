@@ -1,16 +1,17 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import {
   MAT_DIALOG_DATA,
   MatDialogRef,
   MatDialogModule,
 } from '@angular/material/dialog';
-import { CommonModule, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { Exam } from '../../types/shared/exam';
+import { Subscription } from 'rxjs';
+
 import { AutosaveWrapper } from '../../services/autosave.service';
 import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
-import { Subscription } from 'rxjs';
+import { Exam } from '../../types/shared/exam';
 
 export interface ConflictDialogData {
   dbExam: Exam;

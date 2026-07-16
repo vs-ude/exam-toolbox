@@ -1,4 +1,3 @@
-import { NgClass, NgFor, NgIf, NgStyle } from '@angular/common';
 import {
   AfterViewChecked,
   AfterViewInit,
@@ -8,32 +7,19 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatTooltipModule } from '@angular/material/tooltip';
+
+import { environment } from '../../../../../environments/environment';
 import { MultipleChoiceTask, Task } from '../../../../types/shared/tasks';
+import { COMMON_IMPORTS } from '../../../common-imports';
+
 import { BaseTaskComponent } from '../base-task/base-task.component';
 import { TaskAnimations } from '../task-animations';
-import { environment } from '../../../../../environments/environment';
+import { TASK_COMMON_IMPORTS } from '../task-common-imports';
 
 @Component({
   selector: 'app-multiplechoiceTask',
   standalone: true,
-  imports: [
-    FormsModule,
-    NgFor,
-    MatCardModule,
-    MatButtonToggleModule,
-    MatIconModule,
-    MatInputModule,
-    NgStyle,
-    NgIf,
-    MatTooltipModule,
-    NgClass,
-  ],
+  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   templateUrl: './multiplechoice-task.component.html',
   styleUrls: ['./multiplechoice-task.component.scss', '../task.scss'],
   animations: [

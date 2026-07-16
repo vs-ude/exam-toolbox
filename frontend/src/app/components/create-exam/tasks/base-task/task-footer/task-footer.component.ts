@@ -1,15 +1,9 @@
+import { Component, EventEmitter, input, Input, Output } from '@angular/core';
 import { NgStyle } from '@angular/common';
-import {
-  Component,
-  EventEmitter,
-  input,
-  Input,
-  NgModule,
-  Output,
-} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
+
 import { Task } from '../../../../../types/shared/tasks';
 
 @Component({

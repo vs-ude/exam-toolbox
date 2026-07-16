@@ -11,9 +11,10 @@ import {
   ViewChild,
 } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
+
+import { environment } from '../../../../environments/environment';
 import { Translation } from '../../../types/shared/base';
 import { TaskAnimations } from '../tasks/task-animations';
-import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-task-group-title',

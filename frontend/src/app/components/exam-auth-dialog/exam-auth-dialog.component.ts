@@ -28,7 +28,7 @@ import { CommonModule } from '@angular/common';
 import { map, Observable, startWith } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 
-import { ApiService } from '../services/api.service';
+import { ApiService } from '../../services/api.service';
 
 export interface ExamAuthDialogData {
   users: string[];

@@ -1,12 +1,12 @@
 import { NgStyle } from '@angular/common';
 import { Component, Inject, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+
 import { ApiService } from '../../services/api.service';
-import { Tag } from '../../types/shared/tag';
 import { TagHelperService } from '../../services/tag-helper.service';
+import { Tag } from '../../types/shared/tag';
 
 export interface AddTagDialogData {
   _id: string;

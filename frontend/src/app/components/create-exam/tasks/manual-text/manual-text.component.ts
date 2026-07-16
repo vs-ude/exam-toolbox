@@ -1,29 +1,17 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+
+import { environment } from '../../../../../environments/environment';
+import { ManualText, Task } from '../../../../types/shared/tasks';
+import { COMMON_IMPORTS } from '../../../common-imports';
+
+import { TASK_COMMON_IMPORTS } from '../task-common-imports';
 import { TaskAnimations } from '../task-animations';
 import { BaseTaskComponent } from '../base-task/base-task.component';
-import { ManualText, Task } from '../../../../types/shared/tasks';
-import { NgIf, NgStyle } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatLabel } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MathJaxParagraphComponent } from '../../../math-jax-paragraph/math-jax-paragraph.component';
-import { TaskFooterComponent } from '../base-task/task-footer/task-footer.component';
-import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-manual-text',
   standalone: true,
-  imports: [
-    NgIf,
-    NgStyle,
-    MatIconModule,
-    FormsModule,
-    MatLabel,
-    MathJaxParagraphComponent,
-    MatTooltip,
-    TaskFooterComponent,
-  ],
+  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   templateUrl: './manual-text.component.html',
   styleUrls: ['./manual-text.component.scss', '../task.scss'],
   animations: [

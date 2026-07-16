@@ -1,17 +1,20 @@
 import { Component, Input, input } from '@angular/core';
-import { Task } from '../../types/shared/tasks';
 import { MatIconModule } from '@angular/material/icon';
-import { ColorProviderService } from '../../services/color-provider.service';
 import { NgFor, NgStyle } from '@angular/common';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+
+import { environment } from '../../../environments/environment';
+
+import { Task } from '../../types/shared/tasks';
+import { ColorProviderService } from '../../services/color-provider.service';
+import { Tag } from '../../types/shared/tag';
+import { ApiService } from '../../services/api.service';
+import { TagHelperService } from '../../services/tag-helper.service';
+
 import {
   AddTagDialogComponent,
   AddTagDialogData,
 } from '../add-tag-dialog/add-tag-dialog.component';
-import { Tag } from '../../types/shared/tag';
-import { ApiService } from '../../services/api.service';
-import { TagHelperService } from '../../services/tag-helper.service';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-task-pool-card',

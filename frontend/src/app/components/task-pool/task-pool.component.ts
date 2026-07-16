@@ -1,32 +1,29 @@
-import { NgClass, NgFor, NgIf, NgStyle } from '@angular/common';
 import {
   AfterViewInit,
   Component,
   HostListener,
   ViewChild,
 } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { Task } from '../../types/shared/tasks';
-import { TaskPoolCardComponent } from '../task-pool-card/task-pool-card.component';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { COMMON_IMPORTS } from '../common-imports';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { forkJoin } from 'rxjs';
+
+import { Task } from '../../types/shared/tasks';
 import { ApiService } from '../../services/api.service';
 import { Tag } from '../../types/shared/tag';
-import { forkJoin } from 'rxjs';
+
+import { TaskPoolCardComponent } from '../task-pool-card/task-pool-card.component';
 
 @Component({
   selector: 'app-task-pool',
   standalone: true,
   imports: [
-    MatIconModule,
-    NgClass,
-    NgFor,
+    ...COMMON_IMPORTS,
     TaskPoolCardComponent,
     MatTableModule,
     MatSortModule,
-    NgIf,
-    NgStyle,
   ],
   templateUrl: './task-pool.component.html',
   styleUrl: './task-pool.component.scss',

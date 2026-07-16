@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { BaseTaskComponent } from '../base-task/base-task.component';
-import { NewPage, Task } from '../../../../types/shared/tasks';
-import { TaskAnimations } from '../task-animations';
 import { MatIcon } from '@angular/material/icon';
+
+import { NewPage, Task } from '../../../../types/shared/tasks';
+
+import { BaseTaskComponent } from '../base-task/base-task.component';
+import { TaskAnimations } from '../task-animations';
 
 @Component({
   selector: 'app-new-page',

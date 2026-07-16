@@ -1,34 +1,19 @@
-import { BaseTaskComponent } from '../base-task/base-task.component';
-import { NgIf, NgStyle } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatTooltipModule } from '@angular/material/tooltip';
+
 import { PictureTask, Task } from '../../../../types/shared/tasks';
+import { ApiService } from '../../../../services/api.service';
+import { environment } from '../../../../../environments/environment';
+import { COMMON_IMPORTS } from '../../../common-imports';
+
+import { TASK_COMMON_IMPORTS } from '../task-common-imports';
+import { BaseTaskComponent } from '../base-task/base-task.component';
 import { TaskAnimations } from '../task-animations';
 import { DragAndDropDirective } from '../drag-and-drop.directive';
-import { ApiService } from '../../../../services/api.service';
-import { TaskFooterComponent } from '../base-task/task-footer/task-footer.component';
-import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-picture-task',
   standalone: true,
-  imports: [
-    NgStyle,
-    NgIf,
-    FormsModule,
-    MatCardModule,
-    MatButtonToggleModule,
-    MatIconModule,
-    MatInputModule,
-    MatTooltipModule,
-    DragAndDropDirective,
-    TaskFooterComponent,
-  ],
+  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS, DragAndDropDirective],
   templateUrl: './picture-task.component.html',
   styleUrls: ['./picture-task.component.scss', '../task.scss'],
   animations: [

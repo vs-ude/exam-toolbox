@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { Router, RouterModule, RouterOutlet } from '@angular/router';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
-import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -10,8 +12,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { ThemeToggleService } from '../../services/theme-toggle.service';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
-import { NgIf } from '@angular/common';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-main-view',

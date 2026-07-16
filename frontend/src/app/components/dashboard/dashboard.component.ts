@@ -1,22 +1,21 @@
 import { Component, HostListener } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { ExamCardComponent } from '../exam-card/exam-card.component';
-import { NgClass, NgFor } from '@angular/common';
 import { Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { COMMON_IMPORTS } from '../common-imports';
+
 import { ApiService } from '../../services/api.service';
 import { ExamStub } from '../../types/shared/stubs';
+
+import { ExamCardComponent } from '../exam-card/exam-card.component';
 import { ExamsTableComponent } from '../exams-table/exams-table.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
+    ...COMMON_IMPORTS,
     MatButtonModule,
-    MatIconModule,
     ExamCardComponent,
-    NgFor,
-    NgClass,
     ExamsTableComponent,
   ],
   templateUrl: './dashboard.component.html',
