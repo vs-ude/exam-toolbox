@@ -97,8 +97,7 @@ cypress_e2e:
         LDAP_BASE_DN: dc=university,dc=example
         LDAP_READONLY_USER: 'True' # username: "readonly", pw: "readonly"
     - name: mongo:8
-      alias: mongo
-      command: ['--replSet', 'rs0']
+      command: ['--bind_ip', 'mongo', '--replSet', 'rs0']
     - name: marlonb/mailcrab:latest
       alias: mailcrab
   variables:

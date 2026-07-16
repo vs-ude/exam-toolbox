@@ -29,10 +29,7 @@ rm -f tectonic.tar.gz
 mv tectonic /usr/local/bin/
 
 echo "Preparing tectonic cache..."
-echo "Saving cache in ${HOME}/.cache/Tectonic"
-echo "${CI_PROJECT_DIR}"
 cd "$TEMPLATE_PATH"
 LOG="$CI_PROJECT_DIR/.logs"
 mkdir -p ${LOG}
 HOME="${CI_PROJECT_DIR}" tectonic -X compile exam.tex --untrusted >"$LOG/tectonic.log" 2>&1
-ls -l ${CI_PROJECT_DIR}/.cache/Tectonic
