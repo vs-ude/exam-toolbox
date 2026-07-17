@@ -20,13 +20,13 @@ An internal web application for higher-education staff to author exam templates,
 
 | Layer             | Technology                                                   |
 | ----------------- | ------------------------------------------------------------ |
-| Frontend          | Angular 18, Angular Material, RxJS, Prettier                 |
+| Frontend          | Angular 22, Angular Material, RxJS, Prettier                 |
 | Backend           | Deno, Hono, `@hono/zod-openapi`                              |
 | Document pipeline | LaTeX (tectonic), Ghostscript, ZIP archiving, Eta templating |
 | Image processing  | ImageMagick (contrast adjustment for QR scanning)            |
 | Reverse proxy     | Caddy                                                        |
 | Authentication    | Native Hono JWT & OpenLDAP client integration                |
-| Database          | MongoDB 6                                                    |
+| Database          | MongoDB 8                                                    |
 | Directory         | OpenLDAP                                                     |
 | Dev mail sandbox  | MailCrab                                                     |
 | Periodic cleanup  | Deno cron container                                          |
@@ -49,7 +49,7 @@ exam-toolbox/
 │       └── task_types/   # Per-task-type Eta templates
 ├── caddy/                # Caddy reverse proxy + public static asset host
 ├── docs/                 # OpenAPI specifications and Bruno API client collection
-├── frontend/             # Angular 18 application (hot-reloaded in dev container via ng serve)
+├── frontend/             # Angular 22 application (hot-reloaded in dev container via ng serve)
 ├── ldap/                 # Bootstrap LDIF data for local/dev LDAP with role mapping
 ├── periodical/           # Cron container that removes stale job directories
 ├── testdata/             # Shared test fixtures (exam JSON, CSVs, images, scan JPEGs)

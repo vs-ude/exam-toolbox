@@ -2,13 +2,13 @@
 
 ## Overview
 
-The frontend is an **Angular 18 standalone-component application** that provides the browser UI for managing exams, a task pool, tags, and mass exam generation jobs. It communicates exclusively with the backend through the `/api/*` prefix (proxied by Caddy in all environments). Hash-based routing is used (`withHashLocation()`).
+The frontend is an **Angular 22 standalone-component application** that provides the browser UI for managing exams, a task pool, tags, and mass exam generation jobs. It communicates exclusively with the backend through the `/api/*` prefix (proxied by Caddy in all environments). Hash-based routing is used (`withHashLocation()`).
 
 ## Technology stack
 
 | Concern             | Technology                                                          |
 | ------------------- | ------------------------------------------------------------------- |
-| Framework           | Angular 18 (standalone components, no NgModules)                    |
+| Framework           | Angular 22 (standalone components, no NgModules)                    |
 | UI components       | Angular Material (MDC-based) with `material-symbols-outlined` icons |
 | HTTP                | `HttpClient` with a functional interceptor (`withInterceptors`)     |
 | Reactive primitives | RxJS `BehaviorSubject`, `Observable`, `pipe` operators              |

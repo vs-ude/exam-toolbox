@@ -28,7 +28,7 @@ The scan ingest pipeline is actively being built. QR detection and exam-code val
 ## Repository structure
 
 ```
-frontend/          Angular 18 SPA
+frontend/          Angular 22 SPA
 backend/           Deno + Hono API, generation pipeline, worker pool
 backend/template/  LaTeX / Eta template sources and QR cache
 caddy/             Reverse proxy config and static file serving
@@ -58,7 +58,7 @@ Browser → Caddy (/:static, /api/*:proxy) → Deno/Hono backend → MongoDB
 
 | Layer             | Stack                                                       |
 | ----------------- | ----------------------------------------------------------- |
-| Frontend          | Angular 18, Angular Material, RxJS, Prettier, Karma/Cypress |
+| Frontend          | Angular 22, Angular Material, RxJS, Prettier, Karma/Cypress |
 | Backend           | Deno, Hono, `@hono/zod-openapi`, MongoDB driver             |
 | Document pipeline | LaTeX (`tectonic`), Ghostscript, Eta templating, ZIP        |
 | Image / QR        | ImageMagick, `qrencode`, `zbarimg`                          |
