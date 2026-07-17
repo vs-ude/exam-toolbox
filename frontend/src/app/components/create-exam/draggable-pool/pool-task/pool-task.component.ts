@@ -1,5 +1,12 @@
-import { CommonModule, DOCUMENT } from '@angular/common';
-import { Component, ElementRef, Inject, Input, Renderer2 } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  Component,
+  ElementRef,
+  Inject,
+  Input,
+  Renderer2,
+  DOCUMENT,
+} from '@angular/core';
 import { Task } from '../../../../types/shared/tasks';
 import { environment } from '../../../../../environments/environment';
 
