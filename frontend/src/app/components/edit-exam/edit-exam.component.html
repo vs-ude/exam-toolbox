@@ -81,28 +81,6 @@
   </div>
 
   <div class="center_container">
-    <div class="exam_name_wrapper" id="examName">
-      @if (!isNameChange) {
-        <span
-          class="exam_name"
-          (click)="isNameChange = true"
-          id="examName"
-          data-cy="exam-name-display"
-        >
-          {{ exam.courseName }}
-        </span>
-      }
-      @if (isNameChange) {
-        <input
-          class="name_input"
-          [value]="exam.courseName"
-          (keydown)="onNameChange($event)"
-          id="examName"
-          #nameInput
-          data-cy="exam-name-input"
-        />
-      }
-    </div>
     <div class="viewBar_wrapper">
       <div class="icon_wrapper bar_icon">
         <mat-icon
@@ -129,7 +107,6 @@
           >
         }
       </div>
-
       <div class="icon_wrapper bar_icon">
         <mat-icon
           aria-hidden="false"
@@ -138,78 +115,19 @@
           >download</mat-icon
         >
       </div>
+      <h3 class="exam_name" data-cy="exam-name-display">
+        {{ exam.courseName }}
+      </h3>
 
-      <div
-        [matTooltip]="exam.bilingual ? 'Bilingual' : 'Monolingual'"
-        class="icon_wrapper language_icon"
-      >
-        <mat-icon aria-hidden="false">language</mat-icon>
-        <mat-slide-toggle
-          labelPosition="before"
-          class="small"
-          [(ngModel)]="exam.bilingual"
-        />
-      </div>
+      <span class="spacer"></span>
 
-      <div matTooltip="Exam duration" class="duration_wrapper">
-        <div class="icon_wrapper">
-          <mat-icon aria-hidden="false">access_time</mat-icon>
-        </div>
-        <input
-          class="duration_picker"
-          type="number"
-          min="0"
-          step="10"
-          [(ngModel)]="exam.examLengthMinutes"
-          data-cy="duration-input"
-        />
-      </div>
-
-      <div matTooltip="Exam date" class="date_wrapper">
-        <input
-          type="date"
-          class="datePicker"
-          [(ngModel)]="exam.date"
-          data-cy="date-input"
-        />
-      </div>
-
-      <div matTooltip="Examiner" class="examiner_wrapper" id="examiner">
-        <mat-icon matPrefix aria-hidden="false">person</mat-icon>
-        <input
-          class="examiner_input"
-          placeholder="Name"
-          required
-          [(ngModel)]="exam.examinerName"
-          data-cy="examiner-input"
-        />
-      </div>
-
-      <div matTooltip="Semester" class="semester_wrapper bar_icon">
-        <div class="icon_wrapper">
-          <mat-icon aria-hidden="false">school</mat-icon>
-        </div>
-        <mat-select
-          class="selectSemester"
-          placeholder="Select Semester"
-          [(ngModel)]="exam.semester"
-          panelClass="semesterSelect"
-          data-cy="semester-select"
-        >
-          @for (semester of semesters; track semester) {
-            <mat-option [value]="semester">
-              {{ semester }}
-            </mat-option>
-          }
-        </mat-select>
-      </div>
-
-      <div matTooltip="Configure Access Rights" class="icon_wrapper bar_icon">
+      <div class="icon_wrapper bar_icon">
         <mat-icon
           aria-hidden="false"
-          matTooltip="Configure Access Rights"
-          (click)="onConfigureAccess()"
-          >manage_accounts</mat-icon
+          matTooltip="Exam Setup"
+          (click)="onSetup()"
+          data-cy="exam-setup"
+          >tune</mat-icon
         >
       </div>
     </div>

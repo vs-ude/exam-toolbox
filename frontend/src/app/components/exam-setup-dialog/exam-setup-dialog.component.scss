@@ -1,0 +1,33 @@
+.full-width {
+  width: 100%;
+}
+
+.setup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 420px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 16px;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.hidden {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+
+::ng-deep .mat-vertical-content-container-active {
+  margin-top: 8px;
+}

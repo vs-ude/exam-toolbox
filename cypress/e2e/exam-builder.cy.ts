@@ -6,6 +6,11 @@ describe('Exam Builder Drag and Drop and create pdf preview', () => {
   });
 
   it('Drag a Short Answer block and generate a PDF preview', () => {
+    // insert required exam meta-data
+    cy.get('[data-cy="course-name-input"]').clear().type('Test Exam');
+    cy.get('[data-cy="examiner-input"]').clear().type('Dr. Cypress');
+    cy.get('[data-cy="save-meta"]').click();
+
     // Drag and Drop
     const dataTransfer = new DataTransfer();
 
@@ -18,10 +23,6 @@ describe('Exam Builder Drag and Drop and create pdf preview', () => {
     cy.get('[data-cy="dropzone"]')
       .contains('Assignment 1.a')
       .should('be.visible');
-
-    // insert required exam meta-data
-    cy.get('[data-cy="examiner-input"]').type('Dr. Cypress');
-    cy.get('[data-cy="date-input"]').type('2026-12-24');
 
     // generate preview PDF
     cy.get('[data-cy="preview-btn"]').click();

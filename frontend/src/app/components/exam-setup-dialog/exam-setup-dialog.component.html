@@ -1,0 +1,330 @@
+<h2 mat-dialog-title>Exam Setup</h2>
+
+<mat-dialog-content>
+  @if (isLoading) {
+    <div class="spinner-container">
+      <mat-spinner diameter="40" />
+    </div>
+  }
+
+  @if (!isLoading) {
+    @if (isNew) {
+      <mat-stepper orientation="vertical" #stepper>
+        <mat-step [stepControl]="nameFormGroup">
+          <ng-template matStepLabel>Name</ng-template>
+          <form [formGroup]="nameFormGroup" class="step-form">
+            <mat-form-field class="full-width">
+              <mat-label>Course Name</mat-label>
+              <input
+                matInput
+                formControlName="courseName"
+                data-cy="course-name-input"
+                placeholder="Course name"
+                required
+              />
+            </mat-form-field>
+
+            <mat-form-field class="full-width">
+              <mat-label>Examiner</mat-label>
+              <mat-icon matPrefix>person</mat-icon>
+              <input
+                matInput
+                formControlName="examinerName"
+                data-cy="examiner-input"
+                placeholder="Name"
+                required
+              />
+            </mat-form-field>
+
+            <div class="step-actions">
+              <button
+                mat-flat-button
+                matStepperNext
+                [disabled]="nameFormGroup.invalid"
+              >
+                Next
+              </button>
+            </div>
+          </form>
+        </mat-step>
+
+        <mat-step [stepControl]="dateFormGroup">
+          <ng-template matStepLabel>Date and Time</ng-template>
+          <form [formGroup]="dateFormGroup" class="step-form">
+            <mat-form-field class="full-width">
+              <mat-label>Semester</mat-label>
+              <mat-icon matPrefix>school</mat-icon>
+              <input
+                matInput
+                formControlName="semester"
+                placeholder="Semester"
+                [matAutocomplete]="semesterAuto"
+              />
+              <mat-autocomplete #semesterAuto="matAutocomplete">
+                @for (semester of filteredSemesters$ | async; track semester) {
+                  <mat-option [value]="semester">{{ semester }}</mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field class="full-width">
+              <mat-label>Exam Date</mat-label>
+              <mat-icon matPrefix>event</mat-icon>
+              <input matInput type="date" formControlName="date" required />
+            </mat-form-field>
+
+            <mat-form-field class="full-width">
+              <mat-label>Duration (minutes)</mat-label>
+              <mat-icon matPrefix>access_time</mat-icon>
+              <input
+                matInput
+                type="number"
+                formControlName="examLengthMinutes"
+                min="0"
+                step="10"
+                required
+              />
+            </mat-form-field>
+
+            <div class="step-actions">
+              <button mat-button matStepperPrevious>Back</button>
+              <button
+                mat-flat-button
+                matStepperNext
+                [disabled]="dateFormGroup.invalid"
+              >
+                Next
+              </button>
+            </div>
+          </form>
+        </mat-step>
+
+        <mat-step [stepControl]="languageFormGroup">
+          <ng-template matStepLabel>Language</ng-template>
+          <form [formGroup]="languageFormGroup" class="step-form">
+            <div class="toggle-row">
+              <mat-icon>language</mat-icon>
+              <span>Bilingual</span>
+              <mat-slide-toggle formControlName="bilingual" />
+            </div>
+
+            <div class="step-actions">
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-flat-button matStepperNext>Next</button>
+            </div>
+          </form>
+        </mat-step>
+
+        <mat-step>
+          <ng-template matStepLabel>Configure Access</ng-template>
+          <div class="step-form">
+            <mat-form-field class="full-width">
+              <mat-label>Users</mat-label>
+              <mat-chip-grid #userChipGridS aria-label="User selection">
+                @for (user of selectedUsers; track user) {
+                  <mat-chip-row (removed)="removeUser(user)">
+                    {{ user }}
+                    <button matChipRemove><mat-icon>cancel</mat-icon></button>
+                  </mat-chip-row>
+                }
+              </mat-chip-grid>
+              <input
+                matInput
+                #userInput
+                placeholder="Add user..."
+                [formControl]="userInputCtrl"
+                [matChipInputFor]="userChipGridS"
+                [matAutocomplete]="userAutoS"
+                #userAutoTriggerS="matAutocompleteTrigger"
+                (click)="openPanel(userAutoTriggerS)"
+              />
+              <mat-autocomplete
+                #userAutoS="matAutocomplete"
+                (optionSelected)="addUser($event)"
+              >
+                @for (user of filteredUsers$ | async; track user) {
+                  <mat-option [value]="user">{{ user }}</mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field class="full-width">
+              <mat-label>Groups</mat-label>
+              <mat-chip-grid #groupChipGridS aria-label="Group selection">
+                @for (group of selectedGroups; track group) {
+                  <mat-chip-row (removed)="removeGroup(group)">
+                    {{ group }}
+                    <button matChipRemove><mat-icon>cancel</mat-icon></button>
+                  </mat-chip-row>
+                }
+              </mat-chip-grid>
+              <input
+                #groupInput
+                placeholder="Add group..."
+                [formControl]="groupInputCtrl"
+                [matChipInputFor]="groupChipGridS"
+                [matAutocomplete]="groupAutoS"
+                #groupAutoTriggerS="matAutocompleteTrigger"
+                (click)="openPanel(groupAutoTriggerS)"
+              />
+              <mat-autocomplete
+                #groupAutoS="matAutocomplete"
+                (optionSelected)="addGroup($event)"
+              >
+                @for (group of filteredGroups$ | async; track group) {
+                  <mat-option [value]="group">{{ group }}</mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+
+            <div class="step-actions">
+              <button mat-button matStepperPrevious>Back</button>
+            </div>
+          </div>
+        </mat-step>
+      </mat-stepper>
+    } @else {
+      <div class="setup-form">
+        <form [formGroup]="nameFormGroup">
+          <mat-form-field class="full-width">
+            <mat-label>Course Name</mat-label>
+            <input
+              matInput
+              formControlName="courseName"
+              placeholder="Course name"
+              required
+            />
+          </mat-form-field>
+
+          <mat-form-field class="full-width">
+            <mat-label>Examiner</mat-label>
+            <mat-icon matPrefix>person</mat-icon>
+            <input
+              matInput
+              formControlName="examinerName"
+              placeholder="Name"
+              required
+            />
+          </mat-form-field>
+        </form>
+
+        <form [formGroup]="dateFormGroup">
+          <mat-form-field class="full-width">
+            <mat-label>Semester</mat-label>
+            <mat-icon matPrefix>school</mat-icon>
+            <input
+              matInput
+              formControlName="semester"
+              placeholder="Semester"
+              [matAutocomplete]="semesterAuto"
+            />
+            <mat-autocomplete #semesterAuto="matAutocomplete">
+              @for (semester of filteredSemesters$ | async; track semester) {
+                <mat-option [value]="semester">{{ semester }}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+
+          <mat-form-field class="full-width">
+            <mat-label>Exam Date</mat-label>
+            <mat-icon matPrefix>event</mat-icon>
+            <input matInput type="date" formControlName="date" required />
+          </mat-form-field>
+
+          <mat-form-field class="full-width">
+            <mat-label>Duration (minutes)</mat-label>
+            <mat-icon matPrefix>access_time</mat-icon>
+            <input
+              matInput
+              type="number"
+              formControlName="examLengthMinutes"
+              min="0"
+              step="10"
+              required
+            />
+          </mat-form-field>
+        </form>
+
+        <form [formGroup]="languageFormGroup">
+          <div class="toggle-row">
+            <mat-icon>language</mat-icon>
+            <span>Bilingual</span>
+            <mat-slide-toggle formControlName="bilingual" />
+          </div>
+        </form>
+
+        <mat-form-field class="full-width">
+          <mat-label>Users</mat-label>
+          <mat-chip-grid #userChipGrid aria-label="User selection">
+            @for (user of selectedUsers; track user) {
+              <mat-chip-row (removed)="removeUser(user)">
+                {{ user }}
+                <button matChipRemove><mat-icon>cancel</mat-icon></button>
+              </mat-chip-row>
+            }
+          </mat-chip-grid>
+          <input
+            matInput
+            #userInput
+            placeholder="Add user..."
+            [formControl]="userInputCtrl"
+            [matChipInputFor]="userChipGrid"
+            [matAutocomplete]="userAuto"
+            #userAutoTrigger="matAutocompleteTrigger"
+            (click)="openPanel(userAutoTrigger)"
+          />
+          <mat-autocomplete
+            #userAuto="matAutocomplete"
+            (optionSelected)="addUser($event)"
+          >
+            @for (user of filteredUsers$ | async; track user) {
+              <mat-option [value]="user">{{ user }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <mat-label>Groups</mat-label>
+          <mat-chip-grid #groupChipGrid aria-label="Group selection">
+            @for (group of selectedGroups; track group) {
+              <mat-chip-row (removed)="removeGroup(group)">
+                {{ group }}
+                <button matChipRemove><mat-icon>cancel</mat-icon></button>
+              </mat-chip-row>
+            }
+          </mat-chip-grid>
+          <input
+            #groupInput
+            placeholder="Add group..."
+            [formControl]="groupInputCtrl"
+            [matChipInputFor]="groupChipGrid"
+            [matAutocomplete]="groupAuto"
+            #groupAutoTrigger="matAutocompleteTrigger"
+            (click)="openPanel(groupAutoTrigger)"
+          />
+          <mat-autocomplete
+            #groupAuto="matAutocomplete"
+            (optionSelected)="addGroup($event)"
+          >
+            @for (group of filteredGroups$ | async; track group) {
+              <mat-option [value]="group">{{ group }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="onSave()"
+    data-cy="save-meta"
+    [disabled]="isInvalid"
+  >
+    Save
+  </button>
+</mat-dialog-actions>

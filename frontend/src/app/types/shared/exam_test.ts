@@ -36,8 +36,8 @@ function makeNewPageTask(_taskId: string): NewPage {
 Deno.test('Exam constructor sets placeholders and defaults', () => {
   const exam = new Exam();
 
-  assertEquals(exam.courseName, 'placeholder');
-  assertEquals(exam.examinerName, 'placeholder');
+  assertEquals(exam.courseName, '');
+  assertEquals(exam.examinerName, '');
   assertEquals(exam.semester, 'WS 70/71');
   assertEquals(exam.date, '1970-01-01');
   assertEquals(exam.examLengthMinutes, 0);

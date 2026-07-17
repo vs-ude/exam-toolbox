@@ -29,8 +29,8 @@ export class Exam {
     access?: { users: string[]; groups?: string[] },
     _id?: string,
   ) {
-    this.courseName = courseName ?? 'placeholder';
-    this.examinerName = examinerName ?? 'placeholder';
+    this.courseName = courseName ?? '';
+    this.examinerName = examinerName ?? '';
     this.semester = semester ?? 'WS 70/71';
     this.date = date ?? '1970-01-01';
     this.examLengthMinutes = examLengthMinutes ?? 0;

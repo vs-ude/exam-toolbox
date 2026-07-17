@@ -5,11 +5,10 @@ describe('User Permissions and Role-Based Access', () => {
     cy.login('admin');
     cy.get('[data-cy="nav-create-exam"]').click();
 
-    // Fill exam metadata
-    cy.get('[data-cy="exam-name-display"]').click();
-    cy.get('[data-cy="exam-name-input"]').type(`${examName}{enter}`);
-    cy.get('[data-cy="examiner-input"]').type('Dr. Admin');
-    cy.get('[data-cy="date-input"]').type('2026-10-10');
+    // insert required exam meta-data
+    cy.get('[data-cy="course-name-input"]').clear().type(examName);
+    cy.get('[data-cy="examiner-input"]').clear().type('Dr. Admin');
+    cy.get('[data-cy="save-meta"]').click();
 
     // Intercept the specific save call from ApiService
     cy.intercept('POST', '/api/exams').as('saveExam');
@@ -45,9 +44,11 @@ describe('User Permissions and Role-Based Access', () => {
     cy.get('[data-cy="nav-create-exam"]').click();
     cy.intercept('POST', '/api/exams').as('deniedSave');
 
-    // Fill out only minimally required fields to click save
-    cy.get('[data-cy="examiner-input"]').type('Student Try');
-    cy.get('[data-cy="date-input"]').type('2026-12-24');
+    // insert required exam meta-data
+    cy.get('[data-cy="course-name-input"]').clear().type('Student Exam');
+    cy.get('[data-cy="examiner-input"]').clear().type('Student');
+    cy.get('[data-cy="save-meta"]').click();
+
     cy.get('[data-cy="save"]').click();
 
     // Backend must reject this

@@ -1,12 +1,5 @@
 import { debounceTime, forkJoin, Observable, retry, Subject, take } from 'rxjs';
-import {
-  Component,
-  ElementRef,
-  HostListener,
-  ViewChild,
-  ChangeDetectionStrategy,
-} from '@angular/core';
-import { MatSelectModule } from '@angular/material/select';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { COMMON_IMPORTS } from '../common-imports';
@@ -22,7 +15,6 @@ import {
 import { HttpResponse } from '@angular/common/http';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 import { environment } from '../../../environments/environment';
 
@@ -45,9 +37,9 @@ import { MassExamDialogComponent } from '../mass-exam-dialog/mass-exam-dialog.co
 import { UpdateTaskDialogComponent } from '../update-task-dialog/update-task-dialog.component';
 import { ConflictDialogComponent } from '../conflict-dialog/conflict-dialog.component';
 import {
-  ExamAuthDialogComponent,
-  ExamAuthDialogResult,
-} from '../exam-auth-dialog/exam-auth-dialog.component';
+  ExamSetupDialogComponent,
+  ExamSetupDialogData,
+} from '../exam-setup-dialog/exam-setup-dialog.component';
 import { ManualTextComponent } from '../tasks/manual-text/manual-text.component';
 import { MultiplechoiceTaskComponent } from '../tasks/multipleChoiceTask/multiplechoice-task.component';
 import { ShortAnswerTaskComponent } from '../tasks/short-answer-task/short-answer-task.component';
@@ -72,8 +64,6 @@ interface PDFTaskInfo {
     ...COMMON_IMPORTS,
     AddTaskComponent,
     MultiplechoiceTaskComponent,
-    MatSelectModule,
-    MatSlideToggleModule,
     MatTabsModule,
     MatFormFieldModule,
     ShortAnswerTaskComponent,
@@ -95,11 +85,9 @@ interface PDFTaskInfo {
 })
 export class EditExamComponent {
   public inDropzone = false;
-  public isNameChange = false;
   public isUpdateMode = false;
 
   private bodyElement: HTMLElement = document.body;
-  public semesters = ['WS 23/24', 'SS 24', 'WS 24/25', 'SS 25'];
   private modifiedPoolTasks: Set<string> = new Set<string>();
   private newTasksToCreate: Set<string> = new Set<string>();
   private tasksWithModifiedTags: {
@@ -110,7 +98,8 @@ export class EditExamComponent {
   public taskPool: Task[] = [];
   public refreshPool$: Subject<void> = new Subject<void>();
   public totalPoints = 0;
-  public exam = new Exam();
+  public exam: Exam = new Exam();
+  public isExamSetup = false;
 
   public currentGroupView = 0;
   public readonly publicPath = environment.publicPath;
@@ -139,57 +128,21 @@ export class EditExamComponent {
     this.autosaveTrigger$.pipe(debounceTime(2000)).subscribe(() => {
       // If we are in "Create Mode" (no ID or 'new'), pass undefined to service (it handles 'new_draft')
       const idToSave =
-        this.exam._id && this.exam._id !== 'new' ? this.exam._id : undefined;
+        this.exam && this.exam._id && this.exam._id !== 'new'
+          ? this.exam._id
+          : undefined;
       this.autosaveService.saveLocal(idToSave, this.exam);
     });
 
     this.importExam();
     this.importPoolTasks();
-    this.semesters = this.getSemesters();
-    if (!this.exam.semester) {
-      this.exam.semester = this.semesters[0];
-    }
     if (this.exam.tasks.length === 0) {
       this.exam.tasks = [this.taskBuilder.createDefaultGroup()];
     }
   }
 
-  @ViewChild('nameInput')
-  nameInput?: ElementRef;
-
   private triggerAutosave() {
     this.autosaveTrigger$.next();
-  }
-
-  @HostListener('document:click', ['$event'])
-  unselectInputs(event: MouseEvent) {
-    const elementId = (event.target as Element).id;
-
-    if (elementId === 'examName') {
-      return;
-    }
-    this.isNameChange = false;
-    if (!this.nameInput) {
-      return;
-    }
-    const newName = this.nameInput.nativeElement.value;
-    if (newName === '') {
-      return;
-    }
-    this.exam.courseName = newName;
-    if (this.exam.courseName !== newName) this.triggerAutosave();
-  }
-
-  onNameChange(event: any) {
-    if (event.key !== 'Enter') {
-      return;
-    }
-    const newName = event.target.value;
-    if (newName !== '') {
-      this.exam.courseName = event.target.value;
-      this.triggerAutosave();
-    }
-    this.isNameChange = false;
   }
 
   dragStart(event: DragEvent) {
@@ -570,14 +523,18 @@ export class EditExamComponent {
         dialogRef.afterClosed().subscribe((resume: boolean) => {
           if (resume) {
             this.exam = draft.data;
+            this.isExamSetup = true;
             this.adjustTotalPoints();
             this.snackBar.open('Resumed unsaved new exam.', 'OK', {
               duration: 3000,
             });
           } else {
             this.autosaveService.clearLocal(undefined);
+            this.openSetupDialog();
           }
         });
+      } else {
+        this.openSetupDialog();
       }
       return;
     }
@@ -626,6 +583,7 @@ export class EditExamComponent {
 
   private initializeExamData(response: Exam) {
     this.exam = response;
+    this.isExamSetup = true;
     for (let taskGroup of this.exam.tasks) {
       for (let task of taskGroup.tasks) {
         this.tagHelper.importTagsToTask(task);
@@ -700,20 +658,29 @@ export class EditExamComponent {
     return String.fromCharCode(97 + (index % 26));
   }
 
-  onConfigureAccess() {
+  onSetup() {
+    this.openSetupDialog();
+  }
+
+  private openSetupDialog() {
+    const data: ExamSetupDialogData = this.isExamSetup
+      ? { exam: this.exam }
+      : {};
     this.dialog
-      .open(ExamAuthDialogComponent, {
-        width: '50%',
-        data: {
-          users: this.exam.access?.users ?? [],
-          groups: this.exam.access?.groups ?? [],
-        },
-      })
+      .open(ExamSetupDialogComponent, { width: '560px', data })
       .afterClosed()
-      .subscribe((result: ExamAuthDialogResult | null) => {
-        if (result) {
-          this.exam.access = { users: result.users, groups: result.groups };
+      .subscribe((result: Exam | null) => {
+        if (!result) return;
+        if (this.isExamSetup) {
+          Object.assign(this.exam, result);
+        } else {
+          this.exam = result;
+          if (this.exam.tasks.length === 0) {
+            this.exam.tasks = [this.taskBuilder.createDefaultGroup()];
+          }
+          this.isExamSetup = true;
         }
+        this.triggerAutosave();
       });
   }
 
@@ -725,30 +692,6 @@ export class EditExamComponent {
       height: '60%',
       data: { exam: this.exam },
     });
-  }
-
-  private getSemesters() {
-    const currentDate = new Date();
-    const month = currentDate.getMonth() + 1; // getMonth() returns 0-11, so we add 1
-    const year = currentDate.getFullYear();
-
-    let formatYear = (year: number): string => {
-      return year.toString().slice(-2);
-    };
-
-    if (month >= 10 || month <= 3) {
-      return [
-        `WS ${formatYear(year)}/${formatYear(year + 1)}`,
-        `SS ${formatYear(year + 1)}`,
-        `WS ${formatYear(year + 1)}/${formatYear(year + 2)}`,
-      ];
-    } else {
-      return [
-        `SS ${formatYear(year)}`,
-        `WS ${formatYear(year)}/${formatYear(year + 1)}`,
-        `SS ${formatYear(year + 1)}`,
-      ];
-    }
   }
 
   public onAddTag(index: number) {
