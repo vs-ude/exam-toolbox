@@ -4,7 +4,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import {
   LatexPreviewsService,
   LatexPreview,
-} from '../../../../../services/latex-previews.service';
+} from '../../../../services/latex-previews.service';
 
 @Component({
   selector: 'app-preview-dialog',

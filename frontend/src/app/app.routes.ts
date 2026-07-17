@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AboutComponent } from './components/about/about.component';
 import { GettingStartedComponent } from './components/getting-started/getting-started.component';
-import { CreateExamComponent } from './components/create-exam/create-exam.component';
+import { EditExamComponent } from './components/edit-exam/edit-exam.component';
 import { DebugComponent } from './components/debug/debug.component';
 import { TaskPoolComponent } from './components/task-pool/task-pool.component';
 import { ExamsPoolComponent } from './components/exams-pool/exams-pool.component';
@@ -20,8 +20,8 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'about', component: AboutComponent },
       { path: 'getting-started', component: GettingStartedComponent },
-      { path: 'create-exam', component: CreateExamComponent },
-      { path: 'edit-exam/:id', component: CreateExamComponent },
+      { path: 'create-exam', component: EditExamComponent },
+      { path: 'edit-exam/:id', component: EditExamComponent },
       { path: 'debug', component: DebugComponent },
       { path: 'task-pool', component: TaskPoolComponent },
       { path: 'exams-pool', component: ExamsPoolComponent },

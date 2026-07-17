@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 
-import { NewPage, Task } from '../../../../types/shared/tasks';
+import { NewPage, Task } from '../../../types/shared/tasks';
 
 import { BaseTaskComponent } from '../base-task/base-task.component';
 import { TaskAnimations } from '../task-animations';

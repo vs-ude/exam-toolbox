@@ -36,18 +36,18 @@ frontend/src/app/
 
 All routes except `/login` are wrapped in a parent route protected by `authGuard`. The root path redirects to `/dashboard`.
 
-| Path                        | Component                           |
-| --------------------------- | ----------------------------------- |
-| `/login`                    | `LoginComponent`                    |
-| `/dashboard`                | `DashboardComponent`                |
-| `/create-exam`              | `CreateExamComponent`               |
-| `/edit-exam/:id`            | `CreateExamComponent` (update mode) |
-| `/task-pool`                | `TaskPoolComponent`                 |
-| `/exams-pool`               | `ExamsPoolComponent`                |
-| `/search` / `/search/:text` | `SearchComponent`                   |
-| `/about`                    | `AboutComponent`                    |
-| `/getting-started`          | `GettingStartedComponent`           |
-| `/debug`                    | `DebugComponent`                    |
+| Path                        | Component                         |
+| --------------------------- | --------------------------------- |
+| `/login`                    | `LoginComponent`                  |
+| `/dashboard`                | `DashboardComponent`              |
+| `/create-exam`              | `EditExamComponent`               |
+| `/edit-exam/:id`            | `EditExamComponent` (update mode) |
+| `/task-pool`                | `TaskPoolComponent`               |
+| `/exams-pool`               | `ExamsPoolComponent`              |
+| `/search` / `/search/:text` | `SearchComponent`                 |
+| `/about`                    | `AboutComponent`                  |
+| `/getting-started`          | `GettingStartedComponent`         |
+| `/debug`                    | `DebugComponent`                  |
 
 ## Application bootstrap (`app.config.ts`)
 
@@ -76,7 +76,7 @@ Components are standalone (no shared NgModule). Each component self-declares its
 | ------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | `LoginComponent`          | `/login`                         | LDAP credential form; calls `AuthService.login()`, navigates to `/dashboard` on success                                                      |
 | `DashboardComponent`      | `/dashboard`                     | Lists recent exams (`ExamCard`) and downloadable mass-generation jobs                                                                        |
-| `CreateExamComponent`     | `/create-exam`, `/edit-exam/:id` | Main exam editor – drag-and-drop task groups, task editing, autosave, live PDF preview, mass generation trigger, conflict resolution on load |
+| `EditExamComponent`       | `/create-exam`, `/edit-exam/:id` | Main exam editor – drag-and-drop task groups, task editing, autosave, live PDF preview, mass generation trigger, conflict resolution on load |
 | `TaskPoolComponent`       | `/task-pool`                     | Browsable/filterable task pool; supports tag filtering, type filtering, free-text search                                                     |
 | `ExamsPoolComponent`      | `/exams-pool`                    | Paginated/searchable table of all exams (`ExamsTable`)                                                                                       |
 | `SearchComponent`         | `/search/:text`                  | Global search across exams and tasks                                                                                                         |
@@ -155,7 +155,7 @@ Persists exam drafts to `localStorage` with a timestamp.
 
 - Key pattern: `exam_autosave_<examId>` or `exam_autosave_new_draft` for new exams.
 - Methods: `saveLocal()`, `loadLocal()`, `clearLocal()`.
-- `CreateExamComponent` triggers autosave on a debounced `Subject` and uses `ConflictDialogComponent` to resolve differences between the local draft and the database version.
+- `EditExamComponent` triggers autosave on a debounced `Subject` and uses `ConflictDialogComponent` to resolve differences between the local draft and the database version.
 
 ### `TaskBuilderService`
 
@@ -244,7 +244,7 @@ Route navigation
   → 401 anywhere → authInterceptor clears session, redirects /login
 ```
 
-### Exam editor flow (`CreateExamComponent`)
+### Exam editor flow (`EditExamComponent`)
 
 1. On init, reads route param (`:id` or empty → new exam).
 2. Checks `AutosaveService` for a local draft; if both a DB version and a draft exist and differ, opens `ConflictDialogComponent`.

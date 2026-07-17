@@ -15,7 +15,7 @@ import { MatIcon } from '@angular/material/icon';
 
 import { environment } from '../../../../environments/environment';
 import { Translation } from '../../../types/shared/base';
-import { TaskAnimations } from '../tasks/task-animations';
+import { TaskAnimations } from '../../tasks/task-animations';
 
 @Component({
   selector: 'app-task-group-title',

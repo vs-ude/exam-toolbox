@@ -24,29 +24,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
-import {
-  AddTagDialogComponent,
-  AddTagDialogData,
-} from '../add-tag-dialog/add-tag-dialog.component';
-import { MassExamDialogComponent } from '../mass-exam-dialog/mass-exam-dialog.component';
-import { UpdateTaskDialogComponent } from '../update-task-dialog/update-task-dialog.component';
-import { ConflictDialogComponent } from '../conflict-dialog/conflict-dialog.component';
-import {
-  ExamAuthDialogComponent,
-  ExamAuthDialogResult,
-} from '../exam-auth-dialog/exam-auth-dialog.component';
-
-import { AddTaskComponent } from './add-task/add-task.component';
-import { ManualTextComponent } from './tasks/manual-text/manual-text.component';
-import { MultiplechoiceTaskComponent } from './tasks/multipleChoiceTask/multiplechoice-task.component';
-import { ShortAnswerTaskComponent } from './tasks/short-answer-task/short-answer-task.component';
-import { TaskGroupTitleComponent } from './task-group-title/task-group-title.component';
-import { PictureTaskComponent } from './tasks/picture-task/picture-task.component';
-import { LatexTaskComponent } from './tasks/latex-task/latex-task.component';
-import { TableTaskComponent } from './tasks/table-task/table-task.component';
-import { NewPageComponent } from './tasks/new-page/new-page.component';
-import { DraggablePoolComponent } from './draggable-pool/draggable-pool.component';
-import { NewPageDialogComponent } from './new-page-dialog/new-page-dialog.component';
+import { environment } from '../../../environments/environment';
 
 import { Exam } from '../../types/shared/exam';
 import { Task } from '../../types/shared/tasks';
@@ -59,7 +37,29 @@ import { ApiService } from '../../services/api.service';
 import { TagHelperService } from '../../services/tag-helper.service';
 import { AutosaveService } from '../../services/autosave.service';
 
-import { environment } from '../../../environments/environment';
+import {
+  AddTagDialogComponent,
+  AddTagDialogData,
+} from '../add-tag-dialog/add-tag-dialog.component';
+import { MassExamDialogComponent } from '../mass-exam-dialog/mass-exam-dialog.component';
+import { UpdateTaskDialogComponent } from '../update-task-dialog/update-task-dialog.component';
+import { ConflictDialogComponent } from '../conflict-dialog/conflict-dialog.component';
+import {
+  ExamAuthDialogComponent,
+  ExamAuthDialogResult,
+} from '../exam-auth-dialog/exam-auth-dialog.component';
+import { ManualTextComponent } from '../tasks/manual-text/manual-text.component';
+import { MultiplechoiceTaskComponent } from '../tasks/multipleChoiceTask/multiplechoice-task.component';
+import { ShortAnswerTaskComponent } from '../tasks/short-answer-task/short-answer-task.component';
+import { PictureTaskComponent } from '../tasks/picture-task/picture-task.component';
+import { LatexTaskComponent } from '../tasks/latex-task/latex-task.component';
+import { TableTaskComponent } from '../tasks/table-task/table-task.component';
+import { NewPageComponent } from '../tasks/new-page/new-page.component';
+
+import { AddTaskComponent } from './add-task/add-task.component';
+import { DraggablePoolComponent } from './draggable-pool/draggable-pool.component';
+import { NewPageDialogComponent } from './new-page-dialog/new-page-dialog.component';
+import { TaskGroupTitleComponent } from './task-group-title/task-group-title.component';
 
 interface PDFTaskInfo {
   page: number;
@@ -67,7 +67,7 @@ interface PDFTaskInfo {
 }
 
 @Component({
-  selector: 'app-create-exam',
+  selector: 'app-edit-exam',
   imports: [
     ...COMMON_IMPORTS,
     AddTaskComponent,
@@ -89,11 +89,11 @@ interface PDFTaskInfo {
     MatSnackBarModule,
     DraggablePoolComponent,
   ],
-  templateUrl: './create-exam.component.html',
+  templateUrl: './edit-exam.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrl: './create-exam.component.scss',
+  styleUrl: './edit-exam.component.scss',
 })
-export class CreateExamComponent {
+export class EditExamComponent {
   public inDropzone = false;
   public isNameChange = false;
   public isUpdateMode = false;

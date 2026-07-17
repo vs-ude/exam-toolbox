@@ -5,10 +5,10 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 
-import { PictureTask, Task } from '../../../../types/shared/tasks';
-import { ApiService } from '../../../../services/api.service';
-import { environment } from '../../../../../environments/environment';
-import { COMMON_IMPORTS } from '../../../common-imports';
+import { PictureTask, Task } from '../../../types/shared/tasks';
+import { ApiService } from '../../../services/api.service';
+import { environment } from '../../../../environments/environment';
+import { COMMON_IMPORTS } from '../../common-imports';
 
 import { TASK_COMMON_IMPORTS } from '../task-common-imports';
 import { BaseTaskComponent } from '../base-task/base-task.component';

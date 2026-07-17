@@ -5,9 +5,9 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 
-import { environment } from '../../../../../environments/environment';
-import { ManualText, Task } from '../../../../types/shared/tasks';
-import { COMMON_IMPORTS } from '../../../common-imports';
+import { environment } from '../../../../environments/environment';
+import { ManualText, Task } from '../../../types/shared/tasks';
+import { COMMON_IMPORTS } from '../../common-imports';
 
 import { TASK_COMMON_IMPORTS } from '../task-common-imports';
 import { TaskAnimations } from '../task-animations';

@@ -9,10 +9,10 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 
-import { Task } from '../../../../types/shared/tasks';
-import { Tag } from '../../../../types/shared/tag';
+import { Task } from '../../../types/shared/tasks';
+import { Tag } from '../../../types/shared/tag';
 
-import { environment } from '../../../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-base-task',

@@ -9,9 +9,9 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 
-import { environment } from '../../../../../environments/environment';
-import { MultipleChoiceTask, Task } from '../../../../types/shared/tasks';
-import { COMMON_IMPORTS } from '../../../common-imports';
+import { environment } from '../../../../environments/environment';
+import { MultipleChoiceTask, Task } from '../../../types/shared/tasks';
+import { COMMON_IMPORTS } from '../../common-imports';
 
 import { BaseTaskComponent } from '../base-task/base-task.component';
 import { TaskAnimations } from '../task-animations';
