@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import { MainViewComponent } from './components/main-view/main-view.component';
 import { LoadingIndicatorComponent } from './components/loading-indicator/loading-indicator.component';
@@ -7,6 +7,7 @@ import { LoadingIndicatorComponent } from './components/loading-indicator/loadin
   selector: 'app-root',
   imports: [MainViewComponent, LoadingIndicatorComponent],
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.component.scss',
 })
 export class AppComponent {

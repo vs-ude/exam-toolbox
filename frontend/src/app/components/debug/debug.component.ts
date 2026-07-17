@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { saveAs } from 'file-saver';
 
@@ -71,6 +71,7 @@ const exam: Exam = new Exam(
   selector: 'app-debug',
   imports: [],
   templateUrl: './debug.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './debug.component.scss',
 })
 export class DebugComponent {

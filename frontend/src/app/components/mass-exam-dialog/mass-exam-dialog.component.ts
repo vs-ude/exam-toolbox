@@ -1,4 +1,10 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnDestroy,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,6 +26,7 @@ import { ApiService, JobStatus } from '../../services/api.service';
     MatSlideToggleModule,
   ],
   templateUrl: './mass-exam-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './mass-exam-dialog.component.scss',
 })
 export class MassExamDialogComponent implements OnInit, OnDestroy {

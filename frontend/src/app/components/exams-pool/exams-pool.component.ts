@@ -1,4 +1,9 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { COMMON_IMPORTS } from '../common-imports';
@@ -25,6 +30,7 @@ type ExamFilter = {
   imports: [...COMMON_IMPORTS, ExamCardComponent, ExamsTableComponent],
   templateUrl: './exams-pool.component.html',
   styleUrl: './exams-pool.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     trigger('leftRightAnimation', [
       transition(':enter', [

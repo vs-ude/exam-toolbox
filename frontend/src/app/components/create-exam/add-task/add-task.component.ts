@@ -1,5 +1,10 @@
 import { NgStyle } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import {
+  Component,
+  inject,
+  Input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import { environment } from '../../../../environments/environment';
 
@@ -7,6 +12,7 @@ import { environment } from '../../../../environments/environment';
   selector: 'app-AddTask',
   imports: [NgStyle],
   templateUrl: './add-task.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './add-task.component.scss',
 })
 export class AddTaskComponent {

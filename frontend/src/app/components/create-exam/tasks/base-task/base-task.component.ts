@@ -6,6 +6,7 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 
 import { Task } from '../../../../types/shared/tasks';
@@ -17,6 +18,7 @@ import { environment } from '../../../../../environments/environment';
   selector: 'app-base-task',
   imports: [],
   template: '',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: '../task.scss',
 })
 export abstract class BaseTaskComponent {

@@ -9,6 +9,7 @@ import {
   SimpleChange,
   SimpleChanges,
   ViewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -22,6 +23,7 @@ import { DownloadableJob } from '../../services/api.service';
   selector: 'app-exams-table',
   imports: [MatTooltip, MatTableModule, MatSortModule, MatIconModule],
   templateUrl: './exams-table.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './exams-table.component.scss',
 })
 export class ExamsTableComponent implements AfterViewInit, OnChanges {

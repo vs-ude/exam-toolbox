@@ -1,5 +1,11 @@
 import { debounceTime, forkJoin, Observable, retry, Subject, take } from 'rxjs';
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  ViewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -85,6 +91,7 @@ interface PDFTaskInfo {
     DraggablePoolComponent,
   ],
   templateUrl: './create-exam.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './create-exam.component.scss',
 })
 export class CreateExamComponent {

@@ -1,4 +1,8 @@
-import { Component, HostListener } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { COMMON_IMPORTS } from '../common-imports';
@@ -18,6 +22,7 @@ import { ExamsTableComponent } from '../exams-table/exams-table.component';
     ExamsTableComponent,
   ],
   templateUrl: './dashboard.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './dashboard.component.scss',
 })
 export class DashboardComponent {

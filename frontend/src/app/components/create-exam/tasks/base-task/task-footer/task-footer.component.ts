@@ -1,4 +1,11 @@
-import { Component, EventEmitter, input, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  input,
+  Input,
+  Output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatLabel } from '@angular/material/form-field';
@@ -10,6 +17,7 @@ import { Task } from '../../../../../types/shared/tasks';
   selector: 'app-task-footer',
   imports: [MatIcon, FormsModule, NgStyle, MatLabel],
   templateUrl: './task-footer.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './task-footer.component.scss',
 })
 export class TaskFooterComponent {

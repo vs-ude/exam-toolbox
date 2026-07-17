@@ -1,4 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import { environment } from '../../../../../environments/environment';
 import { ManualText, Task } from '../../../../types/shared/tasks';
@@ -13,6 +18,7 @@ import { BaseTaskComponent } from '../base-task/base-task.component';
   imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   templateUrl: './manual-text.component.html',
   styleUrls: ['./manual-text.component.scss', '../task.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation,

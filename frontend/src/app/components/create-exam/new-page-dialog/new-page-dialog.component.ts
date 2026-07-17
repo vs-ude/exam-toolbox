@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 
 import { Task } from '../../../types/shared/tasks';
@@ -7,6 +7,7 @@ import { Task } from '../../../types/shared/tasks';
   selector: 'app-new-page-dialog',
   imports: [MatDialogModule],
   templateUrl: './new-page-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './new-page-dialog.component.scss',
 })
 export class NewPageDialogComponent {

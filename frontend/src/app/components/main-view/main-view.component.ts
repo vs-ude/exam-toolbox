@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -27,6 +27,7 @@ import { AuthService } from '../../services/auth.service';
     MatTooltipModule,
   ],
   templateUrl: './main-view.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './main-view.component.scss',
 })
 export class MainViewComponent {

@@ -1,4 +1,9 @@
-import { Component, Input, input } from '@angular/core';
+import {
+  Component,
+  Input,
+  input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { NgStyle } from '@angular/common';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -20,6 +25,7 @@ import {
   selector: 'app-task-pool-card',
   imports: [MatIconModule, NgStyle],
   templateUrl: './task-pool-card.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './task-pool-card.component.scss',
 })
 export class TaskPoolCardComponent {

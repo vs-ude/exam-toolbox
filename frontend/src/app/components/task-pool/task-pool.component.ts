@@ -3,6 +3,7 @@ import {
   Component,
   HostListener,
   ViewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { COMMON_IMPORTS } from '../common-imports';
@@ -26,6 +27,7 @@ import { TaskPoolCardComponent } from '../task-pool-card/task-pool-card.componen
   ],
   templateUrl: './task-pool.component.html',
   styleUrl: './task-pool.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     trigger('leftRightAnimation', [
       transition(':enter', [

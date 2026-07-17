@@ -9,6 +9,7 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 
@@ -21,6 +22,7 @@ import { TaskAnimations } from '../tasks/task-animations';
   imports: [NgStyle, MatIcon],
   templateUrl: './task-group-title.component.html',
   styleUrl: './task-group-title.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation,

@@ -1,4 +1,10 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnDestroy,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import {
   MAT_DIALOG_DATA,
@@ -14,6 +20,7 @@ import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
   selector: 'app-delete-confirmation-dialog',
   imports: [MatDialogModule, MatButtonModule],
   templateUrl: './delete-confirmation-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './delete-confirmation-dialog.component.scss',
 })
 export class DeleteConfirmationDialogComponent implements OnInit, OnDestroy {

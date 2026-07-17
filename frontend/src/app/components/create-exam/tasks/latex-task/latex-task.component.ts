@@ -1,4 +1,10 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import { environment } from '../../../../../environments/environment';
@@ -15,6 +21,7 @@ import { PreviewDialogComponent } from './preview-dialog/preview-dialog.componen
   imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   templateUrl: './latex-task.component.html',
   styleUrls: ['./latex-task.component.scss', '../task.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation,

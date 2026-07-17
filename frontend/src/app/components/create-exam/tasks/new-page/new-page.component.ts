@@ -1,4 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 
 import { NewPage, Task } from '../../../../types/shared/tasks';
@@ -11,6 +16,7 @@ import { TaskAnimations } from '../task-animations';
   imports: [MatIcon],
   templateUrl: './new-page.component.html',
   styleUrls: ['./new-page.component.scss', '../task.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation,

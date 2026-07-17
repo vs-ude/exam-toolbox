@@ -1,5 +1,10 @@
 import { NgStyle } from '@angular/common';
-import { Component, Inject, NgModule } from '@angular/core';
+import {
+  Component,
+  Inject,
+  NgModule,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -20,6 +25,7 @@ export interface AddTagDialogData {
   selector: 'app-add-tag-dialog',
   imports: [MatDialogModule, MatButtonModule, FormsModule, NgStyle],
   templateUrl: './add-tag-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './add-tag-dialog.component.scss',
 })
 export class AddTagDialogComponent {

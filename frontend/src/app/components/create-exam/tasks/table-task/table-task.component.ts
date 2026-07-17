@@ -1,4 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import { environment } from '../../../../../environments/environment';
 import { TableTask, Task } from '../../../../types/shared/tasks';
@@ -13,6 +18,7 @@ import { TaskAnimations } from '../task-animations';
   imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   templateUrl: './table-task.component.html',
   styleUrls: ['./table-task.component.scss', '../task.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation,

@@ -1,4 +1,10 @@
-import { Component, ContentChild, Input, TemplateRef } from '@angular/core';
+import {
+  Component,
+  ContentChild,
+  Input,
+  TemplateRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import {
   RouteConfigLoadEnd,
@@ -14,6 +20,7 @@ import { LoadingService } from '../../services/loading.service';
   selector: 'app-loading-indicator',
   imports: [MatProgressSpinnerModule, AsyncPipe, NgTemplateOutlet],
   templateUrl: './loading-indicator.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './loading-indicator.component.scss',
 })
 export class LoadingIndicatorComponent {

@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { forkJoin, Observable, Subscription } from 'rxjs';
@@ -24,6 +30,7 @@ interface TypeOption {
   selector: 'app-draggable-pool',
   imports: [PoolTaskComponent, MatTooltipModule, MatIcon],
   templateUrl: './draggable-pool.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './draggable-pool.component.scss',
 })
 export class DraggablePoolComponent {

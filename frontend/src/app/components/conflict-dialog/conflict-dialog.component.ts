@@ -1,4 +1,10 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnDestroy,
+  OnInit,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import {
   MAT_DIALOG_DATA,
@@ -24,6 +30,7 @@ export interface ConflictDialogData {
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
   providers: [DatePipe],
   templateUrl: './conflict-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './conflict-dialog.component.scss',
 })
 export class ConflictDialogComponent implements OnInit, OnDestroy {

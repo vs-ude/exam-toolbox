@@ -4,6 +4,7 @@ import {
   Inject,
   OnInit,
   ViewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
@@ -59,6 +60,7 @@ export interface ExamAuthDialogResult {
     MatProgressSpinnerModule,
   ],
   templateUrl: './exam-auth-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './exam-auth-dialog.component.scss',
 })
 export class ExamAuthDialogComponent implements OnInit {

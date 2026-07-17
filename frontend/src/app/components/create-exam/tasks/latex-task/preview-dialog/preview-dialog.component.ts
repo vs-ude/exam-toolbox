@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
 
 import {
@@ -10,6 +10,7 @@ import {
   selector: 'app-preview-dialog',
   imports: [MatDialogModule],
   templateUrl: './preview-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './preview-dialog.component.scss',
 })
 export class PreviewDialogComponent {

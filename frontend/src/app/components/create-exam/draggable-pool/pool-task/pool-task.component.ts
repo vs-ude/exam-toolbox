@@ -5,6 +5,7 @@ import {
   Input,
   Renderer2,
   DOCUMENT,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { Task } from '../../../../types/shared/tasks';
 import { environment } from '../../../../../environments/environment';
@@ -13,6 +14,7 @@ import { environment } from '../../../../../environments/environment';
   selector: 'app-pool-task',
   imports: [],
   templateUrl: './pool-task.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './pool-task.component.scss',
 })
 export class PoolTaskComponent {

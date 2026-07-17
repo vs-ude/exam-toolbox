@@ -6,6 +6,7 @@ import {
   OnChanges,
   OnInit,
   Output,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 
 import { environment } from '../../../../../environments/environment';
@@ -21,6 +22,7 @@ import { TASK_COMMON_IMPORTS } from '../task-common-imports';
   imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   templateUrl: './multiplechoice-task.component.html',
   styleUrls: ['./multiplechoice-task.component.scss', '../task.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     TaskAnimations.inOutAnimation,
     TaskAnimations.leftRightAnimation,

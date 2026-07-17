@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { COMMON_IMPORTS } from '../common-imports';
 
@@ -19,6 +19,7 @@ import { ExamCardComponent } from '../exam-card/exam-card.component';
     TaskPoolCardComponent,
   ],
   templateUrl: './search.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './search.component.scss',
 })
 export class SearchComponent {

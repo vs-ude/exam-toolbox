@@ -1,10 +1,17 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  ViewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MathJaxService } from '../../services/math-jax.service';
 
 @Component({
   selector: 'app-math-jax-paragraph',
   imports: [],
   templateUrl: './math-jax-paragraph.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './math-jax-paragraph.component.scss',
 })
 export class MathJaxParagraphComponent {

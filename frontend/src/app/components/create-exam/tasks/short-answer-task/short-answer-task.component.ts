@@ -6,6 +6,7 @@ import {
   OnChanges,
   OnInit,
   Output,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 
 import { environment } from '../../../../../environments/environment';
@@ -24,6 +25,7 @@ import { TASK_COMMON_IMPORTS } from '../task-common-imports';
     TaskAnimations.leftRightAnimation,
   ],
   templateUrl: './short-answer-task.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./short-answer-task.component.scss', '../task.scss'],
 })
 export class ShortAnswerTaskComponent

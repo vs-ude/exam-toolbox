@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { Task } from '../../types/shared/tasks';
@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-update-task-dialog',
   imports: [MatDialogModule, MatButtonModule, FormsModule],
   templateUrl: './update-task-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './update-task-dialog.component.scss',
 })
 export class UpdateTaskDialogComponent {
