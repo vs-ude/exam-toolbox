@@ -46,12 +46,12 @@
           class="submit-button full-width"
           [disabled]="isLoading || !loginForm.form.valid"
         >
-          <mat-spinner
-            *ngIf="isLoading"
-            diameter="20"
-            class="button-spinner"
-          ></mat-spinner>
-          <span *ngIf="!isLoading">Login</span>
+          @if (isLoading) {
+            <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+          }
+          @if (!isLoading) {
+            <span>Login</span>
+          }
         </button>
       </form>
     </mat-card-content>

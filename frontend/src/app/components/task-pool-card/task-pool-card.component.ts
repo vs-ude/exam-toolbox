@@ -1,6 +1,6 @@
 import { Component, Input, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { NgFor, NgStyle } from '@angular/common';
+import { NgStyle } from '@angular/common';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 import { environment } from '../../../environments/environment';

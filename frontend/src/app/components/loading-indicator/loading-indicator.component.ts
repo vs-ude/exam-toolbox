@@ -1,5 +1,5 @@
 import { Component, ContentChild, Input, TemplateRef } from '@angular/core';
-import { AsyncPipe, NgIf, NgTemplateOutlet } from '@angular/common';
+import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import {
   RouteConfigLoadEnd,
   RouteConfigLoadStart,

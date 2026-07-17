@@ -1,103 +1,129 @@
 <!-- Question -->
 <div class="form-header">
   <!-- Bilingual -->
-  <div *ngIf="bilingual" class="question-container" [@leftRightAnimation]>
-    <div class="question-language-wrapper">
-      <span class="language_icon"
-        ><img [src]="publicPath + 'german.svg'"
-      /></span>
-      <div
-        #questionFieldDE
-        contenteditable="true"
-        class="form-question"
-        (focus)="activateFormatButtons()"
-        (blur)="deactivateFormatButtons($event)"
-        (input)="updateQuestion($event, 'DE')"
-        [attr.data-placeholder]="'Frage Eingeben...'"
-      ></div>
-    </div>
-    <div class="question-language-wrapper">
-      <span class="language_icon"
-        ><img [src]="publicPath + 'english.svg'"
-      /></span>
-      <div
-        #questionFieldEN
-        contenteditable="true"
-        class="form-question"
-        (focus)="activateFormatButtons()"
-        (blur)="deactivateFormatButtons($event)"
-        (input)="updateQuestion($event, 'EN')"
-        [attr.data-placeholder]="'Enter Question...'"
-      ></div>
-    </div>
-  </div>
-
-  <!-- German -->
-  <div
-    *ngIf="!bilingual"
-    #questionFieldDE
-    contenteditable="true"
-    class="form-question"
-    (focus)="activateFormatButtons()"
-    (blur)="deactivateFormatButtons($event)"
-    (input)="updateQuestion($event, 'DE')"
-    [attr.data-placeholder]="'Frage Eingeben...'"
-  ></div>
-</div>
-
-<!-- Buttons for formatting -->
-<div *ngIf="isQuestionActive" [@inOutAnimation] class="form-toolbar">
-  <div
-    class="icon_wrapper delete_option_icon"
-    (mousedown)="setQuestionFormat('bold', $event)"
-    [ngStyle]="{
-      'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-    }"
-  >
-    <mat-icon aria-hidden="false">format_bold</mat-icon>
-  </div>
-
-  <div
-    class="icon_wrapper delete_option_icon"
-    (mousedown)="setQuestionFormat('italic', $event)"
-    [ngStyle]="{
-      'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-    }"
-  >
-    <mat-icon aria-hidden="false">format_italic</mat-icon>
-  </div>
-
-  <div
-    class="icon_wrapper delete_option_icon"
-    (mousedown)="setQuestionFormat('underline', $event)"
-    [ngStyle]="{
-      'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-    }"
-  >
-    <mat-icon aria-hidden="false">format_underlined</mat-icon>
-  </div>
-</div>
-
-<!-- Answer Options -->
-<div class="form-body">
-  <div
-    class="form-option"
-    *ngFor="let option of task.answerOptions; let i = index"
-    [@inOutAnimation]
-  >
-    <input
-      type="checkbox"
-      name="multiple-choice"
-      [(ngModel)]="task.answerOptions[i].correct"
-      (change)="onOptionCorrectChange()"
-    />
-
-    <!-- Bilingual -->
-    <div class="option_language_container" *ngIf="bilingual">
-      <div class="option_language_wrapper">
+  @if (bilingual) {
+    <div class="question-container" [@leftRightAnimation]>
+      <div class="question-language-wrapper">
         <span class="language_icon"
           ><img [src]="publicPath + 'german.svg'"
         /></span>
+        <div
+          #questionFieldDE
+          contenteditable="true"
+          class="form-question"
+          (focus)="activateFormatButtons()"
+          (blur)="deactivateFormatButtons($event)"
+          (input)="updateQuestion($event, 'DE')"
+          [attr.data-placeholder]="'Frage Eingeben...'"
+        ></div>
+      </div>
+      <div class="question-language-wrapper">
+        <span class="language_icon"
+          ><img [src]="publicPath + 'english.svg'"
+        /></span>
+        <div
+          #questionFieldEN
+          contenteditable="true"
+          class="form-question"
+          (focus)="activateFormatButtons()"
+          (blur)="deactivateFormatButtons($event)"
+          (input)="updateQuestion($event, 'EN')"
+          [attr.data-placeholder]="'Enter Question...'"
+        ></div>
+      </div>
+    </div>
+  }
+
+  <!-- German -->
+  @if (!bilingual) {
+    <div
+      #questionFieldDE
+      contenteditable="true"
+      class="form-question"
+      (focus)="activateFormatButtons()"
+      (blur)="deactivateFormatButtons($event)"
+      (input)="updateQuestion($event, 'DE')"
+      [attr.data-placeholder]="'Frage Eingeben...'"
+    ></div>
+  }
+</div>
+
+<!-- Buttons for formatting -->
+@if (isQuestionActive) {
+  <div [@inOutAnimation] class="form-toolbar">
+    <div
+      class="icon_wrapper delete_option_icon"
+      (mousedown)="setQuestionFormat('bold', $event)"
+      [ngStyle]="{
+        'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+      }"
+    >
+      <mat-icon aria-hidden="false">format_bold</mat-icon>
+    </div>
+    <div
+      class="icon_wrapper delete_option_icon"
+      (mousedown)="setQuestionFormat('italic', $event)"
+      [ngStyle]="{
+        'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+      }"
+    >
+      <mat-icon aria-hidden="false">format_italic</mat-icon>
+    </div>
+    <div
+      class="icon_wrapper delete_option_icon"
+      (mousedown)="setQuestionFormat('underline', $event)"
+      [ngStyle]="{
+        'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
+      }"
+    >
+      <mat-icon aria-hidden="false">format_underlined</mat-icon>
+    </div>
+  </div>
+}
+
+<!-- Answer Options -->
+<div class="form-body">
+  @for (option of task.answerOptions; track option; let i = $index) {
+    <div class="form-option" [@inOutAnimation]>
+      <input
+        type="checkbox"
+        name="multiple-choice"
+        [(ngModel)]="task.answerOptions[i].correct"
+        (change)="onOptionCorrectChange()"
+      />
+      <!-- Bilingual -->
+      @if (bilingual) {
+        <div class="option_language_container">
+          <div class="option_language_wrapper">
+            <span class="language_icon"
+              ><img [src]="publicPath + 'german.svg'"
+            /></span>
+            <input
+              type="text"
+              [value]="task.answerOptions[i].DE"
+              (keydown.enter)="changeOption($event, i, 'DE')"
+              (blur)="changeOption($event, i, 'DE')"
+              placeholder="Option {{ i + 1 }}"
+              class="form-option-input"
+            />
+          </div>
+          <div class="option_language_wrapper">
+            <span class="language_icon"
+              ><img [src]="publicPath + 'english.svg'"
+            /></span>
+            <input
+              type="text"
+              [value]="task.answerOptions[i].EN"
+              (keydown.enter)="changeOption($event, i, 'EN')"
+              (blur)="changeOption($event, i, 'EN')"
+              placeholder="Option {{ i + 1 }}"
+              class="form-option-input"
+            />
+          </div>
+        </div>
+      }
+      <!-- German -->
+      @if (!bilingual) {
         <input
           type="text"
           [value]="task.answerOptions[i].DE"
@@ -106,37 +132,12 @@
           placeholder="Option {{ i + 1 }}"
           class="form-option-input"
         />
-      </div>
-      <div class="option_language_wrapper">
-        <span class="language_icon"
-          ><img [src]="publicPath + 'english.svg'"
-        /></span>
-        <input
-          type="text"
-          [value]="task.answerOptions[i].EN"
-          (keydown.enter)="changeOption($event, i, 'EN')"
-          (blur)="changeOption($event, i, 'EN')"
-          placeholder="Option {{ i + 1 }}"
-          class="form-option-input"
-        />
+      }
+      <div class="icon_wrapper delete_option_icon">
+        <mat-icon aria-hidden="false" (click)="removeOption(i)">close</mat-icon>
       </div>
     </div>
-
-    <!-- German -->
-    <input
-      *ngIf="!bilingual"
-      type="text"
-      [value]="task.answerOptions[i].DE"
-      (keydown.enter)="changeOption($event, i, 'DE')"
-      (blur)="changeOption($event, i, 'DE')"
-      placeholder="Option {{ i + 1 }}"
-      class="form-option-input"
-    />
-
-    <div class="icon_wrapper delete_option_icon">
-      <mat-icon aria-hidden="false" (click)="removeOption(i)">close</mat-icon>
-    </div>
-  </div>
+  }
 
   <!-- add AnswerOption -->
   <div class="add-option">

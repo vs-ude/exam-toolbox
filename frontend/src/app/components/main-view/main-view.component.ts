@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NgIf } from '@angular/common';
+
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -22,7 +22,6 @@ import { AuthService } from '../../services/auth.service';
     MatButtonModule,
     RouterModule,
     MatIcon,
-    NgIf,
     MatToolbarModule,
     MatMenuModule,
     MatTooltipModule,

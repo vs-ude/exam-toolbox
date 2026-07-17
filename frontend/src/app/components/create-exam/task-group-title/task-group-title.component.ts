@@ -1,4 +1,4 @@
-import { NgIf, NgStyle } from '@angular/common';
+import { NgStyle } from '@angular/common';
 import {
   AfterViewChecked,
   Component,
@@ -18,7 +18,7 @@ import { TaskAnimations } from '../tasks/task-animations';
 
 @Component({
   selector: 'app-task-group-title',
-  imports: [NgStyle, MatIcon, NgIf],
+  imports: [NgStyle, MatIcon],
   templateUrl: './task-group-title.component.html',
   styleUrl: './task-group-title.component.scss',
   animations: [

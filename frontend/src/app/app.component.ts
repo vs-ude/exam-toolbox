@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { MainViewComponent } from './components/main-view/main-view.component';
 import { LoadingIndicatorComponent } from './components/loading-indicator/loading-indicator.component';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, MainViewComponent, LoadingIndicatorComponent],
+  imports: [MainViewComponent, LoadingIndicatorComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

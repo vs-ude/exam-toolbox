@@ -4,14 +4,18 @@
 </h2>
 
 <mat-dialog-content [class.dark-theme]="isDarkTheme">
-  <p *ngIf="!data.isNewExam">
-    We found a draft on this computer that is newer than the version on the
-    server. Which version would you like to continue working on?
-  </p>
-  <p *ngIf="data.isNewExam">
-    You have an unsaved exam draft from a previous session. Do you want to
-    resume it?
-  </p>
+  @if (!data.isNewExam) {
+    <p>
+      We found a draft on this computer that is newer than the version on the
+      server. Which version would you like to continue working on?
+    </p>
+  }
+  @if (data.isNewExam) {
+    <p>
+      You have an unsaved exam draft from a previous session. Do you want to
+      resume it?
+    </p>
+  }
 
   <div class="comparison-container">
     <div class="version-card local">
@@ -23,9 +27,9 @@
 
     <div class="version-card server">
       <h3>{{ data.isNewExam ? 'Start Fresh' : 'Server Version' }}</h3>
-      <p *ngIf="!data.isNewExam">
-        <strong>Saved:</strong> {{ dbDate | date: 'medium' }}
-      </p>
+      @if (!data.isNewExam) {
+        <p><strong>Saved:</strong> {{ dbDate | date: 'medium' }}</p>
+      }
       <p><strong>Tasks:</strong> {{ getTaskCount(data.dbExam) }}</p>
       <p class="note">Discard the draft.</p>
     </div>

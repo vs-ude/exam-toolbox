@@ -3,141 +3,141 @@
 </h2>
 
 <mat-dialog-content class="content">
-  <div *ngIf="!isLoading && jobStatus?.status !== 'completed'">
-    <div *ngIf="!isSingleMode">
-      <p class="dialog-description">
-        Please select the student list file (.xlsx) to begin.
-      </p>
-
-      <div class="generation-controls">
-        <div class="file-input-container">
-          <label for="file-upload" class="file-upload-label">
-            <mat-icon>attach_file</mat-icon>
-            <span>{{ selectedFile ? 'Change file' : 'Choose a file...' }}</span>
-          </label>
-          <input
-            id="file-upload"
-            type="file"
-            (change)="onFileSelected($event)"
-            accept=".xlsx, .xls"
-          />
+  @if (!isLoading && jobStatus?.status !== 'completed') {
+    <div>
+      @if (!isSingleMode) {
+        <div>
+          <p class="dialog-description">
+            Please select the student list file (.xlsx) to begin.
+          </p>
+          <div class="generation-controls">
+            <div class="file-input-container">
+              <label for="file-upload" class="file-upload-label">
+                <mat-icon>attach_file</mat-icon>
+                <span>{{
+                  selectedFile ? 'Change file' : 'Choose a file...'
+                }}</span>
+              </label>
+              <input
+                id="file-upload"
+                type="file"
+                (change)="onFileSelected($event)"
+                accept=".xlsx, .xls"
+              />
+            </div>
+            @if (selectedFile) {
+              <div class="file-name-display">
+                <mat-icon>description</mat-icon>
+                <span>{{ selectedFile.name }}</span>
+              </div>
+            }
+          </div>
         </div>
-
-        <div *ngIf="selectedFile" class="file-name-display">
-          <mat-icon>description</mat-icon>
-          <span>{{ selectedFile.name }}</span>
+      }
+      @if (isSingleMode) {
+        <div>
+          <p class="dialog-description">Enter the student details manually.</p>
+          <div class="generation-controls manual-form-container">
+            <div class="form-row">
+              <input
+                type="text"
+                placeholder="First Name"
+                [(ngModel)]="singleStudent.firstName"
+                class="custom-input"
+              />
+              <input
+                type="text"
+                placeholder="Last Name"
+                [(ngModel)]="singleStudent.lastName"
+                class="custom-input"
+              />
+            </div>
+            <div class="form-row">
+              <input
+                type="text"
+                placeholder="Matrikelnummer (ID)"
+                [(ngModel)]="singleStudent.studentId"
+                class="custom-input"
+              />
+            </div>
+          </div>
+        </div>
+      }
+      <div class="generation-controls settings-block">
+        <div class="setting-row">
+          <div class="setting-label">
+            <span>Start Exam Number:</span>
+            <span class="sub-text">(Default: 1)</span>
+          </div>
+          <input
+            type="number"
+            [(ngModel)]="startSeatNumber"
+            min="1"
+            class="custom-input small-input"
+          />
         </div>
       </div>
-    </div>
-
-    <div *ngIf="isSingleMode">
-      <p class="dialog-description">Enter the student details manually.</p>
-
-      <div class="generation-controls manual-form-container">
-        <div class="form-row">
-          <input
-            type="text"
-            placeholder="First Name"
-            [(ngModel)]="singleStudent.firstName"
-            class="custom-input"
-          />
-          <input
-            type="text"
-            placeholder="Last Name"
-            [(ngModel)]="singleStudent.lastName"
-            class="custom-input"
-          />
-        </div>
-        <div class="form-row">
-          <input
-            type="text"
-            placeholder="Matrikelnummer (ID)"
-            [(ngModel)]="singleStudent.studentId"
-            class="custom-input"
-          />
-        </div>
+      <div class="toggles-wrapper">
+        <mat-slide-toggle
+          [(ngModel)]="isSingleMode"
+          color="primary"
+          class="small-toggle"
+        >
+          Enter Student Manually
+        </mat-slide-toggle>
+        <mat-slide-toggle [(ngModel)]="autoDownload" class="small-toggle">
+          Auto-download when complete
+        </mat-slide-toggle>
       </div>
     </div>
+  }
 
-    <div class="generation-controls settings-block">
-      <div class="setting-row">
-        <div class="setting-label">
-          <span>Start Exam Number:</span>
-          <span class="sub-text">(Default: 1)</span>
-        </div>
-        <input
-          type="number"
-          [(ngModel)]="startSeatNumber"
-          min="1"
-          class="custom-input small-input"
-        />
-      </div>
+  @if (isLoading) {
+    <div class="loading-container">
+      <p>Generating exams... Please do not close this window.</p>
+      @if (jobStatus && jobStatus.progress.total > 0) {
+        <mat-progress-bar
+          mode="determinate"
+          [value]="
+            (jobStatus.progress.completed / jobStatus.progress.total) * 100
+          "
+        >
+        </mat-progress-bar>
+        <p class="progress-text">
+          {{ jobStatus.progress.completed }} /
+          {{ jobStatus.progress.total }} tasks completed.
+        </p>
+      }
+      @if (!jobStatus) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <p class="progress-text">Starting job...</p>
+      }
     </div>
+  }
 
-    <div class="toggles-wrapper">
-      <mat-slide-toggle
-        [(ngModel)]="isSingleMode"
-        color="primary"
-        class="small-toggle"
-      >
-        Enter Student Manually
-      </mat-slide-toggle>
-
-      <mat-slide-toggle [(ngModel)]="autoDownload" class="small-toggle">
-        Auto-download when complete
-      </mat-slide-toggle>
+  @if (!isLoading && jobStatus?.status === 'completed') {
+    <div class="completed-container">
+      <mat-icon class="completed-icon">check_circle</mat-icon>
+      <h3>Generation Complete</h3>
+      @if (downloadSuccessful) {
+        <p>Download started successfully!</p>
+      } @else {
+        <p>Your file is ready to download.</p>
+      }
     </div>
-  </div>
+  }
 
-  <div *ngIf="isLoading" class="loading-container">
-    <p>Generating exams... Please do not close this window.</p>
-
-    <ng-container *ngIf="jobStatus && jobStatus.progress.total > 0">
-      <mat-progress-bar
-        mode="determinate"
-        [value]="
-          (jobStatus.progress.completed / jobStatus.progress.total) * 100
-        "
-      >
-      </mat-progress-bar>
-      <p class="progress-text">
-        {{ jobStatus.progress.completed }} /
-        {{ jobStatus.progress.total }} tasks completed.
-      </p>
-    </ng-container>
-
-    <ng-container *ngIf="!jobStatus">
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      <p class="progress-text">Starting job...</p>
-    </ng-container>
-  </div>
-
-  <div
-    *ngIf="!isLoading && jobStatus?.status === 'completed'"
-    class="completed-container"
-  >
-    <mat-icon class="completed-icon">check_circle</mat-icon>
-    <h3>Generation Complete</h3>
-
-    <p *ngIf="downloadSuccessful; else downloadPrompt">
-      Download started successfully!
-    </p>
-
-    <ng-template #downloadPrompt>
-      <p>Your file is ready to download.</p>
-    </ng-template>
-  </div>
-
-  <div *ngIf="errorMessage" class="error-message">
-    <mat-icon>error_outline</mat-icon>
-    <span>{{ errorMessage }}</span>
-  </div>
+  @if (errorMessage) {
+    <div class="error-message">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+  }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <ng-container *ngIf="!isLoading && jobStatus?.status !== 'completed'">
+  @if (!isLoading && jobStatus?.status !== 'completed') {
     <button mat-stroked-button mat-dialog-close>Cancel</button>
-
     <button
       mat-flat-button
       color="primary"
@@ -153,19 +153,16 @@
       <mat-icon>play_arrow</mat-icon>
       <span>Generate</span>
     </button>
-  </ng-container>
+  }
 
-  <button
-    *ngIf="isLoading"
-    mat-stroked-button
-    color="warn"
-    (click)="cancelGeneration()"
-  >
-    <mat-icon>cancel</mat-icon>
-    <span>Stop Generation</span>
-  </button>
+  @if (isLoading) {
+    <button mat-stroked-button color="warn" (click)="cancelGeneration()">
+      <mat-icon>cancel</mat-icon>
+      <span>Stop Generation</span>
+    </button>
+  }
 
-  <ng-container *ngIf="!isLoading && jobStatus?.status === 'completed'">
+  @if (!isLoading && jobStatus?.status === 'completed') {
     <button mat-stroked-button (click)="navigateToExamsPool()">
       View in Exams Pool
     </button>
@@ -179,5 +176,5 @@
       <mat-icon>download</mat-icon>
       <span>Download Now</span>
     </button>
-  </ng-container>
+  }
 </mat-dialog-actions>

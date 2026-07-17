@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   Component,
   ElementRef,
@@ -12,7 +11,7 @@ import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-pool-task',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './pool-task.component.html',
   styleUrl: './pool-task.component.scss',
 })

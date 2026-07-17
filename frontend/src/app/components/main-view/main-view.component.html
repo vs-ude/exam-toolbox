@@ -1,159 +1,157 @@
 <div class="main">
-  <mat-toolbar *ngIf="!isLoginPage()" class="app-toolbar">
-    <img src="public/logo.png" id="header-logo" aria-hidden="false" />
-    <span class="app-title">Exam Toolbox</span>
-    <span class="spacer"></span>
-    <button
-      mat-stroked-button
-      [mat-menu-trigger-for]="userMenu"
-      class="user-menu-button"
-      data-cy="user-menu-button"
-      aria-label="User menu"
-    >
-      <div class="avatar">{{ initialLetter }}</div>
-      <span class="username-text">{{ username }}</span>
-      <mat-icon iconPositionEnd>more_vert</mat-icon>
-    </button>
-    <mat-menu #userMenu="matMenu" xPosition="after">
-      <button data-cy="logout-button" mat-menu-item (click)="onLogout()">
-        <mat-icon aria-hidden="false">logout</mat-icon>
-        <span>Logout</span>
+  @if (!isLoginPage()) {
+    <mat-toolbar class="app-toolbar">
+      <img src="public/logo.png" id="header-logo" aria-hidden="false" />
+      <span class="app-title">Exam Toolbox</span>
+      <span class="spacer"></span>
+      <button
+        mat-stroked-button
+        [mat-menu-trigger-for]="userMenu"
+        class="user-menu-button"
+        data-cy="user-menu-button"
+        aria-label="User menu"
+      >
+        <div class="avatar">{{ initialLetter }}</div>
+        <span class="username-text">{{ username }}</span>
+        <mat-icon iconPositionEnd>more_vert</mat-icon>
       </button>
-    </mat-menu>
-  </mat-toolbar>
+      <mat-menu #userMenu="matMenu" xPosition="after">
+        <button data-cy="logout-button" mat-menu-item (click)="onLogout()">
+          <mat-icon aria-hidden="false">logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+  }
   <mat-divider></mat-divider>
 
-  <mat-drawer-container
-    class="main-drawer-container"
-    *ngIf="!isLoginPage()"
-    autosize
-  >
-    <mat-drawer
-      #drawer
-      class="main-drawer"
-      [class.collapsed]="sidebarCollapsed"
-      mode="side"
-      [opened]="true"
-    >
-      <mat-action-list>
-        <button
-          mat-list-item
-          routerLink="/dashboard"
-          routerLinkActive="active-button"
-          class="nav-item"
-          data-cy="nav-dashboard"
-          [matTooltip]="sidebarCollapsed ? 'Dashboard' : ''"
-          matTooltipPosition="right"
-          aria-label="Dashboard"
-        >
-          <mat-icon matListItemIcon aria-hidden="false">dashboard</mat-icon>
-          <span matListItemTitle class="nav-label">Dashboard</span>
-        </button>
-        <button
-          mat-list-item
-          routerLink="/create-exam"
-          routerLinkActive="active-button"
-          class="nav-item"
-          data-cy="nav-create-exam"
-          [matTooltip]="sidebarCollapsed ? 'Create New Exam' : ''"
-          matTooltipPosition="right"
-          aria-label="Create New Exam"
-        >
-          <mat-icon matListItemIcon aria-hidden="false"
-            >note_stack_add</mat-icon
-          >
-          <span matListItemTitle class="nav-label">Create New Exam</span>
-        </button>
-        <a
-          mat-list-item
-          routerLink="/exams-pool"
-          routerLinkActive="active-button"
-          class="nav-item"
-          data-cy="nav-exams-pool"
-          [matTooltip]="sidebarCollapsed ? 'Exams Pool' : ''"
-          matTooltipPosition="right"
-          aria-label="Exams Pool"
-        >
-          <mat-icon matListItemIcon aria-hidden="false">note_stack</mat-icon>
-          <span matListItemTitle class="nav-label">Exams Pool</span>
-        </a>
-        <button
-          mat-list-item
-          routerLink="/task-pool"
-          routerLinkActive="active-button"
-          class="nav-item"
-          data-cy="nav-task-pool"
-          [matTooltip]="sidebarCollapsed ? 'Task Pool' : ''"
-          matTooltipPosition="right"
-          aria-label="Task Pool"
-        >
-          <mat-icon matListItemIcon aria-hidden="false">list_alt</mat-icon>
-          <span matListItemTitle class="nav-label">Task Pool</span>
-        </button>
-
-        <div id="bottom-buttons">
+  @if (!isLoginPage()) {
+    <mat-drawer-container class="main-drawer-container" autosize>
+      <mat-drawer
+        #drawer
+        class="main-drawer"
+        [class.collapsed]="sidebarCollapsed"
+        mode="side"
+        [opened]="true"
+      >
+        <mat-action-list>
           <button
             mat-list-item
-            (click)="toggleTheme()"
-            class="nav-item"
-            [matTooltip]="sidebarCollapsed ? 'Theme' : ''"
-            matTooltipPosition="right"
-            aria-label="Toggle Theme"
-          >
-            <mat-icon matListItemIcon aria-hidden="false">{{
-              themeIcon
-            }}</mat-icon>
-            <span matListItemTitle class="nav-label">Theme</span>
-          </button>
-
-          <button
-            mat-list-item
-            routerLink="/getting-started"
-            class="nav-item"
+            routerLink="/dashboard"
             routerLinkActive="active-button"
-            [matTooltip]="sidebarCollapsed ? 'Getting Started' : ''"
-            matTooltipPosition="right"
-            aria-label="Getting Started"
-            data-cy="nav-getting-started"
-          >
-            <mat-icon matListItemIcon aria-hidden="false">help</mat-icon>
-            <span matListItemTitle class="nav-label">Getting Started</span>
-          </button>
-
-          <button
-            mat-list-item
-            routerLink="/about"
             class="nav-item"
-            routerLinkActive="active-button"
-            [matTooltip]="sidebarCollapsed ? 'About' : ''"
+            data-cy="nav-dashboard"
+            [matTooltip]="sidebarCollapsed ? 'Dashboard' : ''"
             matTooltipPosition="right"
-            aria-label="About"
-            data-cy="nav-about"
+            aria-label="Dashboard"
           >
-            <mat-icon matListItemIcon aria-hidden="false">info</mat-icon>
-            <span matListItemTitle class="nav-label">About</span>
+            <mat-icon matListItemIcon aria-hidden="false">dashboard</mat-icon>
+            <span matListItemTitle class="nav-label">Dashboard</span>
           </button>
-
           <button
             mat-list-item
-            class="drawer-toggle"
-            [matTooltip]="sidebarCollapsed ? 'Show sidebar' : ''"
+            routerLink="/create-exam"
+            routerLinkActive="active-button"
+            class="nav-item"
+            data-cy="nav-create-exam"
+            [matTooltip]="sidebarCollapsed ? 'Create New Exam' : ''"
             matTooltipPosition="right"
-            aria-label="Toggle Left Sidebar"
-            (click)="toggleSidebar()"
+            aria-label="Create New Exam"
           >
-            <mat-icon matListItemIcon aria-hidden="false">{{
-              sidebarCollapsed ? 'left_panel_open' : 'left_panel_close'
-            }}</mat-icon>
-            <span matListItemTitle class="nav-label">Hide Sidebar</span>
+            <mat-icon matListItemIcon aria-hidden="false"
+              >note_stack_add</mat-icon
+            >
+            <span matListItemTitle class="nav-label">Create New Exam</span>
           </button>
-        </div>
-      </mat-action-list>
-    </mat-drawer>
-    <mat-drawer-content class="drawer-outlet">
-      <router-outlet></router-outlet>
-    </mat-drawer-content>
-  </mat-drawer-container>
+          <a
+            mat-list-item
+            routerLink="/exams-pool"
+            routerLinkActive="active-button"
+            class="nav-item"
+            data-cy="nav-exams-pool"
+            [matTooltip]="sidebarCollapsed ? 'Exams Pool' : ''"
+            matTooltipPosition="right"
+            aria-label="Exams Pool"
+          >
+            <mat-icon matListItemIcon aria-hidden="false">note_stack</mat-icon>
+            <span matListItemTitle class="nav-label">Exams Pool</span>
+          </a>
+          <button
+            mat-list-item
+            routerLink="/task-pool"
+            routerLinkActive="active-button"
+            class="nav-item"
+            data-cy="nav-task-pool"
+            [matTooltip]="sidebarCollapsed ? 'Task Pool' : ''"
+            matTooltipPosition="right"
+            aria-label="Task Pool"
+          >
+            <mat-icon matListItemIcon aria-hidden="false">list_alt</mat-icon>
+            <span matListItemTitle class="nav-label">Task Pool</span>
+          </button>
+          <div id="bottom-buttons">
+            <button
+              mat-list-item
+              (click)="toggleTheme()"
+              class="nav-item"
+              [matTooltip]="sidebarCollapsed ? 'Theme' : ''"
+              matTooltipPosition="right"
+              aria-label="Toggle Theme"
+            >
+              <mat-icon matListItemIcon aria-hidden="false">{{
+                themeIcon
+              }}</mat-icon>
+              <span matListItemTitle class="nav-label">Theme</span>
+            </button>
+            <button
+              mat-list-item
+              routerLink="/getting-started"
+              class="nav-item"
+              routerLinkActive="active-button"
+              [matTooltip]="sidebarCollapsed ? 'Getting Started' : ''"
+              matTooltipPosition="right"
+              aria-label="Getting Started"
+              data-cy="nav-getting-started"
+            >
+              <mat-icon matListItemIcon aria-hidden="false">help</mat-icon>
+              <span matListItemTitle class="nav-label">Getting Started</span>
+            </button>
+            <button
+              mat-list-item
+              routerLink="/about"
+              class="nav-item"
+              routerLinkActive="active-button"
+              [matTooltip]="sidebarCollapsed ? 'About' : ''"
+              matTooltipPosition="right"
+              aria-label="About"
+              data-cy="nav-about"
+            >
+              <mat-icon matListItemIcon aria-hidden="false">info</mat-icon>
+              <span matListItemTitle class="nav-label">About</span>
+            </button>
+            <button
+              mat-list-item
+              class="drawer-toggle"
+              [matTooltip]="sidebarCollapsed ? 'Show sidebar' : ''"
+              matTooltipPosition="right"
+              aria-label="Toggle Left Sidebar"
+              (click)="toggleSidebar()"
+            >
+              <mat-icon matListItemIcon aria-hidden="false">{{
+                sidebarCollapsed ? 'left_panel_open' : 'left_panel_close'
+              }}</mat-icon>
+              <span matListItemTitle class="nav-label">Hide Sidebar</span>
+            </button>
+          </div>
+        </mat-action-list>
+      </mat-drawer>
+      <mat-drawer-content class="drawer-outlet">
+        <router-outlet></router-outlet>
+      </mat-drawer-content>
+    </mat-drawer-container>
+  }
 
-  <router-outlet *ngIf="isLoginPage()"></router-outlet>
+  @if (isLoginPage()) {
+    <router-outlet></router-outlet>
+  }
 </div>

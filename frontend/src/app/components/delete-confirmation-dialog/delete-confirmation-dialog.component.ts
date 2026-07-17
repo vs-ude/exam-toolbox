@@ -1,5 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -12,7 +12,7 @@ import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
 
 @Component({
   selector: 'app-delete-confirmation-dialog',
-  imports: [CommonModule, MatDialogModule, MatButtonModule],
+  imports: [MatDialogModule, MatButtonModule],
   templateUrl: './delete-confirmation-dialog.component.html',
   styleUrl: './delete-confirmation-dialog.component.scss',
 })

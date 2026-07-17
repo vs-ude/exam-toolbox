@@ -172,46 +172,44 @@
       </div>
     </div>
   } @else {
-    <div
-      class="examBrowser_grid_view"
-      *ngIf="viewMode === 'grid'"
-      @leftRightAnimation
-    >
-      @for (exam of filteredExams; track exam._id) {
-        <div class="examBrowser_item" (click)="onEdit(exam._id)">
-          @if (isDownloadable(exam._id)) {
+    @if (viewMode === 'grid') {
+      <div class="examBrowser_grid_view" @leftRightAnimation>
+        @for (exam of filteredExams; track exam._id) {
+          <div class="examBrowser_item" (click)="onEdit(exam._id)">
+            @if (isDownloadable(exam._id)) {
+              <button
+                class="download-icon-wrapper"
+                matTooltip="Download Generated Exam"
+                (click)="onDownload($event, exam._id)"
+              >
+                <mat-icon>download</mat-icon>
+              </button>
+            }
             <button
-              class="download-icon-wrapper"
-              matTooltip="Download Generated Exam"
-              (click)="onDownload($event, exam._id)"
+              class="delete-icon-wrapper"
+              matTooltip="Delete Exam"
+              [matTooltipShowDelay]="500"
+              (click)="onDeleteExam($event, exam._id)"
             >
-              <mat-icon>download</mat-icon>
+              <mat-icon>delete</mat-icon>
             </button>
-          }
+            <app-exam-card [name]="exam.courseName" />
+          </div>
+        }
+      </div>
+    }
 
-          <button
-            class="delete-icon-wrapper"
-            matTooltip="Delete Exam"
-            [matTooltipShowDelay]="500"
-            (click)="onDeleteExam($event, exam._id)"
-          >
-            <mat-icon>delete</mat-icon>
-          </button>
-
-          <app-exam-card [name]="exam.courseName" />
-        </div>
-      }
-    </div>
-
-    <div class="examBrowser_table_view" *ngIf="viewMode === 'list'">
-      <app-exams-table
-        [exams]="filteredExams"
-        [downloadableJobs]="downloadableJobs"
-        (examSelectedEvent)="onEdit($event)"
-        (downloadExamEvent)="onDownload($event.event, $event.examId)"
-        (deleteExamEvent)="onDeleteExam($event.event, $event.examId)"
-      >
-      </app-exams-table>
-    </div>
+    @if (viewMode === 'list') {
+      <div class="examBrowser_table_view">
+        <app-exams-table
+          [exams]="filteredExams"
+          [downloadableJobs]="downloadableJobs"
+          (examSelectedEvent)="onEdit($event)"
+          (downloadExamEvent)="onDownload($event.event, $event.examId)"
+          (deleteExamEvent)="onDeleteExam($event.event, $event.examId)"
+        >
+        </app-exams-table>
+      </div>
+    }
   }
 </div>
