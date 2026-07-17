@@ -1,3 +1,5 @@
+@use 'variables';
+
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
 @use '@angular/material' as mat;
@@ -8,7 +10,6 @@
 // Be sure that you only ever include this mixin once!
 @include mat.elevation-classes();
 @include mat.app-background();
-@import 'variables';
 
 @font-face {
   font-family: 'Roboto';
@@ -103,7 +104,7 @@ $frontend-dark-theme: mat.define-theme(
 
 body.dark {
   @include mat.all-component-colors($frontend-dark-theme);
-  @include darken();
+  @include variables.darken();
   --color-nav-active-bg: #{mat.get-theme-color(
       $frontend-dark-theme,
       primary,
@@ -117,7 +118,7 @@ body.dark {
 }
 
 body.light {
-  @include lighten();
+  @include variables.lighten();
 }
 
 body.inheritCursors * {
