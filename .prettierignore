@@ -1,5 +1,6 @@
-docs/exam-toolbox-api/
-dist/
-node_modules/
+.agents/
 .angular/
 coverage/
+dist/
+docs/exam-toolbox-api/
+node_modules/
