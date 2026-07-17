@@ -48,13 +48,7 @@ export class ConflictDialogComponent implements OnInit, OnDestroy {
     this.dbDate = new Date((this.data.dbExam as any).updatedAt || Date.now());
   }
 
-  ngOnInit() {
-    this.themeSub = this.themeService.themeChanged$.subscribe(
-      (theme: Theme) => {
-        this.isDarkTheme = theme === Theme.DARK;
-      },
-    );
-  }
+  ngOnInit() {}
 
   ngOnDestroy() {
     this.themeSub?.unsubscribe();

@@ -14,8 +14,6 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { Subscription } from 'rxjs';
 
-import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
-
 @Component({
   selector: 'app-delete-confirmation-dialog',
   imports: [MatDialogModule, MatButtonModule],
@@ -24,26 +22,14 @@ import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
   styleUrl: './delete-confirmation-dialog.component.scss',
 })
 export class DeleteConfirmationDialogComponent implements OnInit, OnDestroy {
-  isDarkTheme = false;
-  private themeSub?: Subscription;
-
   constructor(
     public dialogRef: MatDialogRef<DeleteConfirmationDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { courseName: string },
-    private themeService: ThemeToggleService,
   ) {}
 
-  ngOnInit() {
-    this.themeSub = this.themeService.themeChanged$.subscribe(
-      (theme: Theme) => {
-        this.isDarkTheme = theme === Theme.DARK;
-      },
-    );
-  }
+  ngOnInit() {}
 
-  ngOnDestroy() {
-    this.themeSub?.unsubscribe();
-  }
+  ngOnDestroy() {}
 
   onDismiss(): void {
     this.dialogRef.close(false);

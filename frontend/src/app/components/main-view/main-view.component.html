@@ -92,16 +92,16 @@
           <div id="bottom-buttons">
             <button
               mat-list-item
-              (click)="toggleTheme()"
+              (click)="cycleTheme()"
               class="nav-item"
-              [matTooltip]="sidebarCollapsed ? 'Theme' : ''"
+              [matTooltip]="sidebarCollapsed ? themeText : ''"
               matTooltipPosition="right"
-              aria-label="Toggle Theme"
+              aria-label="Cycle Theme"
             >
               <mat-icon matListItemIcon aria-hidden="false">{{
                 themeIcon
               }}</mat-icon>
-              <span matListItemTitle class="nav-label">Theme</span>
+              <span matListItemTitle class="nav-label">{{ themeText }}</span>
             </button>
             <button
               mat-list-item

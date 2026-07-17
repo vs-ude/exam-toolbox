@@ -52,7 +52,6 @@ import { Exam } from '../../types/shared/exam';
 import { Task } from '../../types/shared/tasks';
 import { UserStub } from '../../types/shared/stubs';
 import { Tag } from '../../types/shared/tag';
-import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
 import { ColorProviderService } from '../../services/color-provider.service';
 import { TaskBuilderService } from '../../services/task-builder.service';
 import { LoadingService } from '../../services/loading.service';
@@ -114,7 +113,6 @@ export class CreateExamComponent {
   public exam = new Exam();
 
   public currentGroupView = 0;
-  public lightTheme: boolean = true;
   public readonly publicPath = environment.publicPath;
 
   public previewPdfUrl: SafeResourceUrl | null = null;
@@ -129,7 +127,6 @@ export class CreateExamComponent {
   constructor(
     private api: ApiService,
     private router: Router,
-    private themeService: ThemeToggleService,
     public colorProvider: ColorProviderService,
     private taskBuilder: TaskBuilderService,
     private dialog: MatDialog,
@@ -155,10 +152,6 @@ export class CreateExamComponent {
     if (this.exam.tasks.length === 0) {
       this.exam.tasks = [this.taskBuilder.createDefaultGroup()];
     }
-
-    this.themeService.themeChanged$.subscribe((theme: Theme) => {
-      this.lightTheme = theme === Theme.LIGHT ? true : false;
-    });
   }
 
   @ViewChild('nameInput')

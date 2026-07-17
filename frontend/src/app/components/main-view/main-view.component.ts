@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 
-import { ThemeToggleService } from '../../services/theme-toggle.service';
+import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -33,7 +33,9 @@ import { AuthService } from '../../services/auth.service';
 export class MainViewComponent {
   public username: string = '';
   public initialLetter: string = '';
-  public themeIcon: 'dark_mode' | 'light_mode' = 'light_mode';
+  public themeIcon: string = 'brightness_auto';
+  public themeText: string = 'System';
+  public readonly Theme = Theme;
   public sidebarCollapsed = false;
 
   constructor(
@@ -49,8 +51,19 @@ export class MainViewComponent {
       this.initialLetter = this.username ? this.username[0].toUpperCase() : '';
     });
 
-    this.themeToggleService.themeChanged$.subscribe(theme => {
-      this.themeIcon = theme === 'dark' ? 'dark_mode' : 'light_mode';
+    this.themeToggleService.themePreference$.subscribe(pref => {
+      this.themeIcon =
+        pref === Theme.DARK
+          ? 'dark_mode'
+          : pref === Theme.LIGHT
+            ? 'light_mode'
+            : 'brightness_auto';
+      this.themeText =
+        pref === Theme.DARK
+          ? 'Dark'
+          : pref === Theme.LIGHT
+            ? 'Light'
+            : 'System';
     });
 
     this.sidebarCollapsed =
@@ -67,8 +80,8 @@ export class MainViewComponent {
     });
   }
 
-  toggleTheme() {
-    this.themeToggleService.toggleTheme();
+  cycleTheme() {
+    this.themeToggleService.cycleTheme();
   }
 
   setUsername(name: string) {

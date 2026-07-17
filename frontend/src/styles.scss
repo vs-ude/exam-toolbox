@@ -125,18 +125,6 @@ body.inheritCursors * {
   cursor: inherit !important;
 }
 
-mat-dialog-container {
-  color: var(--color-text) !important;
-}
-
-mat-dialog-content {
-  background-color: var(--color-background) !important;
-}
-
-mat-dialog-actions {
-  background-color: var(--color-background) !important;
-}
-
 // Comment out the line below if you want to use the pre-defined typography utility classes.
 // For more information: https://material.angular.io/guide/typography#using-typography-styles-in-your-application.
 // @include mat.typography-hierarchy($frontend-theme);
