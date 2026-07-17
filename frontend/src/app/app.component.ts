@@ -6,7 +6,6 @@ import { LoadingIndicatorComponent } from './components/loading-indicator/loadin
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [CommonModule, MainViewComponent, LoadingIndicatorComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

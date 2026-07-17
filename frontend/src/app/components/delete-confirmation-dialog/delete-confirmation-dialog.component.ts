@@ -12,7 +12,6 @@ import { Theme, ThemeToggleService } from '../../services/theme-toggle.service';
 
 @Component({
   selector: 'app-delete-confirmation-dialog',
-  standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule],
   templateUrl: './delete-confirmation-dialog.component.html',
   styleUrl: './delete-confirmation-dialog.component.scss',

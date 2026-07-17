@@ -5,7 +5,6 @@ import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-pool-task',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './pool-task.component.html',
   styleUrl: './pool-task.component.scss',

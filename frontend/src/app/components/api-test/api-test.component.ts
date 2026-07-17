@@ -4,7 +4,6 @@ import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-api-test',
-  standalone: true,
   imports: [],
   templateUrl: './api-test.component.html',
   styleUrl: './api-test.component.scss',

@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-update-task-dialog',
-  standalone: true,
   imports: [MatDialogModule, MatButtonModule, FormsModule],
   templateUrl: './update-task-dialog.component.html',
   styleUrl: './update-task-dialog.component.scss',

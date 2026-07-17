@@ -69,7 +69,6 @@ const exam: Exam = new Exam(
 
 @Component({
   selector: 'app-debug',
-  standalone: true,
   imports: [],
   templateUrl: './debug.component.html',
   styleUrl: './debug.component.scss',

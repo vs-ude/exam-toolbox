@@ -8,7 +8,6 @@ import { Task } from '../../../../../types/shared/tasks';
 
 @Component({
   selector: 'app-task-footer',
-  standalone: true,
   imports: [MatIcon, FormsModule, NgStyle, MatLabel],
   templateUrl: './task-footer.component.html',
   styleUrl: './task-footer.component.scss',

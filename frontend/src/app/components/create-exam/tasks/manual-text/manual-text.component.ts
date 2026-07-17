@@ -10,7 +10,6 @@ import { BaseTaskComponent } from '../base-task/base-task.component';
 
 @Component({
   selector: 'app-manual-text',
-  standalone: true,
   imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   templateUrl: './manual-text.component.html',
   styleUrls: ['./manual-text.component.scss', '../task.scss'],

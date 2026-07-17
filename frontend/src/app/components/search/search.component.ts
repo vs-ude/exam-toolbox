@@ -12,7 +12,6 @@ import { ExamCardComponent } from '../exam-card/exam-card.component';
 
 @Component({
   selector: 'app-search',
-  standalone: true,
   imports: [
     ...COMMON_IMPORTS,
     RouterModule,

@@ -18,7 +18,6 @@ import { TaskPoolCardComponent } from '../task-pool-card/task-pool-card.componen
 
 @Component({
   selector: 'app-task-pool',
-  standalone: true,
   imports: [
     ...COMMON_IMPORTS,
     TaskPoolCardComponent,

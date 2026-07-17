@@ -12,7 +12,6 @@ import { ApiService, JobStatus } from '../../services/api.service';
 
 @Component({
   selector: 'app-mass-exam-dialog',
-  standalone: true,
   imports: [
     ...COMMON_IMPORTS,
     MatDialogModule,

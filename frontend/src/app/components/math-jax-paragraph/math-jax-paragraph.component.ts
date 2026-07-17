@@ -3,7 +3,6 @@ import { MathJaxService } from '../../services/math-jax.service';
 
 @Component({
   selector: 'app-math-jax-paragraph',
-  standalone: true,
   imports: [],
   templateUrl: './math-jax-paragraph.component.html',
   styleUrl: './math-jax-paragraph.component.scss',

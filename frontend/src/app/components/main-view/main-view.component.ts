@@ -15,7 +15,6 @@ import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-main-view',
-  standalone: true,
   imports: [
     MatSidenavModule,
     MatListModule,

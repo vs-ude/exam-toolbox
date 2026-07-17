@@ -8,7 +8,6 @@ import {
 
 @Component({
   selector: 'app-preview-dialog',
-  standalone: true,
   imports: [MatDialogModule],
   templateUrl: './preview-dialog.component.html',
   styleUrl: './preview-dialog.component.scss',

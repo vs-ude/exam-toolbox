@@ -18,7 +18,6 @@ import { TASK_COMMON_IMPORTS } from '../task-common-imports';
 
 @Component({
   selector: 'app-multiplechoiceTask',
-  standalone: true,
   imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   templateUrl: './multiplechoice-task.component.html',
   styleUrls: ['./multiplechoice-task.component.scss', '../task.scss'],

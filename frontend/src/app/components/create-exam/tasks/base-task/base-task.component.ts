@@ -15,7 +15,6 @@ import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-base-task',
-  standalone: true,
   imports: [],
   template: '',
   styleUrl: '../task.scss',

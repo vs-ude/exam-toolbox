@@ -12,7 +12,6 @@ import { PreviewDialogComponent } from './preview-dialog/preview-dialog.componen
 
 @Component({
   selector: 'app-latex-task',
-  standalone: true,
   imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   templateUrl: './latex-task.component.html',
   styleUrls: ['./latex-task.component.scss', '../task.scss'],

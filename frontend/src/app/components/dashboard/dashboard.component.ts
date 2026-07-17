@@ -11,7 +11,6 @@ import { ExamsTableComponent } from '../exams-table/exams-table.component';
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true,
   imports: [
     ...COMMON_IMPORTS,
     MatButtonModule,

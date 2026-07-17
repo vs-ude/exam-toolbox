@@ -63,7 +63,6 @@ interface PDFTaskInfo {
 
 @Component({
   selector: 'app-create-exam',
-  standalone: true,
   imports: [
     ...COMMON_IMPORTS,
     AddTaskComponent,

@@ -42,7 +42,6 @@ export interface ExamAuthDialogResult {
 
 @Component({
   selector: 'app-exam-auth-dialog',
-  standalone: true,
   imports: [
     CommonModule,
     AsyncPipe,

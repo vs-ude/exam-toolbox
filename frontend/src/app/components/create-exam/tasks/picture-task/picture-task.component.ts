@@ -12,7 +12,6 @@ import { DragAndDropDirective } from '../drag-and-drop.directive';
 
 @Component({
   selector: 'app-picture-task',
-  standalone: true,
   imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS, DragAndDropDirective],
   templateUrl: './picture-task.component.html',
   styleUrls: ['./picture-task.component.scss', '../task.scss'],

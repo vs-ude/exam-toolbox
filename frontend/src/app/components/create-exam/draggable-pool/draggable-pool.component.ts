@@ -22,7 +22,6 @@ interface TypeOption {
 }
 @Component({
   selector: 'app-draggable-pool',
-  standalone: true,
   imports: [PoolTaskComponent, MatTooltipModule, MatIcon],
   templateUrl: './draggable-pool.component.html',
   styleUrl: './draggable-pool.component.scss',

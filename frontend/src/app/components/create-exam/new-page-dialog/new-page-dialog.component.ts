@@ -5,7 +5,6 @@ import { Task } from '../../../types/shared/tasks';
 
 @Component({
   selector: 'app-new-page-dialog',
-  standalone: true,
   imports: [MatDialogModule],
   templateUrl: './new-page-dialog.component.html',
   styleUrl: './new-page-dialog.component.scss',

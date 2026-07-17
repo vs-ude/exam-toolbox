@@ -21,7 +21,6 @@ export interface ConflictDialogData {
 
 @Component({
   selector: 'app-conflict-dialog',
-  standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
   providers: [DatePipe],
   templateUrl: './conflict-dialog.component.html',

@@ -18,7 +18,6 @@ import { TaskAnimations } from '../tasks/task-animations';
 
 @Component({
   selector: 'app-task-group-title',
-  standalone: true,
   imports: [NgStyle, MatIcon, NgIf],
   templateUrl: './task-group-title.component.html',
   styleUrl: './task-group-title.component.scss',

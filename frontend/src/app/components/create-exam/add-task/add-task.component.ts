@@ -5,7 +5,6 @@ import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-AddTask',
-  standalone: true,
   imports: [NgStyle],
   templateUrl: './add-task.component.html',
   styleUrl: './add-task.component.scss',

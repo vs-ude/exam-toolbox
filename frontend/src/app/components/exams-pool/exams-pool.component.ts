@@ -22,7 +22,6 @@ type ExamFilter = {
 
 @Component({
   selector: 'app-exams-pool',
-  standalone: true,
   imports: [...COMMON_IMPORTS, ExamCardComponent, ExamsTableComponent],
   templateUrl: './exams-pool.component.html',
   styleUrl: './exams-pool.component.scss',

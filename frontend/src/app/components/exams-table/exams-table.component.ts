@@ -20,7 +20,6 @@ import { DownloadableJob } from '../../services/api.service';
 
 @Component({
   selector: 'app-exams-table',
-  standalone: true,
   imports: [MatTooltip, MatTableModule, MatSortModule, MatIconModule],
   templateUrl: './exams-table.component.html',
   styleUrl: './exams-table.component.scss',

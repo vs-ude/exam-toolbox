@@ -12,7 +12,6 @@ import { LoadingService } from '../../services/loading.service';
 
 @Component({
   selector: 'app-loading-indicator',
-  standalone: true,
   imports: [MatProgressSpinnerModule, AsyncPipe, NgTemplateOutlet],
   templateUrl: './loading-indicator.component.html',
   styleUrl: './loading-indicator.component.scss',

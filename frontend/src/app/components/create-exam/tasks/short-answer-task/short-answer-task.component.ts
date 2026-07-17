@@ -18,7 +18,6 @@ import { TASK_COMMON_IMPORTS } from '../task-common-imports';
 
 @Component({
   selector: 'app-short-answer-task',
-  standalone: true,
   imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   animations: [
     TaskAnimations.inOutAnimation,

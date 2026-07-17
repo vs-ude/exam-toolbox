@@ -10,7 +10,6 @@ import { TaskAnimations } from '../task-animations';
 
 @Component({
   selector: 'app-table-task',
-  standalone: true,
   imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
   templateUrl: './table-task.component.html',
   styleUrls: ['./table-task.component.scss', '../task.scss'],

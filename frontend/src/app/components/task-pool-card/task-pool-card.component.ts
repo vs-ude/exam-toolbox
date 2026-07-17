@@ -18,7 +18,6 @@ import {
 
 @Component({
   selector: 'app-task-pool-card',
-  standalone: true,
   imports: [MatIconModule, NgStyle],
   templateUrl: './task-pool-card.component.html',
   styleUrl: './task-pool-card.component.scss',

@@ -8,7 +8,6 @@ import { TaskAnimations } from '../task-animations';
 
 @Component({
   selector: 'app-new-page',
-  standalone: true,
   imports: [MatIcon],
   templateUrl: './new-page.component.html',
   styleUrls: ['./new-page.component.scss', '../task.scss'],
