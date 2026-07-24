@@ -1,13 +1,13 @@
-import { read, utils } from '@mirror/xlsx';
 import { Context } from '@hono/hono';
+import { read, utils } from '@mirror/xlsx';
 import { crypto } from '@std/crypto';
 import { encodeHex } from '@std/encoding';
 import * as fs from '@std/fs';
 
 import { ensureQRCache } from '../services/qr.ts';
 import { AppEnv } from '../types/context.ts';
-import { Exam, Student, User } from '../types/mod.ts';
 import { HandlerResult, HttpError } from '../types/handler.ts';
+import { Exam, Student, User } from '../types/mod.ts';
 
 import {
   compileExam,
@@ -204,13 +204,13 @@ export async function createExam(
   };
 }
 
-export async function generateExam(
+export async function generatePreview(
   c: Context<AppEnv>,
   deps: ExamManagerDeps,
 ): Promise<HandlerResult> {
   const exam: Exam = Object.assign(new Exam(), await c.req.json());
   const tempDir = await Deno.makeTempDir({ prefix: 'exam_gen_single_' });
-  exam.fillPagesAndPoints();
+  exam.fillMeta();
   await ensureQRCache(1, exam.pageCount!);
   await fs.copy(deps.basePath, tempDir, { overwrite: true });
   await generateSolution(tempDir, exam);
@@ -334,7 +334,7 @@ export async function generateExams(
     dir: jobDir,
   });
 
-  exam.fillPagesAndPoints();
+  exam.fillMeta();
   await fs.copy(deps.basePath, jobTemplatePath, { overwrite: true });
   await renderMetaExam(exam, jobTemplatePath);
   await generateTasksLatex(

@@ -27,7 +27,7 @@ extensions:
     openapi:
       - sourceUrl: http://localhost/api/doc
         groupBy: tags
-        lastSyncDate: 2026-07-13T16:19:36.371Z
-        specHash: ff647c116c057154866a7e6f0dde4b0f
+        lastSyncDate: 2026-07-24T19:33:11.907Z
+        specHash: 624c24a589c70a84b82727fd8432bf6b
         autoCheck: false
         autoCheckInterval: 5

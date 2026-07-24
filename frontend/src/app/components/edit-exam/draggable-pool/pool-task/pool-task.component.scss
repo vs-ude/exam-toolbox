@@ -9,6 +9,14 @@
   min-width: 100px;
   max-width: 100%;
   z-index: auto;
+  margin-top: 8px;
+}
+
+.task_container.cdk-drag-placeholder {
+  width: 95%;
+  max-width: 800px;
+  box-sizing: border-box;
+  margin: 0 auto 20px auto;
 }
 
 .task_icon {

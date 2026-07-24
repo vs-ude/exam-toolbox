@@ -1,0 +1,187 @@
+info:
+  name: Start bulk exam generation
+  type: http
+  seq: 10
+  tags:
+    - Exams
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/exam/:examId/generate"
+  params:
+    - name: examId
+      value: ""
+      type: path
+  body:
+    type: multipart-form
+    data:
+      - name: exam
+        type: text
+        value: ""
+        description: JSON-serialised Exam object.
+      - name: list
+        type: text
+        value: ""
+        description: Excel participant list (.xlsx).
+      - name: startSeatNumber
+        type: text
+        value: ""
+        description: First seat number to assign (defaults to 1).
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 202 Response
+    description: Job accepted
+    request:
+      url: "{{baseUrl}}/api/exam/:examId/generate"
+      method: POST
+      params:
+        - name: examId
+          value: ""
+          type: path
+      body:
+        type: multipart-form
+        data:
+          - name: exam
+            type: text
+            value: ""
+            description: JSON-serialised Exam object.
+          - name: list
+            type: text
+            value: ""
+            description: Excel participant list (.xlsx).
+          - name: startSeatNumber
+            type: text
+            value: ""
+            description: First seat number to assign (defaults to 1).
+    response:
+      status: 202
+      statusText: Accepted
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "jobId": "",
+            "message": ""
+          }
+  - name: 400 Response
+    description: Missing or invalid request data
+    request:
+      url: "{{baseUrl}}/api/exam/:examId/generate"
+      method: POST
+      params:
+        - name: examId
+          value: ""
+          type: path
+      body:
+        type: multipart-form
+        data:
+          - name: exam
+            type: text
+            value: ""
+            description: JSON-serialised Exam object.
+          - name: list
+            type: text
+            value: ""
+            description: Excel participant list (.xlsx).
+          - name: startSeatNumber
+            type: text
+            value: ""
+            description: First seat number to assign (defaults to 1).
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+  - name: 409 Response
+    description: A generation job for this exam is already in progress
+    request:
+      url: "{{baseUrl}}/api/exam/:examId/generate"
+      method: POST
+      params:
+        - name: examId
+          value: ""
+          type: path
+      body:
+        type: multipart-form
+        data:
+          - name: exam
+            type: text
+            value: ""
+            description: JSON-serialised Exam object.
+          - name: list
+            type: text
+            value: ""
+            description: Excel participant list (.xlsx).
+          - name: startSeatNumber
+            type: text
+            value: ""
+            description: First seat number to assign (defaults to 1).
+    response:
+      status: 409
+      statusText: Conflict
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+  - name: 500 Response
+    description: Internal server error
+    request:
+      url: "{{baseUrl}}/api/exam/:examId/generate"
+      method: POST
+      params:
+        - name: examId
+          value: ""
+          type: path
+      body:
+        type: multipart-form
+        data:
+          - name: exam
+            type: text
+            value: ""
+            description: JSON-serialised Exam object.
+          - name: list
+            type: text
+            value: ""
+            description: Excel participant list (.xlsx).
+          - name: startSeatNumber
+            type: text
+            value: ""
+            description: First seat number to assign (defaults to 1).
+    response:
+      status: 500
+      statusText: Internal Server Error
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+
+docs: Takes the exam definition, a participant Excel list, and an optional starting seat number. Enqueues a generation job and immediately returns the job ID. Use the job-status endpoint to poll for completion.

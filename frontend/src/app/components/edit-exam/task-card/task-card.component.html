@@ -1,0 +1,16 @@
+<mat-card class="form-card" cdkDrag>
+  <div class="card-layout">
+    <div class="left">
+      <!-- FIXME: this is shown for a few seconds when dragging a newPage to a position where a proper task was before -->
+      @if (subtaskId) {
+        <div class="subtask-id">{{ subtaskId }}</div>
+      }
+      <div class="drag_handle" cdkDragHandle>
+        <mat-icon>drag_indicator</mat-icon>
+      </div>
+    </div>
+    <div class="card-content">
+      <ng-container #host></ng-container>
+    </div>
+  </div>
+</mat-card>

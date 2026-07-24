@@ -1,0 +1,103 @@
+info:
+  name: Upload a file
+  type: http
+  seq: 2
+  tags:
+    - Files
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/upload"
+  body:
+    type: multipart-form
+    data:
+      - name: image
+        type: text
+        value: ""
+        description: The image file to upload.
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Upload successful
+    request:
+      url: "{{baseUrl}}/api/upload"
+      method: POST
+      body:
+        type: multipart-form
+        data:
+          - name: image
+            type: text
+            value: ""
+            description: The image file to upload.
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": "",
+            "url": ""
+          }
+  - name: 400 Response
+    description: No file or empty file provided
+    request:
+      url: "{{baseUrl}}/api/upload"
+      method: POST
+      body:
+        type: multipart-form
+        data:
+          - name: image
+            type: text
+            value: ""
+            description: The image file to upload.
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+  - name: 500 Response
+    description: Internal server error
+    request:
+      url: "{{baseUrl}}/api/upload"
+      method: POST
+      body:
+        type: multipart-form
+        data:
+          - name: image
+            type: text
+            value: ""
+            description: The image file to upload.
+    response:
+      status: 500
+      statusText: Internal Server Error
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+
+docs: Stores the given file under a content-addressed path. Returns the server-side URL for use in task definitions.

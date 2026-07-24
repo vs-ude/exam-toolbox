@@ -5,20 +5,20 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { COMMON_IMPORTS } from '../common-imports';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatBadgeModule } from '@angular/material/badge';
 import {
   CdkDrag,
   CdkDragDrop,
-  CdkDragHandle,
   CdkDropList,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { HttpResponse } from '@angular/common/http';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { environment } from '../../../environments/environment';
 
-import { Exam } from '../../types/shared/exam';
+import { Exam, parseExam } from '../../types/shared/exam';
 import { Task } from '../../types/shared/tasks';
 import { UserStub } from '../../types/shared/stubs';
 import { Tag } from '../../types/shared/tag';
@@ -28,6 +28,7 @@ import { LoadingService } from '../../services/loading.service';
 import { ApiService } from '../../services/api.service';
 import { TagHelperService } from '../../services/tag-helper.service';
 import { AutosaveService } from '../../services/autosave.service';
+import { truncateString, stripHTML } from '../../services/helpers.service';
 
 import {
   AddTagDialogComponent,
@@ -40,18 +41,37 @@ import {
   ExamSetupDialogComponent,
   ExamSetupDialogData,
 } from '../exam-setup-dialog/exam-setup-dialog.component';
-import { ManualTextComponent } from '../tasks/manual-text/manual-text.component';
-import { MultiplechoiceTaskComponent } from '../tasks/multipleChoiceTask/multiplechoice-task.component';
-import { ShortAnswerTaskComponent } from '../tasks/short-answer-task/short-answer-task.component';
-import { PictureTaskComponent } from '../tasks/picture-task/picture-task.component';
-import { LatexTaskComponent } from '../tasks/latex-task/latex-task.component';
-import { TableTaskComponent } from '../tasks/table-task/table-task.component';
-import { NewPageComponent } from '../tasks/new-page/new-page.component';
-
 import { AddTaskComponent } from './add-task/add-task.component';
+import { TaskCardComponent } from './task-card/task-card.component';
 import { DraggablePoolComponent } from './draggable-pool/draggable-pool.component';
 import { NewPageDialogComponent } from './new-page-dialog/new-page-dialog.component';
 import { TaskGroupTitleComponent } from './task-group-title/task-group-title.component';
+
+interface AddTaskDef {
+  name: string;
+  type: string;
+  iconName: string;
+  dataCy?: string;
+}
+
+const TASK_DEFS: AddTaskDef[] = [
+  {
+    name: 'Multiple Choice',
+    type: 'multipleChoice',
+    iconName: 'multipleChoice.svg',
+  },
+  {
+    name: 'Short Answer',
+    type: 'shortAnswer',
+    iconName: 'shortAnswer.svg',
+    dataCy: 'short-answer',
+  },
+  { name: 'New Page', type: 'newPage', iconName: 'newPage.svg' },
+  { name: 'Picture Task', type: 'pictureTask', iconName: 'pictureTask.svg' },
+  { name: 'Latex Task', type: 'latex', iconName: 'latex.svg' },
+  { name: 'Table Task', type: 'table', iconName: 'table.svg' },
+  { name: 'Manual Text', type: 'manualText', iconName: 'manualText.svg' },
+];
 
 interface PDFTaskInfo {
   page: number;
@@ -63,19 +83,13 @@ interface PDFTaskInfo {
   imports: [
     ...COMMON_IMPORTS,
     AddTaskComponent,
-    MultiplechoiceTaskComponent,
+    TaskCardComponent,
     MatTabsModule,
     MatFormFieldModule,
-    ShortAnswerTaskComponent,
+    MatBadgeModule,
     TaskGroupTitleComponent,
-    PictureTaskComponent,
-    LatexTaskComponent,
-    TableTaskComponent,
-    ManualTextComponent,
     CdkDrag,
     CdkDropList,
-    CdkDragHandle,
-    NewPageComponent,
     MatSnackBarModule,
     DraggablePoolComponent,
   ],
@@ -84,10 +98,8 @@ interface PDFTaskInfo {
   styleUrl: './edit-exam.component.scss',
 })
 export class EditExamComponent {
-  public inDropzone = false;
   public isUpdateMode = false;
 
-  private bodyElement: HTMLElement = document.body;
   private modifiedPoolTasks: Set<string> = new Set<string>();
   private newTasksToCreate: Set<string> = new Set<string>();
   private tasksWithModifiedTags: {
@@ -95,6 +107,7 @@ export class EditExamComponent {
     tagData: Tag;
   }[] = [];
 
+  public readonly taskDefs = TASK_DEFS;
   public taskPool: Task[] = [];
   public refreshPool$: Subject<void> = new Subject<void>();
   public totalPoints = 0;
@@ -145,75 +158,6 @@ export class EditExamComponent {
     this.autosaveTrigger$.next();
   }
 
-  dragStart(event: DragEvent) {
-    this.bodyElement.classList.add('inheritCursors');
-    this.bodyElement.style.cursor = 'grabbing';
-  }
-
-  drop(event: DragEvent) {
-    this.bodyElement.classList.remove('inheritCursors');
-    this.bodyElement.style.cursor = 'unset';
-    const element = event.target as Element;
-    console.log(element.id);
-
-    if (this.inDropzone) {
-      if (element.id.slice(0, 4) === 'new_') {
-        this.pushNewTask(element.id);
-      } else {
-        this.pushPoolTask(element.id);
-      }
-      this.triggerAutosave();
-    }
-    this.inDropzone = false;
-  }
-
-  reorderDrop(event: CdkDragDrop<Task[]>) {
-    moveItemInArray(
-      this.exam.tasks[this.currentGroupView].tasks,
-      event.previousIndex,
-      event.currentIndex,
-    );
-    this.triggerAutosave();
-  }
-
-  private pushNewTask(taskType: string) {
-    let task = this.taskBuilder.createTask(taskType);
-    task.usedIn = [this.exam._id || 'placeholder_id'];
-    this.exam.tasks[this.currentGroupView].tasks.push(task);
-    this.adjustTotalPoints();
-  }
-
-  private pushPoolTask(taskId: string) {
-    const task = this.taskPool.find(element => element._id === taskId);
-    if (task == undefined) {
-      console.warn("couldn't find task");
-      return;
-    }
-
-    // update Task Metadata
-    if (!task.usedIn.includes(this.exam._id || 'placeholder_id')) {
-      task.usedIn.push(this.exam._id || 'placeholder_id');
-    }
-    task.lastUsed = new Date();
-
-    //create new instance of the task to avoid modifying the pool task when editing the task in the exam
-    const newTaskInstance = JSON.parse(JSON.stringify(task)) as Task;
-
-    this.exam.tasks[this.currentGroupView].tasks.push(newTaskInstance);
-    this.adjustTotalPoints();
-  }
-
-  dragOverDropzone(event: DragEvent) {
-    event.preventDefault();
-    this.inDropzone = true;
-  }
-
-  deleteTask(index: number) {
-    this.exam.tasks[this.currentGroupView].tasks.splice(index, 1);
-    this.adjustTotalPoints();
-    this.triggerAutosave();
-  }
-
   onSave() {
     this.checkIfValid();
     this.api.addExam(this.exam).subscribe({
@@ -232,7 +176,7 @@ export class EditExamComponent {
   onPreview() {
     this.checkIfValid();
     this.loadingService.loadingOn();
-    const exam = this.api.generateExam(this.exam);
+    const exam = this.api.previewExam(this.exam);
     exam.subscribe({
       next: (response: HttpResponse<Blob>) => {
         const pdfBlob = response.body;
@@ -275,11 +219,145 @@ export class EditExamComponent {
         this.previewReady$.next();
       },
       error: err => {
-        console.error('Error generating exam preview: ', err);
+        this.snackBar.open(
+          `Error generating exam preview: ${JSON.stringify(err)}`,
+          'OK',
+        );
         this.loadingService.loadingOff();
         alert('An error occurred while generating the exam preview');
       },
     });
+  }
+
+  deleteTask(index: number) {
+    this.exam.tasks[this.currentGroupView].tasks.splice(index, 1);
+    this.exam.fillMeta();
+    this.triggerAutosave();
+    this.previewTabNotification = false;
+  }
+
+  // ------------------------
+  // Drag-and-drop functions
+  //
+  reorderDrop(event: CdkDragDrop<Task[]>) {
+    if (event.previousContainer === event.container) {
+      // internal reorder within the task list
+      if (
+        this.exam.tasks[this.currentGroupView].tasks[event.previousIndex]
+          ?.type == 'newPage' &&
+        !this.validatePageBreaks(event.currentIndex, event.previousIndex)
+      ) {
+        return;
+      }
+      moveItemInArray(
+        this.exam.tasks[this.currentGroupView].tasks,
+        event.previousIndex,
+        event.currentIndex,
+      );
+    } else {
+      // external drop from add-tasks or pool source lists
+      const data = event.item.data as
+        | { source: 'new'; taskType: string }
+        | { source: 'pool'; taskId: string };
+      if (data.source === 'new') {
+        this.pushNewTask(data.taskType, event.currentIndex);
+      } else {
+        this.pushPoolTask(data.taskId, event.currentIndex);
+      }
+    }
+    this.triggerAutosave();
+    this.previewTabNotification = false;
+  }
+
+  validatePageBreaks(insertIndex: number, sourceIndex?: number): boolean {
+    if (insertIndex === 0) {
+      this.snackBar.open(
+        'A page break cannot be the first element in an assignment',
+        'OK',
+        {
+          duration: 4000,
+        },
+      );
+      return false;
+    }
+
+    let checks: number[] = [];
+    if (sourceIndex !== undefined && sourceIndex == insertIndex) {
+      // no-op
+      return true;
+    } else if (sourceIndex === undefined) {
+      // newly added task pushes down the insertIndex task
+      checks.push(insertIndex, insertIndex - 1);
+    } else if (sourceIndex < insertIndex) {
+      // Task moved downwards; check target and below
+      checks.push(insertIndex, insertIndex + 1);
+    } else {
+      // Task moved upwards; check target and above
+      checks.push(insertIndex, insertIndex - 1);
+    }
+
+    const checkTarget = (index: number): boolean => {
+      if (
+        this.exam.tasks[this.currentGroupView] &&
+        this.exam.tasks[this.currentGroupView].tasks[index] &&
+        this.exam.tasks[this.currentGroupView].tasks[index].type === 'newPage'
+      ) {
+        return true;
+      }
+      return false;
+    };
+
+    if (checks.some(index => checkTarget(index))) {
+      this.snackBar.open('Consecutive page breaks are not allowed', 'OK', {
+        duration: 4000,
+      });
+      return false;
+    }
+    return true;
+  }
+
+  private pushNewTask(taskType: string, index?: number) {
+    const targetIndex =
+      index ?? this.exam.tasks[this.currentGroupView].tasks.length;
+    if (taskType == 'new_newPage' && !this.validatePageBreaks(targetIndex)) {
+      return;
+    }
+    let task = this.taskBuilder.createTask(taskType);
+    task.usedIn = [this.exam._id!];
+    this.exam.tasks[this.currentGroupView].tasks.splice(targetIndex, 0, task);
+    this.exam.fillMeta();
+    this.previewTabNotification = false;
+  }
+
+  private pushPoolTask(taskId: string, index?: number) {
+    const task = this.taskPool.find(element => element._id === taskId);
+    if (task == undefined) {
+      console.warn("couldn't find task");
+      return;
+    }
+
+    // update Task Metadata
+    if (!task.usedIn.includes(this.exam._id || 'placeholder_id')) {
+      task.usedIn.push(this.exam._id || 'placeholder_id');
+    }
+    task.lastUsed = new Date();
+
+    //create new instance of the task to avoid modifying the pool task when editing the task in the exam
+    const newTaskInstance = JSON.parse(JSON.stringify(task)) as Task;
+
+    const targetIndex =
+      index ?? this.exam.tasks[this.currentGroupView].tasks.length;
+    this.exam.tasks[this.currentGroupView].tasks.splice(
+      targetIndex,
+      0,
+      newTaskInstance,
+    );
+    this.exam.fillMeta();
+    this.previewTabNotification = false;
+  }
+
+  get taskGroupDropListIds(): string[] {
+    return this.exam.tasks.map((_, i) => `task-group-${i}`);
   }
 
   private insertNewPage(absoluteIndex: number) {
@@ -323,6 +401,7 @@ export class EditExamComponent {
         newPageElement,
       );
       this.triggerAutosave();
+      this.previewTabNotification = false;
     });
   }
 
@@ -357,21 +436,15 @@ export class EditExamComponent {
     }
   }
 
-  private adjustTotalPoints() {
-    this.totalPoints = this.exam.tasks
-      .map(taskGroup => taskGroup.tasks.flat())
-      .flat()
-      .reduce((accumulator: number, task) => (accumulator += task.points), 0);
-  }
-
   onTaskChange(task: Task, index: number) {
     this.exam.tasks[this.currentGroupView].tasks[index] = task;
-    this.adjustTotalPoints();
+    this.exam.fillMeta();
     this.trackChangeInPoolTasks(task._id);
-    console.log(task);
     this.triggerAutosave();
+    this.previewTabNotification = false;
   }
 
+  // FIXME: this is broken; tasks are always overwritten
   private trackChangeInPoolTasks(id: string | undefined) {
     if (id && this.isPoolTask(id)) {
       this.modifiedPoolTasks.add(id);
@@ -402,6 +475,7 @@ export class EditExamComponent {
   onTitleChange(taskGroupTitle: { DE: string; EN: string }) {
     this.exam.tasks[this.currentGroupView].groupTitle = taskGroupTitle;
     this.triggerAutosave();
+    this.previewTabNotification = false;
   }
 
   onUpdate() {
@@ -524,7 +598,7 @@ export class EditExamComponent {
           if (resume) {
             this.exam = draft.data;
             this.isExamSetup = true;
-            this.adjustTotalPoints();
+            this.exam.fillMeta();
             this.snackBar.open('Resumed unsaved new exam.', 'OK', {
               duration: 3000,
             });
@@ -560,7 +634,7 @@ export class EditExamComponent {
             if (useLocal) {
               this.exam = localWrapper.data;
               this.exam._id = dbExam._id;
-              this.adjustTotalPoints();
+              this.exam.fillMeta();
               this.snackBar.open('Unsaved changes restored.', 'OK', {
                 duration: 3000,
               });
@@ -582,7 +656,7 @@ export class EditExamComponent {
   }
 
   private initializeExamData(response: Exam) {
-    this.exam = response;
+    this.exam = parseExam(response);
     this.isExamSetup = true;
     for (let taskGroup of this.exam.tasks) {
       for (let task of taskGroup.tasks) {
@@ -590,7 +664,7 @@ export class EditExamComponent {
         console.log('importing tags for task', task);
       }
     }
-    this.adjustTotalPoints();
+    this.exam.fillMeta();
   }
 
   private importPoolTasks() {
@@ -611,37 +685,11 @@ export class EditExamComponent {
     });
   }
 
-  public addTab() {
-    this.exam.tasks.push({
-      groupNumber: this.exam.tasks.length + 1,
-      groupTitle: { DE: '', EN: '' },
-      tasks: [],
-    });
-    this.currentGroupView = this.exam.tasks.length - 1;
-  }
-
-  public deleteTab() {
-    if (this.exam.tasks.length === 1) {
-      return;
-    }
-    this.exam.tasks.splice(this.currentGroupView, 1);
-    this.currentGroupView--;
-  }
-
-  public changeTab(index: number) {
-    this.currentGroupView = index;
-    if (index < this.exam.tasks.length) {
-      this.isPreviewTabActive = false;
-    } else {
-      this.isPreviewTabActive = true;
-      this.previewTabNotification = false;
-    }
-  }
-
   public calcTaskChar(
     index: number,
     groupIndex = this.currentGroupView,
   ): string {
+    if (index >= this.exam.tasks[groupIndex].tasks.length) return '';
     // ignore manual text and new page tasks when calculating the task number
     let ignoredCount = 0;
     const tasks = this.exam.tasks[groupIndex].tasks;
@@ -651,7 +699,7 @@ export class EditExamComponent {
       }
     }
 
-    return this.mapTaskIndexToChar(index - ignoredCount);
+    return groupIndex + 1 + '.' + this.mapTaskIndexToChar(index - ignoredCount);
   }
 
   private mapTaskIndexToChar(index: number) {
@@ -682,16 +730,6 @@ export class EditExamComponent {
         }
         this.triggerAutosave();
       });
-  }
-
-  onMassExam() {
-    this.checkIfValid();
-
-    this.dialog.open(MassExamDialogComponent, {
-      width: '50%',
-      height: '60%',
-      data: { exam: this.exam },
-    });
   }
 
   public onAddTag(index: number) {
@@ -741,7 +779,7 @@ export class EditExamComponent {
         this.previewPdfUrl =
           this.sanitizer.bypassSecurityTrustResourceUrl(pageUrl);
 
-        this.changeTab(this.exam.tasks.length); // switch to preview tab
+        // this.changeTab(this.exam.tasks.length); // switch to preview tab
       },
       error: () => {
         console.error('Failed to generate preview');
@@ -777,6 +815,9 @@ export class EditExamComponent {
     return count;
   }
 
+  /**
+   * Returns the page number for the given subtask index in the generated PDF.
+   */
   private getPDFPageNumber(
     index: number,
     groupIndex = this.currentGroupView,
@@ -793,5 +834,57 @@ export class EditExamComponent {
       );
     }
     return info.page;
+  }
+
+  /* ------ Task Group Tabs ------ */
+  onTabChange(index: number) {
+    const addTabIndex = this.exam.tasks.length + (this.previewPdfUrl ? 1 : 0);
+    if (index === addTabIndex) {
+      this.addTab();
+    } else if (index >= this.exam.tasks.length) {
+      // preview tab selected — keep currentGroupView on last valid group
+      this.currentGroupView = this.exam.tasks.length - 1;
+    } else {
+      this.currentGroupView = index;
+    }
+  }
+
+  addTab() {
+    this.exam.tasks.push({
+      groupNumber: this.exam.tasks.length + 1,
+      groupTitle: { DE: '', EN: '' },
+      tasks: [],
+    });
+    const newIndex = this.exam.tasks.length - 1;
+    // Defer so Angular renders the new mat-tab before [selectedIndex] tries to select it
+    setTimeout(() => {
+      this.currentGroupView = newIndex;
+    });
+    this.triggerAutosave();
+  }
+
+  deleteTab(i: number) {
+    if (this.exam.tasks.length === 1) {
+      return;
+    }
+    this.exam.tasks.splice(i, 1);
+    this.currentGroupView--;
+    this.triggerAutosave();
+  }
+
+  tabLabel(index: number): string {
+    const title = stripHTML(this.exam.tasks[index].groupTitle.DE);
+    if (title) {
+      return truncateString(title, 20);
+    } else {
+      return 'Assignment ' + (index + 1);
+    }
+  }
+
+  dropTab(event: CdkDragDrop<string[]>) {
+    const prevActive = this.exam.tasks[this.currentGroupView];
+    moveItemInArray(this.exam.tasks, event.previousIndex, event.currentIndex);
+    this.currentGroupView = this.exam.tasks.indexOf(prevActive);
+    this.triggerAutosave();
   }
 }

@@ -1,12 +1,7 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { CdkDropList } from '@angular/cdk/drag-drop';
 import { forkJoin, Observable, Subscription } from 'rxjs';
 
 import { ApiService } from '../../../services/api.service';
@@ -28,16 +23,14 @@ interface TypeOption {
 }
 @Component({
   selector: 'app-draggable-pool',
-  imports: [PoolTaskComponent, MatTooltipModule, MatIcon],
+  imports: [PoolTaskComponent, MatTooltipModule, MatIcon, CdkDropList],
   templateUrl: './draggable-pool.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './draggable-pool.component.scss',
 })
 export class DraggablePoolComponent {
   @Input() refreshPool$!: Observable<void>;
-
-  @Output() dragStart = new EventEmitter<DragEvent>();
-  @Output() drop = new EventEmitter<DragEvent>();
+  @Input() connectedTo: string[] = [];
 
   public taskPool: Task[] = [];
   public filteredTaskPool: Task[] = [];

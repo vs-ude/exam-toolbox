@@ -1,85 +1,9 @@
 <!-- Question -->
-<div class="form-header">
-  <!-- Bilingual -->
-  @if (bilingual) {
-    <div class="question-container" [@leftRightAnimation]>
-      <div class="question-language-wrapper">
-        <span class="language_icon"
-          ><img [src]="publicPath + 'german.svg'"
-        /></span>
-        <div
-          #questionFieldDE
-          contenteditable="true"
-          class="form-question"
-          (focus)="activateFormatButtons()"
-          (blur)="deactivateFormatButtons($event)"
-          (input)="updateQuestion($event, 'DE')"
-          [attr.data-placeholder]="'Frage Eingeben...'"
-        ></div>
-      </div>
-      <div class="question-language-wrapper">
-        <span class="language_icon"
-          ><img [src]="publicPath + 'english.svg'"
-        /></span>
-        <div
-          #questionFieldEN
-          contenteditable="true"
-          class="form-question"
-          (focus)="activateFormatButtons()"
-          (blur)="deactivateFormatButtons($event)"
-          (input)="updateQuestion($event, 'EN')"
-          [attr.data-placeholder]="'Enter Question...'"
-        ></div>
-      </div>
-    </div>
-  }
-
-  <!-- German -->
-  @if (!bilingual) {
-    <div
-      #questionFieldDE
-      contenteditable="true"
-      class="form-question"
-      (focus)="activateFormatButtons()"
-      (blur)="deactivateFormatButtons($event)"
-      (input)="updateQuestion($event, 'DE')"
-      [attr.data-placeholder]="'Frage Eingeben...'"
-    ></div>
-  }
-</div>
-
-<!-- Buttons for formatting -->
-@if (isQuestionActive) {
-  <div [@inOutAnimation] class="form-toolbar">
-    <div
-      class="icon_wrapper delete_option_icon"
-      (mousedown)="setQuestionFormat('bold', $event)"
-      [ngStyle]="{
-        'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-      }"
-    >
-      <mat-icon aria-hidden="false">format_bold</mat-icon>
-    </div>
-    <div
-      class="icon_wrapper delete_option_icon"
-      (mousedown)="setQuestionFormat('italic', $event)"
-      [ngStyle]="{
-        'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-      }"
-    >
-      <mat-icon aria-hidden="false">format_italic</mat-icon>
-    </div>
-    <div
-      class="icon_wrapper delete_option_icon"
-      (mousedown)="setQuestionFormat('underline', $event)"
-      [ngStyle]="{
-        'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-      }"
-    >
-      <mat-icon aria-hidden="false">format_underlined</mat-icon>
-    </div>
-  </div>
-}
+<app-task-header
+  [bilingual]="bilingual"
+  [task]="task"
+  (questionChange)="onQuestionChange($event)"
+></app-task-header>
 
 <!-- Answer Options -->
 <div class="form-body">
@@ -88,6 +12,7 @@
       <input
         type="checkbox"
         name="multiple-choice"
+        matTooltip="Correct Option"
         [(ngModel)]="task.answerOptions[i].correct"
         (change)="onOptionCorrectChange()"
       />
@@ -134,17 +59,23 @@
         />
       }
       <div class="icon_wrapper delete_option_icon">
-        <mat-icon aria-hidden="false" (click)="removeOption(i)">close</mat-icon>
+        <mat-icon
+          aria-hidden="false"
+          matTooltip="Delete Option"
+          (click)="removeOption(i)"
+          >delete</mat-icon
+        >
       </div>
     </div>
   }
 
   <!-- add AnswerOption -->
   <div class="add-option">
+    <div class="spacer"></div>
     <div class="icon_wrapper add_option_icon">
       <mat-icon
         aria-hidden="false"
-        matTooltip="add Option"
+        matTooltip="Add Option"
         (click)="addOption()"
         >add_circle</mat-icon
       >
@@ -153,62 +84,17 @@
 </div>
 
 <!-- Footer -->
-<div class="form-footer">
-  <div class="footer-actions">
-    <div class="icon_wrapper footer_icon_delete">
-      <mat-icon aria-hidden="false" matTooltip="Delete" (click)="onDelete()"
-        >delete</mat-icon
-      >
-    </div>
-
-    @for (tag of task.tags; track tag) {
-      <div
-        class="tag"
-        [ngStyle]="{ 'background-color': tag.color, color: tag.textColor }"
-      >
-        {{ tag.name }}
-      </div>
-    }
-
-    <div class="icon_wrapper footer_icon">
-      <mat-icon aria-hidden="false" matTooltip="add Tag" (click)="onAddTag()"
-        >add</mat-icon
-      >
-    </div>
-
-    @if (isModifiedPoolTask) {
-      <div class="newTaskCheckbox_container">
-        <input
-          class="newTaskCheckbox"
-          type="checkbox"
-          name="newTaskCheckbox"
-          [(ngModel)]="createNewTask"
-          (change)="onCreateNewTaskChange(createNewTask)"
-        />
-        New Task
-      </div>
-    }
-
-    <div class="icon_wrapper footer_icon">
-      <mat-icon
-        aria-hidden="false"
-        matTooltip="Goto Preview"
-        (click)="onPreview()"
-        >preview</mat-icon
-      >
-    </div>
-  </div>
-
-  <div class="points">
-    <mat-label>Points per option</mat-label>
-    <input
-      type="number"
-      step="0.5"
-      min="0.5"
-      class="points_input"
-      value="1"
-      [(ngModel)]="pointsPerOption"
-      (change)="onPointsChange()"
-    />
-  </div>
-</div>
+<app-task-footer
+  [task]="task"
+  [isModifiedPoolTask]="isModifiedPoolTask"
+  [createNewTask]="createNewTask"
+  pointsMode="per-line"
+  pointsPerLineLabel="Points per Correct"
+  [pointsPerLineValue]="pointsPerOption"
+  (pointsPerLineValueChange)="pointsPerOption = $event; onPointsChange()"
+  (deleteEvent)="onDelete()"
+  (newTagEvent)="onAddTag()"
+  (previewEvent)="onPreview()"
+  (createNewTaskEvent)="onCreateNewTaskChange($event)"
+  (taskChangeEvent)="taskChangeEvent.emit($event)"
+></app-task-footer>

@@ -1,9 +1,6 @@
 import {
-  AfterViewChecked,
-  AfterViewInit,
   Component,
   EventEmitter,
-  OnChanges,
   OnInit,
   Output,
   ChangeDetectionStrategy,
@@ -30,7 +27,7 @@ import { TASK_COMMON_IMPORTS } from '../task-common-imports';
 })
 export class MultiplechoiceTaskComponent
   extends BaseTaskComponent
-  implements OnInit, AfterViewInit, AfterViewChecked, OnChanges
+  implements OnInit
 {
   @Output()
   taskChangeEvent = new EventEmitter<Task>();

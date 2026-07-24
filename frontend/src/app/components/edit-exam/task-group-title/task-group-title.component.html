@@ -1,6 +1,5 @@
-<div class="assigment_title">Assignment Description:</div>
-
 <!-- Bilingual -->
+<div class="title">Assignment {{ assignmentNumber }}</div>
 @if (bilingual) {
   <div class="question-container" [@leftRightAnimation]>
     <div class="question-language-wrapper">
@@ -15,7 +14,7 @@
         (blur)="deactivateFormatButtons($event)"
         (input)="updateTitle($event, 'DE')"
         [attr.data-placeholder]="
-          'Beschreibung für Aufgabenblock ' + assignmentNumber + ' eingeben...'
+          'Titel für Aufgabenblock ' + assignmentNumber + ' eingeben...'
         "
       ></div>
     </div>
@@ -31,7 +30,7 @@
         (blur)="deactivateFormatButtons($event)"
         (input)="updateTitle($event, 'EN')"
         [attr.data-placeholder]="
-          'Enter description for assignment ' + assignmentNumber + '...'
+          'Enter title for assignment ' + assignmentNumber + '...'
         "
       ></div>
     </div>
@@ -48,7 +47,7 @@
     (blur)="deactivateFormatButtons($event)"
     (input)="updateTitle($event, 'DE')"
     [attr.data-placeholder]="
-      'Enter description for assignment ' + assignmentNumber + '...'
+      'Enter title for assignment ' + assignmentNumber + '...'
     "
   ></div>
 }

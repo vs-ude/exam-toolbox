@@ -11,7 +11,6 @@ import { COMMON_IMPORTS } from '../../common-imports';
 
 import { TASK_COMMON_IMPORTS } from '../task-common-imports';
 import { BaseTaskComponent } from '../base-task/base-task.component';
-import { TaskAnimations } from '../task-animations';
 
 @Component({
   selector: 'app-table-task',
@@ -19,10 +18,6 @@ import { TaskAnimations } from '../task-animations';
   templateUrl: './table-task.component.html',
   styleUrls: ['./table-task.component.scss', '../task.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  animations: [
-    TaskAnimations.inOutAnimation,
-    TaskAnimations.leftRightAnimation,
-  ],
 })
 export class TableTaskComponent extends BaseTaskComponent {
   @Output()

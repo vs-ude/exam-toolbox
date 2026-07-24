@@ -1,4 +1,4 @@
-import { ExamToolboxDatabase } from '../services/mod.ts';
+import { ExamToolboxDatabase, LogInfo } from '../services/mod.ts';
 import { Language } from '../types/mod.ts';
 
 import { ExamGenerationJob, GenerationTask } from './runtime.ts';
@@ -13,7 +13,7 @@ export interface ExamManagerDeps {
   processQueue: () => void;
   genExamCode: (lang: Language, counter: number) => string;
   getDownloadableJobs: () => Promise<{ examId: string; jobId: string }[]>;
-  parseLogFileForSubtaskInfo: (logContent: string) => unknown[];
+  parseLogFileForSubtaskInfo: (logContent: string) => LogInfo[];
 }
 
 export * from './examHandler.ts';

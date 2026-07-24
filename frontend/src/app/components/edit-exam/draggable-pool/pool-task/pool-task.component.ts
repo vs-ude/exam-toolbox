@@ -7,12 +7,13 @@ import {
   DOCUMENT,
   ChangeDetectionStrategy,
 } from '@angular/core';
+import { CdkDrag } from '@angular/cdk/drag-drop';
 import { Task } from '../../../../types/shared/tasks';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-pool-task',
-  imports: [],
+  imports: [CdkDrag],
   templateUrl: './pool-task.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './pool-task.component.scss',
@@ -24,6 +25,7 @@ export class PoolTaskComponent {
   public color!: string;
   @Input()
   public iconName!: string;
+  @Input() dragData: unknown;
   public readonly publicPath = environment.publicPath;
 
   public hovered = false;

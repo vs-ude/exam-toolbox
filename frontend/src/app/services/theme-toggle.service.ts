@@ -29,7 +29,8 @@ export class ThemeToggleService {
   }
 
   private init() {
-    this.applyPreference(Theme.AUTO);
+    const theme = localStorage.getItem('theme') as Theme;
+    this.applyPreference(theme ? theme : Theme.AUTO);
   }
 
   private resolveSystemTheme(): Theme.LIGHT | Theme.DARK {
@@ -48,6 +49,7 @@ export class ThemeToggleService {
   private applyPreference(theme: Theme) {
     this.preference = theme;
     this.themePreferenceSubject.next(theme);
+    localStorage.setItem('theme', theme);
 
     if (theme === Theme.AUTO) {
       this.applySystemTheme();

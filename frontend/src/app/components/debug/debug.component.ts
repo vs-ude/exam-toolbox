@@ -91,7 +91,7 @@ export class DebugComponent {
   }
 
   onGenerateExam() {
-    this.api.generateExam(exam).subscribe({
+    this.api.previewExam(exam).subscribe({
       next: (response: HttpResponse<Blob>) => {
         const pdfBlob = response.body;
         if (pdfBlob) {

@@ -10,15 +10,16 @@ import { NgStyle } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
 
 import { Task } from '../../../../types/shared/tasks';
 
 @Component({
   selector: 'app-task-footer',
-  imports: [MatIcon, FormsModule, NgStyle, MatLabel],
+  imports: [MatIcon, FormsModule, NgStyle, MatLabel, MatTooltip],
   templateUrl: './task-footer.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrl: './task-footer.component.scss',
+  styleUrls: ['./task-footer.component.scss', '../../task.scss'],
 })
 export class TaskFooterComponent {
   @Input() public isModifiedPoolTask?: boolean;
@@ -26,6 +27,11 @@ export class TaskFooterComponent {
   @Input() public createNewTask: boolean = false;
   @Input() public hasNoPoints?: boolean;
   @Input() public hasNoPreview?: boolean;
+  /** 'total' binds directly to task.points; 'per-line' shows a separate per-line input. */
+  @Input() public pointsMode: 'total' | 'per-line' = 'total';
+  @Input() public pointsPerLineLabel: string = 'Points per line';
+  @Input() public pointsPerLineValue: number = 1;
+  @Output() pointsPerLineValueChange = new EventEmitter<number>();
   @Output() deleteEvent = new EventEmitter<string>();
   @Output() createNewTaskEvent = new EventEmitter<boolean>();
   @Output() newTagEvent = new EventEmitter<void>();
@@ -50,5 +56,9 @@ export class TaskFooterComponent {
 
   public updateTask() {
     this.taskChangeEvent.emit(this.task);
+  }
+
+  public onPointsPerLineChange() {
+    this.pointsPerLineValueChange.emit(this.pointsPerLineValue);
   }
 }

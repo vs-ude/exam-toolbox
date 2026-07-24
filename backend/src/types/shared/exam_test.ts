@@ -53,7 +53,7 @@ Deno.test(
   () => {
     const exam = new Exam();
 
-    exam.fillPagesAndPoints();
+    exam.fillMeta();
 
     assertEquals(exam.points, 0);
     // 0 (task headings) + 0 (newPage tasks) + 2 default concept pages + 3 fixed pages = 5
@@ -75,9 +75,9 @@ Deno.test(
     ];
 
     const exam = new Exam('Course', 'Examiner', 'WS', '2026-01-01', 90, tasks);
-    exam.conceptPages = 2;
+    exam.conceptPagesManual = 2;
 
-    exam.fillPagesAndPoints();
+    exam.fillMeta();
 
     assertEquals(exam.points, 5);
     // 1 (task headings) + 0 (newPage task) + 2 concept pages + 3 fixed pages = 6
@@ -110,9 +110,9 @@ Deno.test(
     ];
 
     const exam = new Exam('Course', 'Examiner', 'WS', '2026-01-01', 90, tasks);
-    exam.conceptPages = 2;
+    exam.conceptPagesManual = 2;
 
-    exam.fillPagesAndPoints();
+    exam.fillMeta();
 
     assertEquals(exam.points, 8);
     // 2 (task headings) + 2 (newPage task) + 2 concept pages + 3 fixed pages = 9
@@ -173,7 +173,7 @@ Deno.test(
   }`;
     const exam: Exam = Object.assign(new Exam(), JSON.parse(examJson));
 
-    exam.fillPagesAndPoints();
+    exam.fillMeta();
 
     assertEquals(exam.points, 1);
     // 1 (first page) + 2 concept pages + 3 fixed pages = 6

@@ -1,0 +1,129 @@
+info:
+  name: Download completed job ZIP
+  type: http
+  seq: 5
+  tags:
+    - Jobs
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/jobs/:jobId/download"
+  params:
+    - name: jobId
+      value: ""
+      type: path
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: ZIP archive containing all generated exam PDFs
+    request:
+      url: "{{baseUrl}}/api/jobs/:jobId/download"
+      method: GET
+      params:
+        - name: jobId
+          value: ""
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/zip
+      body:
+        type: text
+        data: ""
+  - name: 400 Response
+    description: Job is not yet complete or the file is missing
+    request:
+      url: "{{baseUrl}}/api/jobs/:jobId/download"
+      method: GET
+      params:
+        - name: jobId
+          value: ""
+          type: path
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+  - name: 403 Response
+    description: Forbidden – job belongs to a different user
+    request:
+      url: "{{baseUrl}}/api/jobs/:jobId/download"
+      method: GET
+      params:
+        - name: jobId
+          value: ""
+          type: path
+    response:
+      status: 403
+      statusText: Forbidden
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+  - name: 404 Response
+    description: Job not found
+    request:
+      url: "{{baseUrl}}/api/jobs/:jobId/download"
+      method: GET
+      params:
+        - name: jobId
+          value: ""
+          type: path
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+  - name: 500 Response
+    description: Internal server error
+    request:
+      url: "{{baseUrl}}/api/jobs/:jobId/download"
+      method: GET
+      params:
+        - name: jobId
+          value: ""
+          type: path
+    response:
+      status: 500
+      statusText: Internal Server Error
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+
+docs: Streams the ZIP archive produced by a completed generation job. Only the user who started the job may download it.

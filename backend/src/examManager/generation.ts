@@ -1,14 +1,13 @@
-import { type Exam, Language, TaskGroup } from '../types/mod.ts';
-import { getTaskRenderer, type RenderOptions } from './taskRenderer.ts';
+import { getConfig, QRConfig } from '../config/mod.ts';
 import { escapeLatex, getEta } from '../services/mod.ts';
+import { generateExamQR } from '../services/qr.ts';
+import { type Exam, Language, Student, TaskGroup } from '../types/mod.ts';
 import {
   InvalidPageBreakError,
   LatexCompileError,
   LatexRenderError,
 } from './err.ts';
-import { getConfig, QRConfig } from '../config/mod.ts';
-import { Student } from '../types/mod.ts';
-import { generateExamQR } from '../services/qr.ts';
+import { getTaskRenderer, type RenderOptions } from './taskRenderer.ts';
 
 const config = getConfig();
 
@@ -141,7 +140,7 @@ export async function renderMetaStudent(
 
 export async function renderMetaExam(exam: Exam, workingDir: string) {
   if (!exam.points || !exam.pageCount) {
-    exam.fillPagesAndPoints();
+    exam.fillMeta();
   }
 
   const data: ExamMetaTemplateData = {
@@ -284,6 +283,7 @@ export async function generateTasksLatex(
 function checkForInvalidPageBreaks(taskGroups: TaskGroup[]): string[] {
   const offenses: string[] = [];
   for (let g = 0; g < taskGroups.length; g++) {
+    if (taskGroups[g].tasks.length === 0) continue;
     if (taskGroups[g].tasks[0].type === 'newPage') {
       offenses.push(`Assignment ${g + 1} contains a newPage as first item`);
     }

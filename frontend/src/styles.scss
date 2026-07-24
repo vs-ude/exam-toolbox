@@ -80,7 +80,9 @@ $frontend-dark-theme: mat.define-theme(
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
 :root {
+  @include mat.theme($frontend-theme);
   @include mat.all-component-themes($frontend-theme);
+  @include mat.system-level-colors($frontend-theme);
   @include mat.select-overrides(
     (
       enabled-trigger-text-color: var(--color-text),
@@ -103,7 +105,9 @@ $frontend-dark-theme: mat.define-theme(
 }
 
 body.dark {
+  @include mat.theme($frontend-dark-theme);
   @include mat.all-component-colors($frontend-dark-theme);
+  @include mat.system-level-colors($frontend-dark-theme);
   @include variables.darken();
   --color-nav-active-bg: #{mat.get-theme-color(
       $frontend-dark-theme,
@@ -129,8 +133,8 @@ body.inheritCursors * {
 // For more information: https://material.angular.io/guide/typography#using-typography-styles-in-your-application.
 // @include mat.typography-hierarchy($frontend-theme);
 
-// Comment out the line below if you want to use the deprecated `color` inputs.
-@include mat.color-variants-backwards-compatibility($frontend-theme);
+// mat.color-variants-backwards-compatibility is intentionally omitted —
+// no .mat-primary/.mat-accent/.mat-warn color-variant classes are used in this project.
 /* You can add global styles to this file, and also import other style files */
 
 html,
@@ -161,7 +165,7 @@ body {
 .list_delete_icon {
   @include mat.icon-overrides(
     (
-      color: var(--color-warn),
+      color: var(--mat-sys-error),
     )
   );
 }

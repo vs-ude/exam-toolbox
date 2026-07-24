@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Exam } from '../types/shared/exam';
+import { Exam, parseExam } from '../types/shared/exam';
 
 // Wraps the exam data with a timestamp
 export interface AutosaveWrapper {
@@ -48,7 +48,9 @@ export class AutosaveService {
     if (!item) return null;
 
     try {
-      return JSON.parse(item);
+      const parsedItem: AutosaveWrapper = JSON.parse(item);
+      parsedItem.data = parseExam(parsedItem.data);
+      return parsedItem;
     } catch (e) {
       console.error(
         '[Autosave] Corrupt data found in local storage, clearing it.',

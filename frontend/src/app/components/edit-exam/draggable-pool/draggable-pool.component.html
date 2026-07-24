@@ -1,14 +1,14 @@
-<div class="task-pool-container">
+<div
+  class="task-pool-container"
+  cdkDropList
+  id="pool-tasks-drop-list"
+  cdkDropListSortingDisabled
+  [cdkDropListData]="filteredTaskPool"
+  [cdkDropListConnectedTo]="connectedTo"
+>
   <div class="filter-container">
     <div class="search-container">
-      <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-        <path
-          fill="var(--color-icon)"
-          fill-rule="evenodd"
-          d="M16 11.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0m-.956 4.206a5.5 5.5 0 1 1 .662-.662.5.5 0 0 1 .148.102l3 3a.5.5 0 1 1-.707.707l-3-3a.5.5 0 0 1-.103-.147"
-          clip-rule="evenodd"
-        ></path>
-      </svg>
+      <mat-icon>search-icon</mat-icon>
       <input
         type="text"
         placeholder="Search..."
@@ -50,14 +50,11 @@
 
   @for (task of filteredTaskPool; track $index) {
     <app-pool-task
-      class="task_wrapper"
+      class="task_container"
       [task]="task"
       [color]="colorProvider.getTaskColor(task.type)"
       [iconName]="task.type + '.svg'"
-      id="{{ task._id }}"
-      draggable="true"
-      (dragstart)="dragStart.emit($event)"
-      (dragend)="drop.emit($event)"
+      [dragData]="{ source: 'pool', taskId: task._id }"
     >
     </app-pool-task>
   }

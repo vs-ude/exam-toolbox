@@ -11,7 +11,9 @@ export class Exam {
   tasks: TaskGroup[];
   points?: number;
   pageCount?: number;
-  conceptPages?: number;
+  taskCount?: number;
+  conceptPagesManual?: number; // Manual input by the user
+  conceptPages?: number; // Calculated based on manual input and required filler
   public lastEditedBy?: string;
   public updatedAt?: Date;
   access: {
@@ -38,9 +40,13 @@ export class Exam {
     this.access = access ?? { users: [], groups: [] };
   }
 
-  fillPagesAndPoints(this: Exam) {
+  /**
+   * Calculates metadata for the exam (page count, points, task count).
+   */
+  fillMeta(this: Exam) {
     fillPages(this);
     fillPoints(this);
+    fillTaskCount(this);
   }
 }
 
@@ -56,7 +62,7 @@ function fillPages(exam: Exam) {
       ) ?? 0),
     0,
   );
-  exam.conceptPages = exam.conceptPages ?? 2;
+  exam.conceptPages = exam.conceptPagesManual ?? 2;
   exam.pageCount += exam.conceptPages + 3; // + front + info + back
   if (exam.pageCount % 2 != 0) {
     exam.conceptPages += 1;
@@ -69,6 +75,17 @@ function fillPoints(exam: Exam) {
     (acc, group) =>
       acc +
       (group.tasks.reduce((acc, task) => acc + (task.points ?? 0), 0) ?? 0),
+    0,
+  );
+}
+
+function fillTaskCount(exam: Exam) {
+  exam.taskCount = exam.tasks.reduce(
+    (acc, group) =>
+      acc +
+      group.tasks.filter(
+        task => task.type !== 'manualText' && task.type !== 'newPage',
+      ).length,
     0,
   );
 }

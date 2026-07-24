@@ -1,5 +1,7 @@
 <div
   class="task_container"
+  cdkDrag
+  [cdkDragData]="dragData"
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()"
   [style.backgroundColor]="hovered ? color : 'var(--color-bg-lifted)'"

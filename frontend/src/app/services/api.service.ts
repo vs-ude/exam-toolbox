@@ -69,8 +69,8 @@ export class ApiService {
   // Exam related API calls
   // -------
 
-  generateExam(exam?: Exam): Observable<HttpResponse<Blob>> {
-    return this.http.post(`${this.apiUrl}/generate-exam`, exam, {
+  previewExam(exam?: Exam): Observable<HttpResponse<Blob>> {
+    return this.http.post(`${this.apiUrl}/exam/preview`, exam, {
       responseType: 'blob',
       observe: 'response',
     });

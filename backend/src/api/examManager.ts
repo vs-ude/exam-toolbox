@@ -8,8 +8,8 @@ import {
 
 import * as h from '../examManager/main.ts';
 import { AppEnv } from '../types/mod.ts';
-import { checkAccess, checkAdmin } from './middleware.ts';
 import { handle } from './helpers.ts';
+import { checkAccess, checkAdmin } from './middleware.ts';
 import {
   ActiveJobSchema,
   DeleteResultSchema,
@@ -18,6 +18,7 @@ import {
   ExamSchema,
   ExamStubSchema,
   JobStatusSchema,
+  LogInfoSchema,
   MessageSchema,
   TagSchema,
   TaskSchema,
@@ -758,22 +759,289 @@ export function configureExamManagerRouter(
     handler: c => handle(c, () => h.deleteTag(c, deps)),
   });
 
+  const downloadFileRoute = defineOpenAPIRoute<RouteConfig, AppEnv>({
+    route: createRoute({
+      method: 'get',
+      path: '/download',
+      tags: ['Files'],
+      security: BEARER,
+      summary: 'Download a stored file',
+      description:
+        'Returns the raw bytes of a previously uploaded file. The Content-Type is derived from the file extension (PDF, JPEG, PNG, or octet-stream as a fallback).',
+      request: {
+        query: z.object({
+          fileUrl: z
+            .string()
+            .openapi({ param: { name: 'fileUrl', in: 'query' } }),
+        }),
+      },
+
+      responses: {
+        200: {
+          description: 'File contents',
+          content: {
+            'application/octet-stream': {
+              schema: z.any().openapi({ format: 'binary' }),
+            },
+          },
+        },
+        400: {
+          description: 'Missing fileUrl query parameter',
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+        },
+        500: {
+          description: 'Internal server error',
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+        },
+      },
+    }),
+    handler: c => handle(c, () => h.downloadFile(c, deps)),
+  });
+
+  const uploadFileRoute = defineOpenAPIRoute<RouteConfig, AppEnv>({
+    route: createRoute({
+      method: 'post',
+      path: '/upload',
+      tags: ['Files'],
+      security: BEARER,
+      summary: 'Upload a file',
+      description:
+        'Stores the given file under a content-addressed path. Returns the server-side URL for use in task definitions.',
+      request: {
+        body: {
+          content: {
+            'multipart/form-data': {
+              schema: z.object({
+                image: z.any().openapi({
+                  format: 'binary',
+                  description: 'The image file to upload.',
+                }),
+              }),
+            },
+          },
+          required: true,
+        },
+      },
+      responses: {
+        200: {
+          description: 'Upload successful',
+          content: {
+            'application/json': {
+              schema: z.object({
+                message: z.string(),
+                url: z.string().openapi({
+                  description: 'Server-side path to the uploaded file.',
+                }),
+              }),
+            },
+          },
+        },
+        400: {
+          description: 'No file or empty file provided',
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+        },
+        500: {
+          description: 'Internal server error',
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+        },
+      },
+    }),
+    handler: c => handle(c, () => h.uploadFile(c, deps)),
+  });
+
+  // Old: router.post('/exam/preview', c => handle(c, () => h.generatePreview(c, deps)));
+  // New:
+  const examPreviewRoute = defineOpenAPIRoute<RouteConfig, AppEnv>({
+    route: createRoute({
+      method: 'post',
+      path: '/exam/preview',
+      tags: ['Exams'],
+      security: BEARER,
+      summary: 'Generate exam preview',
+      description: 'Generates a preview PDF from the given Exam JSON object.',
+      request: {
+        body: {
+          content: {
+            'application/json': {
+              schema: ExamSchema,
+            },
+          },
+          required: true,
+        },
+      },
+      responses: {
+        200: {
+          description: 'Success',
+          headers: z.object({ 'x-subtask-info': LogInfoSchema }),
+          content: {
+            'application/pdf': {
+              schema: z.any().openapi({ format: 'binary' }),
+            },
+          },
+        },
+        500: {
+          description: 'Internal server error',
+          content: {
+            'application/json': {
+              schema: z.object({
+                message: z.string(),
+              }),
+            },
+          },
+        },
+      },
+    }),
+    handler: c => handle(c, () => h.generatePreview(c, deps)),
+  });
+
+  const generateExamsRoute = defineOpenAPIRoute<RouteConfig, AppEnv>({
+    route: createRoute({
+      method: 'post',
+      path: '/exam/{examId}/generate',
+      tags: ['Exams'],
+      security: BEARER,
+      summary: 'Start bulk exam generation',
+      description:
+        'Takes the exam definition, a participant Excel list, and an optional starting seat number. Enqueues a generation job and immediately returns the job ID. Use the job-status endpoint to poll for completion.',
+      request: {
+        params: z.object({ examId: ExamIdParam.shape.examId }),
+        body: {
+          content: {
+            'multipart/form-data': {
+              schema: z.object({
+                exam: z
+                  .string()
+                  .openapi({ description: 'JSON-serialised Exam object.' }),
+                list: z.any().openapi({
+                  format: 'binary',
+                  description: 'Excel participant list (.xlsx).',
+                }),
+                startSeatNumber: z.string().optional().openapi({
+                  description: 'First seat number to assign (defaults to 1).',
+                }),
+              }),
+            },
+          },
+          required: true,
+        },
+      },
+      responses: {
+        202: {
+          description: 'Job accepted',
+          content: {
+            'application/json': {
+              schema: z.object({
+                jobId: z.string(),
+                message: z.string(),
+              }),
+            },
+          },
+        },
+        400: {
+          description: 'Missing or invalid request data',
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+        },
+        409: {
+          description: 'A generation job for this exam is already in progress',
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+        },
+        500: {
+          description: 'Internal server error',
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+        },
+      },
+    }),
+    handler: c => handle(c, () => h.generateExams(c, deps)),
+  });
+
+  const downloadJobRoute = defineOpenAPIRoute<RouteConfig, AppEnv>({
+    route: createRoute({
+      method: 'get',
+      path: '/jobs/{jobId}/download',
+      tags: ['Jobs'],
+      security: BEARER,
+      summary: 'Download completed job ZIP',
+      description:
+        'Streams the ZIP archive produced by a completed generation job. Only the user who started the job may download it.',
+      request: {
+        params: z.object({ jobId: JobIdParam.shape.jobId }),
+      },
+      responses: {
+        200: {
+          description: 'ZIP archive containing all generated exam PDFs',
+          content: {
+            'application/zip': {
+              schema: z.any().openapi({ format: 'binary' }),
+            },
+          },
+        },
+        400: {
+          description: 'Job is not yet complete or the file is missing',
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+        },
+        403: {
+          description: 'Forbidden – job belongs to a different user',
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+        },
+        404: {
+          description: 'Job not found',
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+        },
+        500: {
+          description: 'Internal server error',
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+        },
+      },
+    }),
+    handler: c => handle(c, () => h.downloadJob(c, deps)),
+  });
+
   // ── Router registration ──────────────────────────────────────────────────────────
-
   const router = new OpenAPIHono<AppEnv>();
-
-  // Files – binary responses, not suitable for JSON schema validation
-  router.get('/download', c => handle(c, () => h.downloadFile(c, deps)));
-  router.post('/upload', c => handle(c, () => h.uploadFile(c, deps)));
-  // Exam generation – multipart or binary responses
-  router.post('/generate-exam', c => handle(c, () => h.generateExam(c, deps)));
-  router.post('/generate-exams', c =>
-    handle(c, () => h.generateExams(c, deps)),
-  );
-  // Jobs – binary download, no JSON schema
-  router.get('/jobs/:jobId/download', c =>
-    handle(c, () => h.downloadJob(c, deps)),
-  );
 
   router.openapiRoutes([
     // Exams
@@ -785,11 +1053,17 @@ export function configureExamManagerRouter(
     updateExamRoute,
     clearExamsRoute,
     deleteExamRoute,
+    examPreviewRoute,
+    generateExamsRoute,
+    // Files
+    downloadFileRoute,
+    uploadFileRoute,
     // Jobs
     getDownloadableJobsRoute,
     getJobStatusRoute,
     cancelJobRoute,
     getActiveJobRoute,
+    downloadJobRoute,
     // Tasks
     getAllTasksRoute,
     getTasksByTagRoute,

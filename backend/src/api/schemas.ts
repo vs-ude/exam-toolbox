@@ -134,3 +134,10 @@ export const ActiveJobSchema = z
 export const DownloadableJobSchema = z
   .object({ examId: z.string(), jobId: z.string() })
   .openapi('DownloadableJob');
+
+export const LogInfoSchema = z
+  .object({
+    page: z.number(),
+    logFileBoundaryError: z.boolean(),
+  })
+  .openapi('LogInfo');

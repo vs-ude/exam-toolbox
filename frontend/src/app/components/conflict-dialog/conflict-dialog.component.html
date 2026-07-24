@@ -1,9 +1,9 @@
-<h2 mat-dialog-title class="dialog-header" [class.dark-theme]="isDarkTheme">
-  <mat-icon color="warn">warning</mat-icon>
+<span mat-dialog-title class="dialog-header">
+  <mat-icon>info</mat-icon>
   {{ data.isNewExam ? 'Restorable Draft Found' : 'Unsaved Changes Detected' }}
-</h2>
+</span>
 
-<mat-dialog-content [class.dark-theme]="isDarkTheme">
+<mat-dialog-content>
   @if (!data.isNewExam) {
     <p>
       We found a draft on this computer that is newer than the version on the
@@ -18,29 +18,55 @@
   }
 
   <div class="comparison-container">
-    <div class="version-card local">
-      <h3>Local Draft</h3>
-      <p><strong>Saved:</strong> {{ localDate | date: 'medium' }}</p>
-      <p><strong>Tasks:</strong> {{ getTaskCount(data.localWrapper.data) }}</p>
-      <p class="note">Recover your unsaved work.</p>
-    </div>
-
-    <div class="version-card server">
-      <h3>{{ data.isNewExam ? 'Start Fresh' : 'Server Version' }}</h3>
-      @if (!data.isNewExam) {
-        <p><strong>Saved:</strong> {{ dbDate | date: 'medium' }}</p>
+    <mat-card
+      class="version-card"
+      [class.selected]="selectedVersion === 'local'"
+      (click)="selectedVersion = 'local'"
+    >
+      <mat-card-title>Local Draft</mat-card-title>
+      @if (data.isNewExam) {
+        <p>
+          <strong>Name:</strong>
+          {{ data.localWrapper.data.courseName }}
+        </p>
       }
-      <p><strong>Tasks:</strong> {{ getTaskCount(data.dbExam) }}</p>
+      <p>
+        <strong>Saved:</strong>
+        {{ localDate | date: 'medium' : timezone : locale }}
+      </p>
+      <p><strong>Tasks:</strong> {{ data.localWrapper.data.taskCount }}</p>
+      <p><strong>Points:</strong> {{ data.dbExam.points }}</p>
+
+      <p class="note">Recover your unsaved work.</p>
+    </mat-card>
+
+    <mat-card
+      class="version-card"
+      [class.selected]="selectedVersion === 'server'"
+      (click)="selectedVersion = 'server'"
+    >
+      <mat-card-title>{{
+        data.isNewExam ? 'Start Fresh' : 'Server Version'
+      }}</mat-card-title>
+      @if (!data.isNewExam) {
+        <p>
+          <strong>Saved:</strong>
+          {{ dbDate | date: 'medium' : timezone : locale }}
+        </p>
+        <p><strong>Tasks:</strong> {{ data.dbExam.taskCount }}</p>
+        <p><strong>Points:</strong> {{ data.dbExam.points }}</p>
+      }
       <p class="note">Discard the draft.</p>
-    </div>
+    </mat-card>
   </div>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end" [class.dark-theme]="isDarkTheme">
-  <button mat-button color="warn" [mat-dialog-close]="false">
-    {{ data.isNewExam ? 'Delete Draft' : 'Discard Local Draft' }}
-  </button>
-  <button mat-flat-button color="primary" [mat-dialog-close]="true">
-    {{ data.isNewExam ? 'Resume Draft' : 'Resume Local Draft' }}
+<mat-dialog-actions align="end">
+  <button
+    mat-flat-button
+    color="primary"
+    [mat-dialog-close]="selectedVersion === 'local'"
+  >
+    Confirm
   </button>
 </mat-dialog-actions>

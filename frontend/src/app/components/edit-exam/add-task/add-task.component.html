@@ -1,5 +1,7 @@
 <div
   class="task_container"
+  cdkDrag
+  [cdkDragData]="dragData"
   (mouseover)="hovered = true"
   (mouseleave)="hovered = false"
   [ngStyle]="{ backgroundColor: hovered ? color : 'var(--color-bg-lifted)' }"

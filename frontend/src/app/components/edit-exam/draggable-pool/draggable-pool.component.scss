@@ -1,8 +1,5 @@
 .task-pool-container {
-  background-color: var(--color-bg-accent);
-  height: 80%;
   border-radius: 15px;
-  padding: 10px 32px 10px 32px;
   box-sizing: border-box;
   overflow-y: auto;
   overflow-x: hidden;
@@ -10,10 +7,8 @@
 }
 
 .filter-container {
-  border: 2px solid var(--border-color);
-  padding: 2%;
+  padding: 4px;
   border-radius: 5px;
-  margin: 0 -16px 0 -16px;
   display: flex;
   align-items: left;
   justify-content: space-between;
@@ -26,7 +21,7 @@
   justify-content: center;
   flex-wrap: nowrap;
   border-radius: 5px;
-  background-color: var(--color-bg-lifted);
+  background-color: var(--mat-sys-on-surface-container-low);
   width: 100%;
 }
 
@@ -103,10 +98,6 @@
 
 .active {
   color: var(--color-primary);
-}
-
-.task_wrapper {
-  margin-left: 1%;
 }
 
 .task_wrapper:hover {

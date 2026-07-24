@@ -1,0 +1,87 @@
+info:
+  name: Download a stored file
+  type: http
+  seq: 1
+  tags:
+    - Files
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/download"
+  params:
+    - name: fileUrl
+      value: ""
+      type: query
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: File contents
+    request:
+      url: "{{baseUrl}}/api/download"
+      method: GET
+      params:
+        - name: fileUrl
+          value: ""
+          type: query
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/octet-stream
+      body:
+        type: text
+        data: ""
+  - name: 400 Response
+    description: Missing fileUrl query parameter
+    request:
+      url: "{{baseUrl}}/api/download"
+      method: GET
+      params:
+        - name: fileUrl
+          value: ""
+          type: query
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+  - name: 500 Response
+    description: Internal server error
+    request:
+      url: "{{baseUrl}}/api/download"
+      method: GET
+      params:
+        - name: fileUrl
+          value: ""
+          type: query
+    response:
+      status: 500
+      statusText: Internal Server Error
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+
+docs: Returns the raw bytes of a previously uploaded file. The Content-Type is derived from the file extension (PDF, JPEG, PNG, or octet-stream as a fallback).
