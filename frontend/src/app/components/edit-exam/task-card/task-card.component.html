@@ -1,4 +1,9 @@
-<mat-card class="form-card" cdkDrag>
+<mat-card
+  class="form-card"
+  [ngClass]="{ error: !!errorMessage }"
+  [matTooltip]="errorMessage ?? ''"
+  cdkDrag
+>
   <div class="card-layout">
     <div class="left">
       <!-- FIXME: this is shown for a few seconds when dragging a newPage to a position where a proper task was before -->

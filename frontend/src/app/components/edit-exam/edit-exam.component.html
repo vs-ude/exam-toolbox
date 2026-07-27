@@ -109,6 +109,7 @@
                   [isModifiedPoolTask]="
                     isModifiedPoolTask(exam.tasks[g].tasks[i]._id)
                   "
+                  [errorMessage]="getTaskError(g, i)"
                   (taskChangeEvent)="onTaskChange($event, i)"
                   (createNewTaskEvent)="onCreateNewTaskChange($event, i)"
                   (deleteEvent)="deleteTask(i)"

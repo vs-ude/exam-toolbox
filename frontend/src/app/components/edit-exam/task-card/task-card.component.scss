@@ -27,6 +27,17 @@
   }
 }
 
+.form-card.error {
+  color: var(--mat-sys-on-error-container);
+  background-color: var(--mat-sys-error-container);
+  border: 1px solid var(--mat-sys-error);
+}
+
+.form-card.error:hover,
+.form-card.error:focus-within {
+  background-color: var(--mat-sys-error-container);
+}
+
 .card-content {
   flex: 1;
   min-width: 0;

@@ -1,6 +1,20 @@
-import { debounceTime, forkJoin, Observable, retry, Subject, take } from 'rxjs';
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { MatTabsModule } from '@angular/material/tabs';
+import {
+  debounceTime,
+  forkJoin,
+  Observable,
+  retry,
+  Subject,
+  Subscription,
+  take,
+} from 'rxjs';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  ViewChildren,
+  ViewChild,
+  QueryList,
+} from '@angular/core';
+import { MatTabsModule, MatTabGroup } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { COMMON_IMPORTS } from '../common-imports';
 import { Router } from '@angular/router';
@@ -119,9 +133,19 @@ export class EditExamComponent {
 
   public previewPdfUrl: SafeResourceUrl | null = null;
 
+  @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
+  @ViewChildren(TaskCardComponent) taskCards!: QueryList<TaskCardComponent>;
+
   public isPreviewTabActive = false;
   public previewTabNotification = false;
   private PDFTasksInfo: PDFTaskInfo[] = [];
+
+  public taskErrors: {
+    groupIndex: number;
+    taskIndex: number;
+    message: string;
+  }[] = [];
+  private snackbarDismissSub?: Subscription;
 
   private autosaveTrigger$ = new Subject<void>();
   private previewReady$ = new Subject<void>();
@@ -215,16 +239,37 @@ export class EditExamComponent {
           this.insertNewPage(errorIndex);
         }
 
+        this.taskErrors = [];
         this.loadingService.loadingOff();
         this.previewReady$.next();
       },
       error: err => {
-        this.snackBar.open(
-          `Error generating exam preview: ${JSON.stringify(err)}`,
-          'OK',
-        );
         this.loadingService.loadingOff();
-        alert('An error occurred while generating the exam preview');
+        this.errorHandler(err);
+      },
+    });
+  }
+
+  public onTaskPreview(index: number) {
+    this.onPreview();
+    this.previewReady$.pipe(take(1)).subscribe({
+      next: () => {
+        const pageNumber = this.getPDFPageNumber(index, this.currentGroupView);
+
+        // Update the PDF URL to jump to the specific page
+        const baseUrl = this.sanitizer.sanitize(
+          4,
+          this.previewPdfUrl,
+        ) as string;
+        const pageUrl = baseUrl + '#page=' + pageNumber;
+        this.previewPdfUrl =
+          this.sanitizer.bypassSecurityTrustResourceUrl(pageUrl);
+
+        // this.changeTab(this.exam.tasks.length); // switch to preview tab
+      },
+      error: (err: any) => {
+        this.loadingService.loadingOff();
+        this.errorHandler(err);
       },
     });
   }
@@ -234,6 +279,7 @@ export class EditExamComponent {
     this.exam.fillMeta();
     this.triggerAutosave();
     this.previewTabNotification = false;
+    this.taskErrors = [];
   }
 
   // ------------------------
@@ -267,6 +313,7 @@ export class EditExamComponent {
     }
     this.triggerAutosave();
     this.previewTabNotification = false;
+    this.taskErrors = [];
   }
 
   validatePageBreaks(insertIndex: number, sourceIndex?: number): boolean {
@@ -764,29 +811,6 @@ export class EditExamComponent {
     });
   }
 
-  public onTaskPreview(index: number) {
-    this.onPreview();
-    this.previewReady$.pipe(take(1)).subscribe({
-      next: () => {
-        const pageNumber = this.getPDFPageNumber(index, this.currentGroupView);
-
-        // Update the PDF URL to jump to the specific page
-        const baseUrl = this.sanitizer.sanitize(
-          4,
-          this.previewPdfUrl,
-        ) as string;
-        const pageUrl = baseUrl + '#page=' + pageNumber;
-        this.previewPdfUrl =
-          this.sanitizer.bypassSecurityTrustResourceUrl(pageUrl);
-
-        // this.changeTab(this.exam.tasks.length); // switch to preview tab
-      },
-      error: () => {
-        console.error('Failed to generate preview');
-      },
-    });
-  }
-
   private getAbsoluteSubtaskIndex(
     groupIndex: number,
     taskIndex: number,
@@ -886,5 +910,110 @@ export class EditExamComponent {
     moveItemInArray(this.exam.tasks, event.previousIndex, event.currentIndex);
     this.currentGroupView = this.exam.tasks.indexOf(prevActive);
     this.triggerAutosave();
+  }
+
+  public getTaskError(
+    groupIndex: number,
+    taskIndex: number,
+  ): string | undefined {
+    return this.taskErrors.find(
+      e => e.groupIndex === groupIndex && e.taskIndex === taskIndex,
+    )?.message;
+  }
+
+  private errorHandler(err: any) {
+    const openSnackbar = (text: string) => {
+      this.snackbarDismissSub?.unsubscribe();
+      this.snackbarDismissSub = this.snackBar
+        .open(text, 'OK')
+        .afterDismissed()
+        .subscribe(() => {
+          this.taskErrors = [];
+        });
+    };
+
+    const scrollToTask = (groupIndex: number, taskIndex: number) => {
+      const alreadyOnTab = this.currentGroupView === groupIndex;
+      this.currentGroupView = groupIndex;
+      const scroll = () =>
+        this.taskCards
+          .toArray()
+          [taskIndex]?.elementRef.nativeElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+      if (alreadyOnTab) {
+        setTimeout(scroll);
+      } else {
+        this.tabGroup.animationDone.pipe(take(1)).subscribe(scroll);
+      }
+    };
+
+    const handle = (err: any) => {
+      const body = err.error;
+      if (!body?.error) {
+        openSnackbar(err.message ?? 'An unknown error occurred.');
+        return;
+      }
+
+      const parsed = JSON.parse(body.error);
+
+      if (
+        parsed.name === 'InvalidPageBreakError' &&
+        Array.isArray(parsed.offenses)
+      ) {
+        const offenses = parsed.offenses as {
+          group: number;
+          task: number;
+          type: string;
+          reason?: string;
+        }[];
+        this.taskErrors = offenses.map(o => ({
+          groupIndex: o.group - 1,
+          taskIndex: o.task - 1,
+          message: o.reason ?? parsed.message,
+        }));
+        if (offenses.length > 0) {
+          scrollToTask(offenses[0].group - 1, offenses[0].task - 1);
+        }
+        openSnackbar(parsed.message);
+        return;
+      }
+
+      // LatexCompileError and LatexRenderError both carry a single cause location
+      if (parsed.cause && typeof parsed.cause.group === 'number') {
+        const cause = parsed.cause as {
+          group: number;
+          task: number;
+          type: string;
+        };
+        const groupIndex = cause.group - 1;
+        const taskIndex = cause.task - 1;
+        if (groupIndex >= 0 && taskIndex >= 0) {
+          this.taskErrors = [
+            { groupIndex, taskIndex, message: parsed.message },
+          ];
+          scrollToTask(groupIndex, taskIndex);
+        }
+        openSnackbar(
+          `Compilation error in group ${cause.group}, task ${cause.task} (${cause.type}).`,
+        );
+        return;
+      }
+
+      openSnackbar(parsed.message ?? 'An unknown error occurred.');
+    };
+
+    try {
+      if (err.error instanceof Blob) {
+        err.error.text().then((text: string) => {
+          handle({ ...err, error: JSON.parse(text) });
+        });
+      } else {
+        handle(err);
+      }
+    } catch {
+      openSnackbar(err.message ?? 'An unknown error occurred.');
+    }
   }
 }

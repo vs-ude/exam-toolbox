@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ComponentRef,
+  ElementRef,
   EventEmitter,
   Input,
   OnChanges,
@@ -13,9 +14,11 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { MatCard } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
 
 import { Task } from '../../../types/shared/tasks';
 import { BaseTaskComponent } from '../../tasks/base-task/base-task.component';
@@ -39,16 +42,18 @@ const TASK_COMPONENT_MAP: Record<string, Type<BaseTaskComponent>> = {
 
 @Component({
   selector: 'app-task-card',
-  imports: [CdkDrag, CdkDragHandle, MatCard, MatIcon],
+  imports: [CdkDrag, CdkDragHandle, MatCard, MatIcon, NgClass, MatTooltip],
   templateUrl: './task-card.component.html',
   styleUrl: './task-card.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class TaskCardComponent implements AfterViewInit, OnChanges, OnDestroy {
+  constructor(public elementRef: ElementRef<HTMLElement>) {}
   @Input() subtaskId?: string = '';
   @Input() task!: Task;
   @Input() bilingual?: boolean;
   @Input() isModifiedPoolTask?: boolean;
+  @Input() errorMessage?: string;
 
   @Output() taskChangeEvent = new EventEmitter<Task>();
   @Output() createNewTaskEvent = new EventEmitter<boolean>();

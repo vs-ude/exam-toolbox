@@ -1,10 +1,20 @@
 import { EtaError } from '@bgub/eta';
 
+export interface CauseLocation {
+  group: number;
+  task: number;
+  type: string;
+  reason?: string;
+}
+
 export class LatexRenderError extends Error {
-  constructor(msg: string, opt?: ErrorOptions) {
+  public location?: CauseLocation;
+
+  constructor(msg: string, location?: CauseLocation, opt?: ErrorOptions) {
     super(msg, opt);
     this.name = 'LatexRenderError';
     Object.setPrototypeOf(this, LatexRenderError.prototype);
+    this.location = location;
   }
 
   toJSON() {
@@ -18,7 +28,7 @@ export class LatexRenderError extends Error {
     return {
       name: this.name,
       message: this.message,
-      cause: cause,
+      cause: this.location ?? cause,
     };
   }
 }
@@ -81,9 +91,9 @@ export class LatexCompileError extends Error {
 }
 
 export class InvalidPageBreakError extends Error {
-  private offenses: string[] = [];
+  private offenses: CauseLocation[] = [];
 
-  constructor(msg: string, offenses?: string[]) {
+  constructor(msg: string, offenses?: CauseLocation[]) {
     super(msg, undefined);
     this.name = 'InvalidPageBreakError';
     Object.setPrototypeOf(this, InvalidPageBreakError.prototype);
@@ -97,7 +107,6 @@ export class InvalidPageBreakError extends Error {
     return {
       name: this.name,
       message: this.message,
-      amount: this.offenses.length,
       offenses: this.offenses,
     };
   }

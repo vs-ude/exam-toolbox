@@ -3,6 +3,7 @@ import { escapeLatex, getEta } from '../services/mod.ts';
 import { generateExamQR } from '../services/qr.ts';
 import { type Exam, Language, Student, TaskGroup } from '../types/mod.ts';
 import {
+  CauseLocation,
   InvalidPageBreakError,
   LatexCompileError,
   LatexRenderError,
@@ -213,61 +214,82 @@ export async function generateTasksLatex(
         continue;
       }
 
-      if (subTask.type === 'manualText') {
-        latexContent +=
-          getTaskRenderer().renderManualText(subTask.question) + '\n';
-        continue; // skip to the next sub-task
+      const location: CauseLocation = {
+        group: g + 1,
+        task: t + 1,
+        type: subTask.type,
+      };
+
+      try {
+        if (subTask.type === 'manualText') {
+          latexContent +=
+            getTaskRenderer().renderManualText(subTask.question) + '\n';
+          continue; // skip to the next sub-task
+        }
+
+        // start a sub-task
+        latexContent += getTaskRenderer().renderSubTaskStart(subTask) + '\n';
+      } catch (e) {
+        if (e instanceof LatexRenderError) {
+          e.location = location;
+        }
+        throw e;
       }
 
-      // start a sub-task
-      latexContent += getTaskRenderer().renderSubTaskStart(subTask) + '\n';
-
-      switch (subTask.type) {
-        case 'multipleChoice':
-          if (subTask.answerOptions) {
-            latexContent += getTaskRenderer().renderMultipleChoice(subTask, {
-              solution: options.solution,
-            });
-          }
-          +'\n';
-          break;
-        case 'shortAnswer':
-          if (subTask.solution) {
+      try {
+        switch (subTask.type) {
+          case 'multipleChoice':
+            if (subTask.answerOptions) {
+              latexContent += getTaskRenderer().renderMultipleChoice(subTask, {
+                solution: options.solution,
+              });
+            }
+            +'\n';
+            break;
+          case 'shortAnswer':
+            if (subTask.solution) {
+              latexContent +=
+                getTaskRenderer().renderMultilineText(subTask, {
+                  solution: options.solution,
+                }) + '\n';
+            }
+            break;
+          case 'latex':
+            // Insert raw LaTeX content directly
+            if (subTask.questionLatex?.DE) {
+              latexContent += subTask.questionLatex.DE + '\n\n';
+            }
+            if (subTask.questionLatex?.EN) {
+              latexContent += subTask.questionLatex.EN + '\n\n';
+            }
+            break;
+          case 'pictureTask':
             latexContent +=
-              getTaskRenderer().renderMultilineText(subTask, {
+              getTaskRenderer().renderPictureTask(subTask, {
+                solution: options.solution,
+                workingDir: workingDir,
+              }) + '\n';
+            break;
+          case 'table':
+            if (!subTask.tableDataQuestion || !subTask.tableDataSolution) {
+              throw new LatexRenderError(
+                `Assignment ${g + 1} table task at position ${
+                  t + 1
+                } is missing data`,
+                location,
+              );
+            }
+            latexContent +=
+              getTaskRenderer().renderTableTask(subTask, {
                 solution: options.solution,
               }) + '\n';
-          }
-          break;
-        case 'latex':
-          // Insert raw LaTeX content directly
-          if (subTask.questionLatex?.DE) {
-            latexContent += subTask.questionLatex.DE + '\n\n';
-          }
-          if (subTask.questionLatex?.EN) {
-            latexContent += subTask.questionLatex.EN + '\n\n';
-          }
-          break;
-        case 'pictureTask':
-          latexContent +=
-            getTaskRenderer().renderPictureTask(subTask, {
-              solution: options.solution,
-              workingDir: workingDir,
-            }) + '\n';
-          break;
-        case 'table':
-          if (!subTask.tableDataQuestion || !subTask.tableDataSolution) {
-            throw new LatexRenderError(
-              `Assignment ${g + 1} table task at position ${
-                t + 1
-              } is missing data`,
-            );
-          }
-          latexContent +=
-            getTaskRenderer().renderTableTask(subTask, {
-              solution: options.solution,
-            }) + '\n';
-          break;
+            break;
+        }
+      } catch (e) {
+        if (e instanceof LatexRenderError && !e.location) {
+          e.location = location;
+        }
+        throw e;
       }
 
       latexContent += `${getTaskRenderer().renderSubTaskEnd()}\n`;
@@ -280,21 +302,29 @@ export async function generateTasksLatex(
   await Deno.writeTextFile(dest, latexContent);
 }
 
-function checkForInvalidPageBreaks(taskGroups: TaskGroup[]): string[] {
-  const offenses: string[] = [];
+function checkForInvalidPageBreaks(taskGroups: TaskGroup[]): CauseLocation[] {
+  const offenses: CauseLocation[] = [];
   for (let g = 0; g < taskGroups.length; g++) {
     if (taskGroups[g].tasks.length === 0) continue;
     if (taskGroups[g].tasks[0].type === 'newPage') {
-      offenses.push(`Assignment ${g + 1} contains a newPage as first item`);
+      offenses.push({
+        group: g + 1,
+        task: 1,
+        type: 'newPage',
+        reason: 'Page break cannot be the first item in a group.',
+      });
     }
     for (let t = 1; t < taskGroups[g].tasks.length; t++) {
       if (
         taskGroups[g].tasks[t].type === 'newPage' &&
         taskGroups[g].tasks[t - 1].type === 'newPage'
       ) {
-        offenses.push(
-          `Assignment ${g + 1} contains two newPage items at position ${t}`,
-        );
+        offenses.push({
+          group: g + 1,
+          task: t + 1,
+          type: 'newPage',
+          reason: 'Consecutive page breaks are not allowed.',
+        });
       }
     }
   }

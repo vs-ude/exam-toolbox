@@ -1,8 +1,8 @@
 import { Context, Input } from '@hono/hono';
 import type { ContentfulStatusCode } from '@hono/hono/utils/http-status';
 
-import { AppEnv } from '../types/mod.ts';
 import { HandlerResult, HttpError } from '../types/handler.ts';
+import { AppEnv } from '../types/mod.ts';
 
 export async function handle<
   E extends AppEnv = AppEnv,
@@ -43,7 +43,7 @@ export async function handle<
       );
     }
     return c.json(
-      { message: 'Internal server error', error: String(e) },
+      { message: 'Internal server error', error: JSON.stringify(e) },
       500 as ContentfulStatusCode,
     );
   }
