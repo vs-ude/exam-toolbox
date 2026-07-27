@@ -66,14 +66,6 @@
                 >{{ tabLabel(g) }}</span
               >
             </ng-template>
-            <!--@if (g === 0) {
-              <div
-                class="tab_slider"
-                [style.transform]="
-                  'translateX(' + currentGroupView * 100 + '%)'
-                "
-              ></div>
-            }-->
             <mat-card class="task_group_title form-card-header">
               <app-task-group-title
                 class="task_container"
@@ -84,16 +76,6 @@
               />
             </mat-card>
 
-            @if (exam.tasks[g].tasks.length === 0) {
-              <div class="empty_group_holder">
-                No tasks in this group yet. Drag and drop tasks
-                <br />or
-                <span (click)="deleteTab(g)" class="delete_group">
-                  <mat-icon>delete</mat-icon
-                  ><span class="delete_group_text">delete this group</span>
-                </span>
-              </div>
-            }
             <div
               cdkDropList
               [id]="'task-group-' + g"
@@ -105,6 +87,16 @@
               (cdkDropListDropped)="reorderDrop($event)"
               class="task_group_container"
             >
+              @if (exam.tasks[g].tasks.length === 0) {
+                <div class="empty_group_holder">
+                  No tasks in this group yet. Drag and drop tasks
+                  <br />or
+                  <span (click)="deleteTab(g)" class="delete_group">
+                    <mat-icon>delete</mat-icon
+                    ><span class="delete_group_text">delete this group</span>
+                  </span>
+                </div>
+              }
               @for (
                 task of exam.tasks[g].tasks;
                 track task._id ?? i;
