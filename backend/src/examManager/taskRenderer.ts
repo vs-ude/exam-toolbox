@@ -1,4 +1,5 @@
 import { type Eta } from '@bgub/eta';
+import { getConfig } from '../config/mod.ts';
 import { escapeLatex, getEta } from '../services/mod.ts';
 import type {
   BaseTask,
@@ -14,7 +15,6 @@ import type {
   TaskGroup,
   Translation,
 } from '../types/mod.ts';
-import { getConfig } from '../config/mod.ts';
 import { LatexRenderError } from './err.ts';
 
 const config = getConfig();
@@ -37,15 +37,20 @@ export class TaskRenderer {
     } catch (err) {
       throw new LatexRenderError(
         `Error during ${template} template rendering`,
+        undefined,
         {
           cause: err instanceof Error ? err.message : 'unknown error',
         },
       );
     }
     if (typeof rendered !== 'string') {
-      throw new LatexRenderError(`Failed to render ${template} template`, {
-        cause: rendered,
-      });
+      throw new LatexRenderError(
+        `Failed to render ${template} template`,
+        undefined,
+        {
+          cause: rendered,
+        },
+      );
     }
     return rendered;
   }
@@ -209,16 +214,21 @@ export class TaskRenderer {
     /* The header should have one name per box column and one for the texts */
     task.lines.forEach(line => {
       if (line.options.length !== task.header.length - 1) {
-        throw new LatexRenderError('Line options do not match header length', {
-          cause: `(options) ${line.options.length} !== ${
-            task.header.length - 1
-          } (header - 1)`,
-        });
+        throw new LatexRenderError(
+          'Line options do not match header length',
+          undefined,
+          {
+            cause: `(options) ${line.options.length} !== ${
+              task.header.length - 1
+            } (header - 1)`,
+          },
+        );
       }
     });
     if (task.header.length - 1 > 4) {
       throw new LatexRenderError(
         'Cannot render more than 4 options in PropertyLines',
+        undefined,
         { cause: `${task.header.length - 1} options requested` },
       );
     }
