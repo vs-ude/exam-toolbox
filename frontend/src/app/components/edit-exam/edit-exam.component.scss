@@ -73,6 +73,7 @@
 }
 
 .view_wrapper {
+  position: relative;
   border: solid 1px;
   border-color: var(--border-color);
   margin-top: 16px;
@@ -82,16 +83,25 @@
   overflow: hidden;
 }
 
-::ng-deep .mat-mdc-tab-labels :last-child.mat-mdc-tab {
-  min-width: unset;
-  width: 48px;
-  padding: 0 12px;
+.add-tab-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 10;
+  background-color: var(--mat-sys-primary-container);
+  .mat-icon {
+    color: var(--mat-sys-on-primary-container);
+  }
 }
 
 ::ng-deep .assignment-tabs {
   height: 100%;
   display: flex;
   flex-direction: column;
+
+  .mat-mdc-tab-header {
+    width: calc(100% - 42px);
+  }
 
   .mat-mdc-tab-body-wrapper {
     flex: 1;

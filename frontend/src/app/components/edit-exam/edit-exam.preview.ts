@@ -48,6 +48,11 @@ export function onPreview(this: EditExamComponent): void {
       this.taskErrors = [];
       this.loadingService.loadingOff();
       this.previewReady$.next();
+      // Defer so Angular renders the preview tab before selecting it
+      // (previewPdfUrl may have just been set for the first time above).
+      setTimeout(() => {
+        this.selectedTabIndex = this.exam.tasks.length;
+      });
     },
     error: err => {
       this.loadingService.loadingOff();

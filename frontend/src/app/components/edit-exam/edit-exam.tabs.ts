@@ -3,13 +3,8 @@ import { truncateString, stripHTML } from '../../services/helpers.service';
 import type { EditExamComponent } from './edit-exam.component';
 
 export function onTabChange(this: EditExamComponent, index: number): void {
-  const addTabIndex = this.exam.tasks.length + (this.previewPdfUrl ? 1 : 0);
-  if (index === addTabIndex) {
-    this.addTab();
-  } else if (index >= this.exam.tasks.length) {
-    // preview tab selected — keep currentGroupView on last valid group
-    this.currentGroupView = this.exam.tasks.length - 1;
-  } else {
+  this.selectedTabIndex = index;
+  if (index < this.exam.tasks.length) {
     this.currentGroupView = index;
   }
 }
@@ -24,6 +19,7 @@ export function addTab(this: EditExamComponent): void {
   // Defer so Angular renders the new mat-tab before [selectedIndex] tries to select it
   setTimeout(() => {
     this.currentGroupView = newIndex;
+    this.selectedTabIndex = newIndex;
   });
   this.triggerAutosave();
 }
@@ -34,6 +30,7 @@ export function deleteTab(this: EditExamComponent, i: number): void {
   }
   this.exam.tasks.splice(i, 1);
   this.currentGroupView--;
+  this.selectedTabIndex = this.currentGroupView;
   this.triggerAutosave();
 }
 
@@ -53,5 +50,6 @@ export function dropTab(
   const prevActive = this.exam.tasks[this.currentGroupView];
   moveItemInArray(this.exam.tasks, event.previousIndex, event.currentIndex);
   this.currentGroupView = this.exam.tasks.indexOf(prevActive);
+  this.selectedTabIndex = this.currentGroupView;
   this.triggerAutosave();
 }

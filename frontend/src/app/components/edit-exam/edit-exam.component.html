@@ -44,10 +44,20 @@
     </mat-card>
 
     <div class="view_wrapper" data-cy="dropzone">
+      <button
+        mat-icon-button
+        class="add-tab-btn"
+        (click)="addTab()"
+        matTooltip="New Assignment"
+        [matTooltipShowDelay]="200"
+        aria-label="Add New Assignment"
+      >
+        <mat-icon>add</mat-icon>
+      </button>
       <mat-tab-group
         class="assignment-tabs"
         mat-stretch-tabs="false"
-        [selectedIndex]="currentGroupView"
+        [selectedIndex]="selectedTabIndex"
         (selectedIndexChange)="onTabChange($event)"
         cdkDropList
         cdkDropListOrientation="horizontal"
@@ -139,19 +149,6 @@
             </div>
           </mat-tab>
         }
-        <mat-tab>
-          <ng-template mat-tab-label>
-            <span
-              mat-icon-button
-              class="new-assignment"
-              matTooltip="New Group"
-              [matTooltipShowDelay]="200"
-              aria-label="Add New Group"
-            >
-              <mat-icon aria-hidden="false">add</mat-icon>
-            </span>
-          </ng-template>
-        </mat-tab>
       </mat-tab-group>
     </div>
   </div>

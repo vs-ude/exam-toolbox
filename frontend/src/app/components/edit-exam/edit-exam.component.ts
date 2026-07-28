@@ -7,6 +7,7 @@ import {
   QueryList,
 } from '@angular/core';
 import { MatTabsModule, MatTabGroup } from '@angular/material/tabs';
+import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { COMMON_IMPORTS } from '../common-imports';
 import { Router } from '@angular/router';
@@ -55,6 +56,7 @@ import * as tabs from './edit-exam.tabs';
     CdkDropList,
     MatSnackBarModule,
     DraggablePoolComponent,
+    MatButtonModule,
   ],
   templateUrl: './edit-exam.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -79,6 +81,7 @@ export class EditExamComponent {
   public isExamSetup = false;
 
   public currentGroupView = 0;
+  public selectedTabIndex = 0;
   public readonly publicPath = environment.publicPath;
 
   public previewPdfUrl: SafeResourceUrl | null = null;
