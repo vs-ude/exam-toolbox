@@ -121,6 +121,10 @@ export class PoolTaskComponent {
     }, this.tooltipDelay);
   }
 
+  public onDragStarted(): void {
+    this.onMouseLeave();
+  }
+
   public onMouseLeave(): void {
     this.hovered = false;
     this.tooltipVisible = false;

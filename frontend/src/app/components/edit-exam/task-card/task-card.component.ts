@@ -66,20 +66,20 @@ export class TaskCardComponent implements AfterViewInit, OnChanges, OnDestroy {
   private componentRef?: ComponentRef<BaseTaskComponent>;
   private viewInitialised = false;
 
-  ngAfterViewInit(): void {
+  get effectiveSubtaskId(): string {
     if (this.task.type === 'manualText' || this.task.type === 'newPage') {
-      this.subtaskId = '';
+      return '';
     }
+    return this.subtaskId ?? '';
+  }
 
+  ngAfterViewInit(): void {
     this.viewInitialised = true;
     this.render();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (!this.viewInitialised) return;
-    if (this.task.type === 'manualText' || this.task.type === 'newPage') {
-      this.subtaskId = '';
-    }
 
     if (changes['task'] && !changes['task'].firstChange) {
       this.render();

@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 
 import { User } from '../types/user';
 
@@ -9,8 +9,8 @@ import { User } from '../types/user';
 })
 export class AuthService {
   private apiUrl = '/api/auth';
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private readonly currentUserSignal = signal<User | null>(null);
+  public readonly currentUser = this.currentUserSignal.asReadonly();
 
   constructor(private http: HttpClient) {
     this.loadSession();
@@ -62,7 +62,7 @@ export class AuthService {
     if (token) {
       const decoded = this.decodeToken(token);
       if (decoded && !this.isTokenExpired(decoded)) {
-        this.currentUserSubject.next(decoded);
+        this.currentUserSignal.set(decoded);
       } else {
         this.clearSession();
       }
@@ -94,7 +94,7 @@ export class AuthService {
             throw new Error('Invalid token format');
           }
           localStorage.setItem('auth_token', token);
-          this.currentUserSubject.next(decoded);
+          this.currentUserSignal.set(decoded);
           return decoded;
         }),
       );
@@ -129,7 +129,7 @@ export class AuthService {
    * Checks whether there is an active session locally.
    */
   isAuthenticated(): boolean {
-    const user = this.currentUserSubject.value;
+    const user = this.currentUserSignal();
     return !!user && !this.isTokenExpired(user);
   }
 
@@ -138,7 +138,7 @@ export class AuthService {
    */
   clearSession(): void {
     localStorage.removeItem('auth_token');
-    this.currentUserSubject.next(null);
+    this.currentUserSignal.set(null);
   }
 
   /**

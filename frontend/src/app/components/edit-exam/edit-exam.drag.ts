@@ -115,6 +115,26 @@ function pushPoolTask(
     return;
   }
 
+  // Check if the task is already present in any group
+  let found = 0;
+  let idx = 0;
+  this.exam.tasks.forEach(group => {
+    idx++;
+    if (group.tasks.some(t => t._id === task._id)) {
+      found = idx;
+    }
+  });
+  if (found) {
+    this.snackBar.open(
+      `This task is already present in assignment ${found}`,
+      'OK',
+      {
+        duration: 4000,
+      },
+    );
+    return;
+  }
+
   // update Task Metadata
   if (!task.usedIn.includes(this.exam._id || 'placeholder_id')) {
     task.usedIn.push(this.exam._id || 'placeholder_id');

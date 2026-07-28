@@ -6,9 +6,8 @@
 >
   <div class="card-layout">
     <div class="left">
-      <!-- FIXME: this is shown for a few seconds when dragging a newPage to a position where a proper task was before -->
-      @if (subtaskId) {
-        <div class="subtask-id">{{ subtaskId }}</div>
+      @if (effectiveSubtaskId) {
+        <div class="subtask-id">{{ effectiveSubtaskId }}</div>
       }
       <div class="drag_handle" cdkDragHandle>
         <mat-icon>drag_indicator</mat-icon>

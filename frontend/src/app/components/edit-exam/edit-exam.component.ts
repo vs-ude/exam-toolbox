@@ -28,6 +28,7 @@ import { LoadingService } from '../../services/loading.service';
 import { ApiService } from '../../services/api.service';
 import { TagHelperService } from '../../services/tag-helper.service';
 import { AutosaveService } from '../../services/autosave.service';
+import { removePlaceholderIds } from '../../services/exam.service';
 
 import { AddTaskComponent } from './add-task/add-task.component';
 import { TaskCardComponent } from './task-card/task-card.component';
@@ -189,7 +190,7 @@ export class EditExamComponent {
 
   onSave(): void {
     this.checkIfValid();
-    this.api.addExam(this.exam).subscribe({
+    this.api.addExam(removePlaceholderIds(this.exam)).subscribe({
       next: response => {
         this.autosaveService.clearLocal(undefined);
         this.router.navigate([`/edit-exam/${response.insertedId}`]);

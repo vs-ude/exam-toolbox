@@ -32,12 +32,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatStepperModule } from '@angular/material/stepper';
 import { map, Observable, startWith } from 'rxjs';
 
 import { Exam } from '../../types/shared/exam';
 import { ApiService } from '../../services/api.service';
+import { getSemesters, newDefaultExam } from '../../services/exam.service';
 
 export interface ExamSetupDialogData {
   exam?: Exam;
@@ -59,6 +62,8 @@ export interface ExamSetupDialogData {
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatSlideToggleModule,
     MatStepperModule,
   ],
@@ -73,7 +78,7 @@ export class ExamSetupDialogComponent implements OnInit {
   // Step form groups (used in stepper mode and also as the backing groups in flat mode)
   public nameFormGroup!: FormGroup;
   public dateFormGroup!: FormGroup;
-  public languageFormGroup!: FormGroup;
+  public miscFormGroup!: FormGroup;
 
   public semesters: string[] = [];
   public filteredSemesters$!: Observable<string[]>;
@@ -98,14 +103,14 @@ export class ExamSetupDialogComponent implements OnInit {
     private fb: FormBuilder,
     private apiService: ApiService,
   ) {
-    this.semesters = this.getSemesters();
+    this.semesters = getSemesters();
   }
 
   ngOnInit() {
     const exam = this.data?.exam;
     this.isNew = !exam;
 
-    const defaults = exam ?? new Exam();
+    const defaults = exam ?? newDefaultExam(this.apiService);
 
     this.nameFormGroup = this.fb.group({
       courseName: [defaults.courseName, Validators.required],
@@ -113,16 +118,17 @@ export class ExamSetupDialogComponent implements OnInit {
     });
 
     this.dateFormGroup = this.fb.group({
-      semester: [defaults.semester],
-      date: [defaults.date, Validators.required],
+      semester: [defaults.semester, Validators.required],
+      date: [this.parseDateString(defaults.date), Validators.required],
       examLengthMinutes: [
         defaults.examLengthMinutes,
         [Validators.required, Validators.min(0)],
       ],
     });
 
-    this.languageFormGroup = this.fb.group({
+    this.miscFormGroup = this.fb.group({
       bilingual: [defaults.bilingual ?? false],
+      conceptPages: [defaults.conceptPagesManual ?? 2],
     });
 
     this.selectedUsers = [...(defaults.access?.users ?? [])];
@@ -160,7 +166,7 @@ export class ExamSetupDialogComponent implements OnInit {
     return (
       this.nameFormGroup?.invalid ||
       this.dateFormGroup?.invalid ||
-      this.languageFormGroup?.invalid
+      this.miscFormGroup?.invalid
     );
   }
 
@@ -218,12 +224,18 @@ export class ExamSetupDialogComponent implements OnInit {
     }
   }
 
+  private parseDateString(s: string): Date | null {
+    if (!s) return null;
+    const [y, m, d] = s.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
   onSave() {
     if (this.isInvalid) return;
 
     const name = this.nameFormGroup.value;
     const date = this.dateFormGroup.value;
-    const language = this.languageFormGroup.value;
+    const misc = this.miscFormGroup.value;
 
     const result: Exam = Object.assign(new Exam(), this.data.exam ?? {}, {
       courseName: name.courseName,
@@ -231,7 +243,8 @@ export class ExamSetupDialogComponent implements OnInit {
       semester: date.semester,
       date: date.date,
       examLengthMinutes: date.examLengthMinutes,
-      bilingual: language.bilingual,
+      bilingual: misc.bilingual,
+      conceptPagesManual: misc.conceptPages,
       access: {
         users: this.selectedUsers,
         groups: this.selectedGroups,
@@ -242,26 +255,5 @@ export class ExamSetupDialogComponent implements OnInit {
 
   onCancel() {
     this.dialogRef.close(null);
-  }
-
-  private getSemesters(): string[] {
-    const currentDate = new Date();
-    const month = currentDate.getMonth() + 1;
-    const year = currentDate.getFullYear();
-    const fmt = (y: number) => y.toString().slice(-2);
-
-    if (month >= 10 || month <= 3) {
-      return [
-        `WS ${fmt(year)}/${fmt(year + 1)}`,
-        `SS ${fmt(year + 1)}`,
-        `WS ${fmt(year + 1)}/${fmt(year + 2)}`,
-      ];
-    } else {
-      return [
-        `SS ${fmt(year)}`,
-        `WS ${fmt(year)}/${fmt(year + 1)}`,
-        `SS ${fmt(year + 1)}`,
-      ];
-    }
   }
 }

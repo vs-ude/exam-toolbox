@@ -1,4 +1,5 @@
 import { MatDialogRef } from '@angular/material/dialog';
+import { removePlaceholderIds } from '../../services/exam.service';
 import { Task } from '../../types/shared/tasks';
 import { Tag } from '../../types/shared/tag';
 import {
@@ -82,33 +83,35 @@ function prepareNewTask(
 }
 
 function submitUpdateExam(this: EditExamComponent): void {
-  this.api.updateExam(this.exam._id!, this.exam).subscribe({
-    next: () => {
-      this.snackBar.open('Exam saved successfully', 'Close', {
-        duration: 3000,
-      });
-      this.autosaveService.clearLocal(this.exam._id);
-      this.modifiedPoolTasks.clear();
-      this.newTasksToCreate.clear();
-      // Re-fetch the exam so in-memory task IDs match what the backend assigned
-      this.api.getExam(this.exam._id!).subscribe({
-        next: updated => {
-          this.exam = updated;
-          this.importPoolTasks();
-        },
-        error: err => {
-          console.error('Error re-fetching exam after update:', err);
-          this.snackBar.open('Error after saving the exam', 'Close', {
-            duration: 10000,
-          });
-        },
-      });
-    },
-    error: err => {
-      console.error('Error saving exam: ', err);
-      this.snackBar.open('Error during save', 'Close', { duration: 10000 });
-    },
-  });
+  this.api
+    .updateExam(this.exam._id!, removePlaceholderIds(this.exam))
+    .subscribe({
+      next: () => {
+        this.snackBar.open('Exam saved successfully', 'Close', {
+          duration: 3000,
+        });
+        this.autosaveService.clearLocal(this.exam._id);
+        this.modifiedPoolTasks.clear();
+        this.newTasksToCreate.clear();
+        // Re-fetch the exam so in-memory task IDs match what the backend assigned
+        this.api.getExam(this.exam._id!).subscribe({
+          next: updated => {
+            this.exam = updated;
+            this.importPoolTasks();
+          },
+          error: err => {
+            console.error('Error re-fetching exam after update:', err);
+            this.snackBar.open('Error after saving the exam', 'Close', {
+              duration: 10000,
+            });
+          },
+        });
+      },
+      error: err => {
+        console.error('Error saving exam: ', err);
+        this.snackBar.open('Error during save', 'Close', { duration: 10000 });
+      },
+    });
 }
 
 export function trackChangeInPoolTasks(

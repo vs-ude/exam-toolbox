@@ -35,6 +35,7 @@ export class TaskBuilderService {
     switch (taskType) {
       case 'new_multipleChoice':
         return {
+          _id: 'tmp_' + crypto.randomUUID(),
           type: 'multipleChoice',
           question: { DE: '', EN: '' },
           answerOptions: [{ DE: '', EN: '', correct: true }],
@@ -49,6 +50,7 @@ export class TaskBuilderService {
         };
       case 'new_shortAnswer':
         return {
+          _id: 'tmp_' + crypto.randomUUID(),
           type: 'shortAnswer',
           question: { DE: '', EN: '' },
           solution: { DE: '', EN: '' },
@@ -61,8 +63,9 @@ export class TaskBuilderService {
           tagIds: [],
           children: [],
         };
-      case 'new_picture':
+      case 'new_pictureTask':
         return {
+          _id: 'tmp_' + crypto.randomUUID(),
           type: 'pictureTask',
           question: { DE: '', EN: '' },
           questionPicture: { urlDE: '', urlEN: '' },
@@ -78,6 +81,7 @@ export class TaskBuilderService {
         };
       case 'new_latex':
         return {
+          _id: 'tmp_' + crypto.randomUUID(),
           type: 'latex',
           question: {
             DE: '',
@@ -95,6 +99,7 @@ export class TaskBuilderService {
         };
       case 'new_table':
         return {
+          _id: 'tmp_' + crypto.randomUUID(),
           type: 'table',
           question: { DE: '', EN: '' },
           tableHeadersQuestion: [
@@ -136,6 +141,7 @@ export class TaskBuilderService {
         };
       case 'new_manualText':
         return {
+          _id: 'tmp_' + crypto.randomUUID(),
           type: 'manualText',
           question: { DE: '', EN: '' },
           points: 0,
@@ -149,6 +155,7 @@ export class TaskBuilderService {
         };
       case 'new_newPage':
         return {
+          _id: 'tmp_' + crypto.randomUUID(),
           type: 'newPage',
           question: { DE: '', EN: '' },
           points: 0,

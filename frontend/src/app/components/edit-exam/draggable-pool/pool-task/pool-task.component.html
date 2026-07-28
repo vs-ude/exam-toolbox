@@ -4,6 +4,7 @@
   [cdkDragData]="dragData"
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()"
+  (cdkDragStarted)="onDragStarted()"
   [style.backgroundColor]="hovered ? color : 'var(--color-bg-lifted)'"
 >
   <div

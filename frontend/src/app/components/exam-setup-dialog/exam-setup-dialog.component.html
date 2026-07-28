@@ -59,6 +59,7 @@
                 formControlName="semester"
                 placeholder="Semester"
                 [matAutocomplete]="semesterAuto"
+                required
               />
               <mat-autocomplete #semesterAuto="matAutocomplete">
                 @for (semester of filteredSemesters$ | async; track semester) {
@@ -69,8 +70,14 @@
 
             <mat-form-field class="full-width">
               <mat-label>Exam Date</mat-label>
-              <mat-icon matPrefix>event</mat-icon>
-              <input matInput type="date" formControlName="date" required />
+              <input
+                matInput
+                [matDatepicker]="datePickerS"
+                formControlName="date"
+                required
+              />
+              <mat-datepicker-toggle matIconSuffix [for]="datePickerS" />
+              <mat-datepicker #datePickerS />
             </mat-form-field>
 
             <mat-form-field class="full-width">
@@ -99,9 +106,22 @@
           </form>
         </mat-step>
 
-        <mat-step [stepControl]="languageFormGroup">
-          <ng-template matStepLabel>Language</ng-template>
-          <form [formGroup]="languageFormGroup" class="step-form">
+        <mat-step [stepControl]="miscFormGroup">
+          <ng-template matStepLabel>Miscellaneous</ng-template>
+          <form [formGroup]="miscFormGroup" class="step-form">
+            <mat-form-field class="full-width">
+              <mat-label>Concept Pages (minimum)</mat-label>
+              <mat-icon matPrefix>note_add</mat-icon>
+              <input
+                matInput
+                type="number"
+                formControlName="conceptPages"
+                min="1"
+                step="1"
+                required
+              />
+            </mat-form-field>
+
             <div class="toggle-row">
               <mat-icon>language</mat-icon>
               <span>Bilingual</span>
@@ -217,6 +237,7 @@
               formControlName="semester"
               placeholder="Semester"
               [matAutocomplete]="semesterAuto"
+              required
             />
             <mat-autocomplete #semesterAuto="matAutocomplete">
               @for (semester of filteredSemesters$ | async; track semester) {
@@ -227,8 +248,14 @@
 
           <mat-form-field class="full-width">
             <mat-label>Exam Date</mat-label>
-            <mat-icon matPrefix>event</mat-icon>
-            <input matInput type="date" formControlName="date" required />
+            <input
+              matInput
+              [matDatepicker]="datePicker"
+              formControlName="date"
+              required
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="datePicker" />
+            <mat-datepicker #datePicker />
           </mat-form-field>
 
           <mat-form-field class="full-width">
@@ -245,7 +272,20 @@
           </mat-form-field>
         </form>
 
-        <form [formGroup]="languageFormGroup">
+        <form [formGroup]="miscFormGroup">
+          <mat-form-field class="full-width">
+            <mat-label>Concept Pages (minimum)</mat-label>
+            <mat-icon matPrefix>note_add</mat-icon>
+            <input
+              matInput
+              type="number"
+              formControlName="conceptPages"
+              min="1"
+              step="1"
+              required
+            />
+          </mat-form-field>
+
           <div class="toggle-row">
             <mat-icon>language</mat-icon>
             <span>Bilingual</span>

@@ -1,5 +1,7 @@
 import { forkJoin } from 'rxjs';
 import { Exam, parseExam } from '../../types/shared/exam';
+import { newDefaultExam } from '../../services/exam.service';
+
 import {
   ExamSetupDialogComponent,
   ExamSetupDialogData,
@@ -60,10 +62,12 @@ export function importExam(this: EditExamComponent): void {
           });
         } else {
           this.autosaveService.clearLocal(undefined);
+          this.exam = newDefaultExam(this.api);
           openSetupDialog.call(this);
         }
       });
     } else {
+      this.exam = newDefaultExam(this.api);
       openSetupDialog.call(this);
     }
     return;
@@ -90,6 +94,7 @@ export function importExam(this: EditExamComponent): void {
           if (useLocal) {
             this.exam = localWrapper.data;
             this.exam._id = dbExam._id;
+            this.isExamSetup = true;
             this.exam.fillMeta();
             this.snackBar.open('Unsaved changes restored.', 'OK', {
               duration: 3000,

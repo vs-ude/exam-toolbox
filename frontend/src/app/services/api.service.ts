@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { filter, Observable, timeout } from 'rxjs';
 
@@ -31,11 +32,13 @@ export interface DownloadableJob {
 })
 export class ApiService {
   private apiUrl = '/api';
+  private http = inject(HttpClient);
+  private authService = inject(AuthService);
+  private readonly user$ = toObservable(this.authService.currentUser).pipe(
+    filter((user): user is User => user !== null),
+  );
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService,
-  ) {}
+  constructor() {}
 
   startMassExamGeneration(
     exam: Exam,
@@ -54,9 +57,11 @@ export class ApiService {
   }
 
   getUser(): Observable<User> {
-    return this.authService.currentUser$.pipe(
-      filter((user): user is User => user !== null),
-    );
+    return this.user$;
+  }
+
+  getUserOnce(): User | null {
+    return this.authService.currentUser();
   }
 
   getUsersAndGroups(): Observable<{ users: UserStub[]; groups: GroupStub[] }> {
