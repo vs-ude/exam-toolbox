@@ -39,19 +39,9 @@ default:
         - .cache/Tectonic
 
 checks:
-  image: alpine:latest
   stage: .pre
-  variables:
-    APK_CACHE_DIR: $CI_PROJECT_DIR/.cache/apk
-  cache:
-    - key: $CI_COMMIT_REF_SLUG
-      paths:
-        - $APK_CACHE_DIR
-  before_script:
-    - mkdir -p $APK_CACHE_DIR
-    - apk add --cache-dir $APK_CACHE_DIR prettier bash >/dev/null 2>&1
   script:
-    - prettier --check **/*.{ts,html,scss,json,yaml,yml,md}
+    - deno x prettier --check **/*.{ts,html,scss,json,yaml,yml,md}
     - bash ./tools/check_shared_types.sh
 
 backend_build:
