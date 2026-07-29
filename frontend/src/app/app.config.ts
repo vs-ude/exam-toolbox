@@ -13,6 +13,7 @@ import {
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatIconRegistry } from '@angular/material/icon';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 import { ApiService } from './services/api.service';
 import { authInterceptor } from './interceptors/auth.interceptor';
@@ -35,5 +36,11 @@ export const appConfig: ApplicationConfig = {
       multi: true,
     },
     provideNativeDateAdapter(),
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: {
+        subscriptSizing: 'dynamic',
+      },
+    },
   ],
 };

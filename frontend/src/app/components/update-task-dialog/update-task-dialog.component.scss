@@ -1,100 +1,27 @@
-.title {
-  color: var(--color-text);
-}
-
-.dialog_content {
-  color: var(--color-text);
-}
-
-.updateTask-container {
+.container {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 20px;
-}
-
-.input {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip {
-  visibility: hidden;
-  width: 200px;
-  background-color: var(--color-bg-lifted);
-  color: var(--color-text);
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  position: absolute;
-  z-index: 1;
-  bottom: 125%;
-  left: 50%;
-  margin-left: -100px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.input:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
+  padding: 4px;
+  margin-top: 10px;
 }
 
 .assignment-wrapper {
   margin-bottom: 20px;
-  border: 1px solid var(--border-color);
-  padding: 15px;
-  border-radius: 8px;
-  background-color: var(--color-bg-accent);
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: start;
+  padding: 8px;
+  color: var(--mat-sys-on-surface-container-low);
+  background-color: var(--mat-sys-surface-container-low);
 }
 
-.assignmentName {
+.subtask-id {
+  position: absolute;
+  color: var(--mat-sys-primary);
+  font-size: 14px;
   font-weight: bold;
-  margin-right: 10%;
-  margin-left: 3%;
+  rotate: -90deg;
+  margin: 4px -12px;
 }
 
-.assignmentQuestion {
-}
-
-.cancel_button {
-  background-color: #f44336;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-.newTask_button {
-  background-color: #008cba;
-  /* Blue */
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-button:hover {
-  cursor: pointer;
-  opacity: 0.8;
-}
-
-::ng-deep .mat-mdc-dialog-container {
-  --mat-dialog-container-color: var(--color-background);
+.text {
+  margin-left: 16px;
 }

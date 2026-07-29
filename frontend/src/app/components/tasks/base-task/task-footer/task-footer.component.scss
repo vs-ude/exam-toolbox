@@ -1,6 +1,4 @@
-/* Footer */
 .form-footer {
-  border-top: solid 1px #e0e0e0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -14,19 +12,25 @@
   gap: 8px;
 }
 
-.form-toolbar {
-  margin-top: 10px;
-  display: flex;
-  gap: 8px;
+.footer_icon {
+  margin-right: 4px;
+  mat-icon {
+    color: var(--color-icon);
+  }
 }
 
-.icon_wrapper {
-  box-sizing: border-box;
-  padding: 4px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 10px;
+.footer_icon:hover {
+  cursor: pointer;
+  mat-icon {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.footer_icon_delete:hover {
+  cursor: pointer;
+  mat-icon {
+    color: var(--mat-sys-error);
+  }
 }
 
 .tag {
@@ -46,49 +50,21 @@
   position: relative;
 }
 
-.newTaskCheckbox_container {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  color: var(--color-text-secondary);
-}
-
-.newTaskCheckbox {
-  width: 16px;
-  height: 16px;
-  margin-right: 6px;
-  cursor: pointer;
-}
+// .newTaskCheckbox_container {
+//   margin-left: auto;
+//   display: flex;
+//   align-items: center;
+//   font-size: 14px;
+//   color: var(--color-text-secondary);
+// }
 
 .points {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-}
+  margin-top: 2px;
+  width: 86px;
 
-.points mat-label {
-  font-size: 14px;
-
-  color: var(--color-text);
-}
-
-.points_input {
-  width: 60px;
-  padding: 4px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  outline: none;
-  text-align: center;
-  background-color: transparent;
-  color: var(--color-text);
-}
-
-.points_input:focus {
-  border-color: #4285f4;
-  box-shadow: 0 0 4px var(--mat-sys-primary);
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+  input {
+    font-size: 14px;
+  }
 }

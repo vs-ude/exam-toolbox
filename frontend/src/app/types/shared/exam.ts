@@ -116,5 +116,15 @@ export function parseExam(raw: unknown): Exam {
     throw new Error(`Exam is missing required fields: ${missing.join(', ')}.`);
   }
 
-  return Object.assign(new Exam(), obj);
+  const exam = Object.assign(new Exam(), obj);
+  let newPageCounter = 0;
+  exam.tasks.forEach(group => {
+    group.tasks.forEach(task => {
+      if (task.type === 'newPage') {
+        task._id = 'dummy:newPage_' + newPageCounter++;
+      }
+    });
+  });
+
+  return exam;
 }

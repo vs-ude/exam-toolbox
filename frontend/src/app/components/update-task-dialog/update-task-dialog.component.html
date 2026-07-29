@@ -1,28 +1,30 @@
-<h2 mat-dialog-title class="title">Update tasks or create a new one?</h2>
-<mat-dialog-content class="dialog_content">
+<h2 mat-dialog-title>Update tasks or create new ones?</h2>
+<mat-dialog-content>
   <div>
-    Some of the tasks that came out of the task pool were modified. You can
-    either update the task in the task pool or create a new one. Check the tasks
-    that should be created as new tasks.
+    {{ data.length }} tasks that came out of the task pool were modified. Choose
+    whether to update or create a new one for each item below.
   </div>
-  <div class="updateTask-container">
-    @for (task of data; track task.assignmentNumber) {
-      <div class="assignment-wrapper">
-        <div class="input">
-          <input
-            type="checkbox"
-            [checked]="true"
-            [(ngModel)]="this.checked[$index]"
-          />
-          <span class="tooltip">Create a new Task</span>
-        </div>
-        <div class="assignmentName">{{ task.assignmentNumber }}</div>
-        <div class="assignmentQuestion">{{ task.task.question.DE }}</div>
-      </div>
+  <div class="container">
+    @for (task of data; track task.assignmentNumber; let i = $index) {
+      <mat-card class="assignment-wrapper">
+        <mat-card-content>
+          <div class="subtask-id">{{ task.assignmentNumber }}</div>
+          <div class="text">{{ task.task.question.DE }}</div>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <mat-button-toggle-group
+            [name]="'assignment' + task.assignmentNumber"
+            [(ngModel)]="toggleValues[i]"
+          >
+            <mat-button-toggle value="new">New</mat-button-toggle>
+            <mat-button-toggle value="update">Update</mat-button-toggle>
+          </mat-button-toggle-group>
+        </mat-card-actions>
+      </mat-card>
     }
   </div>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button class="cancel_button" [mat-dialog-close]="false">Cancel</button>
-  <button class="newTask_button" [mat-dialog-close]="checked">OK</button>
+  <button matButton="outlined" [mat-dialog-close]="false">Cancel</button>
+  <button matButton="filled" [mat-dialog-close]="checked">OK</button>
 </mat-dialog-actions>

@@ -1,5 +1,6 @@
 import { MatDialogRef } from '@angular/material/dialog';
 import { removePlaceholderIds } from '../../services/exam.service';
+import { parseExam } from '../../types/shared/exam';
 import { Task } from '../../types/shared/tasks';
 import { Tag } from '../../types/shared/tag';
 import {
@@ -96,7 +97,7 @@ function submitUpdateExam(this: EditExamComponent): void {
         // Re-fetch the exam so in-memory task IDs match what the backend assigned
         this.api.getExam(this.exam._id!).subscribe({
           next: updated => {
-            this.exam = updated;
+            this.exam = parseExam(updated);
             this.importPoolTasks();
           },
           error: err => {

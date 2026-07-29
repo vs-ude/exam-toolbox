@@ -11,12 +11,24 @@ import { FormsModule } from '@angular/forms';
 import { MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 import { Task } from '../../../../types/shared/tasks';
 
 @Component({
   selector: 'app-task-footer',
-  imports: [MatIcon, FormsModule, NgStyle, MatLabel, MatTooltip],
+  imports: [
+    MatIcon,
+    FormsModule,
+    NgStyle,
+    MatLabel,
+    MatTooltip,
+    MatCheckbox,
+    MatInputModule,
+    MatFormFieldModule,
+  ],
   templateUrl: './task-footer.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./task-footer.component.scss', '../../task.scss'],
@@ -29,8 +41,8 @@ export class TaskFooterComponent {
   @Input() public hasNoPreview?: boolean;
   /** 'total' binds directly to task.points; 'per-line' shows a separate per-line input. */
   @Input() public pointsMode: 'total' | 'per-line' = 'total';
-  @Input() public pointsPerLineLabel: string = 'Points per line';
-  @Input() public pointsPerLineValue: number = 1;
+  @Input() public pointsPerLineLabel: string = 'per line';
+  @Input() public points: number = 1;
   @Output() pointsPerLineValueChange = new EventEmitter<number>();
   @Output() deleteEvent = new EventEmitter<string>();
   @Output() createNewTaskEvent = new EventEmitter<boolean>();
@@ -46,8 +58,9 @@ export class TaskFooterComponent {
     this.newTagEvent.emit();
   }
 
-  public onCreateNewTaskChange() {
-    this.createNewTaskEvent.emit(this.createNewTask);
+  public onCreateNewTaskChange(checked: boolean) {
+    this.createNewTask = checked;
+    this.createNewTaskEvent.emit(checked);
   }
 
   public onPreview() {
@@ -58,7 +71,12 @@ export class TaskFooterComponent {
     this.taskChangeEvent.emit(this.task);
   }
 
-  public onPointsPerLineChange() {
-    this.pointsPerLineValueChange.emit(this.pointsPerLineValue);
+  public onPointsChange() {
+    if (this.pointsMode === 'per-line') {
+      this.pointsPerLineValueChange.emit(this.points);
+    } else {
+      this.task.points = this.points;
+      this.updateTask();
+    }
   }
 }

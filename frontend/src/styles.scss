@@ -169,3 +169,13 @@ body {
     )
   );
 }
+
+.cancel-button {
+  background-color: var(--mat-sys-error);
+  color: var(--mat-sys-on-error);
+}
+
+.confirm-button {
+  background-color: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
