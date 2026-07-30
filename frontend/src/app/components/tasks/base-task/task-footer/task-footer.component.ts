@@ -41,7 +41,7 @@ export class TaskFooterComponent {
   @Input() public hasNoPreview?: boolean;
   /** 'total' binds directly to task.points; 'per-line' shows a separate per-line input. */
   @Input() public pointsMode: 'total' | 'per-line' = 'total';
-  @Input() public pointsPerLineLabel: string = 'per line';
+  @Input() public pointsLabel: string = 'for the task';
   @Input() public points: number = 1;
   @Output() pointsPerLineValueChange = new EventEmitter<number>();
   @Output() deleteEvent = new EventEmitter<string>();
