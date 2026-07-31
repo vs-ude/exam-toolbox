@@ -32,11 +32,6 @@ form-question:focus {
 }
 
 /* Toolbar */
-.form-toolbar {
-  display: flex;
-  gap: 8px;
-}
-
 mat-icon-button.active {
   border-bottom: 2px var(--mat-sys-primary);
 }
@@ -56,18 +51,22 @@ mat-icon-button.active {
   border-radius: 10px;
 }
 
-.format_icon {
-  margin-right: 8px;
-}
-
-.format_icon:hover {
+.icon_wrapper:hover {
   cursor: pointer;
   mat-icon {
     color: var(--mat-sys-primary);
   }
 }
 
+.format_icon {
+  margin-right: 8px;
+}
+
 .form-body {
   margin-bottom: 16px;
   margin-top: 16px;
+}
+
+.full-width {
+  width: 100%;
 }

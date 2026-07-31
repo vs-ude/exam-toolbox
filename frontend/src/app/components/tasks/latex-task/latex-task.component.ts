@@ -4,8 +4,10 @@ import {
   OnInit,
   Output,
   ChangeDetectionStrategy,
+  ViewChild,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
 
 import { environment } from '../../../../environments/environment';
 import { LatexTask, Task } from '../../../types/shared/tasks';
@@ -30,6 +32,8 @@ import { PreviewDialogComponent } from './preview-dialog/preview-dialog.componen
 export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
   @Output()
   taskChangeEvent = new EventEmitter<Task>();
+
+  @ViewChild('autosize') autosize!: CdkTextareaAutosize;
 
   public readonly publicPath = environment.publicPath;
 

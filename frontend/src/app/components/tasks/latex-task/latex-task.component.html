@@ -5,25 +5,37 @@
   (questionChange)="onQuestionChange($event)"
 ></app-task-header>
 
-<!-- Latex Question Input -->
 <div class="form-body">
-  <span class="latex_input_label"
-    >LaTeX content in this format -> \( &lt;content&gt; \)</span
-  >
-  <textarea
-    class="latex_input"
-    [(ngModel)]="this.task.questionLatex.DE"
-    (blur)="updateTask()"
-  ></textarea>
-  <!-- <div  class="latex_preview_container">
-    <span class="latex_input_label">Preview:</span>
-    <app-math-jax-paragraph mathString="{{ task.questionLatex.DE }}"></app-math-jax-paragraph>
-  </div> -->
-</div>
-
-<div class="icon_wrapper presets" (click)="onOpenPreview()">
-  <mat-icon aria-hidden="false">style</mat-icon>
-  Select LaTeX Template
+  <div class="form-toolbar">
+    <span class="spacer"></span>
+    <div class="icon_wrapper">
+      <mat-icon
+        matTooltip="Select LaTeX Template"
+        (click)="onOpenPreview()"
+        aria-hidden="false"
+        >style</mat-icon
+      >
+    </div>
+    <div class="icon_wrapper">
+      <mat-icon matTooltip="LaTeX Info">info</mat-icon>
+    </div>
+    <div class="icon_wrapper">
+      <mat-icon matTooltip="Configure">settings</mat-icon>
+    </div>
+  </div>
+  <!-- Latex Question Input -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>LaTeX Content</mat-label>
+    <textarea
+      matInput
+      cdkTextareaAutosize
+      #autosize="cdkTextareaAutosize"
+      cdkAutosizeMinRows="5"
+      [(ngModel)]="this.task.questionLatex.DE"
+      (blur)="updateTask()"
+    ></textarea>
+    <mat-hint>For available commands, click the info button above.</mat-hint>
+  </mat-form-field>
 </div>
 
 <app-task-footer
