@@ -293,64 +293,66 @@
           </div>
         </form>
 
-        <mat-form-field class="full-width">
-          <mat-label>Users</mat-label>
-          <mat-chip-grid #userChipGrid aria-label="User selection">
-            @for (user of selectedUsers; track user) {
-              <mat-chip-row (removed)="removeUser(user)">
-                {{ user }}
-                <button matChipRemove><mat-icon>cancel</mat-icon></button>
-              </mat-chip-row>
-            }
-          </mat-chip-grid>
-          <input
-            matInput
-            #userInput
-            placeholder="Add user..."
-            [formControl]="userInputCtrl"
-            [matChipInputFor]="userChipGrid"
-            [matAutocomplete]="userAuto"
-            #userAutoTrigger="matAutocompleteTrigger"
-            (click)="openPanel(userAutoTrigger)"
-          />
-          <mat-autocomplete
-            #userAuto="matAutocomplete"
-            (optionSelected)="addUser($event)"
-          >
-            @for (user of filteredUsers$ | async; track user) {
-              <mat-option [value]="user">{{ user }}</mat-option>
-            }
-          </mat-autocomplete>
-        </mat-form-field>
+        <form>
+          <mat-form-field class="full-width">
+            <mat-label>Users</mat-label>
+            <mat-chip-grid #userChipGrid aria-label="User selection">
+              @for (user of selectedUsers; track user) {
+                <mat-chip-row (removed)="removeUser(user)">
+                  {{ user }}
+                  <button matChipRemove><mat-icon>cancel</mat-icon></button>
+                </mat-chip-row>
+              }
+            </mat-chip-grid>
+            <input
+              matInput
+              #userInput
+              placeholder="Add user..."
+              [formControl]="userInputCtrl"
+              [matChipInputFor]="userChipGrid"
+              [matAutocomplete]="userAuto"
+              #userAutoTrigger="matAutocompleteTrigger"
+              (click)="openPanel(userAutoTrigger)"
+            />
+            <mat-autocomplete
+              #userAuto="matAutocomplete"
+              (optionSelected)="addUser($event)"
+            >
+              @for (user of filteredUsers$ | async; track user) {
+                <mat-option [value]="user">{{ user }}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
 
-        <mat-form-field class="full-width">
-          <mat-label>Groups</mat-label>
-          <mat-chip-grid #groupChipGrid aria-label="Group selection">
-            @for (group of selectedGroups; track group) {
-              <mat-chip-row (removed)="removeGroup(group)">
-                {{ group }}
-                <button matChipRemove><mat-icon>cancel</mat-icon></button>
-              </mat-chip-row>
-            }
-          </mat-chip-grid>
-          <input
-            #groupInput
-            placeholder="Add group..."
-            [formControl]="groupInputCtrl"
-            [matChipInputFor]="groupChipGrid"
-            [matAutocomplete]="groupAuto"
-            #groupAutoTrigger="matAutocompleteTrigger"
-            (click)="openPanel(groupAutoTrigger)"
-          />
-          <mat-autocomplete
-            #groupAuto="matAutocomplete"
-            (optionSelected)="addGroup($event)"
-          >
-            @for (group of filteredGroups$ | async; track group) {
-              <mat-option [value]="group">{{ group }}</mat-option>
-            }
-          </mat-autocomplete>
-        </mat-form-field>
+          <mat-form-field class="full-width">
+            <mat-label>Groups</mat-label>
+            <mat-chip-grid #groupChipGrid aria-label="Group selection">
+              @for (group of selectedGroups; track group) {
+                <mat-chip-row (removed)="removeGroup(group)">
+                  {{ group }}
+                  <button matChipRemove><mat-icon>cancel</mat-icon></button>
+                </mat-chip-row>
+              }
+            </mat-chip-grid>
+            <input
+              #groupInput
+              placeholder="Add group..."
+              [formControl]="groupInputCtrl"
+              [matChipInputFor]="groupChipGrid"
+              [matAutocomplete]="groupAuto"
+              #groupAutoTrigger="matAutocompleteTrigger"
+              (click)="openPanel(groupAutoTrigger)"
+            />
+            <mat-autocomplete
+              #groupAuto="matAutocomplete"
+              (optionSelected)="addGroup($event)"
+            >
+              @for (group of filteredGroups$ | async; track group) {
+                <mat-option [value]="group">{{ group }}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+        </form>
       </div>
     }
   }

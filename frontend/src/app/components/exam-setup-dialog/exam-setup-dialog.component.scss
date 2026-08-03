@@ -5,8 +5,20 @@
 .setup-form {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 16px;
   min-width: 420px;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.step-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .toggle-row {
