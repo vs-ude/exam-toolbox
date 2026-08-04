@@ -15,6 +15,7 @@
           <form [formGroup]="nameFormGroup" class="step-form">
             <mat-form-field class="full-width">
               <mat-label>Course Name</mat-label>
+              <mat-icon matPrefix>school</mat-icon>
               <input
                 matInput
                 formControlName="courseName"
@@ -53,7 +54,7 @@
           <form [formGroup]="dateFormGroup" class="step-form">
             <mat-form-field class="full-width">
               <mat-label>Semester</mat-label>
-              <mat-icon matPrefix>school</mat-icon>
+              <mat-icon matPrefix>event_repeat</mat-icon>
               <input
                 matInput
                 formControlName="semester"
@@ -206,7 +207,9 @@
     } @else {
       <div class="setup-form">
         <form [formGroup]="nameFormGroup">
+          <h2>Name</h2>
           <mat-form-field class="full-width">
+            <mat-icon matPrefix>school</mat-icon>
             <mat-label>Course Name</mat-label>
             <input
               matInput
@@ -229,9 +232,10 @@
         </form>
 
         <form [formGroup]="dateFormGroup">
+          <h2>Date and Time</h2>
           <mat-form-field class="full-width">
             <mat-label>Semester</mat-label>
-            <mat-icon matPrefix>school</mat-icon>
+            <mat-icon matPrefix>event_repeat</mat-icon>
             <input
               matInput
               formControlName="semester"
@@ -273,6 +277,7 @@
         </form>
 
         <form [formGroup]="miscFormGroup">
+          <h2>Misc</h2>
           <mat-form-field class="full-width">
             <mat-label>Concept Pages (minimum)</mat-label>
             <mat-icon matPrefix>note_add</mat-icon>
@@ -294,6 +299,7 @@
         </form>
 
         <form>
+          <h2>Access</h2>
           <mat-form-field class="full-width">
             <mat-label>Users</mat-label>
             <mat-chip-grid #userChipGrid aria-label="User selection">

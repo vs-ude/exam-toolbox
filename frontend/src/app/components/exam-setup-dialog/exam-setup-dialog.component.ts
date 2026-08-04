@@ -224,6 +224,14 @@ export class ExamSetupDialogComponent implements OnInit {
     }
   }
 
+  private formatDate(d: Date | null): string {
+    if (!d) return '';
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
   private parseDateString(s: string): Date | null {
     if (!s) return null;
     const [y, m, d] = s.split('-').map(Number);
@@ -241,7 +249,7 @@ export class ExamSetupDialogComponent implements OnInit {
       courseName: name.courseName,
       examinerName: name.examinerName,
       semester: date.semester,
-      date: date.date,
+      date: this.formatDate(date.date),
       examLengthMinutes: date.examLengthMinutes,
       bilingual: misc.bilingual,
       conceptPagesManual: misc.conceptPages,
