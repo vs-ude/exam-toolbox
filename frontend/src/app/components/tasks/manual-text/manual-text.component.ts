@@ -7,6 +7,7 @@ import {
 
 import { environment } from '../../../../environments/environment';
 import { ManualText, Task } from '../../../types/shared/tasks';
+import { LatexTextareaComponent } from '../../latex-textarea/latex-textarea.component';
 import { COMMON_IMPORTS } from '../../common-imports';
 
 import { TASK_COMMON_IMPORTS } from '../task-common-imports';
@@ -15,7 +16,7 @@ import { BaseTaskComponent } from '../base-task/base-task.component';
 
 @Component({
   selector: 'app-manual-text',
-  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
+  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS, LatexTextareaComponent],
   templateUrl: './manual-text.component.html',
   styleUrls: ['./manual-text.component.scss', '../task.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -23,8 +24,6 @@ import { BaseTaskComponent } from '../base-task/base-task.component';
 export class ManualTextComponent extends BaseTaskComponent {
   @Output()
   taskChangeEvent = new EventEmitter<Task>();
-
-  public readonly publicPath = environment.publicPath;
 
   public task: ManualText = {
     type: 'manualText',

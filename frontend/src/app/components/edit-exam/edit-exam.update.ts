@@ -44,7 +44,7 @@ function askUserForTaskUpdate(
   const tasks = modifiedIndices.map(([i, j]) => {
     const task = this.exam.tasks[i].tasks[j];
     return {
-      assignmentNumber: `${i + 1}.${this.mapTaskIndexToChar(j)}`,
+      assignmentNumber: this.calcTaskChar(j, i),
       task,
       newTask: !!task._id && this.newTasksToCreate.has(task._id),
     };

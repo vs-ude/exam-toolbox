@@ -19,13 +19,6 @@
   }
 }
 
-.footer_icon_delete:hover {
-  cursor: pointer;
-  mat-icon {
-    color: var(--mat-sys-error);
-  }
-}
-
 .tag {
   display: flex;
   align-items: center;
@@ -42,14 +35,6 @@
   line-height: 1.4;
   position: relative;
 }
-
-// .newTaskCheckbox_container {
-//   margin-left: auto;
-//   display: flex;
-//   align-items: center;
-//   font-size: 14px;
-//   color: var(--color-text-secondary);
-// }
 
 .points {
   display: flex;

@@ -4,11 +4,15 @@ import {
   OnInit,
   Output,
   ChangeDetectionStrategy,
+  signal,
 } from '@angular/core';
+import { MatDivider } from '@angular/material/divider';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 import { environment } from '../../../../environments/environment';
 import { MultipleChoiceTask, Task } from '../../../types/shared/tasks';
 import { COMMON_IMPORTS } from '../../common-imports';
+import { LatexTextareaComponent } from '../../latex-textarea/latex-textarea.component';
 
 import { BaseTaskComponent } from '../base-task/base-task.component';
 import { TaskAnimations } from '../task-animations';
@@ -16,14 +20,17 @@ import { TASK_COMMON_IMPORTS } from '../task-common-imports';
 
 @Component({
   selector: 'app-multiplechoiceTask',
-  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
+  imports: [
+    ...TASK_COMMON_IMPORTS,
+    ...COMMON_IMPORTS,
+    LatexTextareaComponent,
+    MatDivider,
+    MatCheckbox,
+  ],
   templateUrl: './multiplechoice-task.component.html',
   styleUrls: ['./multiplechoice-task.component.scss', '../task.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  animations: [
-    TaskAnimations.inOutAnimation,
-    TaskAnimations.leftRightAnimation,
-  ],
+  animations: [TaskAnimations.inOutAnimation],
 })
 export class MultiplechoiceTaskComponent
   extends BaseTaskComponent
@@ -32,8 +39,7 @@ export class MultiplechoiceTaskComponent
   @Output()
   taskChangeEvent = new EventEmitter<Task>();
 
-  public readonly publicPath = environment.publicPath;
-
+  numCorrect = signal<number>(0);
   pointsPerOption = 1;
 
   public task: MultipleChoiceTask = {
@@ -56,9 +62,8 @@ export class MultiplechoiceTaskComponent
   ngOnInit(): void {
     if (this.preTask) {
       this.task = this.preTask as MultipleChoiceTask;
-      this.pointsPerOption =
-        this.task.points /
-        this.task.answerOptions.filter(option => option.correct).length;
+      this.updateNumCorrect(this.task.answerOptions);
+      this.pointsPerOption = this.task.points / this.numCorrect();
       return;
     }
     this.taskChangeEvent.emit(this.task);
@@ -72,30 +77,32 @@ export class MultiplechoiceTaskComponent
   removeOption(index: number) {
     if (this.task.answerOptions.length <= 1) return;
     this.task.answerOptions.splice(index, 1);
+    this.updateNumCorrect(this.task.answerOptions);
     this.taskChangeEvent.emit(this.task);
   }
 
-  changeOption(event: any, index: number, language: string) {
+  changeOption(text: any, index: number, language: string) {
     if (language === 'DE') {
-      this.task.answerOptions[index].DE = event.target.value;
+      this.task.answerOptions[index].DE = text;
     } else {
-      this.task.answerOptions[index].EN = event.target.value;
+      this.task.answerOptions[index].EN = text;
     }
 
     this.taskChangeEvent.emit(this.task);
   }
 
   public onOptionCorrectChange() {
-    this.task.points =
-      this.pointsPerOption *
-      this.task.answerOptions.filter(option => option.correct).length;
+    this.updateNumCorrect(this.task.answerOptions);
+    this.task.points = this.pointsPerOption * this.numCorrect();
     this.taskChangeEvent.emit(this.task);
   }
 
   public onPointsChange() {
-    this.task.points =
-      this.pointsPerOption *
-      this.task.answerOptions.filter(option => option.correct).length;
+    this.task.points = this.pointsPerOption * this.numCorrect();
     this.taskChangeEvent.emit(this.task);
+  }
+
+  updateNumCorrect(options: any[]) {
+    this.numCorrect.set(options.filter(option => option.correct).length);
   }
 }

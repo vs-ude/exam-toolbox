@@ -50,6 +50,11 @@ export abstract class BaseTaskComponent {
     this.taskChangeEvent.emit(this.task);
   }
 
+  public onQuestionChangeDirect(question: string, language: 'DE' | 'EN') {
+    this.task.question[language] = question;
+    this.taskChangeEvent.emit(this.task);
+  }
+
   public onDelete() {
     this.deleteEvent.emit('delete');
   }

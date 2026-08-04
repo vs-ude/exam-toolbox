@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 
+import { environment } from '../../environments/environment';
+
 export type LatexPreview = {
   name: string;
   latex: string;
@@ -12,8 +14,8 @@ export type LatexPreview = {
 export class LatexPreviewsService {
   private previews: LatexPreview[] = [
     {
-      name: 'complex-table',
-      previewImageUrl: 'complexTable.jpg',
+      name: 'Chord Routing Table',
+      previewImageUrl: `${environment.publicPath}complexTable.jpg`,
       latex: `\\begin{center}
 \\begin{tabular}{|l|l|l|l|l|l|}
 \\hline
@@ -34,8 +36,8 @@ export class LatexPreviewsService {
 \\end{center}`,
     },
     {
-      name: 'ISO/OSI',
-      previewImageUrl: 'iso-osi.jpg',
+      name: 'ISO/OSI Layers',
+      previewImageUrl: `${environment.publicPath}iso-osi.jpg`,
       latex: `\\begin{center}
 ISO/OSI Layer:\\\\
 \\begin{tabular}{|c|}

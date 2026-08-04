@@ -9,6 +9,7 @@ import {
 import { environment } from '../../../../environments/environment';
 import { ShortAnswerTask, Task } from '../../../types/shared/tasks';
 import { COMMON_IMPORTS } from '../../common-imports';
+import { LatexTextareaComponent } from '../../latex-textarea/latex-textarea.component';
 
 import { BaseTaskComponent } from '../base-task/base-task.component';
 import { TaskAnimations } from '../task-animations';
@@ -16,11 +17,8 @@ import { TASK_COMMON_IMPORTS } from '../task-common-imports';
 
 @Component({
   selector: 'app-short-answer-task',
-  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
-  animations: [
-    TaskAnimations.inOutAnimation,
-    TaskAnimations.leftRightAnimation,
-  ],
+  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS, LatexTextareaComponent],
+  animations: [TaskAnimations.inOutAnimation],
   templateUrl: './short-answer-task.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./short-answer-task.component.scss', '../task.scss'],
@@ -31,8 +29,6 @@ export class ShortAnswerTaskComponent
 {
   @Output()
   taskChangeEvent = new EventEmitter<Task>();
-
-  public readonly publicPath = environment.publicPath;
 
   public task: ShortAnswerTask = {
     type: 'shortAnswer',
@@ -52,6 +48,15 @@ export class ShortAnswerTaskComponent
     if (this.preTask) {
       this.task = this.preTask as ShortAnswerTask;
       return;
+    }
+    this.taskChangeEvent.emit(this.task);
+  }
+
+  public updateSolution(value: string, language: 'DE' | 'EN') {
+    if (language === 'DE') {
+      this.task.solution.DE = value;
+    } else {
+      this.task.solution.EN = value;
     }
     this.taskChangeEvent.emit(this.task);
   }

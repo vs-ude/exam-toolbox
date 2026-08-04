@@ -57,22 +57,6 @@
   flex-wrap: wrap;
 }
 
-.bar_icon {
-  color: var(--color-icon);
-  margin-right: 1%;
-}
-
-.bar-icon :last-child {
-  margin-right: 0;
-}
-
-.bar_icon:hover {
-  cursor: pointer;
-  mat-icon {
-    color: var(--mat-sys-primary);
-  }
-}
-
 .view_wrapper {
   position: relative;
   border: solid 1px;
@@ -89,10 +73,6 @@
   top: 4px;
   right: 4px;
   z-index: 10;
-  background-color: var(--mat-sys-primary-container);
-  .mat-icon {
-    color: var(--mat-sys-on-primary-container);
-  }
 }
 
 ::ng-deep .assignment-tabs {

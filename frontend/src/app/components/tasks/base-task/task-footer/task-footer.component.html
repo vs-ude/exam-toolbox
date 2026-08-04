@@ -1,8 +1,11 @@
 <!-- Footer -->
 <div class="form-footer">
   <div class="footer-actions">
-    <div class="icon_wrapper footer_icon_delete">
-      <mat-icon aria-hidden="false" matTooltip="Delete" (click)="onDelete()"
+    <div class="icon_wrapper footer_icon icon_delete">
+      <mat-icon
+        aria-hidden="false"
+        matTooltip="Delete Task"
+        (click)="onDelete()"
         >delete</mat-icon
       >
     </div>
@@ -47,7 +50,11 @@
   </div>
 
   @if (!hasNoPoints) {
-    <mat-form-field class="points" [matTooltip]="pointsLabel">
+    <mat-form-field
+      appearance="outline"
+      class="points"
+      [matTooltip]="pointsLabel"
+    >
       <mat-label>Points</mat-label>
       <input
         matInput

@@ -1,5 +1,5 @@
 import { getConfig, QRConfig } from '../config/mod.ts';
-import { escapeLatex, getEta } from '../services/mod.ts';
+import { getEta, preprocessLatex } from '../services/mod.ts';
 import { generateExamQR } from '../services/qr.ts';
 import { type Exam, Language, Student, TaskGroup } from '../types/mod.ts';
 import {
@@ -59,7 +59,7 @@ const DEFAULT_INDIVIDUAL_META: IndividualMetaTemplateData = {
 };
 
 function escapeLatexWithSpaces(text?: string): string {
-  return escapeLatex(text).replace(/ /g, '\\ ');
+  return preprocessLatex(text).replace(/ /g, '\\ ');
 }
 
 // Executes tectonic to compile a .tex file and returns the resulting pdf and log file

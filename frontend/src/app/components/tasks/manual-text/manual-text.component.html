@@ -1,10 +1,28 @@
-<app-task-header
-  [bilingual]="bilingual"
-  [task]="task"
-  questionDEPlaceholder="Text Eingeben..."
-  questionENPlaceholder="Enter Text..."
-  (questionChange)="onQuestionChange($event)"
-></app-task-header>
+<div class="form-body">
+  <div class="header-row solution-header">Manual Text</div>
+  @if (bilingual) {
+    <app-latex-textarea
+      label="Text (DE)"
+      [value]="task.question.DE"
+      (valueChange)="onQuestionChangeDirect($event, 'DE')"
+      (blur)="updateTask()"
+    ></app-latex-textarea>
+
+    <app-latex-textarea
+      label="Text (EN)"
+      [value]="task.question.EN"
+      (valueChange)="onQuestionChangeDirect($event, 'EN')"
+      (blur)="updateTask()"
+    ></app-latex-textarea>
+  } @else {
+    <app-latex-textarea
+      label="Text"
+      [value]="task.question.DE"
+      (valueChange)="onQuestionChangeDirect($event, 'DE')"
+      (blur)="updateTask()"
+    ></app-latex-textarea>
+  }
+</div>
 
 <app-task-footer
   [task]="task"

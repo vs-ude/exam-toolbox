@@ -1,0 +1,67 @@
+<mat-form-field appearance="outline" class="full-width">
+  <mat-label>{{ label }}</mat-label>
+  <textarea
+    matInput
+    cdkTextareaAutosize
+    #textareaEl
+    [ngModel]="internalValue"
+    (focus)="onFocus()"
+    (blur)="onBlur($event)"
+    (input)="onInput($event)"
+    (keyup)="onSelectionChange()"
+    (click)="onSelectionChange()"
+    (select)="onSelectionChange()"
+  ></textarea>
+</mat-form-field>
+
+@if (isActive()) {
+  <div [@inOutAnimation] class="form-toolbar">
+    <div class="icon_wrapper" [class.active]="isBold()">
+      <mat-icon
+        class="toolbar-btn"
+        (mousedown)="applyFormat('bold', $event)"
+        matTooltip="Bold (\textbf)"
+      >
+        format_bold</mat-icon
+      >
+    </div>
+    <div class="icon_wrapper" [class.active]="isItalic()">
+      <mat-icon
+        class="toolbar-btn"
+        (mousedown)="applyFormat('italic', $event)"
+        matTooltip="Italic (\textit)"
+      >
+        format_italic</mat-icon
+      >
+    </div>
+    <div class="icon_wrapper" [class.active]="isUnderline()">
+      <mat-icon
+        class="toolbar-btn"
+        (mousedown)="applyFormat('underline', $event)"
+        matTooltip="Underline (\underline)"
+      >
+        format_underlined</mat-icon
+      >
+    </div>
+    <div class="icon_wrapper" [class.active]="isMonospace()">
+      <mat-icon
+        class="toolbar-btn"
+        (mousedown)="applyFormat('monospace', $event)"
+        matTooltip="Monospace (\texttt)"
+      >
+        code</mat-icon
+      >
+    </div>
+    <div class="icon_wrapper" [class.active]="isMath()">
+      <mat-icon
+        class="toolbar-btn"
+        (mousedown)="applyFormat('math', $event)"
+        matTooltip="Inline math (\( ... \))"
+      >
+        calculate</mat-icon
+      >
+    </div>
+    <span class="spacer"></span>
+    <span class="help-text">Supports LaTeX commands.</span>
+  </div>
+}

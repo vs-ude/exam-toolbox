@@ -1,8 +1,26 @@
 <!-- Bilingual -->
 <div class="title">Assignment {{ assignmentNumber }}</div>
-@if (bilingual) {
-  <div class="question-container" [@leftRightAnimation]>
-    <div class="question-language-wrapper">
+<div class="question-container">
+  @if (bilingual) {
+    <app-latex-textarea
+      label="Titel"
+      [value]="description.DE"
+      (valueChange)="updateTitle($event, 'DE')"
+    ></app-latex-textarea>
+
+    <app-latex-textarea
+      label="Title"
+      [value]="description.EN"
+      (valueChange)="updateTitle($event, 'EN')"
+    ></app-latex-textarea>
+  } @else {
+    <app-latex-textarea
+      label="Title"
+      [value]="description.DE"
+      (valueChange)="updateTitle($event, 'DE')"
+    ></app-latex-textarea>
+  }
+  <!-- <div class="question-language-wrapper">
       <span class="language_icon"
         ><img [src]="publicPath + 'german.svg'"
       /></span>
@@ -33,54 +51,5 @@
           'Enter title for assignment ' + assignmentNumber + '...'
         "
       ></div>
-    </div>
-  </div>
-}
-
-<!-- German -->
-@if (!bilingual) {
-  <div
-    #titleFieldDE
-    contenteditable="true"
-    class="form-question"
-    (focus)="activateFormatButtons()"
-    (blur)="deactivateFormatButtons($event)"
-    (input)="updateTitle($event, 'DE')"
-    [attr.data-placeholder]="
-      'Enter title for assignment ' + assignmentNumber + '...'
-    "
-  ></div>
-}
-
-<!-- Buttons for formatting -->
-@if (isQuestionActive) {
-  <div [@inOutAnimation] class="form-toolbar">
-    <div
-      class="icon_wrapper style_icon"
-      (mousedown)="setQuestionFormat('bold', $event)"
-      [ngStyle]="{
-        'background-color': isBold ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-      }"
-    >
-      <mat-icon aria-hidden="false">format_bold</mat-icon>
-    </div>
-    <div
-      class="icon_wrapper style_icon"
-      (mousedown)="setQuestionFormat('italic', $event)"
-      [ngStyle]="{
-        'background-color': isItalic ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-      }"
-    >
-      <mat-icon aria-hidden="false">format_italic</mat-icon>
-    </div>
-    <div
-      class="icon_wrapper style_icon"
-      (mousedown)="setQuestionFormat('underline', $event)"
-      [ngStyle]="{
-        'background-color': isUnderline ? 'rgba(0, 0, 0, 0.1)' : 'transparent',
-      }"
-    >
-      <mat-icon aria-hidden="false">format_underlined</mat-icon>
-    </div>
-  </div>
-}
+    </div> -->
+</div>

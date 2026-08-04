@@ -4,13 +4,13 @@ import {
   OnInit,
   Output,
   ChangeDetectionStrategy,
-  ViewChild,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
 
 import { environment } from '../../../../environments/environment';
 import { LatexTask, Task } from '../../../types/shared/tasks';
+import { LatexTextareaComponent } from '../../latex-textarea/latex-textarea.component';
 import { COMMON_IMPORTS } from '../../common-imports';
 
 import { TASK_COMMON_IMPORTS } from '../task-common-imports';
@@ -20,7 +20,7 @@ import { PreviewDialogComponent } from './preview-dialog/preview-dialog.componen
 
 @Component({
   selector: 'app-latex-task',
-  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS],
+  imports: [...TASK_COMMON_IMPORTS, ...COMMON_IMPORTS, LatexTextareaComponent],
   templateUrl: './latex-task.component.html',
   styleUrls: ['./latex-task.component.scss', '../task.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -32,10 +32,6 @@ import { PreviewDialogComponent } from './preview-dialog/preview-dialog.componen
 export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
   @Output()
   taskChangeEvent = new EventEmitter<Task>();
-
-  @ViewChild('autosize') autosize!: CdkTextareaAutosize;
-
-  public readonly publicPath = environment.publicPath;
 
   public task: LatexTask = {
     type: 'latex',
@@ -66,10 +62,15 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
     this.taskChangeEvent.emit(this.task);
   }
 
+  onLatexChange(value: string, lang: 'DE' | 'EN') {
+    this.task.questionLatex[lang] = value;
+    this.taskChangeEvent.emit(this.task);
+  }
+
   public onOpenPreview() {
     const dialogRef = this.dialog
       .open(PreviewDialogComponent, {
-        width: '30%',
+        width: '70%',
         height: '60%',
       })
       .afterClosed();
@@ -79,13 +80,5 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
       this.task.questionLatex.DE = result;
       this.taskChangeEvent.emit(this.task);
     });
-  }
-
-  public isValidMathString(mathString: string): boolean {
-    return (
-      mathString.length !== 0 &&
-      mathString.startsWith('\\(') &&
-      mathString.endsWith('\\)')
-    );
   }
 }

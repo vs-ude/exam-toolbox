@@ -1,6 +1,9 @@
 <h2 mat-dialog-title class="title">Select a template</h2>
 
 <mat-dialog-content class="dialog_content">
+  <div class="info-text">
+    This replaces the current content in the text field.
+  </div>
   <div class="preview_list">
     @for (preview of previews; track $index) {
       <div class="preview_item" [mat-dialog-close]="preview.latex">
@@ -15,5 +18,4 @@
 
 <mat-dialog-actions align="end">
   <button matButton="outlined" [mat-dialog-close]="false">Cancel</button>
-  <button matButton="filled" [mat-dialog-close]="true">Select</button>
 </mat-dialog-actions>

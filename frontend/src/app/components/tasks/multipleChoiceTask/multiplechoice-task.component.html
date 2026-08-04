@@ -5,60 +5,73 @@
   (questionChange)="onQuestionChange($event)"
 ></app-task-header>
 
-<!-- Answer Options -->
 <div class="form-body">
+  <div class="header-row">
+    <!-- Header -->
+    @if (numCorrect() < 1) {
+      <div class="solution-header">
+        Single/Multiple Choice
+        <mat-icon
+          class="small"
+          matTooltip="You need to mark at least one option as correct"
+          >info</mat-icon
+        >
+      </div>
+    } @else if (numCorrect() < 2) {
+      <span class="solution-header">Single Choice</span>
+    } @else {
+      <span class="solution-header">Multiple Choice</span>
+    }
+    <!-- add AnswerOption -->
+    <div class="spacer"></div>
+    <div class="icon_wrapper icon_add_option">
+      <mat-icon
+        aria-hidden="false"
+        matTooltip="Add Option"
+        (click)="addOption()"
+        >add_circle</mat-icon
+      >
+    </div>
+  </div>
+
+  <!-- Options -->
   @for (option of task.answerOptions; track option; let i = $index) {
     <div class="form-option" [@inOutAnimation]>
-      <input
-        type="checkbox"
+      <mat-checkbox
+        class="option-checkbox"
         name="multiple-choice"
-        matTooltip="Correct Option"
+        matTooltip="Correct"
         [(ngModel)]="task.answerOptions[i].correct"
         (change)="onOptionCorrectChange()"
       />
-      <!-- Bilingual -->
       @if (bilingual) {
-        <div class="option_language_container">
-          <div class="option_language_wrapper">
-            <span class="language_icon"
-              ><img [src]="publicPath + 'german.svg'"
-            /></span>
-            <input
-              type="text"
-              [value]="task.answerOptions[i].DE"
-              (keydown.enter)="changeOption($event, i, 'DE')"
-              (blur)="changeOption($event, i, 'DE')"
-              placeholder="Option {{ i + 1 }}"
-              class="form-option-input"
-            />
-          </div>
-          <div class="option_language_wrapper">
-            <span class="language_icon"
-              ><img [src]="publicPath + 'english.svg'"
-            /></span>
-            <input
-              type="text"
-              [value]="task.answerOptions[i].EN"
-              (keydown.enter)="changeOption($event, i, 'EN')"
-              (blur)="changeOption($event, i, 'EN')"
-              placeholder="Option {{ i + 1 }}"
-              class="form-option-input"
-            />
-          </div>
+        <div class="bilingual-options">
+          <app-latex-textarea
+            label="Option {{ i + 1 }} (DE)"
+            [value]="task.answerOptions[i].DE"
+            (valueChange)="changeOption($event, i, 'DE')"
+            (blur)="updateTask()"
+          ></app-latex-textarea>
+
+          <app-latex-textarea
+            label="Option {{ i + 1 }} (EN)"
+            [value]="task.answerOptions[i].EN"
+            (valueChange)="changeOption($event, i, 'EN')"
+            (blur)="updateTask()"
+          ></app-latex-textarea>
+          @if (i < task.answerOptions.length - 1) {
+            <mat-divider class="divider" [@inOutAnimation]></mat-divider>
+          }
         </div>
-      }
-      <!-- German -->
-      @if (!bilingual) {
-        <input
-          type="text"
+      } @else {
+        <app-latex-textarea
+          label="Option {{ i + 1 }}"
           [value]="task.answerOptions[i].DE"
-          (keydown.enter)="changeOption($event, i, 'DE')"
-          (blur)="changeOption($event, i, 'DE')"
-          placeholder="Option {{ i + 1 }}"
-          class="form-option-input"
-        />
+          (valueChange)="changeOption($event, i, 'DE')"
+          (blur)="updateTask()"
+        ></app-latex-textarea>
       }
-      <div class="icon_wrapper delete_option_icon">
+      <div class="icon_wrapper icon_delete">
         <mat-icon
           aria-hidden="false"
           matTooltip="Delete Option"
@@ -68,19 +81,6 @@
       </div>
     </div>
   }
-
-  <!-- add AnswerOption -->
-  <div class="add-option">
-    <div class="spacer"></div>
-    <div class="icon_wrapper add_option_icon">
-      <mat-icon
-        aria-hidden="false"
-        matTooltip="Add Option"
-        (click)="addOption()"
-        >add_circle</mat-icon
-      >
-    </div>
-  </div>
 </div>
 
 <!-- Footer -->

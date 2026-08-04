@@ -1,0 +1,45 @@
+.form-toolbar {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.icon_wrapper {
+  box-sizing: border-box;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+}
+
+.icon_wrapper:hover {
+  cursor: pointer;
+  mat-icon {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.icon_wrapper.active {
+  mat-icon {
+    color: var(--mat-sys-primary);
+  }
+}
+
+.format_icon {
+  margin-right: 8px;
+}
+
+.form-body {
+  margin-bottom: 16px;
+  margin-top: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.help-text {
+  font-size: 0.75rem;
+  color: var(--mat-sys-on-surface);
+}

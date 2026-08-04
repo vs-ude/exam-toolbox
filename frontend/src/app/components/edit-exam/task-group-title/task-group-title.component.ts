@@ -1,14 +1,9 @@
 import { NgStyle } from '@angular/common';
 import {
-  AfterViewChecked,
   Component,
-  ElementRef,
   EventEmitter,
   Input,
-  OnChanges,
   Output,
-  SimpleChanges,
-  ViewChild,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
@@ -16,19 +11,16 @@ import { MatIcon } from '@angular/material/icon';
 import { environment } from '../../../../environments/environment';
 import { Translation } from '../../../types/shared/base';
 import { TaskAnimations } from '../../tasks/task-animations';
+import { LatexTextareaComponent } from '../../latex-textarea/latex-textarea.component';
 
 @Component({
   selector: 'app-task-group-title',
-  imports: [NgStyle, MatIcon],
+  imports: [LatexTextareaComponent],
   templateUrl: './task-group-title.component.html',
   styleUrl: './task-group-title.component.scss',
   changeDetection: ChangeDetectionStrategy.Eager,
-  animations: [
-    TaskAnimations.inOutAnimation,
-    TaskAnimations.leftRightAnimation,
-  ],
 })
-export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
+export class TaskGroupTitleComponent {
   @Input()
   public assignmentNumber!: number;
   @Input()
@@ -37,20 +29,8 @@ export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
   public preTitle?: Translation;
   @Output()
   titleChangedEvent = new EventEmitter<Translation>();
-  @ViewChild('titleFieldDE')
-  titleFieldDE!: ElementRef;
-  @ViewChild('titleFieldEN')
-  titleFieldEN?: ElementRef;
 
   description: Translation = { DE: '', EN: '' };
-
-  public readonly publicPath = environment.publicPath;
-
-  languageChanged: boolean = false;
-  isQuestionActive: boolean = false;
-  isBold: boolean = false;
-  isItalic: boolean = false;
-  isUnderline: boolean = false;
 
   ngOnInit(): void {
     if (this.preTitle) {
@@ -60,56 +40,13 @@ export class TaskGroupTitleComponent implements OnChanges, AfterViewChecked {
     this.titleChangedEvent.emit(this.description);
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    for (const propName in changes) {
-      if (changes.hasOwnProperty(propName)) {
-        switch (propName) {
-          case 'bilingual': {
-            this.languageChanged = true;
-          }
-        }
-      }
-    }
-  }
-
-  ngAfterViewChecked(): void {
-    if (!this.languageChanged) return;
-    this.languageChanged = false;
-
-    this.titleFieldDE.nativeElement.innerHTML = this.description.DE;
-
-    if (this.titleFieldEN == undefined) return;
-    this.titleFieldEN.nativeElement.innerHTML = this.description.EN;
-  }
-
-  public activateFormatButtons() {
-    this.isQuestionActive = true;
-  }
-
-  public deactivateFormatButtons(event: FocusEvent) {
-    this.isQuestionActive = false;
-  }
-
-  public updateTitle(event: Event, language: string) {
-    const element = event.target as HTMLElement;
+  public updateTitle(value: string, language: 'DE' | 'EN') {
     if (language === 'DE') {
-      this.description.DE = element.innerHTML;
+      this.description.DE = value;
     } else {
-      this.description.EN = element.innerHTML;
+      this.description.EN = value;
     }
 
     this.titleChangedEvent.emit(this.description);
-  }
-
-  public setQuestionFormat(format: string, event: MouseEvent) {
-    event.preventDefault();
-    document.execCommand(format);
-    this.updateButtonStates();
-  }
-
-  private updateButtonStates() {
-    this.isBold = document.queryCommandState('bold');
-    this.isItalic = document.queryCommandState('italic');
-    this.isUnderline = document.queryCommandState('underline');
   }
 }

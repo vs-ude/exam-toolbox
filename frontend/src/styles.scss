@@ -179,3 +179,10 @@ body {
   background-color: var(--mat-sys-primary);
   color: var(--mat-sys-on-primary);
 }
+
+.icon_delete:hover {
+  cursor: pointer;
+  mat-icon {
+    color: var(--mat-sys-error) !important;
+  }
+}

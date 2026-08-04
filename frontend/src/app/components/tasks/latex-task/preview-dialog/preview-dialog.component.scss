@@ -1,76 +1,40 @@
-.title {
-  color: var(--color-text);
-}
-
-.dialog_content {
-  color: var(--color-text);
-}
-
 .preview_list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 10px;
 }
 
+.info-text {
+  margin-bottom: 10px;
+}
+
 .preview_item {
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 6px;
   padding: 10px;
-  background-color: var(--color-bg-accent);
+  border: 1px solid var(--mat-sys-on-surface-variant);
+  background-color: var(--mat-sys-surface-variant);
   transition: background-color 0.3s;
 }
+
 .preview_item:hover {
-  background-color: var(--color-bg-lifted);
+  border: 1px solid var(--mat-sys-primary);
+  background-color: var(--mat-sys-primary-container);
   cursor: pointer;
 }
 
 .preview_label {
   font-weight: bold;
   font-size: 16px;
-  color: var(--color-text);
+  color: var(--mat-sys-primary);
 }
 
 .latex_preview_container {
   margin-top: 5px;
   padding: 5px;
-  background-color: #eaeaea;
   border-radius: 3px;
 }
 
 img {
   max-width: 100%;
   height: auto;
-}
-
-.cancel_button {
-  background-color: #f44336;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-.select_button {
-  background-color: #008cba;
-  /* Blue */
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-::ng-deep .mat-mdc-dialog-container {
-  --mat-dialog-container-color: var(--color-background);
 }

@@ -16,20 +16,12 @@ export function getEta(path: string): Eta {
   return cachedEta;
 }
 
-export function escapeLatex(text?: string): string {
+export function preprocessLatex(text?: string): string {
   if (!text) return '';
-
-  // Escape special LaTeX characters
-  text = text.replace(/([&%$#_{}~^\\])/g, '\\$1');
-
-  // Convert basic HTML formatting to LaTeX commands
   text = text
-    .replace(/<b>(.*?)<\/b>/g, '\\textbf{$1}')
-    .replace(/<i>(.*?)<\/i>/g, '\\textit{$1}')
-    .replace(/<br\s*\/?>/g, '\\\\')
-    .replace(/<u>(.*?)<\/u>/g, '\\underline{$1}')
-    .replace(/<div>([\s\S]*?)<\/div>/g, '\\\\ $1')
-    .replace(/\n/g, '\\\\');
+    .replace(/<br\s*\/?>/g, '\\\\') // Newline
+    .replace(/\n/g, '\\\\') // Newline
+    .replace(/\.\.\./g, '\\ldots'); // Ellipsis
 
   return text;
 }

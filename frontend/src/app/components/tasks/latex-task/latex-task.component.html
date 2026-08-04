@@ -6,7 +6,8 @@
 ></app-task-header>
 
 <div class="form-body">
-  <div class="form-toolbar">
+  <div class="solution-header">
+    Free Form
     <span class="spacer"></span>
     <div class="icon_wrapper">
       <mat-icon
@@ -24,18 +25,12 @@
     </div>
   </div>
   <!-- Latex Question Input -->
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>LaTeX Content</mat-label>
-    <textarea
-      matInput
-      cdkTextareaAutosize
-      #autosize="cdkTextareaAutosize"
-      cdkAutosizeMinRows="5"
-      [(ngModel)]="this.task.questionLatex.DE"
-      (blur)="updateTask()"
-    ></textarea>
-    <mat-hint>For available commands, click the info button above.</mat-hint>
-  </mat-form-field>
+  <app-latex-textarea
+    label="LaTeX Content"
+    [value]="task.questionLatex.DE"
+    (valueChange)="onLatexChange($event, 'DE')"
+    (blur)="updateTask()"
+  ></app-latex-textarea>
 </div>
 
 <app-task-footer

@@ -1,87 +1,44 @@
+.small {
+  scale: 0.75;
+}
+
 .form-option {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  margin-bottom: 8px;
+
+  app-latex-textarea {
+    width: 100%;
+  }
 }
 
-.form-option-input {
-  border: none;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 4px;
-  flex: 1;
-  background-color: transparent;
-  color: var(--color-text);
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.form-option-input:focus {
-  outline: none;
-  border-bottom: 1px solid #4285f4;
-  transition: ease-in 0.1s;
-}
-
-.form-option-input:focus:active::after {
-  width: 100%;
-  left: 0;
-}
-
-.option_language_container {
-  width: 100%;
+.bilingual-options {
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: transparent;
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
-  gap: 5px;
-}
-
-.option_language_wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: right;
-  align-items: center;
-}
-
-.language_icon {
-  margin-right: 2%;
-  user-select: none;
-}
-
-/* add Option  */
-.delete_option_icon {
-  color: var(--color-icon);
-  margin-right: 4px;
-}
-
-.delete_option_icon:hover {
-  cursor: pointer;
-  mat-icon {
-    color: var(--mat-sys-error);
-  }
-}
-
-.add_option_icon {
-  color: var(--color-icon);
-  margin-right: 4px;
-}
-
-.add_option_icon:hover {
-  cursor: pointer;
-  mat-icon {
-    color: var(--mat-sys-primary);
-  }
-}
-
-.add-option {
-  display: flex;
-  align-items: center;
   gap: 8px;
+  width: 100%;
 }
 
-.add-other {
-  color: #4285f4;
-  text-decoration: none;
-  cursor: pointer;
+.divider {
+  margin-top: 8px;
+}
+
+.option-checkbox {
+  margin-top: 8px;
+}
+
+.icon_delete {
+  margin-top: 14px;
+  margin-right: 4px;
+}
+
+.icon_add_option {
+  margin-right: 4px;
+  margin-left: auto;
 }

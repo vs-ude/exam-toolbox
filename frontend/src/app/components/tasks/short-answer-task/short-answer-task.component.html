@@ -4,45 +4,31 @@
   (questionChange)="onQuestionChange($event)"
 ></app-task-header>
 
-<!-- Solution -->
-@if (!bilingual) {
-  <div class="form-body">
-    <span class="solution_input_label">Solution:</span>
-    <textarea
-      class="solution_input"
-      [(ngModel)]="this.task.solution.DE"
+<div class="form-body">
+  <div class="solution-header header-row">Short Answer</div>
+  @if (bilingual) {
+    <app-latex-textarea
+      label="Lösung (DE)"
+      [value]="task.solution.DE"
+      (valueChange)="updateSolution($event, 'DE')"
       (blur)="updateTask()"
-    ></textarea>
-  </div>
-}
+    ></app-latex-textarea>
 
-<!-- Bilingual -->
-@if (bilingual) {
-  <div class="form-body solution_container">
-    <span class="solution_input_label">
-      <span class="language_icon"
-        ><img [src]="publicPath + 'german.svg'"
-      /></span>
-      Lösung:
-    </span>
-    <textarea
-      class="solution_input"
-      [(ngModel)]="this.task.solution.DE"
+    <app-latex-textarea
+      label="Solution (EN)"
+      [value]="task.solution.EN"
+      (valueChange)="updateSolution($event, 'EN')"
       (blur)="updateTask()"
-    ></textarea>
-    <span class="solution_input_label" style="margin-top: 16px">
-      <span class="language_icon"
-        ><img [src]="publicPath + 'english.svg'"
-      /></span>
-      Solution:
-    </span>
-    <textarea
-      class="solution_input"
-      [(ngModel)]="this.task.solution.EN"
+    ></app-latex-textarea>
+  } @else {
+    <app-latex-textarea
+      label="Solution"
+      [value]="task.solution.DE"
+      (valueChange)="updateSolution($event, 'DE')"
       (blur)="updateTask()"
-    ></textarea>
-  </div>
-}
+    ></app-latex-textarea>
+  }
+</div>
 
 <app-task-footer
   [task]="task"

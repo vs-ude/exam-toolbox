@@ -1,6 +1,6 @@
 import { type Eta } from '@bgub/eta';
 import { getConfig } from '../config/mod.ts';
-import { escapeLatex, getEta } from '../services/mod.ts';
+import { getEta, preprocessLatex } from '../services/mod.ts';
 import type {
   BaseTask,
   Dimension,
@@ -59,8 +59,8 @@ export class TaskRenderer {
     const data: HeadingTemplateData = {
       id: String(group.groupNumber),
       title: {
-        DE: escapeLatex(group.groupTitle.DE),
-        EN: escapeLatex(group.groupTitle.EN),
+        DE: preprocessLatex(group.groupTitle.DE),
+        EN: preprocessLatex(group.groupTitle.EN),
       },
       points: group.points,
       solution: false,
@@ -72,8 +72,8 @@ export class TaskRenderer {
     const data: TaskTemplateData = {
       points: task.points,
       question: {
-        DE: escapeLatex(task.question.DE),
-        EN: escapeLatex(task.question.EN),
+        DE: preprocessLatex(task.question.DE),
+        EN: preprocessLatex(task.question.EN),
       },
       solution: false,
     };
@@ -111,8 +111,8 @@ export class TaskRenderer {
       numCorrect,
       pointsPerCorrect,
       answerOptions: task.answerOptions.map(opt => ({
-        DE: escapeLatex(opt.DE),
-        EN: escapeLatex(opt.EN),
+        DE: preprocessLatex(opt.DE),
+        EN: preprocessLatex(opt.EN),
         correct: opt.correct ? 'w' : 'f',
       })),
       solution: options.solution ?? false,
@@ -126,7 +126,7 @@ export class TaskRenderer {
     const solutionTexts = [];
     let maxNoLines = 0;
     for (const val of Object.values(task.solution)) {
-      const escaped = escapeLatex(val);
+      const escaped = preprocessLatex(val);
       solutionTexts.push(escaped);
       maxNoLines = Math.max(maxNoLines, Math.ceil(escaped.length / 50));
     }
