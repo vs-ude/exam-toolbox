@@ -1,9 +1,9 @@
-FROM denoland/deno:latest
+FROM node:24
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN --mount=type=cache,target=/root/.deno deno install
+RUN --mount=type=cache,target=/root/.npm npm ci
 
 # Copy the rest of the application files
 COPY --parents ["*.json", "src/", "./"]
@@ -11,4 +11,4 @@ COPY --parents ["*.json", "src/", "./"]
 EXPOSE 4200
 
 # Start the frontend in development mode
-CMD ["deno", "run", "--allow-net", "ng", "serve", "--configuration", "development", "--host", "0.0.0.0"]
+CMD ["npm", "run", "ng", "serve", "--", "--configuration", "development", "--host", "0.0.0.0"]

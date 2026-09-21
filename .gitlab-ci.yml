@@ -116,7 +116,7 @@ cypress_e2e:
     - bash .ci/prepare_backend_integration.sh .ci/e2e/packages.txt
     - npm config set cache ${CI_PROJECT_DIR}/.npm_cache && npm i --allow-scripts deno -g deno >/dev/null
     - bash -c 'cd backend && deno install -q'
-    - bash -c 'cd frontend && deno install -q'
+    - bash -c 'cd frontend && npm ci --silent'
     - mkdir -p /tmp/cache /tmp/jobs /tmp/uploads # For caddy
     - ldapadd -f ldap/10-testuser.ldif -D cn=admin,dc=university,dc=example -w admin -H ldap://ldap-host:389 > /dev/null
     - bash .ci/e2e/tectonic.sh

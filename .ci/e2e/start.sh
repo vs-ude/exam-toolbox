@@ -21,7 +21,7 @@ mkdir -p ${LOG_FOLDER}
 
 export NO_COLOR=1 # make the logs readable
 bash -c 'cd backend && HOME="${CI_PROJECT_DIR}" deno task start' > ${LOG_FOLDER}/backend.log 2>&1 &
-bash -c 'cd frontend && deno run ng serve --watch false --live-reload false' > ${LOG_FOLDER}/frontend.log 2>&1 &
+bash -c 'cd frontend && npm run ng serve -- --watch false --live-reload false' > ${LOG_FOLDER}/frontend.log 2>&1 &
 caddy run --config .ci/e2e/Caddyfile --adapter caddyfile 2>/dev/null &
 
 wait_on_start "backend" 3000 "/api/health"
