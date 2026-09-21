@@ -6,6 +6,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 
+import { Language, Translation } from '../../../types/shared/base';
 import { Task } from '../../../types/shared/tasks';
 
 @Component({
@@ -45,12 +46,12 @@ export abstract class BaseTaskComponent {
     this.taskChangeEvent.emit(this.task);
   }
 
-  public onQuestionChange(question: { DE: string; EN: string }) {
+  public onQuestionChange(question: Translation) {
     this.task.question = question;
     this.taskChangeEvent.emit(this.task);
   }
 
-  public onQuestionChangeDirect(question: string, language: 'DE' | 'EN') {
+  public onQuestionChangeDirect(question: string, language: Language) {
     this.task.question[language] = question;
     this.taskChangeEvent.emit(this.task);
   }

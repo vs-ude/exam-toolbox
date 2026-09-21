@@ -9,6 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CdkTextareaAutosize, TextFieldModule } from '@angular/cdk/text-field';
 
 import { environment } from '../../../../environments/environment';
+import { Language } from '../../../types/shared/base';
 import { LatexTask, Task } from '../../../types/shared/tasks';
 import { LatexTextareaComponent } from '../../latex-textarea/latex-textarea.component';
 import { COMMON_IMPORTS } from '../../common-imports';
@@ -36,10 +37,10 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
   public task: LatexTask = {
     type: 'latex',
     question: {
-      DE: '',
-      EN: '',
+      A: '',
+      B: '',
     },
-    questionLatex: { DE: '', EN: '' },
+    questionLatex: { A: '', B: '' },
     points: 0,
     tags: [],
     tagIds: [],
@@ -62,7 +63,7 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
     this.taskChangeEvent.emit(this.task);
   }
 
-  onLatexChange(value: string, lang: 'DE' | 'EN') {
+  onLatexChange(value: string, lang: Language) {
     this.task.questionLatex[lang] = value;
     this.taskChangeEvent.emit(this.task);
   }
@@ -77,7 +78,7 @@ export class LatexTaskComponent extends BaseTaskComponent implements OnInit {
 
     dialogRef.subscribe(result => {
       if (!result) return;
-      this.task.questionLatex.DE = result;
+      this.task.questionLatex.A = result;
       this.taskChangeEvent.emit(this.task);
     });
   }

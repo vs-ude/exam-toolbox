@@ -29,7 +29,7 @@ export class TableTaskComponent extends BaseTaskComponent {
 
   public task: TableTask = {
     type: 'table',
-    question: { DE: '', EN: '' },
+    question: { A: '', B: '' },
     tableHeadersQuestion: [],
     tableDataQuestion: [],
     tableDataSolution: [],
@@ -62,22 +62,22 @@ export class TableTaskComponent extends BaseTaskComponent {
     if (!this.task.tableDataQuestion.length) {
       this.task.tableDataQuestion = [
         [
-          { DE: '', EN: '' },
-          { DE: '', EN: '' },
+          { A: '', B: '' },
+          { A: '', B: '' },
         ],
         [
-          { DE: '', EN: '' },
-          { DE: '', EN: '' },
+          { A: '', B: '' },
+          { A: '', B: '' },
         ],
       ];
       this.task.tableDataSolution = [
         [
-          { DE: '', EN: '' },
-          { DE: '', EN: '' },
+          { A: '', B: '' },
+          { A: '', B: '' },
         ],
         [
-          { DE: '', EN: '' },
-          { DE: '', EN: '' },
+          { A: '', B: '' },
+          { A: '', B: '' },
         ],
       ];
     } else {
@@ -85,11 +85,11 @@ export class TableTaskComponent extends BaseTaskComponent {
       const newRow = Array(numberOfColumns)
         .fill(0)
         .map(() => ({
-          DE: '',
-          EN: '',
+          A: '',
+          B: '',
         }));
       this.task.tableDataQuestion.push(newRow);
-      this.task.tableDataSolution.push(newRow.map(() => ({ DE: '', EN: '' })));
+      this.task.tableDataSolution.push(newRow.map(() => ({ A: '', B: '' })));
     }
     this.updateTask();
   }
@@ -109,33 +109,33 @@ export class TableTaskComponent extends BaseTaskComponent {
     if (!this.task.tableDataQuestion.length) {
       this.task.tableDataQuestion = [
         [
-          { DE: '', EN: '' },
-          { DE: '', EN: '' },
+          { A: '', B: '' },
+          { A: '', B: '' },
         ],
         [
-          { DE: '', EN: '' },
-          { DE: '', EN: '' },
+          { A: '', B: '' },
+          { A: '', B: '' },
         ],
       ];
       this.task.tableDataSolution = [
         [
-          { DE: '', EN: '' },
-          { DE: '', EN: '' },
+          { A: '', B: '' },
+          { A: '', B: '' },
         ],
         [
-          { DE: '', EN: '' },
-          { DE: '', EN: '' },
+          { A: '', B: '' },
+          { A: '', B: '' },
         ],
       ];
     } else {
       for (let row of this.task.tableDataQuestion) {
-        row.push({ DE: '', EN: '' });
+        row.push({ A: '', B: '' });
       }
       for (let row of this.task.tableDataSolution) {
-        row.push({ DE: '', EN: '' });
+        row.push({ A: '', B: '' });
       }
-      this.task.tableHeadersQuestion.push({ DE: '', EN: '' });
-      this.task.tableHeadersSolution.push({ DE: '', EN: '' });
+      this.task.tableHeadersQuestion.push({ A: '', B: '' });
+      this.task.tableHeadersSolution.push({ A: '', B: '' });
     }
 
     this.updateTask();

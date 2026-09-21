@@ -30,8 +30,8 @@ export async function searchTasks(
     await this.collections.tasks
       .find({
         $or: [
-          { 'question.DE': { $regex: text, $options: 'i' } },
-          { 'question.EN': { $regex: text, $options: 'i' } },
+          { 'question.A': { $regex: text, $options: 'i' } },
+          { 'question.B': { $regex: text, $options: 'i' } },
         ],
       })
       .toArray()

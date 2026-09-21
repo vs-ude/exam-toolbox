@@ -1,7 +1,7 @@
 import { QRConfig } from '../config/mod.ts';
 
 import { type Exam, type Language } from '../types/mod.ts';
-import { ExamPageQRData, ExamQRData as ExamQRData } from '../types/scan.ts';
+import { ExamPageQRData, ExamQRData } from '../types/scan.ts';
 import { getOrCreateDb } from './db/db.ts';
 import { QRCacheDocument } from './db/qr.ts';
 import { parseExamCode } from './exam_code.ts';
@@ -25,7 +25,7 @@ export class QRError extends Error {
 export async function generateExamQR(
   path: string,
   exam: Exam,
-  language: Language,
+  language: string,
   code: string,
 ): Promise<string> {
   if (exam.points === undefined || exam.points < 1) {
@@ -418,7 +418,7 @@ export async function preGeneratePageQRCache(
       startStudentNumber,
       studentsPerLanguage: targetStudents,
       pagesPerStudent: targetPages,
-      languages: ['DE', 'EN'],
+      languages: ['A', 'B'],
     });
   });
 }

@@ -58,7 +58,7 @@ export class PoolTaskComponent {
     // question
     const q = this.renderer.createElement('div');
     this.renderer.addClass(q, 'tooltip_question');
-    this.renderer.setProperty(q, 'textContent', this.task.question.DE);
+    this.renderer.setProperty(q, 'textContent', this.task.question.A);
     this.renderer.appendChild(el, q);
 
     // tags

@@ -14,7 +14,7 @@ export class Student {
   ) {
     this.name = name ?? 'Paula Placeholder';
     this.matriculation = matriculation ?? '1000000';
-    this.codes = codes ?? { DE: 'R4ND', EN: 'R4ND' };
+    this.codes = codes ?? { A: 'R4ND', B: 'R4ND' };
     this.sequenceNumber = sequenceNumber ?? 4242;
   }
 }

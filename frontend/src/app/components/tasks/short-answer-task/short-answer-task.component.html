@@ -9,22 +9,22 @@
   @if (bilingual) {
     <app-latex-textarea
       label="Lösung (DE)"
-      [value]="task.solution.DE"
-      (valueChange)="updateSolution($event, 'DE')"
+      [value]="task.solution.A"
+      (valueChange)="updateSolution($event, 'A')"
       (blur)="updateTask()"
     ></app-latex-textarea>
 
     <app-latex-textarea
       label="Solution (EN)"
-      [value]="task.solution.EN"
-      (valueChange)="updateSolution($event, 'EN')"
+      [value]="task.solution.B"
+      (valueChange)="updateSolution($event, 'B')"
       (blur)="updateTask()"
     ></app-latex-textarea>
   } @else {
     <app-latex-textarea
       label="Solution"
-      [value]="task.solution.DE"
-      (valueChange)="updateSolution($event, 'DE')"
+      [value]="task.solution.B"
+      (valueChange)="updateSolution($event, 'B')"
       (blur)="updateTask()"
     ></app-latex-textarea>
   }

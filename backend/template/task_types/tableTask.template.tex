@@ -4,9 +4,9 @@
 \hline
 <# for (let c = 0; c < it.header.length; c++) { #>
 \ifthenelse{\equal{\sprache}{de}}{%
-\textbf{<#~ it.header[c].DE #>}
+\textbf{<#~ it.header[c].A #>}
 }{%
-\textbf{<#~ it.header[c].EN #>}
+\textbf{<#~ it.header[c].B #>}
 }
 <# if (c+1 < it.columns) { #>
 &
@@ -19,16 +19,16 @@
 \escapedStringTypeout{VSEXAM: {'Typ':'FreitextLine', 'Aufgabentext': '', 'Loesung': ''}}%
 <# if (it.solution) { #>
 \ifthenelse{\equal{\sprache}{de}}{%
-<#~ row[c].DE #>%
+<#~ row[c].A #>%
 }{%
-<#~ row[c].EN #>%
+<#~ row[c].B #>%
 }
 <# } else { #>
-<# if (row[c].DE.length > 0) { #>
+<# if (row[c].A.length > 0) { #>
 \ifthenelse{\equal{\sprache}{de}}{%
-<#~ row[c].DE #>%
+<#~ row[c].A #>%
 }{%
-<#~ row[c].EN #>%
+<#~ row[c].B #>%
 }
 <# } else { #>
 \hspace{<#~ it.cellWidth #>}

@@ -5,7 +5,7 @@ import { type NewPage, type ShortAnswerTask, type TaskGroup } from './tasks';
 function makeShortAnswerTask(_taskId: string, points: number): ShortAnswerTask {
   return {
     type: 'shortAnswer',
-    question: { DE: 'Frage', EN: 'Question' },
+    question: { A: 'Frage', B: 'Question' },
     points,
     tagIds: [],
     tags: [],
@@ -14,14 +14,14 @@ function makeShortAnswerTask(_taskId: string, points: number): ShortAnswerTask {
     lastUsed: new Date(),
     usedIn: [],
     children: [],
-    solution: { DE: 'Lösung', EN: 'Solution' },
+    solution: { A: 'Lösung', B: 'Solution' },
   };
 }
 
 function makeNewPageTask(_taskId: string): NewPage {
   return {
     type: 'newPage',
-    question: { DE: '', EN: '' },
+    question: { A: '', B: '' },
     points: 0,
     tagIds: [],
     tags: [],
@@ -69,7 +69,7 @@ Deno.test(
     const tasks: TaskGroup[] = [
       {
         groupNumber: 1,
-        groupTitle: { DE: 'Teil A', EN: 'Part A' },
+        groupTitle: { A: 'Teil A', B: 'Part A' },
         tasks: [makeShortAnswerTask('task-1', 5)],
       },
     ];
@@ -93,7 +93,7 @@ Deno.test(
     const tasks: TaskGroup[] = [
       {
         groupNumber: 1,
-        groupTitle: { DE: 'Teil A', EN: 'Part A' },
+        groupTitle: { A: 'Teil A', B: 'Part A' },
         tasks: [
           makeShortAnswerTask('task-1', 5),
           makeNewPageTask('page-break'),
@@ -101,7 +101,7 @@ Deno.test(
       },
       {
         groupNumber: 2,
-        groupTitle: { DE: 'Teil B', EN: 'Part B' },
+        groupTitle: { A: 'Teil B', B: 'Part B' },
         tasks: [
           makeShortAnswerTask('task-2', 3),
           makeNewPageTask('page-break'),
@@ -136,21 +136,21 @@ Deno.test(
           {
               "groupNumber": 1,
               "groupTitle": {
-                  "DE": "",
-                  "EN": ""
+                  "A": "",
+                  "B": ""
               },
               "tasks": [
                   {
                       "_id": "multipleChoice-1780310344264",
                       "type": "multipleChoice",
                       "question": {
-                          "DE": "",
-                          "EN": ""
+                          "A": "",
+                          "B": ""
                       },
                       "answerOptions": [
                           {
-                              "DE": "",
-                              "EN": "",
+                              "A": "",
+                              "B": "",
                               "correct": true
                           }
                       ],

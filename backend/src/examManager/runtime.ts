@@ -14,8 +14,8 @@ const appConfig = getConfig();
 // output from a successful student PDF generation
 export interface StudentResult {
   seatNumber: number;
-  pdfPathDE: string;
-  pdfPathEN: string;
+  pdfPathA: string;
+  pdfPathB: string;
 }
 
 // how a mass-exam-generation-job is defined
@@ -119,8 +119,8 @@ export function createExamManagerRuntime(
     finalOutputDir: string,
   ): Promise<void> {
     job.studentResults.sort((a, b) => a.seatNumber - b.seatNumber);
-    const sortedGermanPaths = job.studentResults.map(r => r.pdfPathDE);
-    const sortedEnglishPaths = job.studentResults.map(r => r.pdfPathEN);
+    const sortedGermanPaths = job.studentResults.map(r => r.pdfPathA);
+    const sortedEnglishPaths = job.studentResults.map(r => r.pdfPathB);
     await mergePdfs(
       sortedGermanPaths.concat(sortedEnglishPaths),
       `${finalOutputDir}/exam_merged.pdf`,
@@ -432,8 +432,8 @@ export function createExamManagerRuntime(
         if (result.type === 'student') {
           associatedJob.studentResults.push({
             seatNumber: result.seatNumber,
-            pdfPathDE: result.pdfPathDE,
-            pdfPathEN: result.pdfPathEN,
+            pdfPathA: result.pdfPathDE,
+            pdfPathB: result.pdfPathEN,
           });
         }
       } else {

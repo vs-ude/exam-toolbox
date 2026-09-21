@@ -28,7 +28,7 @@ export class NewPageComponent extends BaseTaskComponent {
 
   public task: NewPage = {
     type: 'newPage',
-    question: { DE: '', EN: '' },
+    question: { A: '', B: '' },
     points: 0,
     tags: [],
     tagIds: [],

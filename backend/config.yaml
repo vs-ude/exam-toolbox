@@ -40,3 +40,7 @@ smtp:
 qr:
   minStudents: 100
   minPages: 26
+
+languages:
+  A: de
+  B: en

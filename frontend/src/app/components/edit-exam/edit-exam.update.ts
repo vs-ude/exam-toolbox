@@ -79,6 +79,7 @@ function prepareNewTask(
   const newTask: Task = JSON.parse(JSON.stringify(oldTask));
   newTask.parent = oldTask._id;
   newTask.children = [];
+  newTask.usedIn = [];
   delete newTask._id;
   this.exam.tasks[i].tasks[j] = newTask;
 }

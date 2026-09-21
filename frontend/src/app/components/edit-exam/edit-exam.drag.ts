@@ -98,7 +98,9 @@ function pushNewTask(
     return;
   }
   let task = this.taskBuilder.createTask(taskType);
-  task.usedIn = [this.exam._id!];
+  if (this.exam._id) {
+    task.usedIn = [this.exam._id];
+  }
   this.exam.tasks[this.currentGroupView].tasks.splice(targetIndex, 0, task);
   this.exam.fillMeta();
   this.previewTabNotification = false;
@@ -135,14 +137,14 @@ function pushPoolTask(
     return;
   }
 
-  // update Task Metadata
-  if (!task.usedIn.includes(this.exam._id || 'placeholder_id')) {
-    task.usedIn.push(this.exam._id || 'placeholder_id');
-  }
-  task.lastUsed = new Date();
-
   // create new instance of the task to avoid modifying the pool task when editing the task in the exam
   const newTaskInstance = JSON.parse(JSON.stringify(task)) as Task;
+
+  // update Task Metadata on the cloned instance, not the original pool task
+  if (this.exam._id && !newTaskInstance.usedIn.includes(this.exam._id)) {
+    newTaskInstance.usedIn.push(this.exam._id);
+  }
+  newTaskInstance.lastUsed = new Date();
 
   const targetIndex =
     index ?? this.exam.tasks[this.currentGroupView].tasks.length;

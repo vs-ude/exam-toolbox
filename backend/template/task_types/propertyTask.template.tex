@@ -9,9 +9,9 @@
 } \\
 
 <# for (let i = 0; i < it.header.length - 1; i++) { #>
-\ifthenelse{\equal{\sprache}{de}}{<#~ it.header[i].DE #>}{<#~ it.header[i].EN #>} &
+\ifthenelse{\equal{\sprache}{de}}{<#~ it.header[i].A #>}{<#~ it.header[i].B #>} &
 <# } #>
-\ifthenelse{\equal{\sprache}{de}}{<#~ it.header[it.header.length - 1].DE #>}{<#~ it.header[it.header.length - 1].EN #>} \\
+\ifthenelse{\equal{\sprache}{de}}{<#~ it.header[it.header.length - 1].A #>}{<#~ it.header[it.header.length - 1].B #>} \\
 
 <#- for (let i = 0; i < it.lines.length; i++) { /* for lines */ -#>
 <# const line = it.lines[i] -#>
@@ -32,7 +32,7 @@
 <#- } else { #>
 <#~ '\\emptyb & '.repeat(line.options.length) #>
 <# } -#>
-\ifthenelse{\equal{\sprache}{de}}{<#~ line.text.DE #>}{<#~ line.text.EN #>} \\
+\ifthenelse{\equal{\sprache}{de}}{<#~ line.text.A #>}{<#~ line.text.B #>} \\
 
 <#- } /* end for lines */ #>
 

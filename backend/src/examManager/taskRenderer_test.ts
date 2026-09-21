@@ -15,7 +15,7 @@ Deno.test(
     const task: PictureTask = {
       _id: 'task-1',
       type: 'pictureTask',
-      question: { DE: 'Q', EN: 'Q' },
+      question: { A: 'Q', B: 'Q' },
       points: 5,
       tagIds: [],
       tags: [],
@@ -25,21 +25,18 @@ Deno.test(
       usedIn: [],
       children: [],
       questionPicture: {
-        urlDE: '/tmp/q.png',
-        urlEN: '/tmp/q.png',
-        altTextDE: 'Alt DE',
-        altTextEN: 'Alt EN',
+        url: { A: '/tmp/q.png', B: '/tmp/q.png' },
+        altText: { A: 'Alt A', B: 'Alt B' },
       },
       solutionPicture: {
-        urlDE: '/tmp/s.png',
-        urlEN: '/tmp/s.png',
+        url: { A: '/tmp/s.png', B: '/tmp/s.png' },
       },
       size: { unit: 'relative', dimension: 'width', scalar: 0.5 },
     };
 
     const options = {
       solution: false,
-      lang: 'DE' as const,
+      lang: 'A' as const,
       workingDir: '/tmp',
     };
     const taskPath = 'img/q.png';
@@ -61,8 +58,8 @@ Deno.test(
 
 \\centerline{\\textit{%
 \\ifthenelse{\\equal{\\sprache}{de}}%
-{Alt DE}%
-{Alt EN}%
+{Alt A}%
+{Alt B}%
 }}
 `;
 
@@ -79,7 +76,7 @@ Deno.test(
     const task: TableTask = {
       _id: 'task-table-1',
       type: 'table',
-      question: { DE: 'Q', EN: 'Q' },
+      question: { A: 'Q', B: 'Q' },
       points: 5,
       tagIds: [],
       tags: [],
@@ -90,27 +87,27 @@ Deno.test(
       children: [],
       tableHeadersQuestion: [],
       tableHeadersSolution: [
-        { DE: 'HD1', EN: 'HE1' },
-        { DE: 'HD2', EN: 'HE2' },
+        { A: 'HD1', B: 'HE1' },
+        { A: 'HD2', B: 'HE2' },
       ],
       tableDataQuestion: [
         [
-          { DE: 'QD11', EN: 'QE11' },
-          { DE: 'QD12', EN: 'QE12' },
+          { A: 'QD11', B: 'QE11' },
+          { A: 'QD12', B: 'QE12' },
         ],
         [
-          { DE: 'QD21', EN: 'QE21' },
-          { DE: 'QD22', EN: 'QE22' },
+          { A: 'QD21', B: 'QE21' },
+          { A: 'QD22', B: 'QE22' },
         ],
       ],
       tableDataSolution: [
         [
-          { DE: 'SD11', EN: 'SE11' },
-          { DE: 'SD12', EN: 'SE12' },
+          { A: 'SD11', B: 'SE11' },
+          { A: 'SD12', B: 'SE12' },
         ],
         [
-          { DE: 'SD21', EN: 'SE21' },
-          { DE: 'SD22', EN: 'SE22' },
+          { A: 'SD21', B: 'SE21' },
+          { A: 'SD22', B: 'SE22' },
         ],
       ],
     };
@@ -184,7 +181,7 @@ Deno.test(
     const task: TableTask = {
       _id: 'task-table-1',
       type: 'table',
-      question: { DE: 'Q', EN: 'Q' },
+      question: { A: 'Q', B: 'Q' },
       points: 5,
       tagIds: [],
       tags: [],
@@ -195,27 +192,27 @@ Deno.test(
       children: [],
       tableHeadersQuestion: [],
       tableHeadersSolution: [
-        { DE: 'HD1', EN: 'HE1' },
-        { DE: 'HD2', EN: 'HE2' },
+        { A: 'HD1', B: 'HE1' },
+        { A: 'HD2', B: 'HE2' },
       ],
       tableDataQuestion: [
         [
-          { DE: 'QD11', EN: 'QE11' },
-          { DE: '', EN: '' },
+          { A: 'QD11', B: 'QE11' },
+          { A: '', B: '' },
         ],
         [
-          { DE: 'QD21', EN: 'QE21' },
-          { DE: '', EN: '' },
+          { A: 'QD21', B: 'QE21' },
+          { A: '', B: '' },
         ],
       ],
       tableDataSolution: [
         [
-          { DE: 'SD11', EN: 'SE11' },
-          { DE: 'SD12', EN: 'SE12' },
+          { A: 'SD11', B: 'SE11' },
+          { A: 'SD12', B: 'SE12' },
         ],
         [
-          { DE: 'SD21', EN: 'SE21' },
-          { DE: 'SD22', EN: 'SE22' },
+          { A: 'SD21', B: 'SE21' },
+          { A: 'SD22', B: 'SE22' },
         ],
       ],
     };
@@ -275,8 +272,8 @@ const propertyTask: PropertyTask = {
   _id: 'task-prop-1',
   type: 'property',
   question: {
-    DE: 'Welche Eigenschaften treffen zu?',
-    EN: 'Which properties apply?',
+    A: 'Welche Eigenschaften treffen zu?',
+    B: 'Which properties apply?',
   },
   points: 6,
   tagIds: [],
@@ -287,14 +284,14 @@ const propertyTask: PropertyTask = {
   usedIn: [],
   children: [],
   header: [
-    { DE: 'Opt A', EN: 'Opt A' },
-    { DE: 'Opt B', EN: 'Opt B' },
-    { DE: 'Aussage', EN: 'Statement' },
+    { A: 'Opt A', B: 'Opt A' },
+    { A: 'Opt B', B: 'Opt B' },
+    { A: 'Aussage', B: 'Statement' },
   ],
   lines: [
-    { options: [true, false], text: { DE: 'Aussage 1', EN: 'Statement 1' } },
-    { options: [false, true], text: { DE: 'Aussage 2', EN: 'Statement 2' } },
-    { options: [true, true], text: { DE: 'Aussage 3', EN: 'Statement 3' } },
+    { options: [true, false], text: { A: 'Aussage 1', B: 'Statement 1' } },
+    { options: [false, true], text: { A: 'Aussage 2', B: 'Statement 2' } },
+    { options: [true, true], text: { A: 'Aussage 3', B: 'Statement 3' } },
   ],
 };
 
@@ -336,7 +333,7 @@ Deno.test(
 
     const rendered = renderer.renderPropertyTask(propertyTask, {
       solution: false,
-      lang: 'DE',
+      lang: 'A',
     });
 
     assertEquals(rendered, expected);
@@ -381,7 +378,7 @@ Deno.test(
 
     const rendered = renderer.renderPropertyTask(propertyTask, {
       solution: true,
-      lang: 'DE',
+      lang: 'A',
     });
 
     assertEquals(rendered, expected);

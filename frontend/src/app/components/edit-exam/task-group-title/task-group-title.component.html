@@ -4,20 +4,20 @@
   @if (bilingual) {
     <app-latex-textarea
       label="Titel"
-      [value]="description.DE"
-      (valueChange)="updateTitle($event, 'DE')"
+      [value]="description.A"
+      (valueChange)="updateTitle($event, 'A')"
     ></app-latex-textarea>
 
     <app-latex-textarea
       label="Title"
-      [value]="description.EN"
-      (valueChange)="updateTitle($event, 'EN')"
+      [value]="description.B"
+      (valueChange)="updateTitle($event, 'B')"
     ></app-latex-textarea>
   } @else {
     <app-latex-textarea
       label="Title"
-      [value]="description.DE"
-      (valueChange)="updateTitle($event, 'DE')"
+      [value]="description.A"
+      (valueChange)="updateTitle($event, 'A')"
     ></app-latex-textarea>
   }
   <!-- <div class="question-language-wrapper">

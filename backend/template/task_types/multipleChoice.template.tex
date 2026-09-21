@@ -31,12 +31,12 @@
 
 <# if (it.solution) { #>
   <# if (it.answerOptions[i].correct == "w") { #>
-\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].DE #>}{<#~ it.answerOptions[i].EN #>} <#~ delim #>
+\color{red} $\tickedbox$ & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].A #>}{<#~ it.answerOptions[i].B #>} <#~ delim #>
   <# } else { #>
-\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].DE #>}{<#~ it.answerOptions[i].EN #>} <#~ delim #>
+\color{red} \emptyb & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].A #>}{<#~ it.answerOptions[i].B #>} <#~ delim #>
   <# } #>
 <# } else { #>
-\emptyb & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].DE #>}{<#~ it.answerOptions[i].EN #>} <#~ delim #>
+\emptyb & \ifthenelse{\equal{\sprache}{de}}{<#~ it.answerOptions[i].A #>}{<#~ it.answerOptions[i].B #>} <#~ delim #>
 
 <# }} #>
 

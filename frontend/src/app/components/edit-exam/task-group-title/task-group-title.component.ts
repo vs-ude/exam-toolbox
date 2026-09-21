@@ -9,7 +9,7 @@ import {
 import { MatIcon } from '@angular/material/icon';
 
 import { environment } from '../../../../environments/environment';
-import { Translation } from '../../../types/shared/base';
+import { Translation, Language } from '../../../types/shared/base';
 import { TaskAnimations } from '../../tasks/task-animations';
 import { LatexTextareaComponent } from '../../latex-textarea/latex-textarea.component';
 
@@ -30,7 +30,7 @@ export class TaskGroupTitleComponent {
   @Output()
   titleChangedEvent = new EventEmitter<Translation>();
 
-  description: Translation = { DE: '', EN: '' };
+  description: Translation = { A: '', B: '' };
 
   ngOnInit(): void {
     if (this.preTitle) {
@@ -40,11 +40,11 @@ export class TaskGroupTitleComponent {
     this.titleChangedEvent.emit(this.description);
   }
 
-  public updateTitle(value: string, language: 'DE' | 'EN') {
-    if (language === 'DE') {
-      this.description.DE = value;
+  public updateTitle(value: string, language: Language) {
+    if (language === 'A') {
+      this.description.A = value;
     } else {
-      this.description.EN = value;
+      this.description.B = value;
     }
 
     this.titleChangedEvent.emit(this.description);

@@ -28,7 +28,7 @@ type ExamMetaTemplateData = {
 
 type IndividualMetaTemplateData = {
   zeigeloesung: string;
-  sprache: Language;
+  sprache: string; // This is configurable
   randomexamnumber: string;
   sequenznummer: string;
   vollername: string;
@@ -51,7 +51,7 @@ const DEFAULT_EXAM_META: ExamMetaTemplateData = {
 
 const DEFAULT_INDIVIDUAL_META: IndividualMetaTemplateData = {
   zeigeloesung: 'no',
-  sprache: 'DE',
+  sprache: 'de',
   randomexamnumber: 'R4ND',
   sequenznummer: '6',
   vollername: 'Tom\\ Morello',
@@ -114,12 +114,15 @@ export async function renderMetaStudent(
   } = {},
   workingDir: string,
 ) {
-  const sprache = options.sprache ?? DEFAULT_INDIVIDUAL_META.sprache;
+  const sprache = options.sprache
+    ? config.languages[options.sprache]
+    : DEFAULT_INDIVIDUAL_META.sprache;
   const data = {
     zeigeloesung: options.zeigeloesung === 'yes' ? 'yes' : 'no',
     sprache,
     randomexamnumber:
-      student.codes[sprache] || DEFAULT_INDIVIDUAL_META.randomexamnumber,
+      student.codes[options.sprache ?? 'A'] ||
+      DEFAULT_INDIVIDUAL_META.randomexamnumber,
     sequenznummer: String(
       student.sequenceNumber ?? DEFAULT_INDIVIDUAL_META.sequenznummer,
     ),
@@ -256,11 +259,8 @@ export async function generateTasksLatex(
             break;
           case 'latex':
             // Insert raw LaTeX content directly
-            if (subTask.questionLatex?.DE) {
-              latexContent += subTask.questionLatex.DE + '\n\n';
-            }
-            if (subTask.questionLatex?.EN) {
-              latexContent += subTask.questionLatex.EN + '\n\n';
+            if (subTask.questionLatex?.A) {
+              latexContent += subTask.questionLatex.A + '\n\n';
             }
             break;
           case 'pictureTask':
@@ -338,14 +338,14 @@ export async function generateSolution(tempDir: string, exam: Exam) {
   await generateExamQR(
     `${tempDir}/img/mainQr.png`,
     exam,
-    'DE',
-    student.codes.DE,
+    config.languages.A,
+    student.codes.A,
   );
   await renderMetaStudent(
     student,
     {
       zeigeloesung: 'yes',
-      sprache: 'DE',
+      sprache: 'A',
     },
     tempDir,
   );

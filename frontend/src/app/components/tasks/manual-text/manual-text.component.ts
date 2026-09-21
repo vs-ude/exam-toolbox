@@ -27,7 +27,7 @@ export class ManualTextComponent extends BaseTaskComponent {
 
   public task: ManualText = {
     type: 'manualText',
-    question: { DE: '', EN: '' },
+    question: { A: '', B: '' },
     points: 0,
     tags: [],
     tagIds: [],

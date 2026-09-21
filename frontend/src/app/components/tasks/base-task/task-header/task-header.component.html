@@ -3,21 +3,21 @@
   <div class="question-container">
     @if (bilingual) {
       <app-latex-textarea
-        [label]="questionDEPlaceholder"
-        [value]="task.question.DE"
-        (valueChange)="updateQuestion($event, 'DE')"
+        [label]="questionAPlaceholder"
+        [value]="task.question.A"
+        (valueChange)="updateQuestion($event, 'A')"
       ></app-latex-textarea>
 
       <app-latex-textarea
-        [label]="questionENPlaceholder"
-        [value]="task.question.EN"
-        (valueChange)="updateQuestion($event, 'EN')"
+        [label]="questionBPlaceholder"
+        [value]="task.question.B"
+        (valueChange)="updateQuestion($event, 'B')"
       ></app-latex-textarea>
     } @else {
       <app-latex-textarea
         [label]="questionPlaceholder"
-        [value]="task.question.DE"
-        (valueChange)="updateQuestion($event, 'DE')"
+        [value]="task.question.A"
+        (valueChange)="updateQuestion($event, 'A')"
       ></app-latex-textarea>
     }
   </div>

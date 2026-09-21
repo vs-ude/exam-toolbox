@@ -128,8 +128,8 @@ export class DraggablePoolComponent {
     const lowerSearchTerm = this.currentSearchTerm.toLowerCase();
     return this.filteredTaskPool.filter(
       task =>
-        task.question.DE.toLowerCase().includes(lowerSearchTerm) ||
-        task.question.EN.toLowerCase().includes(lowerSearchTerm) ||
+        task.question.A.toLowerCase().includes(lowerSearchTerm) ||
+        task.question.B.toLowerCase().includes(lowerSearchTerm) ||
         task.tags.some(tag => tag.name.toLowerCase().includes(lowerSearchTerm)),
     );
   }

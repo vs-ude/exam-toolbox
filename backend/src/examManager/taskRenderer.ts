@@ -59,8 +59,8 @@ export class TaskRenderer {
     const data: HeadingTemplateData = {
       id: String(group.groupNumber),
       title: {
-        DE: preprocessLatex(group.groupTitle.DE),
-        EN: preprocessLatex(group.groupTitle.EN),
+        A: preprocessLatex(group.groupTitle.A),
+        B: preprocessLatex(group.groupTitle.B),
       },
       points: group.points,
       solution: false,
@@ -72,8 +72,8 @@ export class TaskRenderer {
     const data: TaskTemplateData = {
       points: task.points,
       question: {
-        DE: preprocessLatex(task.question.DE),
-        EN: preprocessLatex(task.question.EN),
+        A: preprocessLatex(task.question.A),
+        B: preprocessLatex(task.question.B),
       },
       solution: false,
     };
@@ -99,8 +99,7 @@ export class TaskRenderer {
       if (
         task.answerOptions.every(
           opt =>
-            opt.DE.length <= maxLenCondensed &&
-            opt.EN.length <= maxLenCondensed,
+            opt.A.length <= maxLenCondensed && opt.B.length <= maxLenCondensed,
         )
       ) {
         condensed = true;
@@ -111,8 +110,8 @@ export class TaskRenderer {
       numCorrect,
       pointsPerCorrect,
       answerOptions: task.answerOptions.map(opt => ({
-        DE: preprocessLatex(opt.DE),
-        EN: preprocessLatex(opt.EN),
+        A: preprocessLatex(opt.A),
+        B: preprocessLatex(opt.B),
         correct: opt.correct ? 'w' : 'f',
       })),
       solution: options.solution ?? false,
@@ -144,12 +143,19 @@ export class TaskRenderer {
   }
 
   renderPictureTask(task: PictureTask, options: RenderOptionsWithAux): string {
+    const taskUrl = task.questionPicture.url[options.lang ?? 'A'];
+    const solutionUrl = task.solutionPicture.url[options.lang ?? 'A'];
+
+    if (!taskUrl || !solutionUrl) {
+      throw new LatexRenderError(
+        'Missing task or solution image for this language!',
+      );
+    }
+
     const taskPath =
-      'img/' +
-      copyUrlToPath(options.workingDir + '/img', task.questionPicture.urlDE);
+      'img/' + copyUrlToPath(options.workingDir + '/img', taskUrl);
     const solutionPath =
-      'img/' +
-      copyUrlToPath(options.workingDir + '/img', task.solutionPicture.urlDE);
+      'img/' + copyUrlToPath(options.workingDir + '/img', solutionUrl);
     return this.renderPictureTaskImpl(task, options, taskPath, solutionPath);
   }
 
@@ -159,16 +165,16 @@ export class TaskRenderer {
     taskPath: string,
     solutionPath: string,
   ): string {
-    const taskText = task.questionPicture.altTextDE
+    const taskText = task.questionPicture.altText
       ? {
-          DE: task.questionPicture.altTextDE,
-          EN: task.questionPicture.altTextEN ?? task.questionPicture.altTextDE,
+          A: task.questionPicture.altText.A,
+          B: task.questionPicture.altText.B,
         }
       : undefined;
 
     const data: PictureTaskTemplateData = {
       solution: options.solution ?? false,
-      lang: options.lang ?? 'DE',
+      lang: options.lang ?? 'A',
       taskPath: taskPath,
       solutionPath: solutionPath,
       text: taskText,
@@ -190,17 +196,17 @@ export class TaskRenderer {
       .concat(subTask.tableDataSolution)
       .map(col =>
         col.reduce((maxLength, cell) =>
-          maxLength.DE.length > cell.DE.length ? maxLength : cell,
+          maxLength.A.length > cell.A.length ? maxLength : cell,
         ),
       )
       .reduce((maxLength, cell) =>
-        maxLength.DE.length > cell.DE.length ? maxLength : cell,
-      ).DE.length;
+        maxLength.A.length > cell.A.length ? maxLength : cell,
+      ).A.length;
 
-    const hasHeaders = subTask.tableHeadersSolution[0].DE ?? false;
+    const hasHeaders = subTask.tableHeadersSolution[0].A ?? false;
     const tableData: TableTaskTemplateData = {
       solution,
-      lang: options.lang ?? 'DE',
+      lang: options.lang ?? 'A',
       header: hasHeaders ? subTask.tableHeadersSolution : [],
       cells: solution ? subTask.tableDataSolution : subTask.tableDataQuestion,
       columns: subTask.tableDataSolution[0].length,
@@ -236,7 +242,7 @@ export class TaskRenderer {
 
     const data: PropertyTaskTemplateData = {
       solution: options.solution ?? false,
-      lang: options.lang ?? 'DE',
+      lang: options.lang ?? 'A',
       header: task.header,
       lines: task.lines,
       columns: task.lines[0].options.length, // substract the text header column
@@ -282,7 +288,7 @@ type ManualTextTemplateData = TemplateData & {
 type MultipleChoiceTemplateData = TemplateData & {
   numCorrect: number;
   pointsPerCorrect: number;
-  answerOptions: { DE: string; EN: string; correct: 'w' | 'f' }[];
+  answerOptions: { A: string; B: string; correct: 'w' | 'f' }[];
   condensed: boolean;
 };
 

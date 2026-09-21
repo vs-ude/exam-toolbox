@@ -13,9 +13,9 @@ import { assertThrows } from '@std/assert/throws';
 
 Deno.test('checksum of a complete valid code equals 1', () => {
   for (const [lang, counter] of [
-    ['DE', 1],
-    ['DE', 999],
-    ['EN', 42],
+    ['A', 1],
+    ['B', 999],
+    ['B', 42],
   ] as const) {
     const code = genExamCode(lang, counter);
     assertEquals(checksum(code), 1, `code ${code} should have checksum 1`);
@@ -34,24 +34,16 @@ Deno.test('calcCheckDigit produces a single base-36 character', () => {
 
 Deno.test('genExamCode produces uppercase alphanumeric codes', () => {
   for (let i = 1; i <= 10; i++) {
-    const de = genExamCode('DE', i);
-    const en = genExamCode('EN', i);
-    assertEquals(
-      /^[0-9A-Z]+$/.test(de),
-      true,
-      `DE code ${de} not alphanumeric`,
-    );
-    assertEquals(
-      /^[0-9A-Z]+$/.test(en),
-      true,
-      `EN code ${en} not alphanumeric`,
-    );
+    const a = genExamCode('A', i);
+    const b = genExamCode('B', i);
+    assertEquals(/^[0-9A-Z]+$/.test(a), true, `'A' code ${a} not alphanumeric`);
+    assertEquals(/^[0-9A-Z]+$/.test(b), true, `'B' code ${b} not alphanumeric`);
   }
 });
 
 Deno.test('genExamCode produces distinct codes for different counters', () => {
   const codes = new Set(
-    Array.from({ length: 50 }, (_, i) => genExamCode('DE', i + 1)),
+    Array.from({ length: 50 }, (_, i) => genExamCode('A', i + 1)),
   );
   assertEquals(codes.size, 50);
 });
@@ -59,9 +51,9 @@ Deno.test('genExamCode produces distinct codes for different counters', () => {
 Deno.test('genExamCode produces distinct codes for different languages', () => {
   for (let i = 1; i <= 20; i++) {
     assertNotEquals(
-      genExamCode('DE', i),
-      genExamCode('EN', i),
-      `counter ${i}: DE and EN should differ`,
+      genExamCode('A', i),
+      genExamCode('B', i),
+      `counter ${i}: 'A' and 'B' should differ`,
     );
   }
 });
@@ -70,29 +62,29 @@ Deno.test('genExamCode produces distinct codes for different languages', () => {
 // parseExamCode – round-trip
 // ---------------------------------------------------------------------------
 
-Deno.test('parseExamCode round-trips every DE counter from 1 to 9999', () => {
+Deno.test("parseExamCode round-trips every 'A' counter from 1 to 9999", () => {
   // Spot-check boundary values and a spread of counters rather than all 9999
   // to keep the test fast.
   const counters = [1, 2, 99, 100, 500, 1000, 4999, 9998, 9999];
   for (const counter of counters) {
-    const code = genExamCode('DE', counter);
+    const code = genExamCode('A', counter);
     const parsed = parseExamCode(code);
     assertEquals(
       parsed,
-      { lang: 'DE', counter },
+      { lang: 'A', counter },
       `failed for counter ${counter}, code ${code}`,
     );
   }
 });
 
-Deno.test('parseExamCode round-trips every EN counter from 1 to 9999', () => {
+Deno.test("parseExamCode round-trips every 'B' counter from 1 to 9999", () => {
   const counters = [1, 2, 99, 100, 500, 1000, 4999, 9998, 9999];
   for (const counter of counters) {
-    const code = genExamCode('EN', counter);
+    const code = genExamCode('B', counter);
     const parsed = parseExamCode(code);
     assertEquals(
       parsed,
-      { lang: 'EN', counter },
+      { lang: 'B', counter },
       `failed for counter ${counter}, code ${code}`,
     );
   }
@@ -102,7 +94,7 @@ Deno.test(
   'parseExamCode full sweep: all counters 1–200 for both languages',
   () => {
     for (let counter = 1; counter <= 200; counter++) {
-      for (const lang of ['DE', 'EN'] as const) {
+      for (const lang of ['A', 'B'] as const) {
         const code = genExamCode(lang, counter);
         const parsed = parseExamCode(code);
         assertEquals(
@@ -120,7 +112,7 @@ Deno.test(
 // ---------------------------------------------------------------------------
 
 Deno.test('parseExamCode returns null for a tampered check digit', () => {
-  const code = genExamCode('DE', 42);
+  const code = genExamCode('A', 42);
   // Replace the last character with something different
   const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const wrongChar = alphabet.charAt(

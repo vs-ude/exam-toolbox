@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 
 import { environment } from '../../../../environments/environment';
+import { Language } from '../../../types/shared/base';
 import { ShortAnswerTask, Task } from '../../../types/shared/tasks';
 import { COMMON_IMPORTS } from '../../common-imports';
 import { LatexTextareaComponent } from '../../latex-textarea/latex-textarea.component';
@@ -32,8 +33,8 @@ export class ShortAnswerTaskComponent
 
   public task: ShortAnswerTask = {
     type: 'shortAnswer',
-    question: { DE: '', EN: '' },
-    solution: { DE: '', EN: '' },
+    question: { A: '', B: '' },
+    solution: { A: '', B: '' },
     points: 2,
     tags: [],
     tagIds: [],
@@ -52,11 +53,11 @@ export class ShortAnswerTaskComponent
     this.taskChangeEvent.emit(this.task);
   }
 
-  public updateSolution(value: string, language: 'DE' | 'EN') {
-    if (language === 'DE') {
-      this.task.solution.DE = value;
+  public updateSolution(value: string, language: Language) {
+    if (language === 'A') {
+      this.task.solution.A = value;
     } else {
-      this.task.solution.EN = value;
+      this.task.solution.B = value;
     }
     this.taskChangeEvent.emit(this.task);
   }

@@ -1,12 +1,13 @@
 import { copy } from '@std/fs';
 
+import { getConfig } from '../config/mod.ts';
+import { generateExamQR } from '../services/qr.ts';
+import { Student } from '../types/mod.ts';
 import {
   compileExam,
   generateSolution,
   renderMetaStudent,
 } from './generation.ts';
-import { generateExamQR } from '../services/qr.ts';
-import { Student } from '../types/mod.ts';
 
 // this worker receives a task, generates a single artifact (like a student pdf or a solution), and sends back the result
 self.onmessage = async (e: MessageEvent) => {
@@ -26,39 +27,39 @@ self.onmessage = async (e: MessageEvent) => {
         student,
         {
           zeigeloesung: 'no',
-          sprache: 'DE',
+          sprache: 'A',
         },
         workerTempDir,
       );
       await generateExamQR(
         `${workerTempDir}/img/mainQr.png`,
         exam,
-        'DE',
-        student.codes.DE,
+        getConfig().languages.A,
+        student.codes.A,
       );
-      const { pdfBytes: pdfBytesDE } = await compileExam(workerTempDir);
-      const pdfPathDE = `${outputDir}/student_pdfs/${student.sequenceNumber}_${student.matriculation}_DE.pdf`;
-      await Deno.writeFile(pdfPathDE, pdfBytesDE);
+      const { pdfBytes: pdfBytesA } = await compileExam(workerTempDir);
+      const pdfPathA = `${outputDir}/student_pdfs/${student.sequenceNumber}_${student.matriculation}_A.pdf`;
+      await Deno.writeFile(pdfPathA, pdfBytesA);
 
       await renderMetaStudent(
         student,
         {
           zeigeloesung: 'no',
-          sprache: 'EN',
+          sprache: 'B',
         },
         workerTempDir,
       );
-      const { pdfBytes: pdfBytesEN } = await compileExam(workerTempDir);
-      const pdfPathEN = `${outputDir}/student_pdfs/${student.sequenceNumber}_${student.matriculation}_EN.pdf`;
-      await Deno.writeFile(pdfPathEN, pdfBytesEN);
+      const { pdfBytes: pdfBytesB } = await compileExam(workerTempDir);
+      const pdfPathB = `${outputDir}/student_pdfs/${student.sequenceNumber}_${student.matriculation}_B.pdf`;
+      await Deno.writeFile(pdfPathB, pdfBytesB);
 
       self.postMessage({
         status: 'success',
         type,
         jobId,
         seatNumber: student.sequenceNumber,
-        pdfPathDE,
-        pdfPathEN,
+        pdfPathDE: pdfPathA,
+        pdfPathEN: pdfPathB,
       });
     } else if (type === 'solution') {
       const { exam } = task;

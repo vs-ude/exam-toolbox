@@ -47,7 +47,7 @@ export function calcCheckDigit(value: string): string {
  */
 export function genExamCode(lang: Language, counter: number): string {
   const paddedCount = counter.toString().padStart(4, '0');
-  const langPrefix = lang === 'DE' ? '1' : '2';
+  const langPrefix = lang === 'A' ? '1' : '2';
 
   const body = parseInt(`${langPrefix}${paddedCount}`, 10)
     .toString(36)
@@ -83,7 +83,7 @@ export function parseExamCode(code: string): ParsedCode {
   if (isNaN(decimal)) throw new ExamCodeError(`Invalid body: ${body}`);
 
   // Reconstruct the original 5-digit decimal string:
-  // digit 0  – language prefix ("1" = DE, "2" = EN)
+  // digit 0  – language prefix ("1" = A, "2" = B)
   // digits 1-4 – zero-padded counter
   const decStr = decimal.toString();
   if (decStr.length !== 5) {
@@ -97,7 +97,7 @@ export function parseExamCode(code: string): ParsedCode {
     throw new ExamCodeError(`Invalid counter: ${counter}`);
   }
 
-  if (langPrefix === '1') return { lang: 'DE', counter };
-  if (langPrefix === '2') return { lang: 'EN', counter };
+  if (langPrefix === '1') return { lang: 'A', counter };
+  if (langPrefix === '2') return { lang: 'B', counter };
   throw new ExamCodeError(`Invalid language prefix: ${langPrefix}`);
 }

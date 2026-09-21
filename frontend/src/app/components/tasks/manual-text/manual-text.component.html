@@ -3,22 +3,22 @@
   @if (bilingual) {
     <app-latex-textarea
       label="Text (DE)"
-      [value]="task.question.DE"
-      (valueChange)="onQuestionChangeDirect($event, 'DE')"
+      [value]="task.question.A"
+      (valueChange)="onQuestionChangeDirect($event, 'A')"
       (blur)="updateTask()"
     ></app-latex-textarea>
 
     <app-latex-textarea
       label="Text (EN)"
-      [value]="task.question.EN"
-      (valueChange)="onQuestionChangeDirect($event, 'EN')"
+      [value]="task.question.B"
+      (valueChange)="onQuestionChangeDirect($event, 'B')"
       (blur)="updateTask()"
     ></app-latex-textarea>
   } @else {
     <app-latex-textarea
       label="Text"
-      [value]="task.question.DE"
-      (valueChange)="onQuestionChangeDirect($event, 'DE')"
+      [value]="task.question.A"
+      (valueChange)="onQuestionChangeDirect($event, 'A')"
       (blur)="updateTask()"
     ></app-latex-textarea>
   }

@@ -48,15 +48,15 @@
         <div class="bilingual-options">
           <app-latex-textarea
             label="Option {{ i + 1 }} (DE)"
-            [value]="task.answerOptions[i].DE"
-            (valueChange)="changeOption($event, i, 'DE')"
+            [value]="task.answerOptions[i].A"
+            (valueChange)="changeOption($event, i, 'A')"
             (blur)="updateTask()"
           ></app-latex-textarea>
 
           <app-latex-textarea
             label="Option {{ i + 1 }} (EN)"
-            [value]="task.answerOptions[i].EN"
-            (valueChange)="changeOption($event, i, 'EN')"
+            [value]="task.answerOptions[i].B"
+            (valueChange)="changeOption($event, i, 'B')"
             (blur)="updateTask()"
           ></app-latex-textarea>
           @if (i < task.answerOptions.length - 1) {
@@ -66,8 +66,8 @@
       } @else {
         <app-latex-textarea
           label="Option {{ i + 1 }}"
-          [value]="task.answerOptions[i].DE"
-          (valueChange)="changeOption($event, i, 'DE')"
+          [value]="task.answerOptions[i].A"
+          (valueChange)="changeOption($event, i, 'A')"
           (blur)="updateTask()"
         ></app-latex-textarea>
       }

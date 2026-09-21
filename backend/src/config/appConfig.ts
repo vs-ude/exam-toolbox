@@ -43,6 +43,10 @@ export interface AppConfig extends Record<string, unknown> {
     minStudents: number;
     minPages: number;
   };
+  languages: {
+    A: string;
+    B: string;
+  };
 }
 
 export const DEFAULT_CONFIG = {
@@ -74,6 +78,7 @@ export const DEFAULT_CONFIG = {
   },
   smtp: { host: 'mailcrab', port: 1025, from: 'noreply@examtoolbox.local' },
   qr: { minStudents: 100, minPages: 26 },
+  languages: { A: 'de', B: 'en' },
 };
 
 export function loadConfig(
@@ -147,6 +152,10 @@ export function loadConfig(
       minPages: env('QR_MIN_PAGES')
         ? Number(env('QR_MIN_PAGES'))
         : base.qr.minPages,
+    },
+    languages: {
+      A: env('LANGUAGES_A') ?? base.languages.A,
+      B: env('LANGUAGES_B') ?? base.languages.B,
     },
   };
   return config;

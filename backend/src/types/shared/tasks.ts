@@ -40,8 +40,8 @@ export interface MultipleChoiceTask extends BaseTask {
 }
 
 export interface AnswerOptions {
-  DE: string;
-  EN: string;
+  A: string;
+  B: string;
   correct: boolean;
 }
 
@@ -70,10 +70,8 @@ export interface PictureTask extends BaseTask {
 }
 
 export interface Image {
-  urlDE: string;
-  urlEN: string;
-  altTextDE?: string;
-  altTextEN?: string;
+  url: Translation;
+  altText?: Translation;
 }
 
 export interface LatexTask extends BaseTask {

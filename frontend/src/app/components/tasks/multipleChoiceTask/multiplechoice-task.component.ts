@@ -11,6 +11,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 
 import { environment } from '../../../../environments/environment';
 import { MultipleChoiceTask, Task } from '../../../types/shared/tasks';
+import { Language } from '../../../types/shared/base';
 import { COMMON_IMPORTS } from '../../common-imports';
 import { LatexTextareaComponent } from '../../latex-textarea/latex-textarea.component';
 
@@ -45,10 +46,10 @@ export class MultiplechoiceTaskComponent
   public task: MultipleChoiceTask = {
     type: 'multipleChoice',
     question: {
-      DE: '',
-      EN: '',
+      A: '',
+      B: '',
     },
-    answerOptions: [{ DE: 'Option1', EN: '', correct: false }],
+    answerOptions: [{ A: 'Option1', B: '', correct: false }],
     points: 0,
     tags: [],
     tagIds: [],
@@ -70,7 +71,7 @@ export class MultiplechoiceTaskComponent
   }
 
   addOption() {
-    this.task.answerOptions.push({ DE: '', EN: '', correct: false });
+    this.task.answerOptions.push({ A: '', B: '', correct: false });
     this.taskChangeEvent.emit(this.task);
   }
 
@@ -81,11 +82,11 @@ export class MultiplechoiceTaskComponent
     this.taskChangeEvent.emit(this.task);
   }
 
-  changeOption(text: any, index: number, language: string) {
-    if (language === 'DE') {
-      this.task.answerOptions[index].DE = text;
+  changeOption(text: any, index: number, language: Language) {
+    if (language === 'A') {
+      this.task.answerOptions[index].A = text;
     } else {
-      this.task.answerOptions[index].EN = text;
+      this.task.answerOptions[index].B = text;
     }
 
     this.taskChangeEvent.emit(this.task);

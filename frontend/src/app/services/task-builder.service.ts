@@ -25,7 +25,7 @@ export class TaskBuilderService {
   public createDefaultGroup(): TaskGroup {
     return {
       groupNumber: 1,
-      groupTitle: { DE: '', EN: '' },
+      groupTitle: { A: '', B: '' },
       tasks: [],
       points: 0,
     };
@@ -37,8 +37,8 @@ export class TaskBuilderService {
         return {
           _id: 'tmp_' + crypto.randomUUID(),
           type: 'multipleChoice',
-          question: { DE: '', EN: '' },
-          answerOptions: [{ DE: '', EN: '', correct: true }],
+          question: { A: '', B: '' },
+          answerOptions: [{ A: '', B: '', correct: true }],
           points: 1,
           createdBy: this.user.id,
           createdAt: new Date(),
@@ -52,8 +52,8 @@ export class TaskBuilderService {
         return {
           _id: 'tmp_' + crypto.randomUUID(),
           type: 'shortAnswer',
-          question: { DE: '', EN: '' },
-          solution: { DE: '', EN: '' },
+          question: { A: '', B: '' },
+          solution: { A: '', B: '' },
           points: 1,
           createdBy: this.user.id,
           createdAt: new Date(),
@@ -67,9 +67,9 @@ export class TaskBuilderService {
         return {
           _id: 'tmp_' + crypto.randomUUID(),
           type: 'pictureTask',
-          question: { DE: '', EN: '' },
-          questionPicture: { urlDE: '', urlEN: '' },
-          solutionPicture: { urlDE: '', urlEN: '' },
+          question: { A: '', B: '' },
+          questionPicture: { url: { A: '', B: '' } },
+          solutionPicture: { url: { A: '', B: '' } },
           points: 1,
           createdBy: this.user.id,
           createdAt: new Date(),
@@ -84,10 +84,10 @@ export class TaskBuilderService {
           _id: 'tmp_' + crypto.randomUUID(),
           type: 'latex',
           question: {
-            DE: '',
-            EN: '',
+            A: '',
+            B: '',
           },
-          questionLatex: { DE: '\\(\n\n\\)', EN: '' },
+          questionLatex: { A: '\\(\n\n\\)', B: '' },
           points: 0,
           tags: [],
           tagIds: [],
@@ -101,33 +101,33 @@ export class TaskBuilderService {
         return {
           _id: 'tmp_' + crypto.randomUUID(),
           type: 'table',
-          question: { DE: '', EN: '' },
+          question: { A: '', B: '' },
           tableHeadersQuestion: [
-            { DE: '', EN: '' },
-            { DE: '', EN: '' },
+            { A: '', B: '' },
+            { A: '', B: '' },
           ],
           tableDataQuestion: [
             [
-              { DE: '', EN: '' },
-              { DE: '', EN: '' },
+              { A: '', B: '' },
+              { A: '', B: '' },
             ],
             [
-              { DE: '', EN: '' },
-              { DE: '', EN: '' },
+              { A: '', B: '' },
+              { A: '', B: '' },
             ],
           ],
           tableHeadersSolution: [
-            { DE: '', EN: '' },
-            { DE: '', EN: '' },
+            { A: '', B: '' },
+            { A: '', B: '' },
           ],
           tableDataSolution: [
             [
-              { DE: '', EN: '' },
-              { DE: '', EN: '' },
+              { A: '', B: '' },
+              { A: '', B: '' },
             ],
             [
-              { DE: '', EN: '' },
-              { DE: '', EN: '' },
+              { A: '', B: '' },
+              { A: '', B: '' },
             ],
           ],
           points: 0,
@@ -143,7 +143,7 @@ export class TaskBuilderService {
         return {
           _id: 'tmp_' + crypto.randomUUID(),
           type: 'manualText',
-          question: { DE: '', EN: '' },
+          question: { A: '', B: '' },
           points: 0,
           tagIds: [],
           tags: [],
@@ -157,7 +157,7 @@ export class TaskBuilderService {
         return {
           _id: 'tmp_' + crypto.randomUUID(),
           type: 'newPage',
-          question: { DE: '', EN: '' },
+          question: { A: '', B: '' },
           points: 0,
           tagIds: [],
           tags: [],

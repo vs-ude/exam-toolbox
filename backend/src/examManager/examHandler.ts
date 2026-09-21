@@ -383,8 +383,8 @@ export async function generateExams(
   studentData.forEach((studentLine: unknown, index: number) => {
     const studentLineData = studentLine as Record<string, unknown>;
     const seatNumber = index + startSeatNumber;
-    const deExamCode = deps.genExamCode('DE', seatNumber);
-    const enExamCode = deps.genExamCode('EN', seatNumber);
+    const deExamCode = deps.genExamCode('A', seatNumber);
+    const enExamCode = deps.genExamCode('B', seatNumber);
 
     const student = new Student(
       `${studentLineData.firstName} ${studentLineData.lastName}`,
@@ -394,8 +394,8 @@ export async function generateExams(
           : placeholderStudentID++,
       ),
       {
-        DE: deExamCode,
-        EN: enExamCode,
+        A: deExamCode,
+        B: enExamCode,
       },
       seatNumber,
     );

@@ -1,7 +1,7 @@
-export type Language = keyof Translation;
+export type Language = 'A' | 'B';
 export interface Translation {
-  DE: string;
-  EN: string;
+  A: string;
+  B: string;
 }
 
 export interface Dimension {
@@ -11,6 +11,6 @@ export interface Dimension {
 }
 
 export interface Question {
-  DE: string;
-  EN: string;
+  A: string;
+  B: string;
 }

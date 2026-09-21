@@ -12,7 +12,7 @@ export function onTabChange(this: EditExamComponent, index: number): void {
 export function addTab(this: EditExamComponent): void {
   this.exam.tasks.push({
     groupNumber: this.exam.tasks.length + 1,
-    groupTitle: { DE: '', EN: '' },
+    groupTitle: { A: '', B: '' },
     tasks: [],
   });
   const newIndex = this.exam.tasks.length - 1;
@@ -35,7 +35,7 @@ export function deleteTab(this: EditExamComponent, i: number): void {
 }
 
 export function tabLabel(this: EditExamComponent, index: number): string {
-  const title = stripHTML(this.exam.tasks[index].groupTitle.DE);
+  const title = stripHTML(this.exam.tasks[index].groupTitle.A);
   if (title) {
     return truncateString(title, 20);
   } else {

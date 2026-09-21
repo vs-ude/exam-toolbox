@@ -18,12 +18,12 @@ const tasks: Task[] = [
     _id: 'task1',
     type: 'shortAnswer',
     question: {
-      DE: 'Was ist Cloud?',
-      EN: 'What is Cloud?',
+      A: 'Was ist Cloud?',
+      B: 'What is Cloud?',
     },
     solution: {
-      DE: '',
-      EN: '',
+      A: '',
+      B: '',
     },
     points: 4,
     tagIds: ['tag1'],
@@ -40,12 +40,12 @@ const tasks: Task[] = [
     _id: 'task2',
     type: 'shortAnswer',
     question: {
-      DE: 'Was ist Web Mobile?',
-      EN: 'What is Web Mobile?',
+      A: 'Was ist Web Mobile?',
+      B: 'What is Web Mobile?',
     },
     solution: {
-      DE: '',
-      EN: '',
+      A: '',
+      B: '',
     },
     points: 6,
     tagIds: [],
@@ -64,7 +64,7 @@ const exam: Exam = new Exam(
   semester,
   date,
   examLengthMinutes,
-  [{ groupNumber: 1, groupTitle: { DE: 'Titel', EN: 'Title' }, tasks: tasks }],
+  [{ groupNumber: 1, groupTitle: { A: 'Titel', B: 'Title' }, tasks: tasks }],
 );
 
 @Component({

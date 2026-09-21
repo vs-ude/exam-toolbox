@@ -213,7 +213,7 @@ export class EditExamComponent {
     this.previewTabNotification = false;
   }
 
-  onTitleChange(taskGroupTitle: { DE: string; EN: string }): void {
+  onTitleChange(taskGroupTitle: { A: string; B: string }): void {
     this.exam.tasks[this.currentGroupView].groupTitle = taskGroupTitle;
     this.triggerAutosave();
     this.previewTabNotification = false;

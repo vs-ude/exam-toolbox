@@ -86,10 +86,10 @@ export async function createTask(
   const insertedId = await deps.db.createTask(task);
   if (task.type === 'pictureTask') {
     const fileURLs = [
-      task.questionPicture.urlDE,
-      task.questionPicture.urlEN,
-      task.solutionPicture.urlDE,
-      task.solutionPicture.urlEN,
+      task.questionPicture.url.A,
+      task.questionPicture.url.B,
+      task.solutionPicture.url.A,
+      task.solutionPicture.url.B,
     ];
     for (const fileURL of fileURLs) {
       const fileName = fileURL.split('/').pop() ?? '';

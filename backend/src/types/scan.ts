@@ -1,10 +1,8 @@
-import type { Language } from './shared/base.ts';
-
 export class ExamQRData {
   courseName: string;
   semester: string;
   date: string;
-  language: Language;
+  language: string; // This is configurable
   pageCount: number;
   points: number;
   code: string;
@@ -13,7 +11,7 @@ export class ExamQRData {
     courseName: string,
     semester: string,
     date: string,
-    language: Language,
+    language: string,
     pageCount: number,
     points: number,
     code: string,
