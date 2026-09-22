@@ -1,0 +1,29 @@
+name: Linters
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+
+      - name: Prettier check
+        run: npx prettier --check **/*.{ts,html,scss,json,yaml,yml,md}
+
+  shared-types:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v4
+
+      - name: Check shared types
+        run: bash ./tools/check_shared_types.sh

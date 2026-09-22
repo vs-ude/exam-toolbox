@@ -1,4 +1,4 @@
-name: Backend-tests
+name: Tests
 
 on:
   push:
@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  backend-integration:
     runs-on: ubuntu-26.04
 
     steps:
