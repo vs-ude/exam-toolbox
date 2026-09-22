@@ -20,10 +20,9 @@ jobs:
         with:
           deno-version: latest
 
-      - uses: tecolicom/actions-use-apt-tools@v1
+      - uses: awalsh128/cache-apt-pkgs-action@v1
         with:
-          tools: 'ghostscript imagemagick qrencode libqrencode4 zbar-tools zip'
-          cache: yes
+          packages: ghostscript imagemagick qrencode zbar-tools zip
 
       # - name: Run linter
       #   run: deno lint
