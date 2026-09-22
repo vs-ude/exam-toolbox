@@ -1,0 +1,33 @@
+name: Backend-tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-26.04
+
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: latest
+
+      - uses: tecolicom/actions-use-apt-tools@v1
+        with:
+          tools: 'ghostscript imagemagick qrencode libqrencode4 zbar-tools zip'
+          cache: yes
+
+      # - name: Run linter
+      #   run: deno lint
+
+      - name: Run tests
+        run: deno task test:integration
+        working-directory: backend
