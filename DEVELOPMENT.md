@@ -61,13 +61,13 @@ docker compose up --build
 
 The first build compiles the frontend and backend images. Subsequent starts are faster.
 
-| Service                  | Default address                                       |
-| ------------------------ | ----------------------------------------------------- |
-| Application              | http://localhost                                      |
-| API Specification (JSON) | http://localhost/api/doc _(Only in development mode)_ |
-| phpLDAPadmin             | http://localhost:6080                                 |
-| MailCrab (dev mail UI)   | http://localhost:1080                                 |
-| MongoDB                  | localhost:27017                                       |
+| Service                  | Default address                                            |
+| ------------------------ | ---------------------------------------------------------- |
+| Application              | http://localhost:8000                                      |
+| API Specification (JSON) | http://localhost:8000/api/doc _(Only in development mode)_ |
+| phpLDAPadmin             | http://localhost:6080                                      |
+| MailCrab (dev mail UI)   | http://localhost:1080                                      |
+| MongoDB                  | localhost:27017                                            |
 
 ### Log in
 

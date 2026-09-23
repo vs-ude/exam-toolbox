@@ -4,8 +4,7 @@ services:
       context: ./caddy/
     command: caddy run --config /etc/caddy/Caddyfile --watch
     ports:
-      - '80:80'
-      - '443:443'
+      - '8000:8000'
     volumes:
       - ./caddy/conf:/etc/caddy
       - caddy_data:/data # https://caddyserver.com/docs/conventions#data-directory
