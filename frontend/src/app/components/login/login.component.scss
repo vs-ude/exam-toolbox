@@ -41,6 +41,11 @@ mat-card-subtitle {
   width: 80px;
 }
 
+form {
+  display: grid;
+  grid-gap: 16px;
+}
+
 .full-width {
   width: 100%;
 }
