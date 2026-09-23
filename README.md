@@ -17,10 +17,8 @@ It is still very much a work in progress and we do not recommend deploying it ye
 - **Mass generation** – upload an Excel participant list and generate per-student exam PDFs in parallel, with a downloadable ZIP artifact and an attendance CSV
 - **Email notification** – notifies the requester when a bulk job finishes
 - **QR codes** – embeds a front-page exam QR code (encoding course, semester, date, language, page count, points, and a random code) and per-page QR codes with a pre-generated cache
-- **QR scanning** – decodes QR codes from uploaded exam images; uses ImageMagick contrast pre-processing to improve scan reliability
 - **Exam codes** – generates and validates exam codes with a checksum algorithm
-- **Access control** – all routes protected by JWT session tokens. Authenticates directly against LDAP; only members of the configured `toolboxUsers` group may log in, with granular roles for `teachers` and `admins`.
-- **API specifications** – dynamically generated OpenAPI 3.1 schemas (accessible at `/api/doc` in development) alongside a fully configured Bruno API client collection.
+- **Access control** – all routes protected by JWT session tokens. Authenticates directly against LDAP; only members of a specific configured group may log in, with granular roles for `teachers` and `admins`.
 
 ## Setup
 
