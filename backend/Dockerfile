@@ -1,13 +1,27 @@
-# Build tectonic and prime the cache
-FROM rust:latest AS builder
-RUN apt-get update && apt-get install -qy -o=Dpkg::Use-Pty=0 --no-install-recommends \
-    libfontconfig-dev libgraphite2-dev libharfbuzz-dev libicu-dev zlib1g-dev
+# Fetch tectonic and prime the cache
+FROM debian:12 AS builder
+ARG TARGETARCH
+ARG TECTONIC_VERSION=0.17.0
 
-RUN --mount=type=cache,target=/usr/local/cargo/git/db \
-    --mount=type=cache,target=/usr/local/cargo/registry/ \
-    cargo install --git https://github.com/tectonic-typesetting/tectonic.git --tag tectonic@0.16.9 --force tectonic
+RUN apt-get update && apt-get install -qy -o=Dpkg::Use-Pty=0 --no-install-recommends \
+    curl ca-certificates libfontconfig-dev libgraphite2-dev libharfbuzz-dev libicu-dev zlib1g-dev
 
 WORKDIR /tmp
+RUN echo "Pulling tectonic for ${TARGETARCH}" && \
+    if [ "$TARGETARCH" = "amd64" ]; then \
+        export TECTONIC_ARCH="x86_64"; \
+      elif [ "$TARGETARCH" = "arm64" ]; then \
+        export TECTONIC_ARCH="aarch64"; \
+      else \
+        echo "Unsupported architecture" \
+      && exit 1; \
+    fi && \
+    export _url="https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic%40${TECTONIC_VERSION}/tectonic-${TECTONIC_VERSION}-${TECTONIC_ARCH}-unknown-linux-musl.tar.gz" \
+    && echo "Downloading from ${_url}" \
+    && curl -L ${_url} -o /tmp/tectonic.tar.gz \
+    && tar xzf /tmp/tectonic.tar.gz -C /tmp/ \
+    && mv /tmp/tectonic /usr/local/bin/
+
 ENV HOME=/tmp
 COPY --exclude="*.template.tex" --exclude="task_types/*" "template/" "/tmp/"
 RUN --mount=type=cache,target=/tmp/.cache tectonic -X compile exam.tex --untrusted && cp -r /tmp/.cache /root/.cache
@@ -26,7 +40,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     zbar-tools qrencode \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /usr/local/cargo/bin/tectonic /usr/bin/
+COPY --from=builder /usr/local/bin/tectonic /usr/local/bin/
 COPY --from=builder --chmod=ugo=rwX /root/.cache/ /root/.cache/
 
 # Set the working directory
