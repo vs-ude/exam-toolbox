@@ -25,7 +25,7 @@ extensions:
       - node_modules
       - .git
     openapi:
-      - sourceUrl: http://localhost/api/doc
+      - sourceUrl: http://localhost:8000/api/doc
         groupBy: tags
         lastSyncDate: 2026-07-24T19:33:11.907Z
         specHash: 624c24a589c70a84b82727fd8432bf6b
