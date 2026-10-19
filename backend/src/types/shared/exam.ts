@@ -38,6 +38,7 @@ export class Exam {
     this.examLengthMinutes = examLengthMinutes ?? 0;
     this.tasks = tasks ?? [];
     this.access = access ?? { users: [], groups: [] };
+    this._id = _id ?? undefined;
   }
 
   /**

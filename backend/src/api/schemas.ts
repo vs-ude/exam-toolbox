@@ -99,6 +99,28 @@ export const ExamSchema = ExamStubSchema.extend({
   }),
 }).openapi('Exam');
 
+/** Access list of an exam: user UIDs plus optional group names. */
+export const ExamAccessSchema = z
+  .object({
+    users: z.array(z.string()),
+    groups: z.array(z.string()).optional(),
+  })
+  .openapi('ExamAccess');
+
+/** Lightweight admin view of an exam (metadata + computed task count). */
+export const AdminExamStubSchema = z
+  .object({
+    _id: z.string(),
+    courseName: z.string(),
+    semester: z.string(),
+    date: z.string(),
+    updatedAt: z.string().datetime().optional(),
+    lastEditedBy: z.string().optional(),
+    access: ExamAccessSchema,
+    taskCount: z.number(),
+  })
+  .openapi('AdminExamStub');
+
 const JobProgressSchema = z.object({
   total: z.number(),
   completed: z.number(),

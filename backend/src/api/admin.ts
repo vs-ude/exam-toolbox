@@ -9,12 +9,19 @@ import {
 
 import { getConfig, type AppConfig } from '../config/mod.ts';
 import { syncLdapUsers } from '../services/auth.ts';
+import { AdminExamSortDir, AdminExamSortField } from '../services/db/exam.ts';
 import { getOrCreateDb } from '../services/mod.ts';
 import { AppEnv } from '../types/context.ts';
-import { HandlerResult } from '../types/handler.ts';
+import { HandlerResult, HttpError } from '../types/handler.ts';
 import { handle } from './helpers.ts';
 import { checkAdmin } from './middleware.ts';
-import { ErrorSchema, UserSchema } from './schemas.ts';
+import {
+  AdminExamStubSchema,
+  ErrorSchema,
+  ExamAccessSchema,
+  MessageSchema,
+  UserSchema,
+} from './schemas.ts';
 
 // ── Route definitions ─────────────────────────────────────────────────────────
 
@@ -114,9 +121,140 @@ export function configureAdminRouter(): OpenAPIHono<AppEnv> {
     handler: c => handle(c, () => getUserObjects(c)),
   });
 
+  const adminExamsRoute = defineOpenAPIRoute<RouteConfig, AppEnv>({
+    route: createRoute({
+      method: 'get',
+      path: '/exams',
+      tags: ['Admin'],
+      summary: 'List all exams',
+      description:
+        'Returns lightweight stubs for every exam in the database, regardless of access lists. Optional `sort` (`date`, `owner` or `taskCount`) and `dir` (`asc`/`desc`) query params control the ordering.',
+      middleware: [checkAdmin],
+      security: [{ Bearer: [] }],
+      request: {
+        query: z.object({
+          sort: z
+            .enum(['date', 'owner', 'taskCount'])
+            .optional()
+            .openapi({ description: 'Field to sort by' }),
+          dir: z
+            .enum(['asc', 'desc'])
+            .optional()
+            .openapi({ description: 'Sort direction' }),
+        }),
+      },
+      responses: {
+        200: {
+          content: {
+            'application/json': { schema: z.array(AdminExamStubSchema) },
+          },
+          description: 'All exams',
+        },
+        403: {
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+          description: 'Not authorised (not an admin)',
+        },
+      },
+    }),
+    handler: c => handle(c, () => getAdminExams(c)),
+  });
+
+  const deleteAdminExamRoute = defineOpenAPIRoute<RouteConfig, AppEnv>({
+    route: createRoute({
+      method: 'delete',
+      path: '/exams/{examId}',
+      tags: ['Admin'],
+      summary: 'Delete exam',
+      description:
+        'Deletes any exam by ID, without access filtering. Restricted to users in the admin group.',
+      middleware: [checkAdmin],
+      security: [{ Bearer: [] }],
+      request: {
+        params: z.object({
+          examId: z.string().openapi({
+            param: { name: 'examId', in: 'path' },
+          }),
+        }),
+      },
+      responses: {
+        200: {
+          content: { 'application/json': { schema: MessageSchema } },
+          description: 'Deleted',
+        },
+        403: {
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+          description: 'Not authorised (not an admin)',
+        },
+        404: {
+          content: { 'application/json': { schema: ErrorSchema } },
+          description: 'Not found',
+        },
+      },
+    }),
+    handler: c => handle(c, () => deleteAdminExam(c)),
+  });
+
+  const setAdminExamAccessRoute = defineOpenAPIRoute<RouteConfig, AppEnv>({
+    route: createRoute({
+      method: 'put',
+      path: '/exams/{examId}/access',
+      tags: ['Admin'],
+      summary: 'Set exam access',
+      description:
+        'Replaces the `access` field of any exam, without ownership checks. Restricted to users in the admin group.',
+      middleware: [checkAdmin],
+      security: [{ Bearer: [] }],
+      request: {
+        params: z.object({
+          examId: z.string().openapi({
+            param: { name: 'examId', in: 'path' },
+          }),
+        }),
+        body: {
+          content: { 'application/json': { schema: ExamAccessSchema } },
+          required: true,
+        },
+      },
+      responses: {
+        200: {
+          content: { 'application/json': { schema: ExamAccessSchema } },
+          description: 'Updated access list',
+        },
+        403: {
+          content: {
+            'application/json': {
+              schema: z.object({ message: z.string() }),
+            },
+          },
+          description: 'Not authorised (not an admin)',
+        },
+        404: {
+          content: { 'application/json': { schema: ErrorSchema } },
+          description: 'Not found',
+        },
+      },
+    }),
+    handler: c => handle(c, () => setAdminExamAccess(c)),
+  });
+
   const router = new OpenAPIHono<AppEnv>();
 
-  router.openapiRoutes([configRoute, syncUsersRoute, usersRoute]);
+  router.openapiRoutes([
+    configRoute,
+    syncUsersRoute,
+    usersRoute,
+    adminExamsRoute,
+    deleteAdminExamRoute,
+    setAdminExamAccessRoute,
+  ]);
 
   return router;
 }
@@ -148,4 +286,41 @@ async function getUserObjects(c: Context<AppEnv>): Promise<HandlerResult> {
   const db = await getOrCreateDb();
   const resolvedUsers = await db.getUsers(uids);
   return { kind: 'json', status: 200, body: { users: resolvedUsers } };
+}
+
+async function getAdminExams(c: Context<AppEnv>): Promise<HandlerResult> {
+  const sort = c.req.query('sort') as AdminExamSortField | undefined;
+  const dir = (c.req.query('dir') ?? 'asc') as AdminExamSortDir;
+  const db = await getOrCreateDb();
+  const exams = await db.getAllExamsAdmin(sort, dir);
+  return { kind: 'json', status: 200, body: exams };
+}
+
+async function deleteAdminExam(c: Context<AppEnv>): Promise<HandlerResult> {
+  const id = c.req.param('examId');
+  if (!id) {
+    throw new HttpError(400, 'Exam ID is required');
+  }
+  const db = await getOrCreateDb();
+  const result = await db.deleteExamAdmin(id);
+  if (result === 0) {
+    throw new HttpError(404, 'Exam not found');
+  }
+  console.log(`Exam ${id} deleted (admin).`);
+  return {
+    kind: 'json',
+    status: 200,
+    body: { message: 'Exam deleted successfully' },
+  };
+}
+
+async function setAdminExamAccess(c: Context<AppEnv>): Promise<HandlerResult> {
+  const id = c.req.param('examId');
+  if (!id) {
+    throw new HttpError(400, 'Exam ID is required');
+  }
+  const access = await c.req.json();
+  const db = await getOrCreateDb();
+  await db.setExamAccess(id, access);
+  return { kind: 'json', status: 200, body: access };
 }

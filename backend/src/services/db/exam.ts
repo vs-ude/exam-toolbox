@@ -1,7 +1,15 @@
 // deno-lint-ignore-file no-explicit-any
 import { newId } from '@diister/mongodbee';
 
-import { Exam, ExamStub, User, parseExam, Task } from '../../types/mod.ts';
+import { HttpError } from '../../types/handler.ts';
+import {
+  AdminExamStub,
+  Exam,
+  ExamStub,
+  parseExam,
+  Task,
+  User,
+} from '../../types/mod.ts';
 import { ExamToolboxDatabase } from '../mod.ts';
 
 import { accessFilter } from './helpers.ts';
@@ -97,6 +105,8 @@ export async function createExam(
   if (!exam.access.users.includes(user.sub)) {
     exam.access.users.push(user.sub);
   }
+  // Compute and store taskCount for efficient querying
+  exam.fillMeta();
   await this.collections.exams.insertOne({ ...exam });
   return id;
 }
@@ -121,7 +131,7 @@ export async function updateExam(
   }
   const hasAccess =
     existing.access.users?.includes(user.sub) ||
-    user.groups.some(g => existing.access.groups?.includes(g));
+    user.groups.some((g: string) => existing.access.groups?.includes(g));
   if (!hasAccess) {
     throw new Error(`User ${user.sub} is not authorized to edit this exam`);
   }
@@ -136,6 +146,8 @@ export async function updateExam(
 
   const { _id: _examId, ...updateData } = data as any;
   void _examId;
+  // Compute and store taskCount for efficient querying
+  data.fillMeta();
   await this.collections.exams.updateOne({ _id: id }, { $set: updateData });
   return id;
 }
@@ -158,4 +170,77 @@ export async function deleteExam(
 export async function clearExams(this: ExamToolboxDatabase): Promise<number> {
   const result = await this.collections.exams.deleteMany({});
   return result.deletedCount;
+}
+
+// ── Admin (no access filtering) ──────────────────────────────────────────────
+
+export type AdminExamSortField = 'date' | 'owner' | 'taskCount';
+export type AdminExamSortDir = 'asc' | 'desc';
+
+/**
+ * Returns lightweight stubs for every exam in the database, without access
+ * filtering. Assumes the caller is an admin (vetted by other mechanisms).
+ * Sorting is done in MongoDB using aggregation pipeline.
+ */
+export async function getAllExamsAdmin(
+  this: ExamToolboxDatabase,
+  field?: AdminExamSortField,
+  dir: AdminExamSortDir = 'asc',
+): Promise<AdminExamStub[]> {
+  const sortDir = dir === 'asc' ? 1 : -1;
+
+  // Build aggregation pipeline with optional sorting
+  const pipeline: any[] = [];
+
+  // Add sort stage if a field is specified
+  if (field) {
+    const sortField = field === 'owner' ? 'lastEditedBy' : field;
+    pipeline.push({ $sort: { [sortField]: sortDir } });
+  }
+
+  // Project only the fields needed for AdminExamStub
+  pipeline.push({
+    $project: {
+      _id: 1,
+      courseName: 1,
+      semester: 1,
+      date: 1,
+      updatedAt: 1,
+      lastEditedBy: 1,
+      access: 1,
+      taskCount: 1,
+    },
+  });
+
+  const result = await this.collections.exams.aggregate(pipeline).toArray();
+  return result as AdminExamStub[];
+}
+
+/**
+ * Deletes an exam by `_id` only, without access filtering.
+ * Assumes the caller is an admin (vetted by other mechanisms).
+ */
+export async function deleteExamAdmin(
+  this: ExamToolboxDatabase,
+  id: string,
+): Promise<number> {
+  const result = await this.collections.exams.deleteOne({ _id: id });
+  return result.deletedCount;
+}
+
+/**
+ * Replaces the `access` field of an exam, without ownership checks.
+ * Assumes the caller is an admin (vetted by other mechanisms).
+ * @throws {HttpError} 404 if the exam with the given id does not exist.
+ */
+export async function setExamAccess(
+  this: ExamToolboxDatabase,
+  id: string,
+  access: { users: string[]; groups?: string[] },
+): Promise<void> {
+  const existing = await this.collections.exams.findOne({ _id: id });
+  if (!existing) {
+    throw new HttpError(404, `Exam with id ${id} not found`);
+  }
+  await this.collections.exams.updateOne({ _id: id }, { $set: { access } });
 }

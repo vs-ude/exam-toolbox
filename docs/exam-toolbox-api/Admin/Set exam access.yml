@@ -1,0 +1,120 @@
+info:
+  name: Set exam access
+  type: http
+  seq: 6
+  tags:
+    - Admin
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/admin/exams/:examId/access"
+  params:
+    - name: examId
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "users": [],
+        "groups": []
+      }
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: Updated access list
+    request:
+      url: "{{baseUrl}}/api/admin/exams/:examId/access"
+      method: PUT
+      params:
+        - name: examId
+          value: ""
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "users": [],
+            "groups": []
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "users": [],
+            "groups": []
+          }
+  - name: 403 Response
+    description: Not authorised (not an admin)
+    request:
+      url: "{{baseUrl}}/api/admin/exams/:examId/access"
+      method: PUT
+      params:
+        - name: examId
+          value: ""
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "users": [],
+            "groups": []
+          }
+    response:
+      status: 403
+      statusText: Forbidden
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+  - name: 404 Response
+    description: Not found
+    request:
+      url: "{{baseUrl}}/api/admin/exams/:examId/access"
+      method: PUT
+      params:
+        - name: examId
+          value: ""
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "users": [],
+            "groups": []
+          }
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+
+docs: Replaces the `access` field of any exam, without ownership checks. Restricted to users in the admin group.

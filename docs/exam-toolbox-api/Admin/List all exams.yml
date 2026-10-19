@@ -1,0 +1,148 @@
+info:
+  name: List all exams
+  type: http
+  seq: 4
+  tags:
+    - Admin
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/admin/exams"
+  params:
+    - name: sort
+      value: date
+      type: query
+      description: Field to sort by
+      disabled: true
+    - name: sort
+      value: owner
+      type: query
+      description: Field to sort by
+      disabled: true
+    - name: sort
+      value: taskCount
+      type: query
+      description: Field to sort by
+      disabled: true
+    - name: dir
+      value: asc
+      type: query
+      description: Sort direction
+      disabled: true
+    - name: dir
+      value: desc
+      type: query
+      description: Sort direction
+      disabled: true
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: All exams
+    request:
+      url: "{{baseUrl}}/api/admin/exams"
+      method: GET
+      params:
+        - name: sort
+          value: date
+          type: query
+          description: Field to sort by
+          disabled: true
+        - name: sort
+          value: owner
+          type: query
+          description: Field to sort by
+          disabled: true
+        - name: sort
+          value: taskCount
+          type: query
+          description: Field to sort by
+          disabled: true
+        - name: dir
+          value: asc
+          type: query
+          description: Sort direction
+          disabled: true
+        - name: dir
+          value: desc
+          type: query
+          description: Sort direction
+          disabled: true
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          [
+            {
+              "_id": "",
+              "courseName": "",
+              "semester": "",
+              "date": "",
+              "updatedAt": "",
+              "lastEditedBy": "",
+              "access": {
+                "users": [],
+                "groups": []
+              },
+              "taskCount": 0
+            }
+          ]
+  - name: 403 Response
+    description: Not authorised (not an admin)
+    request:
+      url: "{{baseUrl}}/api/admin/exams"
+      method: GET
+      params:
+        - name: sort
+          value: date
+          type: query
+          description: Field to sort by
+          disabled: true
+        - name: sort
+          value: owner
+          type: query
+          description: Field to sort by
+          disabled: true
+        - name: sort
+          value: taskCount
+          type: query
+          description: Field to sort by
+          disabled: true
+        - name: dir
+          value: asc
+          type: query
+          description: Sort direction
+          disabled: true
+        - name: dir
+          value: desc
+          type: query
+          description: Sort direction
+          disabled: true
+    response:
+      status: 403
+      statusText: Forbidden
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+
+docs: Returns lightweight stubs for every exam in the database, regardless of access lists. Optional `sort` (`date`, `owner` or `taskCount`) and `dir` (`asc`/`desc`) query params control the ordering.

@@ -100,11 +100,14 @@ export class ExamToolboxDatabase {
   public clearExams = e.clearExams;
   public createExam = e.createExam;
   public deleteExam = e.deleteExam;
+  public deleteExamAdmin = e.deleteExamAdmin;
   public getAllExams = e.getAllExams;
+  public getAllExamsAdmin = e.getAllExamsAdmin;
   public getExamById = e.getExamById;
   public getExamByIdInternal = e.getExamByIdInternal;
   public getRecentExams = e.getRecentExams;
   public searchExams = e.searchExams;
+  public setExamAccess = e.setExamAccess;
   public updateExam = e.updateExam;
 
   public addChildTask = t.addChildTask;
